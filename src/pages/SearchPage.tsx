@@ -100,10 +100,10 @@ function SearchResultCard({
                 borderColor: `${riskColor}40`
               }}
             >
-              {entity.risk_level}
+              {entity.risk_level || 'unknown'}
             </Badge>
             <Badge variant="outline" className="text-[10px] bg-white/5">
-              {Math.round(entity.match_score)}% coincidencia
+              {Math.round(entity.match_score || 0)}% coincidencia
             </Badge>
           </div>
 
@@ -115,13 +115,19 @@ function SearchResultCard({
                 <span>{entity.nationalities.join(', ')}</span>
               </>
             )}
+            {!entity.nationalities || entity.nationalities.length === 0 && (
+              <>
+                <span className="text-gray-600">•</span>
+                <span className="text-gray-500">Sin nacionalidad</span>
+              </>
+            )}
             <span className="text-gray-600">•</span>
             <span className="text-gray-300">{entity.match_type === 'exact' ? 'Coincidencia exacta' : 'Coincidencia aproximada'}</span>
           </div>
 
           {/* Data Sources */}
           <div className="flex flex-wrap gap-1.5 mb-3">
-            {entity.sources.slice(0, 4).map((source) => (
+            {(entity.sources || []).slice(0, 4).map((source) => (
               <span
                 key={source}
                 className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-400 border border-white/10"
@@ -129,9 +135,9 @@ function SearchResultCard({
                 {source}
               </span>
             ))}
-            {entity.sources.length > 4 && (
+            {(entity.sources || []).length > 4 && (
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-500">
-                +{entity.sources.length - 4}
+                +{(entity.sources || []).length - 4}
               </span>
             )}
           </div>

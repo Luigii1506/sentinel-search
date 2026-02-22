@@ -6,7 +6,7 @@ export const screeningService = {
    * Search entities with screening
    */
   async search(request: ScreeningRequest): Promise<ScreeningResponse> {
-    const response = await api.post('/api/v2/screen/check', request);
+    const response = await api.post('/api/v2/screen', request);
     return response.data;
   },
 
@@ -14,10 +14,10 @@ export const screeningService = {
    * Get search suggestions (autocomplete)
    */
   async getSuggestions(query: string, limit: number = 8): Promise<ScreeningMatch[]> {
-    const response = await api.get('/api/v2/screen/autocomplete', {
-      params: { query, limit },
+    const response = await api.get('/api/v2/search/suggest', {
+      params: { q: query, limit },
     });
-    return response.data || [];
+    return response.data.suggestions || [];
   },
 
   /**
