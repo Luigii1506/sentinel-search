@@ -40,18 +40,27 @@ export interface ScreeningRequest {
 
 export interface ScreeningMatch {
   entity_id: string;
+  canonical_id?: string;
   name: string;
   match_score: number;
   confidence: number; // 0-1
   match_type: 'exact' | 'fuzzy' | 'alias' | 'phonetic' | 'partial';
   entity_type: string;
   risk_level: 'critical' | 'high' | 'medium' | 'low' | 'none';
+  risk_score?: number;
   sources: string[];
+  source_count?: number;
   aliases?: string[];
   nationalities?: string[];
+  countries?: string[];
   date_of_birth?: string;
-  matched_fields: string[];
+  matched_fields?: string[];
   explanation?: string;
+  highlight?: string;
+  is_current_pep?: boolean;
+  pep_category?: string;
+  pep_positions?: unknown[];
+  opensearch_score?: number;
 }
 
 export interface ScreeningResponse {
