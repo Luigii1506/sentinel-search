@@ -61,6 +61,53 @@ export interface ScreeningMatch {
   pep_category?: string;
   pep_positions?: unknown[];
   opensearch_score?: number;
+  // ML Reranker v3.5 (Level 5)
+  ml_probability?: number;
+  pre_ml_score?: number;
+  ml_features?: {
+    weighted_token_score?: number;
+    surname_match_ratio?: number;
+    avg_jaro_similarity?: number;
+    order_similarity?: number;
+    country_match?: number;
+    sanctions_flag?: number;
+    token_rarity?: number;
+  };
+  explainability?: {
+    text_score_components?: {
+      weighted_token_score?: number;
+      avg_jaro_similarity?: number;
+      order_similarity?: number;
+      opensearch_contribution?: number;
+    };
+    structural_analysis?: {
+      tokens_matched?: string;
+      surnames_matched?: boolean;
+      surname_match_ratio?: number;
+    };
+    penalties_applied?: Record<string, string>;
+    boosts_applied?: Record<string, string>;
+    final_calculation?: {
+      raw_score?: number;
+      match_percentage?: number;
+    };
+    ml_component?: {
+      ml_probability?: number;
+      pre_ml_contribution?: number;
+      ml_contribution?: number;
+      final_score_formula?: string;
+    };
+  };
+  context_breakdown?: {
+    text_score?: number;
+    country_boost?: number;
+    temporal_boost?: number;
+    position_boost?: number;
+    sanctions_boost?: number;
+    context_score?: number;
+    risk_component?: number;
+    pre_ml_score?: number;
+  };
 }
 
 export interface ScreeningResponse {

@@ -17,6 +17,7 @@ import {
   ArrowRight,
   AlertCircle,
   FileSearch,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -105,6 +106,14 @@ function SearchResultCard({
             <Badge variant="outline" className="text-[10px] bg-white/5">
               {Math.round(entity.match_score || 0)}% coincidencia
             </Badge>
+            {entity.ml_probability !== undefined && (
+              <Badge 
+                className="text-[10px] bg-purple-500/20 text-purple-400 border-purple-500/40"
+                title="Score de ML (Level 5)"
+              >
+                ML: {Math.round(entity.ml_probability * 100)}%
+              </Badge>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-3">
@@ -193,6 +202,46 @@ function SearchResultCard({
               </Tooltip>
             </TooltipProvider>
           </div>
+
+          {/* Explainability Section (Level 5) */}
+          {entity.explainability && (
+            <div className="mt-3 pt-3 border-t border-white/10">
+              <div className="flex items-center gap-2 text-[10px] text-gray-500 mb-2">
+                <Sparkles className="w-3 h-3 text-purple-400" />
+                <span>Análisis del Algoritmo</span>
+              </div>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+                {entity.explainability.structural_analysis && (
+                  <>
+                    <span className="text-gray-600">Tokens:</span>
+                    <span className="text-gray-400">{entity.explainability.structural_analysis.tokens_matched}</span>
+                  </>
+                )}
+                {entity.explainability.structural_analysis?.surnames_matched !== undefined && (
+                  <>
+                    <span className="text-gray-600">Apellidos:</span>
+                    <span className={entity.explainability.structural_analysis.surnames_matched ? 'text-green-400' : 'text-red-400'}>
+                      {entity.explainability.structural_analysis.surnames_matched ? '✓ Coinciden' : '✗ No coinciden'}
+                    </span>
+                  </>
+                )}
+                {entity.ml_probability !== undefined && (
+                  <>
+                    <span className="text-gray-600">ML Score:</span>
+                    <span className="text-purple-400">{Math.round(entity.ml_probability * 100)}%</span>
+                  </>
+                )}
+                {entity.context_breakdown && (
+                  <>
+                    <span className="text-gray-600">Contexto:</span>
+                    <span className="text-blue-400">
+                      +{Math.round((entity.context_breakdown.country_boost || 0) * 100)}%
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Arrow with animation */}
