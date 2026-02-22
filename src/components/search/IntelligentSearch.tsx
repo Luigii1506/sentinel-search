@@ -337,13 +337,13 @@ export function IntelligentSearch({
                       )}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      {Math.round(suggestion.match_score)}% coincidencia
+                      {Math.round(suggestion.match_score || 0)}% coincidencia
                     </div>
                   </div>
 
                   {/* Sources */}
                   <div className="flex flex-wrap gap-1 justify-end max-w-[120px]">
-                    {suggestion.sources.slice(0, 3).map((source) => (
+                    {(suggestion.sources || []).slice(0, 3).map((source) => (
                       <span
                         key={source}
                         className={cn(

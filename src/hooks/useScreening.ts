@@ -54,13 +54,14 @@ export function useScreening(): UseScreeningReturn {
 
   // Fetch suggestions from API
   const fetchSuggestions = useCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery || trimmedQuery.length < 2) {
       setSuggestions([]);
       return;
     }
 
     try {
-      const data = await screeningService.getSuggestions(searchQuery, 8);
+      const data = await screeningService.getSuggestions(trimmedQuery, 8);
       setSuggestions(data);
     } catch (error) {
       console.error('Failed to fetch suggestions:', error);
@@ -81,14 +82,15 @@ export function useScreening(): UseScreeningReturn {
 
   // Execute full search
   const executeSearch = useCallback((searchQuery: string) => {
-    if (!searchQuery.trim()) return;
+    const trimmedQuery = searchQuery.trim();
+    if (!trimmedQuery || trimmedQuery.length < 2) return;
 
     setHasSearched(true);
-    setQueryState(searchQuery);
+    setQueryState(trimmedQuery);
     setSuggestions([]);
 
     const request: ScreeningRequest = {
-      name: searchQuery,
+      name: trimmedQuery,
       min_confidence: 0.5,
       max_results: 50,
       filters: {
