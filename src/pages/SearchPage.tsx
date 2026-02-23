@@ -206,11 +206,19 @@ function SearchResultCard({
           {/* Explainability Section (Level 5) */}
           {entity.explainability && (
             <div className="mt-3 pt-3 border-t border-white/10">
-              <div className="flex items-center gap-2 text-[10px] text-gray-500 mb-2">
-                <Sparkles className="w-3 h-3 text-purple-400" />
-                <span>Análisis del Algoritmo</span>
+              <div className="flex items-center justify-between text-[10px] text-gray-500 mb-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-3 h-3 text-purple-400" />
+                  <span>Análisis del Algoritmo v3.1</span>
+                </div>
+                {entity.ml_probability !== undefined && (
+                  <span className="text-purple-400 font-medium">
+                    ML: {Math.round(entity.ml_probability * 100)}%
+                  </span>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px]">
+              
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] mb-2">
                 {entity.explainability.structural_analysis && (
                   <>
                     <span className="text-gray-600">Tokens:</span>
@@ -225,10 +233,12 @@ function SearchResultCard({
                     </span>
                   </>
                 )}
-                {entity.ml_probability !== undefined && (
+                {entity.explainability.text_score_components && (
                   <>
-                    <span className="text-gray-600">ML Score:</span>
-                    <span className="text-purple-400">{Math.round(entity.ml_probability * 100)}%</span>
+                    <span className="text-gray-600">Similitud:</span>
+                    <span className="text-gray-400">
+                      {Math.round((entity.explainability.text_score_components.avg_jaro_similarity || 0) * 100)}%
+                    </span>
                   </>
                 )}
                 {entity.context_breakdown && (
@@ -240,6 +250,26 @@ function SearchResultCard({
                   </>
                 )}
               </div>
+              
+              {/* Boosts y Penalizaciones */}
+              {entity.explainability.boosts_applied && Object.keys(entity.explainability.boosts_applied).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {Object.entries(entity.explainability.boosts_applied).map(([key, value]) => (
+                    <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">
+                      {key}: {value}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {entity.explainability.penalties_applied && Object.keys(entity.explainability.penalties_applied).length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {Object.entries(entity.explainability.penalties_applied).map(([key, value]) => (
+                    <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">
+                      {key}: {value}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
