@@ -418,10 +418,15 @@ export interface JobInfo {
   id: string;
   source: string;
   status: 'pending' | 'running' | 'success' | 'failed' | 'completed';
+  job_type: string;
   started_at?: string;
   finished_at?: string;
   records_inserted: number;
+  records_processed: number;
+  records_updated: number;
+  records_failed: number;
   error_message?: string;
+  elapsed_seconds?: number;
 }
 
 export interface JobsResponse {

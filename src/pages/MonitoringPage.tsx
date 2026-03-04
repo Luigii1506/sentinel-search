@@ -36,18 +36,37 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
-function formatDuration(startedAt?: string, finishedAt?: string): string {
-  if (!startedAt) return '-';
-  const start = new Date(startedAt);
-  const end = finishedAt ? new Date(finishedAt) : new Date();
-  const diff = end.getTime() - start.getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+function formatElapsed(seconds?: number): string {
+  if (seconds == null || seconds < 0) return '-';
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = Math.floor(seconds % 60);
 
   if (hours > 0) return `${hours}h ${minutes}m`;
-  if (minutes > 0) return `${minutes}m ${seconds}s`;
-  return `${seconds}s`;
+  if (minutes > 0) return `${minutes}m ${secs}s`;
+  return `${secs}s`;
+}
+
+const JOB_TYPE_LABELS: Record<string, string> = {
+  full: 'Full Pipeline',
+  bronze: 'Bronze',
+  silver: 'Silver',
+  gold: 'Gold',
+  refresh: 'Refresh',
+  reindex: 'Reindex',
+  scrape: 'Scrape',
+};
+
+function JobTypeBadge({ type }: { type: string }) {
+  const label = JOB_TYPE_LABELS[type] || type;
+  const color = type === 'full' ? 'text-purple-400 bg-purple-500/10' :
+                type === 'bronze' ? 'text-amber-400 bg-amber-500/10' :
+                type === 'silver' ? 'text-gray-300 bg-gray-500/10' :
+                type === 'gold' ? 'text-yellow-400 bg-yellow-500/10' :
+                'text-blue-400 bg-blue-500/10';
+  return (
+    <span className={`text-[10px] px-1.5 py-0.5 rounded ${color}`}>{label}</span>
+  );
 }
 
 function formatDate(dateStr?: string): string {
@@ -362,12 +381,22 @@ export function MonitoringPage() {
 
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Registros:</span>
-                          <span className="text-white">{job.records_inserted.toLocaleString()}</span>
+                          <span className="text-gray-400">Tipo:</span>
+                          <JobTypeBadge type={job.job_type} />
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-400">Duracion:</span>
-                          <span className="text-white">{formatDuration(job.started_at)}</span>
+                          <span className="text-gray-400">Procesados:</span>
+                          <span className="text-white">
+                            {job.records_processed > 0
+                              ? job.records_processed.toLocaleString()
+                              : job.records_inserted > 0
+                              ? job.records_inserted.toLocaleString()
+                              : 'En progreso...'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-400">Tiempo:</span>
+                          <span className="text-white">{formatElapsed(job.elapsed_seconds)}</span>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-400">Inicio:</span>
@@ -418,7 +447,10 @@ export function MonitoringPage() {
                     <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
                       Fuente
                     </th>
-                    <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                    <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                      Tipo
+                    </th>
+                    <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
                       Status
                     </th>
                     <th className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
@@ -426,9 +458,6 @@ export function MonitoringPage() {
                     </th>
                     <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
                       Inicio
-                    </th>
-                    <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
-                      Fin
                     </th>
                     <th className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
                       Duracion
@@ -450,14 +479,17 @@ export function MonitoringPage() {
                           <p className="text-xs text-gray-500">ID: {job.id.slice(0, 8)}...</p>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-4 text-center">
+                        <JobTypeBadge type={job.job_type} />
+                      </td>
+                      <td className="px-4 py-4 text-center">
                         {job.status === 'success' || job.status === 'completed' ? (
                           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10">
                             <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
                             <span className="text-xs text-green-400">Exito</span>
                           </div>
                         ) : job.status === 'failed' ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10">
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10" title={job.error_message || ''}>
                             <XCircle className="w-3.5 h-3.5 text-red-400" />
                             <span className="text-xs text-red-400">Fallido</span>
                           </div>
@@ -481,14 +513,9 @@ export function MonitoringPage() {
                       <td className="px-6 py-4">
                         <span className="text-sm text-gray-400">{formatDate(job.started_at)}</span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-sm text-gray-400">{formatDate(job.finished_at)}</span>
-                      </td>
                       <td className="px-6 py-4 text-right">
                         <span className="text-sm text-gray-300">
-                          {job.finished_at
-                            ? formatDuration(job.started_at, job.finished_at)
-                            : '-'}
+                          {formatElapsed(job.elapsed_seconds)}
                         </span>
                       </td>
                     </motion.tr>
