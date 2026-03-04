@@ -1,5 +1,5 @@
 import api from './api';
-import type { DashboardStats, AuditLogEntry, User } from '@/types/api';
+import type { DashboardStats, AuditLogEntry, User, SourceSummary, JobsResponse, SourceDetail, SystemHealth, SystemCounts } from '@/types/api';
 
 export const adminService = {
   /**
@@ -120,6 +120,68 @@ export const adminService = {
     secret?: string;
   }): Promise<{ id: string }> {
     const response = await api.post('/api/v1/admin/webhooks', webhook);
+    return response.data;
+  },
+
+  /**
+   * Get sources summary (K1 Dashboard)
+   */
+  async getSourcesSummary(): Promise<SourceSummary> {
+    const response = await api.get('/api/v2/admin/sources/summary');
+    return response.data;
+  },
+
+  /**
+   * Get jobs status (K5 Monitoring)
+   */
+  async getJobs(limit: number = 50): Promise<JobsResponse> {
+    const response = await api.get('/api/v2/admin/jobs', { params: { limit } });
+    return response.data;
+  },
+
+  /**
+   * Get detailed health check (entity counts)
+   */
+  async getHealthDetailed(): Promise<{
+    status: string;
+    components: Record<string, { status: string }>;
+    counts: SystemCounts;
+  }> {
+    const response = await api.get('/api/v2/admin/health/detailed');
+    return response.data;
+  },
+
+  /**
+   * Get system health (services status + latency)
+   */
+  async getSystemHealth(): Promise<SystemHealth> {
+    const response = await api.get('/health');
+    return response.data;
+  },
+
+  /**
+   * Get source detail — Auditoría K1
+   */
+  async getSourceDetail(sourceId: string, checkUrl: boolean = false): Promise<SourceDetail> {
+    const response = await api.get(`/api/v2/admin/sources/${sourceId}/detail`, {
+      params: { check_url: checkUrl }
+    });
+    return response.data;
+  },
+
+  /**
+   * Check if source URL is accessible
+   */
+  async checkSourceUrl(sourceId: string): Promise<{
+    source_id: string;
+    url: string | null;
+    accessible: boolean;
+    status: string;
+    http_status?: number;
+    response_time_ms?: number;
+    error?: string;
+  }> {
+    const response = await api.post(`/api/v2/admin/sources/${sourceId}/check-url`);
     return response.data;
   },
 };
