@@ -1,9 +1,55 @@
 import api from './api';
-import type { GraphData, GraphRelationship } from '@/types/api';
+import type { GraphData, GraphRelationship, NetworkData } from '@/types/api';
 
 export const graphService = {
   /**
-   * Get entity relationships for graph visualization
+   * Get entity network for graph visualization (API v2)
+   */
+  async getNetwork(entityId: string, options?: {
+    depth?: number;
+    filter_types?: string[];
+  }): Promise<NetworkData> {
+    const params = new URLSearchParams();
+    if (options?.depth) params.append('depth', options.depth.toString());
+    if (options?.filter_types?.length) {
+      options.filter_types.forEach(t => params.append('filter_types', t));
+    }
+    
+    const response = await api.get(`/api/v2/entities/${entityId}/network?${params.toString()}`);
+    return response.data;
+  },
+
+  /**
+   * Get entity relationships list (API v2)
+   */
+  async getRelationshipsList(entityId: string, options?: {
+    type?: string;
+    limit?: number;
+  }): Promise<{
+    entity_id: string;
+    entity_name: string;
+    relationships: Array<{
+      direction: 'outgoing' | 'incoming';
+      type: string;
+      subtype?: string;
+      related_entity_name: string;
+      related_entity_id?: string;
+      is_resolved: boolean;
+      confidence: number;
+      percentage?: number;
+    }>;
+    total: number;
+    by_type: Record<string, number>;
+  }> {
+    const response = await api.get(`/api/v2/entities/${entityId}/relationships`, {
+      params: options,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get entity relationships for graph visualization (Legacy API v1)
+   * @deprecated Use getNetwork instead
    */
   async getRelationships(entityId: string, options?: {
     depth?: number;

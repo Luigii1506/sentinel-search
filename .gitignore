@@ -37,4 +37,4 @@ dist-ssr/
 # Optional: Cypress/Playwright videos/screenshots
 cypress/videos/
 cypress/screenshots/
-test-results/
+test-results/en

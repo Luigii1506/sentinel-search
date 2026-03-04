@@ -18,15 +18,20 @@ import {
   FileText,
   Globe,
   AlertCircle,
+  Database,
+  Shield,
+  CreditCard,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEntity } from '@/hooks/useEntity';
-import { useGraph } from '@/hooks/useGraph';
+import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
+import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { cn, getRiskColor, formatDate } from '@/lib/utils';
 import type { RiskLevel } from '@/types';
+import type { APISanctionEntry } from '@/types/api';
 
 const entityTypeIcons = {
   person: User,
@@ -158,24 +163,127 @@ function InfoItem({ label, value, icon: Icon }: { label: string; value?: string;
   );
 }
 
-// Sanction Entry Card
-function SanctionEntry({ entry }: { entry: { source: string; program: string; listing_date: string; reason: string; status: string } }) {
+// Risk level color for border
+function getRiskBorderColor(riesgo?: string): string {
+  if (!riesgo) return 'border-red-500';
+  const r = riesgo.toUpperCase();
+  if (r === 'CRITICAL') return 'border-red-600';
+  if (r === 'HIGH') return 'border-orange-500';
+  if (r === 'MEDIUM') return 'border-yellow-500';
+  return 'border-red-500';
+}
+
+function getRiskBadgeClasses(riesgo?: string): string {
+  if (!riesgo) return 'bg-gray-500/10 text-gray-400';
+  const r = riesgo.toUpperCase();
+  if (r === 'CRITICAL') return 'bg-red-500/10 text-red-400 border-red-500/30';
+  if (r === 'HIGH') return 'bg-orange-500/10 text-orange-400 border-orange-500/30';
+  if (r === 'MEDIUM') return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
+  return 'bg-green-500/10 text-green-400 border-green-500/30';
+}
+
+// Sanction Entry Card (enriched)
+function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
+  const details = entry.details;
+  const borderColor = details?.riesgo ? getRiskBorderColor(details.riesgo) : 'border-red-500';
+
   return (
-    <div className="glass rounded-lg p-4 border-l-4 border-red-500">
+    <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
       <div className="flex items-start justify-between mb-2">
         <div>
           <h4 className="text-white font-medium">{entry.source}</h4>
           <p className="text-sm text-gray-400">{entry.program}</p>
         </div>
-        <Badge variant="outline" className={cn(
-          'text-xs',
-          entry.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
-        )}>
-          {entry.status === 'active' ? 'Activo' : entry.status}
-        </Badge>
+        <div className="flex items-center gap-2">
+          {details?.riesgo && (
+            <Badge variant="outline" className={cn('text-xs', getRiskBadgeClasses(details.riesgo))}>
+              {details.riesgo}
+            </Badge>
+          )}
+          <Badge variant="outline" className={cn(
+            'text-xs',
+            entry.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
+          )}>
+            {entry.status === 'active' ? 'Activo' : entry.status}
+          </Badge>
+        </div>
       </div>
       <p className="text-sm text-gray-300 mb-2">{entry.reason}</p>
-      <p className="text-xs text-gray-500">Listado: {formatDate(entry.listing_date)}</p>
+
+      {/* Enriched details grid */}
+      {details && Object.keys(details).length > 0 && (
+        <div className="mt-3 pt-3 border-t border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {details.rfc && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">RFC</p>
+                <p className="text-sm text-white font-mono">{details.rfc}</p>
+              </div>
+            )}
+            {details.dataset_label && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">Dataset</p>
+                <p className="text-sm text-white">{details.dataset_label}</p>
+              </div>
+            )}
+            {details.supuesto && (
+              <div className="col-span-2 md:col-span-1">
+                <p className="text-[10px] text-gray-500 uppercase">Supuesto</p>
+                <p className="text-sm text-white">{details.supuesto}</p>
+              </div>
+            )}
+            {details.monto && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">Monto</p>
+                <p className="text-sm text-white">{details.monto}</p>
+              </div>
+            )}
+            {details.entidad_federativa && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">Entidad Federativa</p>
+                <p className="text-sm text-white">{details.entidad_federativa}</p>
+              </div>
+            )}
+            {details.tipo_persona && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">Tipo Persona</p>
+                <p className="text-sm text-white">{details.tipo_persona}</p>
+              </div>
+            )}
+            {details.fecha_publicacion && (
+              <div>
+                <p className="text-[10px] text-gray-500 uppercase">Fecha Publicacion</p>
+                <p className="text-sm text-white">{details.fecha_publicacion}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Nested datasets (aggregated format) */}
+          {details.datasets && Array.isArray(details.datasets) && details.datasets.length > 1 && (
+            <div className="mt-3 pt-3 border-t border-white/5">
+              <p className="text-xs text-gray-500 mb-2">
+                Aparece en {details.dataset_count || details.datasets.length} datasets:
+              </p>
+              <div className="space-y-2">
+                {details.datasets.map((ds, idx) => {
+                  const d = ds as Record<string, unknown>;
+                  return (
+                    <div key={idx} className="flex items-center gap-3 p-2 rounded bg-white/5">
+                      <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(String(d.riesgo || '')))}>
+                        {String(d.riesgo || 'N/A')}
+                      </Badge>
+                      <span className="text-xs text-white">{String(d.dataset_label || d.dataset || '')}</span>
+                      {d.supuesto ? <span className="text-xs text-gray-500 truncate max-w-[200px]">{String(d.supuesto)}</span> : null}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <p className="text-xs text-gray-500 mt-2">Listado: {formatDate(entry.listing_date)}</p>
     </div>
   );
 }
@@ -202,7 +310,8 @@ export function EntityProfilePage() {
   const [activeTab, setActiveTab] = useState('overview');
   
   const { entity, isLoading, error, refetch } = useEntity(id);
-  const { data: graphData, isLoading: graphLoading } = useGraph(id, { enabled: activeTab === 'network' });
+  const { data: networkData, isLoading: networkLoading } = useNetwork(id, { enabled: activeTab === 'network' });
+  const { data: relationshipsList } = useRelationshipsList(id, { enabled: activeTab === 'relationships' });
 
   if (isLoading) {
     return <EntityProfileSkeleton />;
@@ -295,12 +404,41 @@ export function EntityProfilePage() {
                     >
                       Riesgo {riskLevelLabels[entity.risk_level]}
                     </Badge>
+                    {/* Topics */}
+                    {entity.topics?.map((topic: string) => {
+                      const topicColors: Record<string, string> = {
+                        sanction: 'bg-red-500/10 text-red-400 border-red-500/20',
+                        pep: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                        crime: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                        debarment: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                        poi: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                      };
+                      return (
+                        <Badge
+                          key={topic}
+                          variant="outline"
+                          className={`text-xs capitalize ${topicColors[topic] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'}`}
+                        >
+                          {topic}
+                        </Badge>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               {/* Quick Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-6">
+                {entity.country && (
+                  <InfoItem label="País" value={entity.country} icon={Globe} />
+                )}
+                {entity.identifications?.length > 0 && entity.identifications.find(i => i.type === 'tax_id') && (
+                  <InfoItem
+                    label={entity.identifications.find(i => i.type === 'tax_id')?.label || 'RFC'}
+                    value={entity.identifications.find(i => i.type === 'tax_id')?.number}
+                    icon={CreditCard}
+                  />
+                )}
                 {entity.date_of_birth && (
                   <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.date_of_birth)} icon={Calendar} />
                 )}
@@ -315,6 +453,13 @@ export function EntityProfilePage() {
                 )}
                 {entity.incorporation_country && (
                   <InfoItem label="País de Constitución" value={entity.incorporation_country} icon={MapPin} />
+                )}
+                {entity.is_current_pep !== undefined && entity.is_current_pep !== null && (
+                  <InfoItem
+                    label="PEP"
+                    value={entity.is_current_pep ? `Activo — ${entity.pep_category || 'PEP'}` : `Histórico — ${entity.pep_category || 'PEP'}`}
+                    icon={Shield}
+                  />
                 )}
               </div>
 
@@ -373,7 +518,20 @@ export function EntityProfilePage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="network" className="data-[state=active]:bg-white/10">
-              Red
+              Grafo
+              {networkData && networkData.total_nodes > 0 && (
+                <Badge className="ml-2 bg-blue-500/20 text-blue-400 text-[10px]">
+                  {networkData.total_nodes}
+                </Badge>
+              )}
+            </TabsTrigger>
+            <TabsTrigger value="relationships" className="data-[state=active]:bg-white/10">
+              Relaciones
+              {relationshipsList && relationshipsList.total > 0 && (
+                <Badge className="ml-2 bg-purple-500/20 text-purple-400 text-[10px]">
+                  {relationshipsList.total}
+                </Badge>
+              )}
             </TabsTrigger>
           </TabsList>
 
@@ -432,6 +590,91 @@ export function EntityProfilePage() {
                             </Badge>
                           )}
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Identifications */}
+              {entity.identifications?.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="glass rounded-xl p-6"
+                >
+                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                    <CreditCard className="w-5 h-5 text-blue-400" />
+                    Identificaciones
+                  </h3>
+                  <div className="space-y-3">
+                    {entity.identifications.map((ident, i) => (
+                      <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
+                        <div className="flex items-center gap-3">
+                          <Badge className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                            {ident.label || ident.type.toUpperCase()}
+                          </Badge>
+                          <span className="text-white font-mono text-sm">{ident.number}</span>
+                        </div>
+                        {ident.country && (
+                          <span className="text-xs text-gray-500">{ident.country}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Source Records */}
+              {entity.source_records && entity.source_records.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  className="glass rounded-xl p-6"
+                >
+                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+                    <Database className="w-5 h-5 text-blue-400" />
+                    Registros por Fuente
+                  </h3>
+                  <div className="space-y-3">
+                    {entity.source_records.map((rec, i) => (
+                      <div key={i} className="p-3 rounded-lg bg-white/5">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-white text-sm font-medium">{rec.source_display || rec.source}</span>
+                            {rec.category && (
+                              <Badge variant="outline" className="text-[10px] text-gray-400">
+                                {rec.category}
+                              </Badge>
+                            )}
+                          </div>
+                          {rec.risk_level && (
+                            <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(rec.risk_level))}>
+                              {rec.risk_level}
+                            </Badge>
+                          )}
+                        </div>
+                        {rec.external_id && (
+                          <p className="text-xs text-gray-500">
+                            <span className="text-gray-600">ID:</span> <span className="font-mono">{rec.external_id}</span>
+                          </p>
+                        )}
+                        {rec.country && (
+                          <p className="text-xs text-gray-500">
+                            <span className="text-gray-600">País:</span> {rec.country}
+                          </p>
+                        )}
+                        {rec.programs && rec.programs.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {rec.programs.map((prog, j) => (
+                              <span key={j} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400">
+                                {prog}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -530,6 +773,9 @@ export function EntityProfilePage() {
                       <div>
                         <h4 className="text-white font-medium text-lg">{pep.role}</h4>
                         <p className="text-pink-400 text-sm">{pep.category}</p>
+                        {pep.institution && (
+                          <p className="text-gray-300 text-sm mt-1">{pep.institution}</p>
+                        )}
                         <p className="text-gray-400 text-sm mt-1">{pep.country}</p>
                       </div>
                       <Badge className={pep.is_current ? 'bg-pink-500/20 text-pink-400' : 'bg-gray-500/20 text-gray-400'}>
@@ -588,14 +834,14 @@ export function EntityProfilePage() {
             )}
           </TabsContent>
 
-          {/* Network Tab */}
-          <TabsContent value="network">
-            {graphLoading ? (
+          {/* Relationships List Tab */}
+          <TabsContent value="relationships">
+            {!relationshipsList ? (
               <div className="glass rounded-xl p-12 text-center">
                 <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-                <p className="text-gray-400">Cargando red de relaciones...</p>
+                <p className="text-gray-400">Cargando relaciones...</p>
               </div>
-            ) : graphData?.relationships.length === 0 ? (
+            ) : relationshipsList.total === 0 ? (
               <div className="glass rounded-xl p-12 text-center">
                 <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
                 <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
@@ -603,17 +849,121 @@ export function EntityProfilePage() {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Summary by type */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {Object.entries(relationshipsList.by_type).map(([type, count]) => (
+                    <Badge key={type} variant="outline" className="text-xs capitalize">
+                      {type}: {count}
+                    </Badge>
+                  ))}
+                </div>
+                
+                {/* Relationships list */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {graphData?.relationships.map((rel, i) => (
+                  {relationshipsList.relationships.map((rel, i) => (
                     <motion.div
                       key={i}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.05 }}
+                      className="glass rounded-lg p-4"
                     >
-                      <RelationshipCard rel={rel} />
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className="text-white font-medium">
+                            {rel.related_entity_name}
+                          </p>
+                          {rel.related_entity_id && (
+                            <p className="text-xs text-gray-500 font-mono">
+                              ID: {rel.related_entity_id.slice(0, 8)}...
+                            </p>
+                          )}
+                        </div>
+                        <Badge 
+                          variant="outline" 
+                          className={cn(
+                            'text-xs capitalize',
+                            rel.direction === 'outgoing' 
+                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                              : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                          )}
+                        >
+                          {rel.direction === 'outgoing' ? 'Saliente' : 'Entrante'}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs capitalize">
+                          {rel.type}
+                        </Badge>
+                        {rel.subtype && (
+                          <span className="text-xs text-gray-400">({rel.subtype})</span>
+                        )}
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs">
+                        <span className={cn(
+                          'px-2 py-0.5 rounded',
+                          rel.is_resolved 
+                            ? 'bg-green-500/10 text-green-400' 
+                            : 'bg-amber-500/10 text-amber-400'
+                        )}>
+                          {rel.is_resolved ? 'Resuelto' : 'Pendiente'}
+                        </span>
+                        <span className="text-gray-500">
+                          Confianza: {Math.round(rel.confidence * 100)}%
+                        </span>
+                      </div>
                     </motion.div>
                   ))}
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Network Tab */}
+          <TabsContent value="network">
+            {networkLoading ? (
+              <div className="glass rounded-xl p-12 text-center">
+                <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
+                <p className="text-gray-400">Cargando red de relaciones...</p>
+              </div>
+            ) : !networkData?.center ? (
+              <div className="glass rounded-xl p-12 text-center">
+                <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+                <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
+                <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Graph Visualization */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <RelationshipGraph
+                    center={networkData.center}
+                    nodes={networkData.nodes}
+                    edges={networkData.edges}
+                    height="600px"
+                    onNavigate={(entityId) => navigate(`/entity/${entityId}`)}
+                  />
+                </motion.div>
+                
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="glass rounded-lg p-4 text-center">
+                    <p className="text-2xl font-bold text-white">{networkData.total_nodes}</p>
+                    <p className="text-sm text-gray-400">Nodos</p>
+                  </div>
+                  <div className="glass rounded-lg p-4 text-center">
+                    <p className="text-2xl font-bold text-white">{networkData.total_edges}</p>
+                    <p className="text-sm text-gray-400">Relaciones</p>
+                  </div>
+                  <div className="glass rounded-lg p-4 text-center">
+                    <p className="text-2xl font-bold text-white">{networkData.depth}</p>
+                    <p className="text-sm text-gray-400">Profundidad</p>
+                  </div>
                 </div>
               </div>
             )}

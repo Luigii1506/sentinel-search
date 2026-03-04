@@ -13,6 +13,12 @@ import {
   LogOut,
   User,
   LogIn,
+  Database,
+  Activity,
+  Upload,
+  ClipboardList,
+  ChevronDown,
+  BarChart3,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -26,12 +32,19 @@ import {
 import { cn, getInitials } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 
-const navLinks = [
+// All navigation links - PUBLIC ACCESS
+const mainNavLinks = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/search', label: 'Búsqueda', icon: Search },
-  { path: '/monitoring', label: 'Monitoreo', icon: Bell, protected: true },
-  { path: '/reports', label: 'Reportes', icon: FileText, protected: true },
-  { path: '/settings', label: 'Configuración', icon: Settings, protected: true },
+  { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload },
+];
+
+const adminNavItems = [
+  { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
+  { path: '/monitoring', label: 'Monitoreo', icon: Activity },
+  { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
+  { path: '/reports', label: 'Reportes', icon: BarChart3 },
+  { path: '/settings', label: 'Configuración', icon: Settings },
 ];
 
 export function Navigation() {
@@ -66,9 +79,6 @@ export function Navigation() {
     navigate('/');
   };
 
-  // Filter nav links based on auth status
-  const visibleNavLinks = navLinks.filter(link => !link.protected || isAuthenticated);
-
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -98,7 +108,7 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-1">
-            {visibleNavLinks.map((link) => {
+            {mainNavLinks.map((link) => {
               const isActive = location.pathname === link.path || 
                 (link.path !== '/' && location.pathname.startsWith(link.path));
               return (
@@ -126,6 +136,36 @@ export function Navigation() {
                 </Link>
               );
             })}
+            
+            {/* Admin Dropdown - ALWAYS VISIBLE */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    'relative px-4 py-2 text-sm font-medium transition-colors rounded-lg flex items-center gap-2',
+                    location.pathname.startsWith('/admin') || location.pathname === '/monitoring' || location.pathname === '/reports' || location.pathname === '/settings'
+                      ? 'text-white bg-white/10'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  )}
+                >
+                  <Settings className="w-4 h-4" />
+                  Admin
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-white/10" align="end">
+                {adminNavItems.map((item) => (
+                  <DropdownMenuItem
+                    key={item.path}
+                    className="text-gray-300 focus:text-white focus:bg-white/10 cursor-pointer"
+                    onClick={() => navigate(item.path)}
+                  >
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           {/* Right Section */}
@@ -208,7 +248,7 @@ export function Navigation() {
           className="lg:hidden bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5"
         >
           <nav className="px-4 py-4 space-y-1">
-            {visibleNavLinks.map((link) => {
+            {mainNavLinks.map((link) => {
               const isActive = location.pathname === link.path ||
                 (link.path !== '/' && location.pathname.startsWith(link.path));
               return (
@@ -225,6 +265,33 @@ export function Navigation() {
                 >
                   <link.icon className="w-5 h-5" />
                   {link.label}
+                </Link>
+              );
+            })}
+            
+            {/* Admin Section Mobile - ALWAYS VISIBLE */}
+            <div className="pt-2 pb-1">
+              <p className="px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Administración
+              </p>
+            </div>
+            {adminNavItems.map((item) => {
+              const isActive = location.pathname === item.path ||
+                (item.path !== '/' && location.pathname.startsWith(item.path));
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
+                    isActive
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
                 </Link>
               );
             })}

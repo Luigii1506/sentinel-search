@@ -9,6 +9,10 @@ import { LoginPage } from '@/pages/LoginPage';
 import { HomePage } from '@/pages/HomePage';
 import { SearchPage } from '@/pages/SearchPage';
 import { EntityProfilePage } from '@/pages/EntityProfilePage';
+import { SourcesDashboardPage } from '@/pages/SourcesDashboardPage';
+import { MonitoringPage } from '@/pages/MonitoringPage';
+import { BulkScreeningPage } from '@/pages/BulkScreeningPage';
+import { AuditPage } from '@/pages/AuditPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -68,45 +72,62 @@ function App() {
                   </AuthenticatedLayout>
                 }
               />
+              <Route
+                path="/screening/bulk"
+                element={
+                  <AuthenticatedLayout>
+                    <BulkScreeningPage />
+                  </AuthenticatedLayout>
+                }
+              />
 
-              {/* Protected Routes */}
+              {/* Admin Routes - Public for now */}
+              <Route
+                path="/admin/sources"
+                element={
+                  <AuthenticatedLayout>
+                    <SourcesDashboardPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/admin/audit"
+                element={
+                  <AuthenticatedLayout>
+                    <AuditPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              
+              {/* All Routes Public for now */}
               <Route
                 path="/monitoring"
                 element={
-                  <ProtectedRoute>
-                    <AuthenticatedLayout>
-                      <div className="pt-24 px-8">
-                        <h1 className="text-2xl font-bold mb-4">Monitoreo</h1>
-                        <p className="text-gray-400">Dashboard de monitoreo en tiempo real (Próximamente)</p>
-                      </div>
-                    </AuthenticatedLayout>
-                  </ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <MonitoringPage />
+                  </AuthenticatedLayout>
                 }
               />
               <Route
                 path="/reports"
                 element={
-                  <ProtectedRoute>
-                    <AuthenticatedLayout>
-                      <div className="pt-24 px-8">
-                        <h1 className="text-2xl font-bold mb-4">Reportes</h1>
-                        <p className="text-gray-400">Generación de reportes de cumplimiento (Próximamente)</p>
-                      </div>
-                    </AuthenticatedLayout>
-                  </ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <div className="pt-24 px-8">
+                      <h1 className="text-2xl font-bold mb-4">Reportes</h1>
+                      <p className="text-gray-400">Generación de reportes de cumplimiento (Próximamente)</p>
+                    </div>
+                  </AuthenticatedLayout>
                 }
               />
               <Route
                 path="/settings"
                 element={
-                  <ProtectedRoute>
-                    <AuthenticatedLayout>
-                      <div className="pt-24 px-8">
-                        <h1 className="text-2xl font-bold mb-4">Configuración</h1>
-                        <p className="text-gray-400">Configuración del sistema (Próximamente)</p>
-                      </div>
-                    </AuthenticatedLayout>
-                  </ProtectedRoute>
+                  <AuthenticatedLayout>
+                    <div className="pt-24 px-8">
+                      <h1 className="text-2xl font-bold mb-4">Configuración</h1>
+                      <p className="text-gray-400">Configuración del sistema (Próximamente)</p>
+                    </div>
+                  </AuthenticatedLayout>
                 }
               />
               
