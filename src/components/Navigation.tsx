@@ -19,6 +19,7 @@ import {
   ClipboardList,
   ChevronDown,
   BarChart3,
+  GitMerge,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -41,6 +42,7 @@ const mainNavLinks = [
 
 const adminNavItems = [
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
+  { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
   { path: '/monitoring', label: 'Monitoreo', icon: Activity },
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },

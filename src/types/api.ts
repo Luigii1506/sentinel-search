@@ -480,6 +480,50 @@ export interface AuditLogEntry {
   ip_address?: string;
 }
 
+// Merge Review Types
+export interface MergeChildInfo {
+  silver_id: string;
+  source: string;
+  external_id?: string;
+  name?: string;
+  name_normalized?: string;
+  match_method?: string;
+  match_confidence?: number;
+  matched_at?: string;
+}
+
+export interface MergedEntitySummary {
+  entity_id: string;
+  canonical_name: string;
+  entity_type?: string;
+  risk_score: number;
+  all_sources: string[];
+  source_count: number;
+  all_names: string[];
+  countries?: string[];
+  birth_date?: string;
+  is_current_pep?: boolean;
+  pep_category?: string;
+  mapping_count: number;
+  merge_methods: string[];
+  min_confidence?: number;
+  max_confidence?: number;
+  avg_confidence?: number;
+  last_merged_at?: string;
+}
+
+export interface MergedEntityDetail extends MergedEntitySummary {
+  children: MergeChildInfo[];
+}
+
+export interface MergeReviewResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  entities: MergedEntitySummary[];
+  stats: Record<string, number>;
+}
+
 // API Error Response
 export interface APIError {
   detail: string;

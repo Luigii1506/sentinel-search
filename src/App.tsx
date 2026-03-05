@@ -13,6 +13,7 @@ import { SourcesDashboardPage } from '@/pages/SourcesDashboardPage';
 import { MonitoringPage } from '@/pages/MonitoringPage';
 import { BulkScreeningPage } from '@/pages/BulkScreeningPage';
 import { AuditPage } from '@/pages/AuditPage';
+import { MergeReviewPage } from '@/pages/MergeReviewPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -95,6 +96,14 @@ function App() {
                 element={
                   <AuthenticatedLayout>
                     <AuditPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/admin/merges"
+                element={
+                  <AuthenticatedLayout>
+                    <MergeReviewPage />
                   </AuthenticatedLayout>
                 }
               />

@@ -1,5 +1,5 @@
 import api from './api';
-import type { DashboardStats, AuditLogEntry, User, SourceSummary, JobsResponse, SourceDetail, SystemHealth, SystemCounts } from '@/types/api';
+import type { DashboardStats, AuditLogEntry, User, SourceSummary, JobsResponse, SourceDetail, SystemHealth, SystemCounts, MergeReviewResponse, MergedEntityDetail } from '@/types/api';
 
 export const adminService = {
   /**
@@ -166,6 +166,29 @@ export const adminService = {
     const response = await api.get(`/api/v2/admin/sources/${sourceId}/detail`, {
       params: { check_url: checkUrl }
     });
+    return response.data;
+  },
+
+  /**
+   * Get merge review — paginated list of merged Gold entities
+   */
+  async getMergeReview(params?: {
+    limit?: number;
+    offset?: number;
+    min_sources?: number;
+    sort_by?: string;
+    match_method?: string;
+    source_filter?: string;
+  }): Promise<MergeReviewResponse> {
+    const response = await api.get('/api/v2/admin/merges/review', { params });
+    return response.data;
+  },
+
+  /**
+   * Get merge detail — full Gold entity with Silver children
+   */
+  async getMergeDetail(entityId: string): Promise<MergedEntityDetail> {
+    const response = await api.get(`/api/v2/admin/merges/${entityId}/detail`);
     return response.data;
   },
 
