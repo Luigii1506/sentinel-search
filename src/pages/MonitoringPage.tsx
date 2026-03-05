@@ -49,20 +49,25 @@ function formatElapsed(seconds?: number): string {
 
 const JOB_TYPE_LABELS: Record<string, string> = {
   full: 'Full Pipeline',
+  bronze_silver: 'Bronze + Silver',
   bronze: 'Bronze',
   silver: 'Silver',
   gold: 'Gold',
   refresh: 'Refresh',
   reindex: 'Reindex',
   scrape: 'Scrape',
+  file_import: 'File Import',
+  incremental: 'Incremental',
 };
 
 function JobTypeBadge({ type }: { type: string }) {
   const label = JOB_TYPE_LABELS[type] || type;
   const color = type === 'full' ? 'text-purple-400 bg-purple-500/10' :
+                type === 'bronze_silver' ? 'text-orange-400 bg-orange-500/10' :
                 type === 'bronze' ? 'text-amber-400 bg-amber-500/10' :
                 type === 'silver' ? 'text-gray-300 bg-gray-500/10' :
                 type === 'gold' ? 'text-yellow-400 bg-yellow-500/10' :
+                type === 'file_import' ? 'text-cyan-400 bg-cyan-500/10' :
                 'text-blue-400 bg-blue-500/10';
   return (
     <span className={`text-[10px] px-1.5 py-0.5 rounded ${color}`}>{label}</span>
