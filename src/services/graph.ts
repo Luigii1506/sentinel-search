@@ -24,6 +24,9 @@ export const graphService = {
    */
   async getRelationshipsList(entityId: string, options?: {
     type?: string;
+    level?: string;
+    min_strength?: number;
+    hide_noise?: boolean;
     limit?: number;
   }): Promise<{
     entity_id: string;
@@ -37,6 +40,9 @@ export const graphService = {
       is_resolved: boolean;
       confidence: number;
       percentage?: number;
+      relationship_level?: string;
+      relationship_strength?: number;
+      is_noise: boolean;
     }>;
     total: number;
     by_type: Record<string, number>;

@@ -29,6 +29,9 @@ export function useNetwork(entityId: string | undefined, options?: {
 // Hook for API v2 relationships list endpoint
 export function useRelationshipsList(entityId: string | undefined, options?: {
   type?: string;
+  level?: string;
+  min_strength?: number;
+  hide_noise?: boolean;
   limit?: number;
   enabled?: boolean;
 }) {
@@ -43,14 +46,20 @@ export function useRelationshipsList(entityId: string | undefined, options?: {
       related_entity_id?: string;
       is_resolved: boolean;
       confidence: number;
+      relationship_level?: string;
+      relationship_strength?: number;
+      is_noise: boolean;
     }>;
     total: number;
     by_type: Record<string, number>;
   }>({
-    queryKey: ['relationships', entityId, options?.type, options?.limit],
+    queryKey: ['relationships', entityId, options?.type, options?.level, options?.min_strength, options?.hide_noise, options?.limit],
     queryFn: () => graphService.getRelationshipsList(entityId!, {
       type: options?.type,
-      limit: options?.limit || 50,
+      level: options?.level,
+      min_strength: options?.min_strength,
+      hide_noise: options?.hide_noise,
+      limit: options?.limit || 100,
     }),
     enabled: !!entityId && (options?.enabled !== false),
     staleTime: 5 * 60 * 1000,

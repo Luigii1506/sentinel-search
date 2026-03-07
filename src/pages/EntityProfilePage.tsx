@@ -308,10 +308,16 @@ export function EntityProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-  
+  const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
+
   const { entity, isLoading, error, refetch } = useEntity(id);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { enabled: activeTab === 'network' });
-  const { data: relationshipsList } = useRelationshipsList(id, { enabled: activeTab === 'relationships' });
+  const { data: relationshipsList } = useRelationshipsList(id, {
+    enabled: activeTab === 'relationships',
+    level: relLevelFilter,
+    hide_noise: true,
+    limit: 200,
+  });
 
   if (isLoading) {
     return <EntityProfileSkeleton />;
@@ -849,6 +855,29 @@ export function EntityProfilePage() {
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Level filter chips */}
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {[
+                    { key: undefined, label: 'Todos' },
+                    { key: 'DIRECT', label: 'Directas' },
+                    { key: 'AFFILIATION', label: 'Afiliacion' },
+                    { key: 'INDIRECT', label: 'Indirectas' },
+                  ].map((filter) => (
+                    <button
+                      key={filter.label}
+                      onClick={() => setRelLevelFilter(filter.key)}
+                      className={cn(
+                        'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                        relLevelFilter === filter.key
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      )}
+                    >
+                      {filter.label}
+                    </button>
+                  ))}
+                </div>
+
                 {/* Summary by type */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {Object.entries(relationshipsList.by_type).map(([type, count]) => (
@@ -857,7 +886,7 @@ export function EntityProfilePage() {
                     </Badge>
                   ))}
                 </div>
-                
+
                 {/* Relationships list */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {relationshipsList.relationships.map((rel, i) => (
@@ -873,46 +902,81 @@ export function EntityProfilePage() {
                           <p className="text-white font-medium">
                             {rel.related_entity_name}
                           </p>
-                          {rel.related_entity_id && (
-                            <p className="text-xs text-gray-500 font-mono">
-                              ID: {rel.related_entity_id.slice(0, 8)}...
+                          {rel.subtype && (
+                            <p className="text-sm text-gray-400 mt-0.5">
+                              {rel.subtype}
                             </p>
                           )}
                         </div>
-                        <Badge 
-                          variant="outline" 
-                          className={cn(
-                            'text-xs capitalize',
-                            rel.direction === 'outgoing' 
-                              ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-                              : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                        <div className="flex items-center gap-2">
+                          {/* Strength badge */}
+                          {rel.relationship_strength != null && (
+                            <span className={cn(
+                              'text-[10px] font-mono px-1.5 py-0.5 rounded',
+                              rel.relationship_strength > 0.7
+                                ? 'bg-red-500/15 text-red-400'
+                                : rel.relationship_strength > 0.4
+                                ? 'bg-orange-500/15 text-orange-400'
+                                : 'bg-gray-500/15 text-gray-400'
+                            )}>
+                              {rel.relationship_strength.toFixed(2)}
+                            </span>
                           )}
-                        >
-                          {rel.direction === 'outgoing' ? 'Saliente' : 'Entrante'}
-                        </Badge>
+                          {/* Type badge */}
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              'text-xs',
+                              rel.type === 'family' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
+                              rel.type === 'beneficial_ownership' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                              rel.type === 'corporate' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
+                              rel.type === 'membership' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
+                              rel.type === 'political' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                              'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                            )}
+                          >
+                            {rel.type === 'family' ? 'Familiar' :
+                             rel.type === 'beneficial_ownership' ? 'Propiedad' :
+                             rel.type === 'corporate' ? 'Corporativa' :
+                             rel.type === 'membership' ? 'Miembro' :
+                             rel.type === 'political' ? 'Politico' :
+                             rel.type === 'associate' ? 'Asociado' :
+                             rel.type === 'representation' ? 'Representante' :
+                             rel.type === 'sanction' ? 'Sancion' :
+                             rel.type === 'unknown' ? 'Vinculado' :
+                             rel.type}
+                          </Badge>
+                        </div>
                       </div>
-                      
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-xs capitalize">
-                          {rel.type}
-                        </Badge>
-                        {rel.subtype && (
-                          <span className="text-xs text-gray-400">({rel.subtype})</span>
+
+                      <div className="flex items-center justify-between text-xs mt-2">
+                        <div className="flex items-center gap-2">
+                          {/* Level label */}
+                          {rel.relationship_level && (
+                            <span className={cn(
+                              'px-1.5 py-0.5 rounded text-[10px] font-medium',
+                              rel.relationship_level === 'DIRECT'
+                                ? 'bg-red-500/10 text-red-400'
+                                : rel.relationship_level === 'AFFILIATION'
+                                ? 'bg-yellow-500/10 text-yellow-400'
+                                : 'bg-gray-500/10 text-gray-400'
+                            )}>
+                              {rel.relationship_level === 'DIRECT' ? 'Directa' :
+                               rel.relationship_level === 'AFFILIATION' ? 'Afiliacion' :
+                               'Indirecta'}
+                            </span>
+                          )}
+                          <span className="text-gray-500">
+                            {rel.direction === 'outgoing'
+                              ? `Relacionado con ${rel.related_entity_name.split(' ')[0]}`
+                              : `${rel.related_entity_name.split(' ')[0]} vinculado a esta entidad`}
+                          </span>
+                        </div>
+                        {!rel.is_resolved && (
+                          <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400">
+                            Sin identificar
+                          </span>
                         )}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs">
-                        <span className={cn(
-                          'px-2 py-0.5 rounded',
-                          rel.is_resolved 
-                            ? 'bg-green-500/10 text-green-400' 
-                            : 'bg-amber-500/10 text-amber-400'
-                        )}>
-                          {rel.is_resolved ? 'Resuelto' : 'Pendiente'}
-                        </span>
-                        <span className="text-gray-500">
-                          Confianza: {Math.round(rel.confidence * 100)}%
-                        </span>
                       </div>
                     </motion.div>
                   ))}
