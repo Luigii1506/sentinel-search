@@ -6,6 +6,7 @@ export interface OptimizedSearchRequest {
   query: string;
   max_results?: number;
   min_confidence?: number;
+  source_level?: 1 | 2 | 3;
   use_cache?: boolean;
   timeout_ms?: number;
 }
@@ -65,7 +66,7 @@ const searchCache = new Map<string, { data: OptimizedSearchResponse; timestamp: 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function getCacheKey(request: OptimizedSearchRequest): string {
-  return `${request.query.toLowerCase().trim()}_${request.max_results}_${request.min_confidence}`;
+  return `${request.query.toLowerCase().trim()}_${request.max_results}_${request.min_confidence}_${request.source_level || 'all'}`;
 }
 
 function getCachedResult(key: string): OptimizedSearchResponse | null {
@@ -106,6 +107,7 @@ export const screeningService = {
       name: request.query,
       max_results: request.max_results ?? 20,
       min_confidence: request.min_confidence ?? 0.3,
+      source_level: request.source_level,
     });
     
     // Transform ScreeningResponse to OptimizedSearchResponse format
@@ -203,6 +205,14 @@ export const screeningService = {
         pep_category: m.pep_category,
         pep_positions: m.pep_positions,
         opensearch_score: m.opensearch_score,
+        // Adverse Media
+        has_adverse_media: m.has_adverse_media,
+        adverse_media_categories: m.adverse_media_categories,
+        adverse_media_severity: m.adverse_media_severity,
+        adverse_media_details: m.adverse_media_details,
+        // Freshness
+        freshness_factor: m.freshness_factor,
+        days_since_update: m.days_since_update,
       })),
     };
   },

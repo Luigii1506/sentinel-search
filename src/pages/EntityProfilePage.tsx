@@ -21,14 +21,18 @@ import {
   Database,
   Shield,
   CreditCard,
+  Network,
+  Landmark,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useQuery } from '@tanstack/react-query';
 import { useEntity } from '@/hooks/useEntity';
 import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
+import { complianceService } from '@/services/compliance';
 import { cn, getRiskColor, formatDate } from '@/lib/utils';
 import type { RiskLevel } from '@/types';
 import type { APISanctionEntry } from '@/types/api';
@@ -56,6 +60,304 @@ const riskLevelLabels = {
   low: 'Bajo',
   none: 'Ninguno',
 };
+
+// ── Network Risk Tab ──
+
+function NetworkRiskTab({ entityId }: { entityId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['network-risk', entityId],
+    queryFn: () => complianceService.getNetworkRisk(entityId),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-32 rounded-xl" />
+        <Skeleton className="h-48 rounded-xl" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="glass rounded-xl p-12 text-center">
+        <Network className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <h3 className="text-xl font-medium text-white mb-2">Sin Datos de Riesgo de Red</h3>
+        <p className="text-gray-400">No se encontró análisis de riesgo de red para esta entidad.</p>
+      </div>
+    );
+  }
+
+  const nr = data as any;
+  const riskColor = nr.propagated_risk_level === 'critical' ? '#ef4444' :
+                    nr.propagated_risk_level === 'high' ? '#f97316' :
+                    nr.propagated_risk_level === 'medium' ? '#eab308' : '#22c55e';
+
+  return (
+    <div className="space-y-6">
+      {/* Risk Summary */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass rounded-xl p-6"
+      >
+        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+          <Network className="w-5 h-5 text-blue-400" />
+          Riesgo Propagado por Red
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-xs text-gray-500">Riesgo Directo</p>
+            <p className="text-2xl font-bold text-white">{nr.direct_risk_score ?? '-'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Riesgo Propagado</p>
+            <p className="text-2xl font-bold" style={{ color: riskColor }}>
+              {nr.propagated_risk_score ?? '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Nivel</p>
+            <Badge
+              variant="outline"
+              className="mt-1"
+              style={{ backgroundColor: `${riskColor}20`, color: riskColor, borderColor: `${riskColor}40` }}
+            >
+              {nr.propagated_risk_level || '-'}
+            </Badge>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Conexiones Riesgosas</p>
+            <p className="text-2xl font-bold text-white">{nr.risky_connections ?? 0}</p>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Risk Neighbors */}
+      {nr.risk_neighbors && nr.risk_neighbors.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass rounded-xl p-6"
+        >
+          <h3 className="text-lg font-medium text-white mb-4">
+            Vecinos de Riesgo ({nr.risk_neighbors.length})
+          </h3>
+          <div className="space-y-3">
+            {nr.risk_neighbors.map((neighbor: any, i: number) => {
+              const nColor = neighbor.risk_level === 'critical' ? 'text-red-400' :
+                            neighbor.risk_level === 'high' ? 'text-orange-400' :
+                            neighbor.risk_level === 'medium' ? 'text-yellow-400' : 'text-green-400';
+              return (
+                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                  <div>
+                    <p className="text-white font-medium">{neighbor.name || neighbor.entity_name}</p>
+                    <p className="text-xs text-gray-500">
+                      {neighbor.relationship_type} — Distancia: {neighbor.distance ?? 1}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={cn('text-sm font-bold', nColor)}>
+                      {neighbor.risk_score ?? '-'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Contribución: {neighbor.contribution != null ? `${Math.round(neighbor.contribution)}%` : '-'}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Formula explanation */}
+      <div className="glass rounded-xl p-4">
+        <p className="text-xs text-gray-500">
+          El riesgo propagado se calcula como: risk = neighbor_risk * 0.5^distance * weight.
+          Entidades directamente conectadas a sanciones o PEP contribuyen más al riesgo.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── UBO Tab ──
+
+function UBOTab({ entityId }: { entityId: string }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['ubo-analysis', entityId],
+    queryFn: () => complianceService.getUBOAnalysis(entityId),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-32 rounded-xl" />
+        <Skeleton className="h-48 rounded-xl" />
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="glass rounded-xl p-12 text-center">
+        <Landmark className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <h3 className="text-xl font-medium text-white mb-2">Sin Análisis UBO</h3>
+        <p className="text-gray-400">No se encontró análisis de beneficiario final para esta entidad.</p>
+      </div>
+    );
+  }
+
+  const ubo = data as any;
+  const owners = ubo.ultimate_beneficial_owners || ubo.ubos || [];
+  const chain = ubo.ownership_chain || [];
+
+  return (
+    <div className="space-y-6">
+      {/* UBO Summary */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass rounded-xl p-6"
+      >
+        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+          <Landmark className="w-5 h-5 text-blue-400" />
+          Beneficiario Final (UBO)
+        </h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+          <div>
+            <p className="text-xs text-gray-500">UBOs Identificados</p>
+            <p className="text-2xl font-bold text-white">{owners.length}</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Niveles de Propiedad</p>
+            <p className="text-2xl font-bold text-white">{ubo.max_depth ?? chain.length}</p>
+          </div>
+          {ubo.total_ownership_resolved != null && (
+            <div>
+              <p className="text-xs text-gray-500">Propiedad Resuelta</p>
+              <p className="text-2xl font-bold text-white">{Math.round(ubo.total_ownership_resolved * 100)}%</p>
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      {/* UBO List */}
+      {owners.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="glass rounded-xl p-6"
+        >
+          <h3 className="text-lg font-medium text-white mb-4">Beneficiarios Finales</h3>
+          <div className="space-y-3">
+            {owners.map((owner: any, i: number) => {
+              const ownerRiskColor = owner.risk_level === 'critical' ? 'text-red-400' :
+                                    owner.risk_level === 'high' ? 'text-orange-400' :
+                                    owner.risk_level === 'medium' ? 'text-yellow-400' : 'text-green-400';
+              return (
+                <div key={i} className="p-4 rounded-lg bg-white/5 border-l-4 border-blue-500">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-white font-medium text-lg">{owner.name || owner.entity_name}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        {owner.ownership_percentage != null && (
+                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                            {Math.round(owner.ownership_percentage * 100)}% propiedad
+                          </Badge>
+                        )}
+                        {owner.is_pep && (
+                          <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-400 border-purple-500/30">
+                            PEP
+                          </Badge>
+                        )}
+                        {owner.is_sanctioned && (
+                          <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                            Sancionado
+                          </Badge>
+                        )}
+                        {owner.country && (
+                          <span className="text-xs text-gray-500">{owner.country}</span>
+                        )}
+                      </div>
+                    </div>
+                    {owner.risk_score != null && (
+                      <div className="text-right">
+                        <p className={cn('text-lg font-bold', ownerRiskColor)}>{owner.risk_score}</p>
+                        <p className="text-xs text-gray-500">Risk Score</p>
+                      </div>
+                    )}
+                  </div>
+                  {owner.path && owner.path.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-white/5">
+                      <p className="text-xs text-gray-500 mb-1">Cadena de propiedad:</p>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {owner.path.map((step: string, j: number) => (
+                          <span key={j} className="flex items-center gap-1">
+                            <span className="text-xs text-gray-300">{step}</span>
+                            {j < owner.path.length - 1 && (
+                              <span className="text-gray-600">→</span>
+                            )}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Ownership Chain */}
+      {chain.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="glass rounded-xl p-6"
+        >
+          <h3 className="text-lg font-medium text-white mb-4">Cadena de Propiedad</h3>
+          <div className="relative">
+            <div className="absolute left-4 top-0 bottom-0 w-px bg-white/10" />
+            {chain.map((link: any, i: number) => (
+              <div key={i} className="relative pl-10 py-3">
+                <div className="absolute left-2 w-5 h-5 rounded-full bg-[#0a0a0a] border-2 border-blue-500/50 flex items-center justify-center">
+                  <span className="text-[8px] text-blue-400 font-bold">{i + 1}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-white text-sm font-medium">{link.entity_name || link.name}</p>
+                    {link.relationship_type && (
+                      <p className="text-xs text-gray-500">{link.relationship_type}</p>
+                    )}
+                  </div>
+                  {link.ownership_share != null && (
+                    <Badge variant="outline" className="text-xs">
+                      {Math.round(link.ownership_share * 100)}%
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* FATF Explanation */}
+      <div className="glass rounded-xl p-4">
+        <p className="text-xs text-gray-500">
+          Análisis UBO basado en FATF Recomendación 24/25. Se considera Beneficiario Final
+          a toda persona natural con participación directa o indirecta ≥25% o con control efectivo.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // Loading Skeleton
 function EntityProfileSkeleton() {
@@ -309,9 +611,10 @@ export function EntityProfilePage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
+  const [graphDepth, setGraphDepth] = useState(2);
 
   const { entity, isLoading, error, refetch } = useEntity(id);
-  const { data: networkData, isLoading: networkLoading } = useNetwork(id, { enabled: activeTab === 'network' });
+  const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
   const { data: relationshipsList } = useRelationshipsList(id, {
     enabled: activeTab === 'relationships',
     level: relLevelFilter,
@@ -538,6 +841,14 @@ export function EntityProfilePage() {
                   {relationshipsList.total}
                 </Badge>
               )}
+            </TabsTrigger>
+            <TabsTrigger value="network-risk" className="data-[state=active]:bg-white/10">
+              <Network className="w-4 h-4 mr-1" />
+              Riesgo Red
+            </TabsTrigger>
+            <TabsTrigger value="ubo" className="data-[state=active]:bg-white/10">
+              <Landmark className="w-4 h-4 mr-1" />
+              UBO
             </TabsTrigger>
           </TabsList>
 
@@ -999,38 +1310,33 @@ export function EntityProfilePage() {
                 <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
               </div>
             ) : (
-              <div className="space-y-6">
-                {/* Graph Visualization */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <RelationshipGraph
-                    center={networkData.center}
-                    nodes={networkData.nodes}
-                    edges={networkData.edges}
-                    height="600px"
-                    onNavigate={(entityId) => navigate(`/entity/${entityId}`)}
-                  />
-                </motion.div>
-                
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="glass rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-white">{networkData.total_nodes}</p>
-                    <p className="text-sm text-gray-400">Nodos</p>
-                  </div>
-                  <div className="glass rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-white">{networkData.total_edges}</p>
-                    <p className="text-sm text-gray-400">Relaciones</p>
-                  </div>
-                  <div className="glass rounded-lg p-4 text-center">
-                    <p className="text-2xl font-bold text-white">{networkData.depth}</p>
-                    <p className="text-sm text-gray-400">Profundidad</p>
-                  </div>
-                </div>
-              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <RelationshipGraph
+                  center={networkData.center}
+                  nodes={networkData.nodes}
+                  edges={networkData.edges}
+                  height="600px"
+                  depth={graphDepth}
+                  onDepthChange={setGraphDepth}
+                  totalNodes={networkData.total_nodes}
+                  totalEdges={networkData.total_edges}
+                  onNavigate={(entityId) => navigate(`/entity/${entityId}`)}
+                />
+              </motion.div>
             )}
+          </TabsContent>
+
+          {/* Network Risk Tab */}
+          <TabsContent value="network-risk">
+            <NetworkRiskTab entityId={id!} />
+          </TabsContent>
+
+          {/* UBO Tab */}
+          <TabsContent value="ubo">
+            <UBOTab entityId={id!} />
           </TabsContent>
         </Tabs>
       </div>

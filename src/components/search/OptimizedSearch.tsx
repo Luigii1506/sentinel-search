@@ -48,6 +48,7 @@ export function OptimizedSearch({
   const [results, setResults] = useState<OptimizedSearchResult[]>([]);
   const [metrics, setMetrics] = useState<SearchMetrics | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3>(2);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Mutation para búsqueda optimizada
@@ -57,6 +58,7 @@ export function OptimizedSearch({
         query: searchQuery,
         max_results: 20,
         min_confidence: 0.6,
+        source_level: sourceLevel,
         use_cache: true,
         timeout_ms: 2000,
       });
@@ -177,6 +179,37 @@ export function OptimizedSearch({
             )}
           </Button>
         </div>
+      </div>
+
+      {/* Source Level Selector */}
+      <div className="mt-3 flex items-center gap-2">
+        <span className="text-xs text-gray-500 mr-1">Nivel:</span>
+        {([
+          { level: 1 as const, label: 'Core AML', desc: 'Sanciones, Terrorismo, Law Enforcement' },
+          { level: 2 as const, label: 'Extendido', desc: '+ PEP, Inhabilitaciones, Regulatorio' },
+          { level: 3 as const, label: 'Completo', desc: 'Todas las fuentes' },
+        ]).map(({ level, label, desc }) => (
+          <TooltipProvider key={level}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => setSourceLevel(level)}
+                  className={cn(
+                    "px-3 py-1 rounded-full text-xs font-medium border transition-all duration-200",
+                    sourceLevel === level
+                      ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
+                      : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20 hover:text-gray-300"
+                  )}
+                >
+                  {label}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-xs">{desc}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        ))}
       </div>
 
       {/* Performance Metrics */}

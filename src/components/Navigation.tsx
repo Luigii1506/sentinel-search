@@ -38,6 +38,7 @@ const mainNavLinks = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/search', label: 'Búsqueda', icon: Search },
   { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload },
+  { path: '/compliance', label: 'Compliance', icon: Shield },
 ];
 
 const adminNavItems = [

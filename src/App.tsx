@@ -14,6 +14,8 @@ import { MonitoringPage } from '@/pages/MonitoringPage';
 import { BulkScreeningPage } from '@/pages/BulkScreeningPage';
 import { AuditPage } from '@/pages/AuditPage';
 import { MergeReviewPage } from '@/pages/MergeReviewPage';
+import { ComplianceDashboardPage } from '@/pages/ComplianceDashboardPage';
+import { CaseDetailPage } from '@/pages/CaseDetailPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -108,6 +110,24 @@ function App() {
                 }
               />
               
+              {/* Compliance */}
+              <Route
+                path="/compliance"
+                element={
+                  <AuthenticatedLayout>
+                    <ComplianceDashboardPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/compliance/cases/:caseId"
+                element={
+                  <AuthenticatedLayout>
+                    <CaseDetailPage />
+                  </AuthenticatedLayout>
+                }
+              />
+
               {/* All Routes Public for now */}
               <Route
                 path="/monitoring"

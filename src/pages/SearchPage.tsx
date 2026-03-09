@@ -22,6 +22,8 @@ import {
   FileText,
   Globe,
   Siren,
+  Newspaper,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -272,7 +274,6 @@ function SearchResultCard({
       }
     | undefined;
 
-  console.log("entituy", entity);
   return (
     <motion.div
       variants={itemVariants}
@@ -337,6 +338,53 @@ function SearchResultCard({
                 </Badge>
               );
             })}
+            {/* Adverse Media badge */}
+            {entity.has_adverse_media && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className="text-[10px] bg-red-500/10 text-red-400 border-red-500/20 gap-1"
+                    >
+                      <Newspaper className="w-3 h-3" />
+                      AM {entity.adverse_media_severity || 0}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Adverse Media: {entity.adverse_media_categories?.join(', ')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            {/* Freshness warning */}
+            {entity.freshness_factor != null && entity.freshness_factor < 0.8 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] gap-1 ${
+                        entity.freshness_factor < 0.3
+                          ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                          : entity.freshness_factor < 0.5
+                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                      }`}
+                    >
+                      <Clock className="w-3 h-3" />
+                      {Math.round(entity.freshness_factor * 100)}%
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Freshness: {Math.round(entity.freshness_factor * 100)}%
+                      {entity.days_since_update != null && ` — ${entity.days_since_update} dias sin actualizar`}
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
 
           {/* Row 2: Type + country + birth_date + gender + match type */}
@@ -538,6 +586,27 @@ function SearchResultCard({
                     +{entity.sanctions_details.length - 2} sanciones más...
                   </p>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Adverse Media Details */}
+          {entity.adverse_media_details && entity.adverse_media_details.length > 0 && (
+            <div className="mb-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/10">
+              <div className="flex items-center gap-2 mb-2">
+                <Newspaper className="w-4 h-4 text-orange-400" />
+                <span className="text-sm font-medium text-orange-400">
+                  Adverse Media — Severidad {entity.adverse_media_severity}
+                </span>
+              </div>
+              <div className="space-y-1.5">
+                {entity.adverse_media_details.map((am, i) => (
+                  <div key={i} className="text-xs">
+                    <span className="text-gray-300 font-medium capitalize">{am.category}</span>
+                    <span className="text-gray-500"> — sev. {am.severity}</span>
+                    <p className="text-gray-500 text-[10px] mt-0.5">{am.details}</p>
+                  </div>
+                ))}
               </div>
             </div>
           )}

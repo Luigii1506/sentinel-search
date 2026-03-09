@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -17,6 +17,7 @@ import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
 import {
   Maximize2,
+  Minimize2,
   Filter,
   Share2,
   Download,
@@ -25,7 +26,9 @@ import {
   Ship,
   Plane,
   Users,
-  ExternalLink,
+  Layers,
+  Activity,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -79,7 +82,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
       {isCenter && (
         <div className="absolute -top-1 -left-1 w-3 h-3 rounded-full bg-purple-500" />
       )}
-      
+
       {/* Risk indicator */}
       <div
         className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
@@ -92,7 +95,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
           className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{ backgroundColor: `${color}20` }}
         >
-          <Icon className="w-5 h-5" style={{ color }} />
+          <Icon className={`w-5 h-5`} />
         </div>
 
         {/* Content */}
@@ -114,7 +117,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
               </span>
             )}
           </div>
-          
+
           {/* Topics */}
           {entity.topics && entity.topics.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
@@ -144,15 +147,11 @@ const edgeStyles: Record<string, { color: string; label: string }> = {
   family: { color: '#8b5cf6', label: 'Familiar' },
   directorship: { color: '#06b6d4', label: 'Directivo' },
   associate: { color: '#eab308', label: 'Asociado' },
-  sanction: { color: '#ef4444', label: 'Sanción' },
+  sanction: { color: '#ef4444', label: 'Sancion' },
   membership: { color: '#f97316', label: 'Miembro' },
   representation: { color: '#22c55e', label: 'Representante' },
   unknownlink: { color: '#6a6a6a', label: 'Otro' },
 };
-
-function getRelationshipLabel(type: string): string {
-  return edgeStyles[type]?.label || type;
-}
 
 interface RelationshipGraphProps {
   center?: NetworkNode;
@@ -163,6 +162,10 @@ interface RelationshipGraphProps {
   onNodeClick?: (entity: NetworkNode) => void;
   onNavigate?: (entityId: string) => void;
   height?: string;
+  depth?: number;
+  onDepthChange?: (depth: number) => void;
+  totalNodes?: number;
+  totalEdges?: number;
 }
 
 export function RelationshipGraph({
@@ -174,20 +177,48 @@ export function RelationshipGraph({
   onNodeClick,
   onNavigate,
   height = '500px',
+  depth = 2,
+  onDepthChange,
+  totalNodes,
+  totalEdges,
 }: RelationshipGraphProps) {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [filterTypes, setFilterTypes] = useState<string[]>([]);
+  const [minStrength, setMinStrength] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Filter edges by strength and type (client-side)
+  const filteredEdges = useMemo(() => {
+    return edges.filter(e => {
+      if (filterTypes.length > 0 && !filterTypes.includes(e.type)) return false;
+      if (minStrength > 0) {
+        const strength = (e.properties?.relationship_strength as number) ?? 0.5;
+        if (strength < minStrength / 100) return false;
+      }
+      return true;
+    });
+  }, [edges, filterTypes, minStrength]);
+
+  // Compute visible node IDs from filtered edges
+  const visibleNodeIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (center) ids.add(center.id);
+    for (const e of filteredEdges) {
+      ids.add(e.source);
+      ids.add(e.target);
+    }
+    return ids;
+  }, [center, filteredEdges]);
 
   // Create ReactFlow nodes from network nodes
   const initialNodes: Node[] = useMemo(() => {
     if (!center) return [];
-    
-    const allNodes = [center, ...nodes];
+
+    const allNodes = [center, ...nodes].filter(n => visibleNodeIds.has(n.id));
     const nodeCount = allNodes.length;
-    
+
     return allNodes.map((node, index) => {
       const isCenter = node.id === center.id;
-      // Calculate position in a circle layout
       const angle = isCenter ? 0 : (index * 2 * Math.PI) / Math.max(nodeCount - 1, 1);
       const radius = isCenter ? 0 : 300;
       const x = isCenter ? 400 : 400 + radius * Math.cos(angle);
@@ -204,42 +235,49 @@ export function RelationshipGraph({
         } as unknown as Record<string, unknown>,
       };
     });
-  }, [center, nodes]);
+  }, [center, nodes, visibleNodeIds]);
 
-  // Create ReactFlow edges from network edges
+  // Create ReactFlow edges from filtered network edges
   const initialEdges: Edge[] = useMemo(() => {
-    return edges
-      .filter((edge) => filterTypes.length === 0 || filterTypes.includes(edge.type))
-      .map((edge, index) => {
-        const style = edgeStyles[edge.type] || { color: '#6a6a6a', label: edge.type };
-        return {
-          id: `edge-${index}`,
-          source: edge.source,
-          target: edge.target,
-          type: 'smoothstep',
-          animated: edge.type === 'ownership',
-          style: {
-            stroke: style.color,
-            strokeWidth: 2,
-            strokeDasharray: edge.dashed ? '5,5' : undefined,
-          },
-          label: edge.label || edge.subtype || style.label,
-          labelStyle: {
-            fill: '#a0a0a0',
-            fontSize: 11,
-          },
-          labelBgStyle: {
-            fill: '#1a1a1a',
-            stroke: '#2a2a2a',
-          },
-          labelBgPadding: [4, 4],
-          labelBgBorderRadius: 4,
-        };
-      });
-  }, [edges, filterTypes]);
+    return filteredEdges.map((edge, index) => {
+      const style = edgeStyles[edge.type] || { color: '#6a6a6a', label: edge.type };
+      return {
+        id: `edge-${index}`,
+        source: edge.source,
+        target: edge.target,
+        type: 'smoothstep',
+        animated: edge.type === 'ownership',
+        style: {
+          stroke: style.color,
+          strokeWidth: 2,
+          strokeDasharray: edge.dashed ? '5,5' : undefined,
+        },
+        label: edge.label || edge.subtype || style.label,
+        labelStyle: {
+          fill: '#a0a0a0',
+          fontSize: 11,
+        },
+        labelBgStyle: {
+          fill: '#1a1a1a',
+          stroke: '#2a2a2a',
+        },
+        labelBgPadding: [4, 4] as [number, number],
+        labelBgBorderRadius: 4,
+      };
+    });
+  }, [filteredEdges]);
 
-  const [flowNodes, , onNodesChange] = useNodesState(initialNodes);
+  const [flowNodes, setFlowNodes, onNodesChange] = useNodesState(initialNodes);
   const [flowEdges, setFlowEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Sync flow state when data changes (depth change, filters, etc.)
+  useEffect(() => {
+    setFlowNodes(initialNodes);
+  }, [initialNodes, setFlowNodes]);
+
+  useEffect(() => {
+    setFlowEdges(initialEdges);
+  }, [initialEdges, setFlowEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => setFlowEdges((eds) => addEdge(params, eds)),
@@ -263,7 +301,7 @@ export function RelationshipGraph({
     );
   };
 
-  // Get unique relationship types from edges
+  // Get unique relationship types from all edges (not filtered)
   const availableTypes = useMemo(() => {
     const types = new Set(edges.map(e => e.type));
     return Array.from(types);
@@ -290,8 +328,15 @@ export function RelationshipGraph({
     );
   }
 
-  return (
-    <div className={cn('relative rounded-xl overflow-hidden border border-white/10', className)} style={{ height }}>
+  const graphContent = (
+    <div
+      className={cn(
+        'relative rounded-xl overflow-hidden border border-white/10',
+        isFullscreen ? 'h-full border-0 rounded-none' : '',
+        className
+      )}
+      style={isFullscreen ? undefined : { height }}
+    >
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -327,15 +372,16 @@ export function RelationshipGraph({
           }}
         />
 
-        {/* Custom Controls Panel */}
+        {/* Action Buttons - Top Right */}
         <Panel position="top-right" className="m-4">
           <div className="flex flex-col gap-2">
             <Button
               variant="outline"
               size="sm"
               className="bg-[#1a1a1a]/80 backdrop-blur border-white/10 hover:bg-white/10"
+              onClick={() => setIsFullscreen(!isFullscreen)}
             >
-              <Maximize2 className="w-4 h-4" />
+              {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
             </Button>
             <Button
               variant="outline"
@@ -354,41 +400,105 @@ export function RelationshipGraph({
           </div>
         </Panel>
 
-        {/* Filter Panel */}
-        {availableTypes.length > 0 && (
-          <Panel position="top-left" className="m-4">
-            <div className="glass rounded-xl p-3 space-y-3 max-w-[250px]">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Filter className="w-4 h-4" />
-                <span>Filtrar Relaciones</span>
-                <span className="text-xs text-gray-500">({edges.length})</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {availableTypes.map((type) => {
-                  const style = edgeStyles[type] || { color: '#6a6a6a', label: type };
-                  const isActive = filterTypes.length === 0 || filterTypes.includes(type);
-                  return (
+        {/* Unified Controls Panel - Top Left */}
+        <Panel position="top-left" className="m-4">
+          <div className="glass rounded-xl p-3 space-y-3 max-w-[280px]">
+            {/* Depth Selector */}
+            {onDepthChange && (
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>Profundidad</span>
+                </div>
+                <div className="flex gap-1.5">
+                  {[1, 2, 3].map((d) => (
                     <button
-                      key={type}
-                      onClick={() => toggleFilter(type)}
+                      key={d}
+                      onClick={() => onDepthChange(d)}
                       className={cn(
-                        'px-2 py-1 rounded text-[10px] uppercase tracking-wider transition-all',
-                        isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'
+                        'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                        depth === d
+                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
                       )}
-                      style={{
-                        backgroundColor: `${style.color}20`,
-                        color: style.color,
-                        border: `1px solid ${style.color}40`,
-                      }}
                     >
-                      {style.label}
+                      {d}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
+            )}
+
+            {/* Strength Slider */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Fuerza min.</span>
+                </div>
+                <span className="text-xs text-gray-500">{minStrength}%</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={minStrength}
+                onChange={(e) => setMinStrength(Number(e.target.value))}
+                className="w-full h-1.5 rounded-full appearance-none cursor-pointer
+                  bg-white/10 accent-blue-500
+                  [&::-webkit-slider-thumb]:appearance-none
+                  [&::-webkit-slider-thumb]:w-3
+                  [&::-webkit-slider-thumb]:h-3
+                  [&::-webkit-slider-thumb]:rounded-full
+                  [&::-webkit-slider-thumb]:bg-blue-400
+                  [&::-webkit-slider-thumb]:shadow-sm
+                  [&::-webkit-slider-thumb]:cursor-pointer"
+              />
             </div>
-          </Panel>
-        )}
+
+            {/* Type Filters */}
+            {availableTypes.length > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <Filter className="w-3.5 h-3.5" />
+                  <span>Tipo</span>
+                  <span className="text-gray-500">({filteredEdges.length})</span>
+                </div>
+                <div className="flex flex-wrap gap-1.5">
+                  {availableTypes.map((type) => {
+                    const style = edgeStyles[type] || { color: '#6a6a6a', label: type };
+                    const isActive = filterTypes.length === 0 || filterTypes.includes(type);
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => toggleFilter(type)}
+                        className={cn(
+                          'px-2 py-1 rounded text-[10px] uppercase tracking-wider transition-all',
+                          isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'
+                        )}
+                        style={{
+                          backgroundColor: `${style.color}20`,
+                          color: style.color,
+                          border: `1px solid ${style.color}40`,
+                        }}
+                      >
+                        {style.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Stats */}
+            <div className="flex items-center gap-3 pt-1 border-t border-white/5 text-xs text-gray-500">
+              <span>{visibleNodeIds.size}{totalNodes && totalNodes !== visibleNodeIds.size ? `/${totalNodes}` : ''} nodos</span>
+              <span className="text-gray-600">·</span>
+              <span>{filteredEdges.length}{totalEdges && totalEdges !== filteredEdges.length ? `/${totalEdges}` : ''} relaciones</span>
+            </div>
+          </div>
+        </Panel>
 
         {/* Legend Panel */}
         <Panel position="bottom-left" className="m-4">
@@ -402,7 +512,7 @@ export function RelationshipGraph({
                 </div>
               ))}
             </div>
-            
+
             {onNavigate && (
               <div className="mt-3 pt-3 border-t border-white/10">
                 <p className="text-[10px] text-gray-500">
@@ -415,6 +525,22 @@ export function RelationshipGraph({
       </ReactFlow>
     </div>
   );
+
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 bg-[#0a0a0a]">
+        <button
+          onClick={() => setIsFullscreen(false)}
+          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-[#1a1a1a]/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        {graphContent}
+      </div>
+    );
+  }
+
+  return graphContent;
 }
 
 export default RelationshipGraph;

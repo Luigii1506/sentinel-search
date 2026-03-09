@@ -76,6 +76,18 @@ export interface ScreeningMatch {
   pep_category?: string;
   pep_positions?: unknown[];
   opensearch_score?: number;
+  // Adverse Media (Tier 1)
+  has_adverse_media?: boolean;
+  adverse_media_categories?: string[];
+  adverse_media_severity?: number;
+  adverse_media_details?: Array<{
+    category: string;
+    severity: number;
+    details: string;
+  }>;
+  // Freshness / Risk Decay
+  freshness_factor?: number;
+  days_since_update?: number | null;
   // ML Reranker v3.5 (Level 5)
   ml_probability?: number;
   pre_ml_score?: number;

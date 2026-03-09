@@ -127,7 +127,7 @@ export const adminService = {
    * Get sources summary (K1 Dashboard)
    */
   async getSourcesSummary(): Promise<SourceSummary> {
-    const response = await api.get('/api/v2/admin/sources/summary');
+    const response = await api.get('/api/v2/admin/sources/summary', { timeout: 60000 });
     return response.data;
   },
 
