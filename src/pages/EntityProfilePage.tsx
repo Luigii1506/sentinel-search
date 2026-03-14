@@ -69,6 +69,23 @@ const riskLevelLabels = {
   none: 'Ninguno',
 };
 
+const countryNames: Record<string, string> = {
+  MX: 'México', US: 'Estados Unidos', BR: 'Brasil', CO: 'Colombia', UY: 'Uruguay',
+  AR: 'Argentina', CL: 'Chile', PE: 'Perú', VE: 'Venezuela', PA: 'Panamá',
+  GB: 'Reino Unido', ES: 'España', FR: 'Francia', DE: 'Alemania', IT: 'Italia',
+  RU: 'Rusia', CN: 'China', JP: 'Japón', KR: 'Corea del Sur', IN: 'India',
+  CA: 'Canadá', AU: 'Australia', CU: 'Cuba', NI: 'Nicaragua', BO: 'Bolivia',
+  PY: 'Paraguay', EC: 'Ecuador', GT: 'Guatemala', HN: 'Honduras', SV: 'El Salvador',
+  CR: 'Costa Rica', DO: 'Rep. Dominicana', HT: 'Haití', JM: 'Jamaica',
+  AE: 'Emiratos Árabes', SA: 'Arabia Saudita', IR: 'Irán', IQ: 'Irak',
+  SY: 'Siria', LB: 'Líbano', IL: 'Israel', TR: 'Turquía', UA: 'Ucrania',
+  BY: 'Bielorrusia', KP: 'Corea del Norte', MM: 'Myanmar', AF: 'Afganistán',
+  PK: 'Pakistán', NG: 'Nigeria', ZA: 'Sudáfrica', KE: 'Kenia', ET: 'Etiopía',
+  CD: 'RD Congo', SD: 'Sudán', LY: 'Libia', SO: 'Somalia', YE: 'Yemen',
+  NL: 'Países Bajos', BE: 'Bélgica', CH: 'Suiza', AT: 'Austria', PT: 'Portugal',
+  SE: 'Suecia', NO: 'Noruega', PL: 'Polonia', CZ: 'Chequia', RO: 'Rumania',
+};
+
 const amCategoryLabels: Record<string, string> = {
   terrorism: 'Terrorismo', sanctions_evasion: 'Evasion Sanciones', wanted: 'Buscados',
   crime: 'Crimen', human_rights: 'DDHH', financial_crime: 'Crimen Financiero',
@@ -995,7 +1012,7 @@ export function EntityProfilePage() {
               {/* Quick Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-6">
                 {entity.country && (
-                  <InfoItem label="País" value={entity.country} icon={Globe} />
+                  <InfoItem label="País" value={countryNames[entity.country] || entity.country} icon={Globe} />
                 )}
                 {entity.identifications?.length > 0 && entity.identifications.find(i => i.type === 'tax_id') && (
                   <InfoItem
@@ -1004,14 +1021,17 @@ export function EntityProfilePage() {
                     icon={CreditCard}
                   />
                 )}
-                {entity.date_of_birth && (
-                  <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.date_of_birth)} icon={Calendar} />
+                {(entity.birth_date || entity.date_of_birth) && (
+                  <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.birth_date || entity.date_of_birth)} icon={Calendar} />
+                )}
+                {entity.gender && (
+                  <InfoItem label="Género" value={entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender} icon={User} />
                 )}
                 {entity.place_of_birth && (
                   <InfoItem label="Lugar de Nacimiento" value={entity.place_of_birth} icon={MapPin} />
                 )}
                 {entity.nationalities && entity.nationalities.length > 0 && (
-                  <InfoItem label="Nacionalidades" value={entity.nationalities.join(', ')} icon={Globe} />
+                  <InfoItem label="Nacionalidades" value={entity.nationalities.map((n: string) => countryNames[n] || n).join(', ')} icon={Globe} />
                 )}
                 {entity.incorporation_date && (
                   <InfoItem label="Fecha de Constitución" value={formatDate(entity.incorporation_date)} icon={Calendar} />
@@ -1035,14 +1055,23 @@ export function EntityProfilePage() {
                   <SourceLevelSelector value={sourceLevel} onChange={handleSourceLevelChange} size="sm" />
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {entity.data_sources.map((source) => (
-                    <span
-                      key={source}
-                      className="text-xs px-2 py-1 rounded-full bg-white/5 text-gray-400 border border-white/10"
-                    >
-                      {source}
-                    </span>
-                  ))}
+                  {(entity.data_sources_display || entity.data_sources.map((s: string) => ({ id: s, display_name: s, category: '' }))).map((src: { id: string; display_name: string; category: string }) => {
+                    const catColors: Record<string, string> = {
+                      SANCTIONS: 'bg-red-500/10 text-red-400 border-red-500/30',
+                      LAW_ENFORCEMENT: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
+                      PEP: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+                      REGULATORY: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+                      TAX: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+                    };
+                    return (
+                      <span
+                        key={src.id}
+                        className={`text-xs px-2 py-1 rounded-full border ${catColors[src.category] || 'bg-white/5 text-gray-400 border-white/10'}`}
+                      >
+                        {src.display_name}
+                      </span>
+                    );
+                  })}
                 </div>
               </div>
             </div>
