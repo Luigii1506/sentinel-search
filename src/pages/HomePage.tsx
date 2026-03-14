@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
 import { IntelligentSearch } from '@/components/search/IntelligentSearch';
+import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import { useDashboard } from '@/hooks/useDashboard';
 import { cn, formatCompactNumber } from '@/lib/utils';
 
@@ -167,13 +168,14 @@ export function HomePage() {
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   
   const { stats, isLoading } = useDashboard();
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(2);
 
   const handleSearch = (query: string) => {
-    navigate(`/search?q=${encodeURIComponent(query)}`);
+    navigate(`/search?q=${encodeURIComponent(query)}&source_level=${sourceLevel}`);
   };
 
   const handleSelectResult = (entityId: string) => {
-    navigate(`/entity/${entityId}`);
+    navigate(`/entity/${entityId}?source_level=${sourceLevel}`);
   };
 
   return (
@@ -236,8 +238,13 @@ export function HomePage() {
                 onSelectResult={handleSelectResult}
                 size="large"
                 autoFocus
+                sourceLevel={sourceLevel}
               />
             </motion.div>
+
+            <div className="mt-4 flex justify-center">
+              <SourceLevelSelector value={sourceLevel} onChange={setSourceLevel} />
+            </div>
 
             {/* Quick Tags */}
             <motion.div

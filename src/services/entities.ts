@@ -5,8 +5,10 @@ export const entityService = {
   /**
    * Get entity by ID
    */
-  async getById(id: string): Promise<APIEntity> {
-    const response = await api.get(`/api/v1/entity/${id}`);
+  async getById(id: string, source_level?: number): Promise<APIEntity> {
+    const response = await api.get(`/api/v1/entity/${id}`, {
+      params: source_level ? { source_level } : undefined,
+    });
     return response.data;
   },
 

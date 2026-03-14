@@ -31,6 +31,7 @@ export interface ScreeningRequest {
   entity_type?: 'person' | 'company' | 'vessel' | 'aircraft' | 'organization';
   min_confidence?: number;
   max_results?: number;
+  source_level?: 1 | 2 | 3 | 4;
   filters?: {
     sources?: string[];
     countries?: string[];

@@ -20,6 +20,7 @@ import {
   ChevronDown,
   BarChart3,
   GitMerge,
+  Newspaper,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -39,6 +40,7 @@ const mainNavLinks = [
   { path: '/search', label: 'Búsqueda', icon: Search },
   { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload },
   { path: '/compliance', label: 'Compliance', icon: Shield },
+  { path: '/adverse-media', label: 'Adverse Media', icon: Newspaper },
 ];
 
 const adminNavItems = [

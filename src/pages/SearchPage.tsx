@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -35,10 +35,12 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { IntelligentSearch } from "@/components/search/IntelligentSearch";
+import { SourceLevelSelector } from "@/components/SourceLevelSelector";
 import { SemanticSearchToggle } from "@/components/search/SemanticSearchToggle";
 import { SemanticResults } from "@/components/search/SemanticResults";
 import { cn, getRiskColor, getEntityTypeLabel } from "@/lib/utils";
 import { useScreening } from "@/hooks/useScreening";
+import { complianceService } from "@/services/compliance";
 import type { EntityType, RiskLevel, DataSource } from "@/types";
 
 const entityTypeIcons = {
@@ -247,9 +249,15 @@ function getMatchTypeLabel(matchType: string, score: number): string {
 function SearchResultCard({
   result,
   onClick,
+  queryName,
+  onCreateAlert,
 }: {
   result: ReturnType<typeof useScreening>["results"][0];
   onClick: () => void;
+  queryName?: string;
+  onCreateAlert?: (
+    result: ReturnType<typeof useScreening>["results"][0],
+  ) => void;
 }) {
   const entity = result;
   const Icon = entityTypeIcons[entity.entity_type as EntityType] || User;
@@ -322,17 +330,17 @@ function SearchResultCard({
             {/* Topics badges */}
             {entity.topics?.map((topic) => {
               const topicColors: Record<string, string> = {
-                sanction: 'bg-red-500/10 text-red-400 border-red-500/20',
-                pep: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-                crime: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-                debarment: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-                poi: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                sanction: "bg-red-500/10 text-red-400 border-red-500/20",
+                pep: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+                crime: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+                debarment: "bg-amber-500/10 text-amber-400 border-amber-500/20",
+                poi: "bg-blue-500/10 text-blue-400 border-blue-500/20",
               };
               return (
                 <Badge
                   key={topic}
                   variant="outline"
-                  className={`text-[10px] capitalize ${topicColors[topic] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'}`}
+                  className={`text-[10px] capitalize ${topicColors[topic] || "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}
                 >
                   {topic}
                 </Badge>
@@ -352,39 +360,44 @@ function SearchResultCard({
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Adverse Media: {entity.adverse_media_categories?.join(', ')}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-            {/* Freshness warning */}
-            {entity.freshness_factor != null && entity.freshness_factor < 0.8 && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] gap-1 ${
-                        entity.freshness_factor < 0.3
-                          ? 'bg-red-500/10 text-red-400 border-red-500/20'
-                          : entity.freshness_factor < 0.5
-                            ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                            : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                      }`}
-                    >
-                      <Clock className="w-3 h-3" />
-                      {Math.round(entity.freshness_factor * 100)}%
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent>
                     <p>
-                      Freshness: {Math.round(entity.freshness_factor * 100)}%
-                      {entity.days_since_update != null && ` — ${entity.days_since_update} dias sin actualizar`}
+                      Adverse Media:{" "}
+                      {entity.adverse_media_categories?.join(", ")}
                     </p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
+            {/* Freshness warning */}
+            {entity.freshness_factor != null &&
+              entity.freshness_factor < 0.8 && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] gap-1 ${
+                          entity.freshness_factor < 0.3
+                            ? "bg-red-500/10 text-red-400 border-red-500/20"
+                            : entity.freshness_factor < 0.5
+                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                              : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
+                        }`}
+                      >
+                        <Clock className="w-3 h-3" />
+                        {Math.round(entity.freshness_factor * 100)}%
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Freshness: {Math.round(entity.freshness_factor * 100)}%
+                        {entity.days_since_update != null &&
+                          ` — ${entity.days_since_update} dias sin actualizar`}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
           </div>
 
           {/* Row 2: Type + country + birth_date + gender + match type */}
@@ -395,7 +408,9 @@ function SearchResultCard({
             {entity.entity_subtype && (
               <>
                 <span className="text-gray-600">·</span>
-                <span className="capitalize text-gray-500">{entity.entity_subtype}</span>
+                <span className="capitalize text-gray-500">
+                  {entity.entity_subtype}
+                </span>
               </>
             )}
             {countryFlag && (
@@ -528,15 +543,18 @@ function SearchResultCard({
           {/* Addresses */}
           {entity.addresses && entity.addresses.length > 0 && (
             <div className="mb-3 text-sm text-gray-400">
-              <span className="text-gray-500">📍</span>{' '}
+              <span className="text-gray-500">📍</span>{" "}
               {entity.addresses.slice(0, 2).map((addr, i) => (
                 <span key={i}>
-                  {typeof addr === 'string' ? addr : addr.address}
-                  {i < Math.min(entity.addresses!.length, 2) - 1 && ' | '}
+                  {typeof addr === "string" ? addr : addr.address}
+                  {i < Math.min(entity.addresses!.length, 2) - 1 && " | "}
                 </span>
               ))}
               {entity.addresses.length > 2 && (
-                <span className="text-gray-500"> +{entity.addresses.length - 2} más</span>
+                <span className="text-gray-500">
+                  {" "}
+                  +{entity.addresses.length - 2} más
+                </span>
               )}
             </div>
           )}
@@ -544,14 +562,16 @@ function SearchResultCard({
           {/* Identifiers */}
           {entity.identifiers && Object.keys(entity.identifiers).length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
-              {Object.entries(entity.identifiers).slice(0, 3).map(([key, value]) => (
-                <span
-                  key={key}
-                  className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
-                >
-                  {key}: {value}
-                </span>
-              ))}
+              {Object.entries(entity.identifiers)
+                .slice(0, 3)
+                .map(([key, value]) => (
+                  <span
+                    key={key}
+                    className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                  >
+                    {key}: {value}
+                  </span>
+                ))}
               {Object.keys(entity.identifiers).length > 3 && (
                 <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-gray-500">
                   +{Object.keys(entity.identifiers).length - 3} más
@@ -572,12 +592,19 @@ function SearchResultCard({
               <div className="space-y-1.5">
                 {entity.sanctions_details.slice(0, 2).map((sanction, i) => (
                   <div key={i} className="text-xs">
-                    <span className="text-gray-300 font-medium">{sanction.authority}</span>
+                    <span className="text-gray-300 font-medium">
+                      {sanction.authority}
+                    </span>
                     {sanction.program && (
-                      <span className="text-gray-400"> — {sanction.program}</span>
+                      <span className="text-gray-400">
+                        {" "}
+                        — {sanction.program}
+                      </span>
                     )}
                     {sanction.reason && (
-                      <p className="text-gray-500 text-[10px] mt-0.5">{sanction.reason}</p>
+                      <p className="text-gray-500 text-[10px] mt-0.5">
+                        {sanction.reason}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -591,25 +618,33 @@ function SearchResultCard({
           )}
 
           {/* Adverse Media Details */}
-          {entity.adverse_media_details && entity.adverse_media_details.length > 0 && (
-            <div className="mb-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Newspaper className="w-4 h-4 text-orange-400" />
-                <span className="text-sm font-medium text-orange-400">
-                  Adverse Media — Severidad {entity.adverse_media_severity}
-                </span>
+          {entity.adverse_media_details &&
+            entity.adverse_media_details.length > 0 && (
+              <div className="mb-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <Newspaper className="w-4 h-4 text-orange-400" />
+                  <span className="text-sm font-medium text-orange-400">
+                    Adverse Media — Severidad {entity.adverse_media_severity}
+                  </span>
+                </div>
+                <div className="space-y-1.5">
+                  {entity.adverse_media_details.map((am, i) => (
+                    <div key={i} className="text-xs">
+                      <span className="text-gray-300 font-medium capitalize">
+                        {am.category}
+                      </span>
+                      <span className="text-gray-500">
+                        {" "}
+                        — sev. {am.severity}
+                      </span>
+                      <p className="text-gray-500 text-[10px] mt-0.5">
+                        {am.details}
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-1.5">
-                {entity.adverse_media_details.map((am, i) => (
-                  <div key={i} className="text-xs">
-                    <span className="text-gray-300 font-medium capitalize">{am.category}</span>
-                    <span className="text-gray-500"> — sev. {am.severity}</span>
-                    <p className="text-gray-500 text-[10px] mt-0.5">{am.details}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
           {/* Row 6: Explanation }}
           {entity.explanation && (
@@ -724,14 +759,28 @@ function SearchResultCard({
           )}
         </div>
 
-        {/* Arrow with animation */}
-        <motion.div
-          initial={{ x: 0, opacity: 0.5 }}
-          whileHover={{ x: 5, opacity: 1 }}
-          className="flex-shrink-0"
-        >
-          <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
-        </motion.div>
+        {/* Actions */}
+        <div className="flex flex-col items-center gap-2 flex-shrink-0">
+          {onCreateAlert && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onCreateAlert(result);
+              }}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+              title="Crear alerta de compliance"
+            >
+              <AlertCircle className="w-3.5 h-3.5 inline mr-1" />
+              Alertar
+            </button>
+          )}
+          <motion.div
+            initial={{ x: 0, opacity: 0.5 }}
+            whileHover={{ x: 5, opacity: 1 }}
+          >
+            <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+          </motion.div>
+        </div>
       </div>
     </motion.div>
   );
@@ -917,6 +966,12 @@ export function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialQuery = searchParams.get("q") || "";
+  const initialSourceLevel = parseInt(
+    searchParams.get("source_level") || "2",
+  ) as 1 | 2 | 3 | 4;
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(
+    initialSourceLevel,
+  );
 
   const {
     query,
@@ -931,7 +986,7 @@ export function SearchPage() {
     executeSearch,
     executeSemanticSearch,
     clearSearch,
-  } = useScreening();
+  } = useScreening(sourceLevel);
 
   const [showFilters, setShowFilters] = useState(false);
   const [localFilters, setLocalFilters] = useState({
@@ -947,8 +1002,21 @@ export function SearchPage() {
     }
   }, []);
 
+  // Re-execute search when sourceLevel changes
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const q = query || initialQuery;
+    if (q) {
+      executeSearch(q);
+    }
+  }, [sourceLevel]);
+
   const handleSearch = (searchQuery: string) => {
-    setSearchParams({ q: searchQuery });
+    setSearchParams({ q: searchQuery, source_level: String(sourceLevel) });
     if (searchMode === "semantic") {
       executeSemanticSearch(searchQuery);
     } else {
@@ -969,7 +1037,35 @@ export function SearchPage() {
   };
 
   const handleSelectResult = (entityId: string) => {
-    navigate(`/entity/${entityId}`);
+    navigate(`/entity/${entityId}?source_level=${sourceLevel}`);
+  };
+
+  const [alertCreating, setAlertCreating] = useState<string | null>(null);
+
+  const handleCreateAlert = async (result: (typeof results)[0]) => {
+    if (alertCreating) return;
+    setAlertCreating(result.entity_id);
+    try {
+      const resp = await complianceService.createAlertFromMatch({
+        query_name: query,
+        entity_id: result.entity_id,
+        entity_name: result.name,
+        match_confidence: result.confidence,
+        match_type: result.match_type || "opensearch",
+        risk_score: result.risk_score ?? 50,
+        sources: result.sources || [],
+      });
+      alert(`Alerta creada: ${resp.case_number}`);
+    } catch (err: unknown) {
+      const msg =
+        err && typeof err === "object" && "response" in err
+          ? (err as { response?: { data?: { detail?: string } } }).response
+              ?.data?.detail || "Error al crear alerta"
+          : "Error al crear alerta";
+      alert(msg);
+    } finally {
+      setAlertCreating(null);
+    }
   };
 
   const handleFilterChange = (newFilters: typeof localFilters) => {
@@ -1003,7 +1099,20 @@ export function SearchPage() {
           <IntelligentSearch
             onSearch={handleSearch}
             onSelectResult={handleSelectResult}
+            initialQuery={initialQuery}
             className="max-w-3xl"
+            sourceLevel={sourceLevel}
+          />
+          <SourceLevelSelector
+            value={sourceLevel}
+            onChange={(level) => {
+              setSourceLevel(level);
+              setSearchParams({
+                q: query || initialQuery,
+                source_level: String(level),
+              });
+            }}
+            className="mt-3"
           />
         </motion.div>
 
@@ -1130,6 +1239,8 @@ export function SearchPage() {
                           key={result.entity_id}
                           result={result}
                           onClick={() => handleSelectResult(result.entity_id)}
+                          queryName={query}
+                          onCreateAlert={handleCreateAlert}
                         />
                       ))}
                     </motion.div>

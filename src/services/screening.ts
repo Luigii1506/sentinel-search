@@ -6,7 +6,7 @@ export interface OptimizedSearchRequest {
   query: string;
   max_results?: number;
   min_confidence?: number;
-  source_level?: 1 | 2 | 3;
+  source_level?: 1 | 2 | 3 | 4;
   use_cache?: boolean;
   timeout_ms?: number;
 }
@@ -22,6 +22,13 @@ export interface OptimizedSearchResult {
   confidence: number;
   match_type: 'opensearch' | 'semantic' | 'phonetic' | 'hybrid';
   match_sources: string[];
+  // Adverse media (Tier 1 — structured)
+  has_adverse_media?: boolean;
+  adverse_media_categories?: string[];
+  adverse_media_severity?: number;
+  // Adverse media (Tier 2 — articles)
+  article_count?: number;
+  article_max_severity?: number;
 }
 
 export interface OptimizedSearchResponse {
@@ -168,6 +175,7 @@ export const screeningService = {
       name: request.name,
       max_results: request.max_results ?? 50,
       min_confidence: request.min_confidence ?? 0.5,
+      source_level: request.source_level,
     });
 
     const entityTypeMap: Record<string, string> = {

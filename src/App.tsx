@@ -16,6 +16,8 @@ import { AuditPage } from '@/pages/AuditPage';
 import { MergeReviewPage } from '@/pages/MergeReviewPage';
 import { ComplianceDashboardPage } from '@/pages/ComplianceDashboardPage';
 import { CaseDetailPage } from '@/pages/CaseDetailPage';
+import ReportsPage from '@/pages/ReportsPage';
+import { AdverseMediaPage } from '@/pages/AdverseMediaPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -110,6 +112,16 @@ function App() {
                 }
               />
               
+              {/* Adverse Media */}
+              <Route
+                path="/adverse-media"
+                element={
+                  <AuthenticatedLayout>
+                    <AdverseMediaPage />
+                  </AuthenticatedLayout>
+                }
+              />
+
               {/* Compliance */}
               <Route
                 path="/compliance"
@@ -141,10 +153,7 @@ function App() {
                 path="/reports"
                 element={
                   <AuthenticatedLayout>
-                    <div className="pt-24 px-8">
-                      <h1 className="text-2xl font-bold mb-4">Reportes</h1>
-                      <p className="text-gray-400">Generación de reportes de cumplimiento (Próximamente)</p>
-                    </div>
+                    <ReportsPage />
                   </AuthenticatedLayout>
                 }
               />

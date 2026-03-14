@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -34,6 +34,7 @@ import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
 import { cn, getRiskColor, formatDate } from '@/lib/utils';
+import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
 import type { APISanctionEntry } from '@/types/api';
 
@@ -609,11 +610,24 @@ function RelationshipCard({ rel }: { rel: { target_name?: string; type: string; 
 export function EntityProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
   const [graphDepth, setGraphDepth] = useState(2);
 
-  const { entity, isLoading, error, refetch } = useEntity(id);
+  const sourceLevelParam = searchParams.get('source_level');
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(
+    sourceLevelParam ? (parseInt(sourceLevelParam) as 1 | 2 | 3 | 4) : 2
+  );
+
+  const handleSourceLevelChange = (level: 1 | 2 | 3 | 4) => {
+    setSourceLevel(level);
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('source_level', String(level));
+    setSearchParams(newParams, { replace: true });
+  };
+
+  const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
   const { data: relationshipsList } = useRelationshipsList(id, {
     enabled: activeTab === 'relationships',
@@ -774,7 +788,10 @@ export function EntityProfilePage() {
 
               {/* Data Sources */}
               <div className="mt-6">
-                <p className="text-xs text-gray-500 uppercase mb-2">Fuentes de Datos</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs text-gray-500 uppercase">Fuentes de Datos</p>
+                  <SourceLevelSelector value={sourceLevel} onChange={handleSourceLevelChange} size="sm" />
+                </div>
                 <div className="flex flex-wrap gap-2">
                   {entity.data_sources.map((source) => (
                     <span

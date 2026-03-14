@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import {
   User,
   Shield,
@@ -13,11 +14,17 @@ import {
   CheckCircle,
   UserCircle,
   Building,
+  AlertTriangle,
+  Clock,
+  TrendingUp,
+  Zap,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn, formatDate, getSourceBadgeClass, getRelationshipTypeLabel } from '@/lib/utils';
+import { complianceService } from '@/services/compliance';
 import type { Entity } from '@/types';
 
 interface InformationTabsProps {
@@ -452,9 +459,30 @@ function PepTab({ entity }: { entity: Entity }) {
   );
 }
 
-// Adverse Media Tab
+// Adverse Media Tab — connected to real API
 function AdverseMediaTab({ entity }: { entity: Entity }) {
-  if (entity.adverseMedia.length === 0) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['adverse-media-entity', entity.id],
+    queryFn: () => complianceService.getAdverseMediaProfile(entity.id),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <Skeleton className="h-24 rounded-xl" />
+        <Skeleton className="h-32 rounded-xl" />
+        <Skeleton className="h-32 rounded-xl" />
+      </div>
+    );
+  }
+
+  const profile = data;
+  const articles = profile?.articles?.items || [];
+  const riskProfile = profile?.risk_profile;
+  const structured = profile?.structured_media;
+  const hasContent = articles.length > 0 || (structured?.has_adverse_media);
+
+  if (!hasContent) {
     return (
       <div className="glass rounded-xl p-8 text-center">
         <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
@@ -464,65 +492,152 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
     );
   }
 
+  const severityColor = (s: number) =>
+    s >= 90 ? 'text-red-400' : s >= 70 ? 'text-orange-400' : s >= 50 ? 'text-yellow-400' : 'text-blue-400';
+
+  const severityBg = (s: number) =>
+    s >= 90 ? 'bg-red-500' : s >= 70 ? 'bg-orange-500' : s >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
+
+  const categoryLabels: Record<string, string> = {
+    terrorism: 'Terrorismo', sanctions_evasion: 'Evasion Sanciones', wanted: 'Buscados',
+    crime: 'Crimen', human_rights: 'DDHH', financial_crime: 'Crimen Financiero',
+    corruption: 'Corrupcion', offshore: 'Offshore', regulatory: 'Regulatorio',
+  };
+
   return (
     <div className="space-y-4">
-      {entity.adverseMedia.map((media, index) => (
-        <motion.div
-          key={media.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="glass rounded-xl p-5 border-l-4 border-orange-500"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-            <h4 className="text-lg font-medium text-white flex-1">{media.title}</h4>
-            <Badge
-              variant="outline"
-              className={cn(
-                'capitalize',
-                media.sentiment === 'negative'
-                  ? 'bg-red-500/10 text-red-400 border-red-500/30'
-                  : media.sentiment === 'neutral'
-                  ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
-                  : 'bg-green-500/10 text-green-400 border-green-500/30'
+      {/* Risk Profile Summary */}
+      {riskProfile && riskProfile.total_articles > 0 && (
+        <div className="glass rounded-xl p-5">
+          <div className="flex items-center gap-6">
+            <div className="text-center">
+              <p className={cn('text-3xl font-bold', severityColor(riskProfile.article_risk_score))}>
+                {Math.round(riskProfile.article_risk_score)}
+              </p>
+              <p className="text-xs text-gray-400">Risk Score</p>
+            </div>
+            <div className="flex-1 grid grid-cols-3 gap-4">
+              <div>
+                <p className="text-lg font-bold text-white">{riskProfile.total_articles}</p>
+                <p className="text-xs text-gray-400">Articulos</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-white">{riskProfile.recent_30d}</p>
+                <p className="text-xs text-gray-400">Ultimos 30d</p>
+              </div>
+              <div>
+                <p className={cn('text-lg font-bold', severityColor(riskProfile.max_severity))}>
+                  {riskProfile.max_severity}
+                </p>
+                <p className="text-xs text-gray-400">Max Severity</p>
+              </div>
+            </div>
+            {riskProfile.top_categories.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {riskProfile.top_categories.map((cat) => (
+                  <Badge key={cat} variant="outline" className="text-[10px] bg-white/5">
+                    {categoryLabels[cat] || cat}
+                  </Badge>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Structured Media (Tier 1) */}
+      {structured?.has_adverse_media && structured.categories.length > 0 && (
+        <div className="glass rounded-xl p-5">
+          <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            Categorias Estructuradas (Sources)
+          </h4>
+          <div className="space-y-2">
+            {structured.categories.map((cat, i) => (
+              <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
+                <span className="text-sm text-white">{categoryLabels[cat.category] || cat.category}</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                    <div className={cn('h-full rounded-full', severityBg(cat.severity))} style={{ width: `${cat.severity}%` }} />
+                  </div>
+                  <span className={cn('text-xs font-mono', severityColor(cat.severity))}>{cat.severity}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Articles (Tier 2) */}
+      {articles.length > 0 && (
+        <div>
+          <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+            <Newspaper className="w-4 h-4" />
+            Articulos de Noticias ({articles.length})
+          </h4>
+          {articles.map((article, index) => (
+            <motion.div
+              key={article.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="glass rounded-xl p-4 mb-3 border-l-4 border-orange-500/50"
+            >
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
+                {article.severity > 0 && (
+                  <Badge variant="outline" className={cn('text-xs shrink-0',
+                    article.severity >= 90 ? 'bg-red-500/10 text-red-400 border-red-500/30' :
+                    article.severity >= 70 ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
+                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                  )}>
+                    {article.severity}
+                  </Badge>
+                )}
+              </div>
+
+              {article.summary && (
+                <p className="text-xs text-gray-400 mb-2 line-clamp-2">{article.summary}</p>
               )}
-            >
-              {media.sentiment}
-            </Badge>
-          </div>
 
-          <p className="text-gray-300 mb-4">{media.summary}</p>
+              <div className="flex flex-wrap items-center gap-3 text-xs">
+                {article.categories?.map((cat) => (
+                  <Badge key={cat} variant="outline" className="text-[10px] bg-white/5">
+                    {categoryLabels[cat] || cat}
+                  </Badge>
+                ))}
+                <span className="text-gray-500 flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {article.publication_date ? formatDate(article.publication_date) : 'N/A'}
+                </span>
+                {article.link_confidence != null && (
+                  <span className="text-gray-500 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    {Math.round(article.link_confidence * 100)}% match
+                  </span>
+                )}
+                {article.is_verified && (
+                  <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/30">
+                    Verificado
+                  </Badge>
+                )}
+              </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-sm">
-            <div className="flex items-center gap-1 text-gray-400">
-              <Newspaper className="w-4 h-4" />
-              <span>{media.source}</span>
-            </div>
-            <div className="flex items-center gap-1 text-gray-400">
-              <span>{formatDate(media.publicationDate)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              {media.categories.map((cat) => (
-                <Badge key={cat} variant="outline" className="text-[10px] bg-white/5">
-                  {cat}
-                </Badge>
-              ))}
-            </div>
-          </div>
-
-          {media.sourceUrl && (
-            <a
-              href={media.sourceUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 mt-3 text-sm text-blue-400 hover:text-blue-300"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Read Article
-            </a>
-          )}
-        </motion.div>
-      ))}
+              {article.source_url && (
+                <a
+                  href={article.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mt-2 text-xs text-blue-400 hover:text-blue-300"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  Leer articulo
+                </a>
+              )}
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

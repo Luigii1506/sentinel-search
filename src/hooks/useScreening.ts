@@ -54,7 +54,7 @@ const defaultFilters: SearchFilters = {
   countries: [],
 };
 
-export function useScreening(): UseScreeningReturn {
+export function useScreening(sourceLevel?: 1 | 2 | 3 | 4): UseScreeningReturn {
   const [query, setQueryState] = useState('');
   const [suggestions, setSuggestions] = useState<ScreeningMatch[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -93,9 +93,23 @@ export function useScreening(): UseScreeningReturn {
     },
   });
 
-  // Optimized suggestions mutation
+  // Optimized suggestions mutation (respects source_level)
   const suggestionsMutation = useMutation({
-    mutationFn: (q: string) => screeningService.getSuggestions(q, 8),
+    mutationFn: (q: string) => screeningService.optimizedSearch({
+      query: q,
+      max_results: 8,
+      min_confidence: 0.5,
+      source_level: sourceLevel,
+    }).then(r => r.matches.map(m => ({
+      entity_id: m.entity_id,
+      name: m.name,
+      match_score: m.score * 100,
+      confidence: m.confidence,
+      match_type: m.match_type,
+      entity_type: m.entity_type?.toLowerCase(),
+      risk_level: m.risk_level,
+      sources: m.sources || [],
+    } as ScreeningMatch))),
     onSuccess: (data) => {
       setSuggestions(data);
     },
@@ -137,6 +151,7 @@ export function useScreening(): UseScreeningReturn {
       name: trimmedQuery,
       min_confidence: 0.5,
       max_results: 50,
+      source_level: sourceLevel,
       filters: {
         sources: filters.sources.length > 0 ? filters.sources : undefined,
         countries: filters.countries.length > 0 ? filters.countries : undefined,
@@ -145,7 +160,7 @@ export function useScreening(): UseScreeningReturn {
     };
 
     searchMutation.mutate(request);
-  }, [filters, searchMutation]);
+  }, [filters, searchMutation, sourceLevel]);
 
   // Execute optimized semantic search
   const executeSemanticSearch = useCallback((searchQuery: string) => {

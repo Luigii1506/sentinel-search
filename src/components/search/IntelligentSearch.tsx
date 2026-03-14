@@ -21,6 +21,8 @@ interface IntelligentSearchProps {
   size?: 'default' | 'large';
   placeholder?: string;
   autoFocus?: boolean;
+  initialQuery?: string;
+  sourceLevel?: 1 | 2 | 3 | 4;
 }
 
 const entityTypeFilters = [
@@ -45,6 +47,8 @@ export function IntelligentSearch({
   size = 'default',
   placeholder = 'Buscar personas, empresas, o identificadores...',
   autoFocus = false,
+  initialQuery = '',
+  sourceLevel,
 }: IntelligentSearchProps) {
   const {
     query,
@@ -55,11 +59,18 @@ export function IntelligentSearch({
     setFilters,
     executeSearch,
     clearSearch,
-  } = useScreening();
+  } = useScreening(sourceLevel);
 
   const [isFocused, setIsFocused] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+
+  // Initialize query from URL param
+  useEffect(() => {
+    if (initialQuery && !query) {
+      setQuery(initialQuery);
+    }
+  }, [initialQuery]);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 

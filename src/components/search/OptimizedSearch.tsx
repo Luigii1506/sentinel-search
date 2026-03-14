@@ -1,27 +1,34 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Zap, 
-  Clock, 
-  Database, 
-  Sparkles, 
+import {
+  Search,
+  Zap,
+  Clock,
+  Database,
+  Sparkles,
   BarChart3,
   AlertCircle,
-  XCircle
+  XCircle,
+  Eye,
+  AlertTriangle,
+  Check,
+  Loader2,
+  Newspaper
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import { screeningService, type OptimizedSearchResult } from '@/services/screening';
+import { complianceService } from '@/services/compliance';
 
 export interface OptimizedSearchProps {
   onResultSelect?: (result: OptimizedSearchResult) => void;
@@ -48,7 +55,7 @@ export function OptimizedSearch({
   const [results, setResults] = useState<OptimizedSearchResult[]>([]);
   const [metrics, setMetrics] = useState<SearchMetrics | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3>(2);
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(2);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Mutation para búsqueda optimizada
@@ -76,6 +83,50 @@ export function OptimizedSearch({
     },
   });
 
+  // Track which entities were just added to watchlist (for UI feedback)
+  const [watchlistedIds, setWatchlistedIds] = useState<Set<string>>(new Set());
+
+  // Mutation para agregar a monitoreo
+  const watchlistMutation = useMutation({
+    mutationFn: async (result: OptimizedSearchResult) => {
+      return complianceService.addToWatchlist({
+        entity_name: result.name,
+        entity_type: result.entity_type,
+        monitoring_frequency: 'daily',
+        source_level: sourceLevel,
+        min_confidence: 0.6,
+      });
+    },
+    onSuccess: (_data, result) => {
+      setWatchlistedIds(prev => new Set(prev).add(result.entity_id));
+      toast.success(`${result.name} agregado a monitoreo continuo`);
+    },
+    onError: (_err, result) => {
+      toast.error(`Error al agregar ${result.name} a monitoreo`);
+    },
+  });
+
+  // Mutation para crear alerta/caso desde resultado
+  const alertMutation = useMutation({
+    mutationFn: async (result: OptimizedSearchResult) => {
+      return complianceService.createAlertFromMatch({
+        query_name: query,
+        entity_id: result.entity_id,
+        entity_name: result.name,
+        match_confidence: result.confidence,
+        match_type: result.match_sources?.[0],
+        risk_score: result.risk_score ?? 0,
+        sources: result.sources ?? [],
+      });
+    },
+    onSuccess: (data) => {
+      toast.success(`Alerta creada — Caso ${data.case_number}`);
+    },
+    onError: () => {
+      toast.error('Error al crear alerta');
+    },
+  });
+
   const handleSearch = useCallback(() => {
     const trimmed = query.trim();
     if (trimmed.length < 2) return;
@@ -93,6 +144,7 @@ export function OptimizedSearch({
     setResults([]);
     setMetrics(null);
     setIsExpanded(false);
+    setWatchlistedIds(new Set());
     inputRef.current?.focus();
   }, []);
 
@@ -185,9 +237,10 @@ export function OptimizedSearch({
       <div className="mt-3 flex items-center gap-2">
         <span className="text-xs text-gray-500 mr-1">Nivel:</span>
         {([
-          { level: 1 as const, label: 'Core AML', desc: 'Sanciones, Terrorismo, Law Enforcement' },
-          { level: 2 as const, label: 'Extendido', desc: '+ PEP, Inhabilitaciones, Regulatorio' },
-          { level: 3 as const, label: 'Completo', desc: 'Todas las fuentes' },
+          { level: 1 as const, label: 'Critical', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
+          { level: 2 as const, label: 'Sanciones', desc: '+ Sanciones, Terrorismo, Law Enforcement restantes' },
+          { level: 3 as const, label: 'PEP & Compliance', desc: '+ PEP, Inhabilitaciones, Regulatorio, Fiscal' },
+          { level: 4 as const, label: 'Completo', desc: 'Todas las fuentes' },
         ]).map(({ level, label, desc }) => (
           <TooltipProvider key={level}>
             <Tooltip>
@@ -375,6 +428,15 @@ export function OptimizedSearch({
                     >
                       {result.risk_level}
                     </Badge>
+                    {(result.has_adverse_media || (result.article_count ?? 0) > 0) && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs gap-1 border-orange-500/30 text-orange-400"
+                      >
+                        <Newspaper className="w-3 h-3" />
+                        {result.article_count ?? 0} media
+                      </Badge>
+                    )}
                   </div>
                   
                   <div className="flex items-center gap-3 text-sm text-gray-400">
@@ -407,8 +469,64 @@ export function OptimizedSearch({
                   )}
                 </div>
 
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ArrowRight className="w-5 h-5 text-blue-400" />
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            watchlistMutation.mutate(result);
+                          }}
+                          disabled={watchlistedIds.has(result.entity_id) || watchlistMutation.isPending}
+                          className={cn(
+                            "p-2 rounded-lg transition-all duration-200",
+                            watchlistedIds.has(result.entity_id)
+                              ? "bg-green-500/20 text-green-400 cursor-default"
+                              : "hover:bg-purple-500/20 text-gray-400 hover:text-purple-400"
+                          )}
+                        >
+                          {watchlistedIds.has(result.entity_id) ? (
+                            <Check className="w-4 h-4" />
+                          ) : watchlistMutation.isPending && watchlistMutation.variables?.entity_id === result.entity_id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{watchlistedIds.has(result.entity_id) ? 'En monitoreo' : 'Monitorear'}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            alertMutation.mutate(result);
+                          }}
+                          disabled={alertMutation.isPending}
+                          className="p-2 rounded-lg hover:bg-orange-500/20 text-gray-400
+                                     hover:text-orange-400 transition-all duration-200"
+                        >
+                          {alertMutation.isPending && alertMutation.variables?.entity_id === result.entity_id ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <AlertTriangle className="w-4 h-4" />
+                          )}
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Investigar (crear alerta)</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <ArrowRight className="w-5 h-5 text-blue-400 ml-1" />
                 </div>
               </motion.div>
             ))}
