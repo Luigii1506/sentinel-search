@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -11,24 +11,36 @@ import {
   Search,
   Filter,
   CheckCircle,
-  XCircle,
   Clock,
   Zap,
   TrendingUp,
   Globe,
-  X,
   User,
   Building2,
   Link2,
   ShieldAlert,
   FileText,
   Eye,
+  Brain,
+  Cpu,
+  Tag,
+  BarChart3,
 } from 'lucide-react';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Input } from '@/components/ui/input';
+import { Slider } from '@/components/ui/slider';
 import {
   Dialog,
   DialogContent,
@@ -50,7 +62,6 @@ import type {
   AdverseMediaArticle,
   AdverseMediaStats,
   AdverseMediaSource,
-  ArticleDetail,
 } from '@/services/compliance';
 
 const containerVariants = {
@@ -87,6 +98,13 @@ const categoryLabels: Record<string, string> = {
   regulatory: 'Regulatorio',
 };
 
+const methodLabels: Record<string, { label: string; color: string; icon: typeof Zap }> = {
+  moonshot_ai: { label: 'Moonshot AI', color: 'bg-violet-500/10 text-violet-400 border-violet-500/30', icon: Brain },
+  claude_ai: { label: 'Claude AI', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30', icon: Brain },
+  keyword: { label: 'Keywords', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30', icon: Tag },
+  unknown: { label: 'Sin clasificar', color: 'bg-gray-500/10 text-gray-500 border-gray-500/30', icon: Cpu },
+};
+
 function getSeverityColor(severity: number): string {
   if (severity >= 90) return 'text-red-400 bg-red-500/10 border-red-500/30';
   if (severity >= 70) return 'text-orange-400 bg-orange-500/10 border-orange-500/30';
@@ -116,17 +134,31 @@ function formatDate(dateStr: string | null): string {
   return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+function getMethodBadge(method: string | null | undefined) {
+  const key = method || 'unknown';
+  const meta = methodLabels[key] || methodLabels.unknown;
+  const Icon = meta.icon;
+  return (
+    <Badge variant="outline" className={cn('text-[10px] gap-1', meta.color)}>
+      <Icon className="w-3 h-3" />
+      {meta.label}
+    </Badge>
+  );
+}
+
 // ── Stat Card ──
 
 function StatCard({
   label,
   value,
+  subValue,
   icon: Icon,
   color = 'text-blue-400',
   bgColor = 'bg-blue-500/10',
 }: {
   label: string;
   value: string | number;
+  subValue?: string;
   icon: typeof Newspaper;
   color?: string;
   bgColor?: string;
@@ -140,6 +172,7 @@ function StatCard({
         <div>
           <p className="text-2xl font-bold text-white">{value}</p>
           <p className="text-sm text-gray-400">{label}</p>
+          {subValue && <p className="text-xs text-gray-500">{subValue}</p>}
         </div>
       </div>
     </motion.div>
@@ -152,14 +185,16 @@ function ArticlesTab() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDays, setSelectedDays] = useState<string>('30');
+  const [minSeverity, setMinSeverity] = useState<number>(0);
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ['adverse-media-articles', searchQuery, selectedCategory, selectedDays],
+    queryKey: ['adverse-media-articles', searchQuery, selectedCategory, selectedDays, minSeverity],
     queryFn: () =>
       complianceService.searchAdverseMedia({
         query: searchQuery || undefined,
         categories: selectedCategory !== 'all' ? [selectedCategory] : undefined,
+        min_severity: minSeverity > 0 ? minSeverity : undefined,
         days: parseInt(selectedDays),
         limit: 100,
       }),
@@ -181,7 +216,7 @@ function ArticlesTab() {
     <div className="space-y-4">
       {/* Filters */}
       <div className="glass rounded-xl p-4">
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-3 items-end">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -218,6 +253,18 @@ function ArticlesTab() {
               <SelectItem value="365">1 ano</SelectItem>
             </SelectContent>
           </Select>
+          <div className="w-[180px]">
+            <p className="text-[10px] text-gray-500 mb-1">
+              Severity min: <span className="text-white font-mono">{minSeverity}</span>
+            </p>
+            <Slider
+              value={[minSeverity]}
+              onValueChange={(v) => setMinSeverity(v[0])}
+              max={100}
+              step={10}
+              className="w-full"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={() => refetch()} className="border-white/10">
             <RefreshCw className="w-4 h-4 mr-1" />
             Refresh
@@ -260,15 +307,23 @@ function ArticlesTab() {
 }
 
 function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onClick?: () => void }) {
+  const sourceDomain = useMemo(() => {
+    try {
+      return new URL(article.source_url).hostname.replace('www.', '');
+    } catch {
+      return null;
+    }
+  }, [article.source_url]);
+
   return (
     <motion.div
       variants={itemVariants}
-      className="glass rounded-xl p-5 hover:bg-white/[0.04] transition-colors cursor-pointer"
+      className="glass rounded-xl p-5 hover:bg-white/[0.04] transition-colors cursor-pointer group"
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
             {article.severity > 0 && (
               <Badge variant="outline" className={cn('text-xs', getSeverityColor(article.severity))}>
                 {article.severity}
@@ -283,12 +338,10 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
                 {categoryLabels[cat] || cat}
               </Badge>
             ))}
-            {article.language && (
-              <span className="text-xs text-gray-500 uppercase">{article.language}</span>
-            )}
+            {getMethodBadge(article.classification_method)}
           </div>
 
-          <h4 className="text-sm font-medium text-white mb-1 line-clamp-2">
+          <h4 className="text-sm font-medium text-white mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
             {article.title}
           </h4>
 
@@ -297,14 +350,22 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
           )}
 
           <div className="flex items-center gap-3 text-xs text-gray-500">
+            {sourceDomain && (
+              <span className="flex items-center gap-1 text-gray-400">
+                <Globe className="w-3 h-3" />
+                {sourceDomain}
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {formatDate(article.publication_date)}
             </span>
-            {article.classification_method && (
-              <span className="flex items-center gap-1">
-                <Zap className="w-3 h-3" />
-                {article.classification_method}
+            {article.language && (
+              <span className="uppercase text-gray-600">{article.language}</span>
+            )}
+            {article.classification_confidence != null && article.classification_confidence > 0 && (
+              <span className="text-gray-600">
+                {Math.round(article.classification_confidence * 100)}% conf
               </span>
             )}
           </div>
@@ -312,10 +373,17 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
 
         {/* Severity bar */}
         {article.severity > 0 && (
-          <div className="w-16 flex flex-col items-center gap-1">
-            <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+          <div className="w-20 flex flex-col items-center gap-1 shrink-0">
+            <span className={cn('text-xs font-mono font-bold',
+              article.severity >= 90 ? 'text-red-400' :
+              article.severity >= 70 ? 'text-orange-400' :
+              article.severity >= 50 ? 'text-yellow-400' : 'text-blue-400'
+            )}>
+              {article.severity}
+            </span>
+            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
               <div
-                className={cn('h-full rounded-full', getSeverityBarColor(article.severity))}
+                className={cn('h-full rounded-full transition-all', getSeverityBarColor(article.severity))}
                 style={{ width: `${article.severity}%` }}
               />
             </div>
@@ -326,7 +394,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
           href={article.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 shrink-0"
+          className="text-blue-400 hover:text-blue-300 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink className="w-4 h-4" />
@@ -340,6 +408,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
 
 function SourcesTab() {
   const queryClient = useQueryClient();
+  const [filterType, setFilterType] = useState<string>('all');
 
   const { data, isLoading } = useQuery({
     queryKey: ['adverse-media-sources'],
@@ -369,12 +438,58 @@ function SourcesTab() {
   const activeSources = sources.filter((s) => s.is_active);
   const inactiveSources = sources.filter((s) => !s.is_active);
 
+  const filteredActive = filterType === 'all'
+    ? activeSources
+    : activeSources.filter((s) => s.source_type === filterType);
+
+  const totalArticles = activeSources.reduce((sum, s) => sum + s.total_articles, 0);
+  const totalErrors = sources.reduce((sum, s) => sum + s.error_count, 0);
+
   return (
     <div className="space-y-6">
+      {/* Sources summary */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div className="glass rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-green-400">{activeSources.length}</p>
+          <p className="text-xs text-gray-400">Activas</p>
+        </div>
+        <div className="glass rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-red-400">{inactiveSources.length}</p>
+          <p className="text-xs text-gray-400">Inactivas</p>
+        </div>
+        <div className="glass rounded-lg p-3 text-center">
+          <p className="text-xl font-bold text-white">{totalArticles.toLocaleString()}</p>
+          <p className="text-xs text-gray-400">Total Articulos</p>
+        </div>
+        <div className="glass rounded-lg p-3 text-center">
+          <p className={cn('text-xl font-bold', totalErrors > 0 ? 'text-orange-400' : 'text-gray-600')}>{totalErrors}</p>
+          <p className="text-xs text-gray-400">Errores Acumulados</p>
+        </div>
+      </div>
+
+      {/* Filter by type */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-gray-500">Filtrar:</span>
+        {['all', 'rss', 'api', 'gdelt'].map((type) => (
+          <Button
+            key={type}
+            variant="outline"
+            size="sm"
+            className={cn(
+              'text-xs border-white/10',
+              filterType === type && 'bg-white/10 text-white'
+            )}
+            onClick={() => setFilterType(type)}
+          >
+            {type === 'all' ? 'Todas' : type.toUpperCase()}
+          </Button>
+        ))}
+      </div>
+
       {/* Active sources */}
       <div>
         <h3 className="text-sm font-medium text-gray-400 mb-3">
-          Fuentes Activas ({activeSources.length})
+          Fuentes Activas ({filteredActive.length})
         </h3>
         <div className="glass rounded-xl overflow-hidden">
           <table className="w-full text-sm">
@@ -390,7 +505,7 @@ function SourcesTab() {
               </tr>
             </thead>
             <tbody>
-              {activeSources
+              {filteredActive
                 .sort((a, b) => b.total_articles - a.total_articles)
                 .map((source) => (
                   <SourceRow
@@ -413,6 +528,14 @@ function SourcesTab() {
           </h3>
           <div className="glass rounded-xl overflow-hidden opacity-60">
             <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/5">
+                  <th className="text-left p-3 text-gray-500 font-medium">Fuente</th>
+                  <th className="text-left p-3 text-gray-500 font-medium">Tipo</th>
+                  <th className="text-right p-3 text-gray-500 font-medium">Articulos</th>
+                  <th className="text-right p-3 text-gray-500 font-medium">Errores</th>
+                </tr>
+              </thead>
               <tbody>
                 {inactiveSources.map((source) => (
                   <tr key={source.id} className="border-b border-white/5 last:border-0">
@@ -423,7 +546,7 @@ function SourcesTab() {
                       </Badge>
                     </td>
                     <td className="p-3 text-right text-gray-500">{source.total_articles}</td>
-                    <td className="p-3 text-right text-gray-600">{source.error_count} errores</td>
+                    <td className="p-3 text-right text-red-400/60">{source.error_count}</td>
                   </tr>
                 ))}
               </tbody>
@@ -470,7 +593,9 @@ function SourceRow({
       </td>
       <td className="p-3 text-right">
         {source.error_count > 0 ? (
-          <span className="text-red-400">{source.error_count}</span>
+          <span className={cn(source.error_count > 5 ? 'text-red-400' : 'text-orange-400')}>
+            {source.error_count}
+          </span>
         ) : (
           <span className="text-gray-600">0</span>
         )}
@@ -502,38 +627,147 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
     .sort(([, a], [, b]) => b - a);
   const maxCount = Math.max(...categories.map(([, count]) => count), 1);
 
+  const methods = Object.entries(stats.by_method || {})
+    .sort(([, a], [, b]) => b - a);
+  const totalClassified = methods.reduce((sum, [, count]) => sum + count, 0);
+
+  const chartData = (stats.by_day || []).map((d) => ({
+    date: d.date ? new Date(d.date).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }) : '',
+    count: d.count,
+  }));
+
   return (
     <div className="space-y-6">
-      {/* Category Distribution */}
-      <div className="glass rounded-xl p-5">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-blue-400" />
-          Distribucion por Categoria
-        </h3>
-        <div className="space-y-3">
-          {categories.map(([category, count]) => (
-            <div key={category} className="flex items-center gap-3">
-              <span className="text-sm text-gray-400 w-36 shrink-0">
-                {categoryLabels[category] || category}
-              </span>
-              <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${(count / maxCount) * 100}%` }}
-                  transition={{ duration: 0.8, ease: 'easeOut' }}
-                  className={cn('h-full rounded-full', getSeverityBarColor(
-                    category === 'terrorism' ? 100 :
-                    category === 'sanctions_evasion' ? 95 :
-                    category === 'crime' ? 85 :
-                    category === 'financial_crime' ? 80 :
-                    category === 'corruption' ? 80 :
-                    50
-                  ))}
+      {/* Time Series Chart */}
+      {chartData.length > 0 && (
+        <div className="glass rounded-xl p-5">
+          <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-orange-400" />
+            Articulos Adverse por Dia (30d)
+          </h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData}>
+                <defs>
+                  <linearGradient id="colorAdverse" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis
+                  dataKey="date"
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
+                  interval="preserveStartEnd"
                 />
+                <YAxis
+                  stroke="rgba(255,255,255,0.3)"
+                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
+                  allowDecimals={false}
+                />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: '#1a1a2e',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '12px',
+                  }}
+                  labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="count"
+                  stroke="#f97316"
+                  strokeWidth={2}
+                  fillOpacity={1}
+                  fill="url(#colorAdverse)"
+                  name="Articulos"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Category Distribution */}
+        <div className="glass rounded-xl p-5">
+          <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-blue-400" />
+            Distribucion por Categoria
+          </h3>
+          <div className="space-y-3">
+            {categories.map(([category, count]) => (
+              <div key={category} className="flex items-center gap-3">
+                <span className="text-sm text-gray-400 w-32 shrink-0 truncate">
+                  {categoryLabels[category] || category}
+                </span>
+                <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(count / maxCount) * 100}%` }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    className={cn('h-full rounded-full', getSeverityBarColor(
+                      category === 'terrorism' ? 100 :
+                      category === 'sanctions_evasion' ? 95 :
+                      category === 'crime' ? 85 :
+                      category === 'financial_crime' ? 80 :
+                      category === 'corruption' ? 80 :
+                      50
+                    ))}
+                  />
+                </div>
+                <span className="text-sm font-mono text-white w-8 text-right">{count}</span>
               </div>
-              <span className="text-sm font-mono text-white w-10 text-right">{count}</span>
-            </div>
-          ))}
+            ))}
+            {categories.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">Sin datos de categorias</p>
+            )}
+          </div>
+        </div>
+
+        {/* Classification Method Distribution */}
+        <div className="glass rounded-xl p-5">
+          <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+            <Brain className="w-5 h-5 text-violet-400" />
+            Metodo de Clasificacion
+          </h3>
+          <div className="space-y-3">
+            {methods.map(([method, count]) => {
+              const meta = methodLabels[method] || methodLabels.unknown;
+              const Icon = meta.icon;
+              const pct = totalClassified > 0 ? Math.round((count / totalClassified) * 100) : 0;
+              return (
+                <div key={method} className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 w-32 shrink-0">
+                    <Icon className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400 truncate">{meta.label}</span>
+                  </div>
+                  <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${pct}%` }}
+                      transition={{ duration: 0.8, ease: 'easeOut' }}
+                      className={cn('h-full rounded-full',
+                        method === 'moonshot_ai' ? 'bg-violet-500' :
+                        method === 'claude_ai' ? 'bg-cyan-500' :
+                        method === 'keyword' ? 'bg-gray-500' : 'bg-gray-600'
+                      )}
+                    />
+                  </div>
+                  <div className="text-right w-20 shrink-0">
+                    <span className="text-sm font-mono text-white">{count}</span>
+                    <span className="text-xs text-gray-500 ml-1">({pct}%)</span>
+                  </div>
+                </div>
+              );
+            })}
+            {methods.length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-4">Sin datos de metodos</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -637,6 +871,7 @@ function ArticleDetailModal({
                         {categoryLabels[cat] || cat}
                       </Badge>
                     ))}
+                    {getMethodBadge(article.classification_method)}
                   </div>
                 </div>
               </div>
@@ -657,15 +892,9 @@ function ArticleDetailModal({
               {article.language && (
                 <span className="uppercase">{article.language}</span>
               )}
-              {article.classification_method && (
-                <span className="flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  {article.classification_method}
-                  {article.classification_confidence != null && (
-                    <span className="text-gray-500">
-                      ({Math.round(article.classification_confidence * 100)}%)
-                    </span>
-                  )}
+              {article.classification_confidence != null && (
+                <span className="text-gray-500">
+                  Confianza: {Math.round(article.classification_confidence * 100)}%
                 </span>
               )}
               <a
@@ -831,6 +1060,10 @@ export function AdverseMediaPage() {
     onError: () => toast.error('Error al reclasificar'),
   });
 
+  // Compute AI vs keyword ratio for stat card
+  const aiArticles = (stats?.by_method?.moonshot_ai || 0) + (stats?.by_method?.claude_ai || 0);
+  const keywordArticles = stats?.by_method?.keyword || 0;
+
   return (
     <div className="min-h-screen p-6 md:p-8 max-w-7xl mx-auto">
       {/* Header */}
@@ -867,10 +1100,10 @@ export function AdverseMediaPage() {
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
       >
         {statsLoading ? (
-          [...Array(4)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)
+          [...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)
         ) : (
           <>
             <StatCard
@@ -883,6 +1116,7 @@ export function AdverseMediaPage() {
             <StatCard
               label="Adverse Media"
               value={stats?.adverse ?? 0}
+              subValue={`${stats?.adverse_rate_pct ?? 0}% tasa`}
               icon={AlertTriangle}
               color="text-orange-400"
               bgColor="bg-orange-500/10"
@@ -897,9 +1131,18 @@ export function AdverseMediaPage() {
             <StatCard
               label="Entity Links"
               value={stats?.total_entity_links ?? 0}
+              subValue={`${stats?.entities_with_articles ?? 0} entidades`}
               icon={Activity}
               color="text-purple-400"
               bgColor="bg-purple-500/10"
+            />
+            <StatCard
+              label="Clasificacion AI"
+              value={aiArticles}
+              subValue={`${keywordArticles} por keywords`}
+              icon={Brain}
+              color="text-violet-400"
+              bgColor="bg-violet-500/10"
             />
           </>
         )}

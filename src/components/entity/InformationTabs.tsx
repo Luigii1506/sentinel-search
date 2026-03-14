@@ -18,9 +18,14 @@ import {
   Clock,
   TrendingUp,
   Zap,
+  Brain,
+  Tag,
+  ArrowRight,
+  Globe,
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, formatDate, getSourceBadgeClass, getRelationshipTypeLabel } from '@/lib/utils';
@@ -498,24 +503,68 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   const severityBg = (s: number) =>
     s >= 90 ? 'bg-red-500' : s >= 70 ? 'bg-orange-500' : s >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
 
+  const severityLabel = (s: number) =>
+    s >= 90 ? 'Critico' : s >= 70 ? 'Alto' : s >= 50 ? 'Medio' : s >= 30 ? 'Bajo' : 'Minimo';
+
   const categoryLabels: Record<string, string> = {
     terrorism: 'Terrorismo', sanctions_evasion: 'Evasion Sanciones', wanted: 'Buscados',
     crime: 'Crimen', human_rights: 'DDHH', financial_crime: 'Crimen Financiero',
     corruption: 'Corrupcion', offshore: 'Offshore', regulatory: 'Regulatorio',
   };
 
+  const categoryColors: Record<string, string> = {
+    terrorism: 'bg-red-500/10 text-red-400 border-red-500/30',
+    sanctions_evasion: 'bg-red-500/10 text-red-300 border-red-500/30',
+    wanted: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
+    crime: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
+    human_rights: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
+    financial_crime: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
+    corruption: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+    offshore: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+    regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+  };
+
+  const getMethodIcon = (method: string | undefined) => {
+    if (method === 'moonshot_ai' || method === 'claude_ai') return Brain;
+    if (method === 'keyword') return Tag;
+    return Zap;
+  };
+
+  const getMethodLabel = (method: string | undefined) => {
+    if (method === 'moonshot_ai') return 'Moonshot AI';
+    if (method === 'claude_ai') return 'Claude AI';
+    if (method === 'keyword') return 'Keywords';
+    return method || '';
+  };
+
   return (
     <div className="space-y-4">
-      {/* Risk Profile Summary */}
+      {/* Risk Profile Summary — enhanced gauge */}
       {riskProfile && riskProfile.total_articles > 0 && (
         <div className="glass rounded-xl p-5">
           <div className="flex items-center gap-6">
-            <div className="text-center">
-              <p className={cn('text-3xl font-bold', severityColor(riskProfile.article_risk_score))}>
-                {Math.round(riskProfile.article_risk_score)}
-              </p>
-              <p className="text-xs text-gray-400">Risk Score</p>
+            {/* Risk Score Gauge */}
+            <div className="relative w-20 h-20 shrink-0">
+              <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="3" />
+                <circle
+                  cx="18" cy="18" r="14" fill="none"
+                  stroke={riskProfile.article_risk_score >= 90 ? '#ef4444' :
+                    riskProfile.article_risk_score >= 70 ? '#f97316' :
+                    riskProfile.article_risk_score >= 50 ? '#eab308' : '#3b82f6'}
+                  strokeWidth="3"
+                  strokeDasharray={`${(riskProfile.article_risk_score / 100) * 88} 88`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={cn('text-lg font-bold', severityColor(riskProfile.article_risk_score))}>
+                  {Math.round(riskProfile.article_risk_score)}
+                </span>
+                <span className="text-[8px] text-gray-500">{severityLabel(riskProfile.article_risk_score)}</span>
+              </div>
             </div>
+
             <div className="flex-1 grid grid-cols-3 gap-4">
               <div>
                 <p className="text-lg font-bold text-white">{riskProfile.total_articles}</p>
@@ -535,7 +584,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
             {riskProfile.top_categories.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {riskProfile.top_categories.map((cat) => (
-                  <Badge key={cat} variant="outline" className="text-[10px] bg-white/5">
+                  <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-white/5')}>
                     {categoryLabels[cat] || cat}
                   </Badge>
                 ))}
@@ -571,71 +620,115 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
       {/* Articles (Tier 2) */}
       {articles.length > 0 && (
         <div>
-          <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
-            <Newspaper className="w-4 h-4" />
-            Articulos de Noticias ({articles.length})
-          </h4>
-          {articles.map((article, index) => (
-            <motion.div
-              key={article.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="glass rounded-xl p-4 mb-3 border-l-4 border-orange-500/50"
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+              <Newspaper className="w-4 h-4" />
+              Articulos de Noticias ({articles.length})
+            </h4>
+            <a
+              href="/adverse-media"
+              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
-                {article.severity > 0 && (
-                  <Badge variant="outline" className={cn('text-xs shrink-0',
-                    article.severity >= 90 ? 'bg-red-500/10 text-red-400 border-red-500/30' :
-                    article.severity >= 70 ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
-                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
-                  )}>
-                    {article.severity}
-                  </Badge>
+              Ver dashboard completo
+              <ArrowRight className="w-3 h-3" />
+            </a>
+          </div>
+          {articles.map((article, index) => {
+            const MethodIcon = getMethodIcon(article.classification_method);
+            let sourceDomain: string | null = null;
+            try {
+              sourceDomain = new URL(article.source_url).hostname.replace('www.', '');
+            } catch { /* ignore */ }
+
+            return (
+              <motion.div
+                key={article.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={cn(
+                  'glass rounded-xl p-4 mb-3 border-l-4',
+                  article.severity >= 90 ? 'border-red-500/70' :
+                  article.severity >= 70 ? 'border-orange-500/60' :
+                  article.severity >= 50 ? 'border-yellow-500/50' :
+                  'border-blue-500/40'
                 )}
-              </div>
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
+                  {article.severity > 0 && (
+                    <div className="flex items-center gap-1 shrink-0">
+                      <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                        <div className={cn('h-full rounded-full', severityBg(article.severity))} style={{ width: `${article.severity}%` }} />
+                      </div>
+                      <span className={cn('text-xs font-mono font-bold', severityColor(article.severity))}>
+                        {article.severity}
+                      </span>
+                    </div>
+                  )}
+                </div>
 
-              {article.summary && (
-                <p className="text-xs text-gray-400 mb-2 line-clamp-2">{article.summary}</p>
-              )}
+                {article.summary && (
+                  <p className="text-xs text-gray-400 mb-2 line-clamp-2">{article.summary}</p>
+                )}
 
-              <div className="flex flex-wrap items-center gap-3 text-xs">
-                {article.categories?.map((cat) => (
-                  <Badge key={cat} variant="outline" className="text-[10px] bg-white/5">
-                    {categoryLabels[cat] || cat}
-                  </Badge>
-                ))}
-                <span className="text-gray-500 flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  {article.publication_date ? formatDate(article.publication_date) : 'N/A'}
-                </span>
-                {article.link_confidence != null && (
-                  <span className="text-gray-500 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    {Math.round(article.link_confidence * 100)}% match
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {article.categories?.map((cat) => (
+                    <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-white/5')}>
+                      {categoryLabels[cat] || cat}
+                    </Badge>
+                  ))}
+
+                  {article.classification_method && (
+                    <Badge variant="outline" className={cn('text-[10px] gap-1',
+                      article.classification_method === 'moonshot_ai' ? 'bg-violet-500/10 text-violet-400 border-violet-500/30' :
+                      article.classification_method === 'claude_ai' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' :
+                      'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                    )}>
+                      <MethodIcon className="w-3 h-3" />
+                      {getMethodLabel(article.classification_method)}
+                    </Badge>
+                  )}
+
+                  <span className="text-gray-500 flex items-center gap-1 ml-auto">
+                    {sourceDomain && (
+                      <>
+                        <Globe className="w-3 h-3" />
+                        <span className="text-gray-400">{sourceDomain}</span>
+                        <span className="text-gray-600 mx-1">·</span>
+                      </>
+                    )}
+                    <Clock className="w-3 h-3" />
+                    {article.publication_date ? formatDate(article.publication_date) : 'N/A'}
                   </span>
-                )}
-                {article.is_verified && (
-                  <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/30">
-                    Verificado
-                  </Badge>
-                )}
-              </div>
 
-              {article.source_url && (
-                <a
-                  href={article.source_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 mt-2 text-xs text-blue-400 hover:text-blue-300"
-                >
-                  <ExternalLink className="w-3 h-3" />
-                  Leer articulo
-                </a>
-              )}
-            </motion.div>
-          ))}
+                  {article.link_confidence != null && (
+                    <span className="text-gray-500 flex items-center gap-1">
+                      <TrendingUp className="w-3 h-3" />
+                      {Math.round(article.link_confidence * 100)}% match
+                    </span>
+                  )}
+                  {article.is_verified && (
+                    <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/30">
+                      Verificado
+                    </Badge>
+                  )}
+                </div>
+
+                {article.source_url && (
+                  <a
+                    href={article.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-400 hover:text-blue-300"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    Leer articulo
+                  </a>
+                )}
+              </motion.div>
+            );
+          })}
         </div>
       )}
     </div>

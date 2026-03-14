@@ -192,6 +192,8 @@ export interface AdverseMediaStats {
   entities_with_articles: number;
   by_category: Record<string, number>;
   active_sources: number;
+  by_method: Record<string, number>;
+  by_day: Array<{ date: string; count: number }>;
 }
 
 export interface AdverseMediaSource {
