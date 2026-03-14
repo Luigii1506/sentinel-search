@@ -106,7 +106,9 @@ const SOURCE_DISPLAY: Record<string, string> = {
   co_funcion_publica: "Función Pública CO",
   ONU: "ONU Sanciones",
   UN_CONSOLIDATED: "ONU Sanciones",
+  INTERPOL: "Interpol Red Notices",
   INTERPOL_RED_NOTICES: "Interpol",
+  DEA: "DEA Fugitivos",
   ransomwhere: "Ransomwhere",
   CA_SANCTIONS: "Sanciones Canadá",
   CA_TERRORISTS: "Terroristas Canadá",
@@ -215,14 +217,29 @@ function getCountryFromSources(sources: string[]): string | null {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  US: "\u{1F1FA}\u{1F1F8}",
-  MX: "\u{1F1F2}\u{1F1FD}",
-  BR: "\u{1F1E7}\u{1F1F7}",
-  CO: "\u{1F1E8}\u{1F1F4}",
-  INT: "\u{1F30D}",
-  EU: "\u{1F1EA}\u{1F1FA}",
-  GB: "\u{1F1EC}\u{1F1E7}",
-  CA: "\u{1F1E8}\u{1F1E6}",
+  US: "\u{1F1FA}\u{1F1F8}", MX: "\u{1F1F2}\u{1F1FD}", BR: "\u{1F1E7}\u{1F1F7}",
+  CO: "\u{1F1E8}\u{1F1F4}", INT: "\u{1F30D}", EU: "\u{1F1EA}\u{1F1FA}",
+  GB: "\u{1F1EC}\u{1F1E7}", CA: "\u{1F1E8}\u{1F1E6}", UY: "\u{1F1FA}\u{1F1FE}",
+  AR: "\u{1F1E6}\u{1F1F7}", CL: "\u{1F1E8}\u{1F1F1}", PE: "\u{1F1F5}\u{1F1EA}",
+  VE: "\u{1F1FB}\u{1F1EA}", PA: "\u{1F1F5}\u{1F1E6}", CU: "\u{1F1E8}\u{1F1FA}",
+  RU: "\u{1F1F7}\u{1F1FA}", CN: "\u{1F1E8}\u{1F1F3}", IR: "\u{1F1EE}\u{1F1F7}",
+  KP: "\u{1F1F0}\u{1F1F5}", SY: "\u{1F1F8}\u{1F1FE}", AF: "\u{1F1E6}\u{1F1EB}",
+  BO: "\u{1F1E7}\u{1F1F4}", PY: "\u{1F1F5}\u{1F1FE}", EC: "\u{1F1EA}\u{1F1E8}",
+  ES: "\u{1F1EA}\u{1F1F8}", FR: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}",
+  IT: "\u{1F1EE}\u{1F1F9}", NL: "\u{1F1F3}\u{1F1F1}", TR: "\u{1F1F9}\u{1F1F7}",
+  UA: "\u{1F1FA}\u{1F1E6}", NG: "\u{1F1F3}\u{1F1EC}", ZA: "\u{1F1FF}\u{1F1E6}",
+  AU: "\u{1F1E6}\u{1F1FA}", JP: "\u{1F1EF}\u{1F1F5}", IN: "\u{1F1EE}\u{1F1F3}",
+};
+
+const COUNTRY_NAMES: Record<string, string> = {
+  MX: 'México', US: 'EE.UU.', BR: 'Brasil', CO: 'Colombia', UY: 'Uruguay',
+  AR: 'Argentina', CL: 'Chile', PE: 'Perú', VE: 'Venezuela', PA: 'Panamá',
+  GB: 'Reino Unido', ES: 'España', FR: 'Francia', DE: 'Alemania', IT: 'Italia',
+  RU: 'Rusia', CN: 'China', JP: 'Japón', IN: 'India', CA: 'Canadá',
+  AU: 'Australia', CU: 'Cuba', BO: 'Bolivia', PY: 'Paraguay', EC: 'Ecuador',
+  IR: 'Irán', KP: 'Corea del Norte', SY: 'Siria', AF: 'Afganistán',
+  TR: 'Turquía', UA: 'Ucrania', NG: 'Nigeria', ZA: 'Sudáfrica',
+  NL: 'Países Bajos', EU: 'Unión Europea',
 };
 
 const CATEGORY_CONFIG: Record<
@@ -266,7 +283,7 @@ function SearchResultCard({
   // Derive intelligence from data
   const sources = entity.sources || [];
   const categories = new Set(sources.map(getSourceCategory));
-  const country = getCountryFromSources(sources);
+  const country = entity.countries?.[0] || entity.nationalities?.[0] || getCountryFromSources(sources);
   const countryFlag = country ? COUNTRY_FLAGS[country] : null;
   const isPep =
     entity.is_current_pep || !!entity.pep_category || categories.has("pep");
@@ -413,32 +430,33 @@ function SearchResultCard({
                 </span>
               </>
             )}
-            {countryFlag && (
+            {country && (
               <>
                 <span className="text-gray-600">·</span>
                 <span>
-                  {countryFlag} {country}
+                  {countryFlag || '🌍'} {COUNTRY_NAMES[country] || country}
                 </span>
               </>
             )}
-            {entity.nationalities && entity.nationalities.length > 0 && (
+            {entity.nationalities && entity.nationalities.length > 0 &&
+             !(entity.nationalities.length === 1 && entity.nationalities[0] === country) && (
               <>
                 <span className="text-gray-600">·</span>
-                <span>{entity.nationalities.join(", ")}</span>
+                <span>Nac: {entity.nationalities.map((n: string) => COUNTRY_NAMES[n] || n).join(", ")}</span>
               </>
             )}
             {(entity.birth_date || entity.date_of_birth) && (
               <>
                 <span className="text-gray-600">·</span>
                 <span className="flex items-center gap-1">
-                  📅 {entity.birth_date || entity.date_of_birth}
+                  Nac. {entity.birth_date || entity.date_of_birth}
                 </span>
               </>
             )}
             {entity.gender && (
               <>
                 <span className="text-gray-600">·</span>
-                <span className="capitalize">{entity.gender}</span>
+                <span>{entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender}</span>
               </>
             )}
             <span className="text-gray-600">·</span>
