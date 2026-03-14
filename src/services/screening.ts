@@ -22,6 +22,22 @@ export interface OptimizedSearchResult {
   confidence: number;
   match_type: 'opensearch' | 'semantic' | 'phonetic' | 'hybrid';
   match_sources: string[];
+  // Person info
+  birth_date?: string;
+  gender?: string;
+  countries?: string[];
+  nationalities?: string[];
+  topics?: string[];
+  aliases?: string[];
+  identifiers?: Record<string, string>;
+  addresses?: (string | { address: string; country?: string })[];
+  entity_subtype?: string;
+  // PEP
+  is_current_pep?: boolean;
+  pep_category?: string;
+  pep_positions?: unknown[];
+  // Sanctions
+  sanctions_details?: Array<{ authority: string; program: string; reason?: string }>;
   // Adverse media (Tier 1 — structured)
   has_adverse_media?: boolean;
   adverse_media_categories?: string[];
@@ -29,6 +45,13 @@ export interface OptimizedSearchResult {
   // Adverse media (Tier 2 — articles)
   article_count?: number;
   article_max_severity?: number;
+  // Freshness
+  freshness_factor?: number;
+  days_since_update?: number;
+  // Match details
+  match_score?: number;
+  explanation?: string;
+  matched_name?: string;
 }
 
 export interface OptimizedSearchResponse {
@@ -136,6 +159,28 @@ export const screeningService = {
         confidence: match.confidence,
         match_type: match.match_type || 'hybrid',
         match_sources: match.matched_fields || ['name'],
+        // Pass through all entity fields for display
+        birth_date: match.birth_date,
+        gender: match.gender,
+        countries: match.countries,
+        nationalities: match.nationalities,
+        topics: match.topics,
+        aliases: match.aliases,
+        identifiers: match.identifiers,
+        addresses: match.addresses,
+        entity_subtype: match.entity_subtype,
+        is_current_pep: match.is_current_pep,
+        pep_category: match.pep_category,
+        pep_positions: match.pep_positions,
+        sanctions_details: match.sanctions_details,
+        has_adverse_media: match.has_adverse_media,
+        adverse_media_categories: match.adverse_media_categories,
+        adverse_media_severity: match.adverse_media_severity,
+        freshness_factor: match.freshness_factor,
+        days_since_update: match.days_since_update,
+        match_score: match.match_score,
+        explanation: match.explanation,
+        matched_name: match.matched_name,
       })),
     };
     
