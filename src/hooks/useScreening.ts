@@ -54,7 +54,7 @@ const defaultFilters: SearchFilters = {
   countries: [],
 };
 
-export function useScreening(sourceLevel?: 1 | 2 | 3 | 4): UseScreeningReturn {
+export function useScreening(sourceLevel?: 1 | 2 | 3 | 4 | 5): UseScreeningReturn {
   const [query, setQueryState] = useState('');
   const [suggestions, setSuggestions] = useState<ScreeningMatch[]>([]);
   const [hasSearched, setHasSearched] = useState(false);

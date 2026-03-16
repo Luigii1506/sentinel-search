@@ -7,15 +7,16 @@ import {
 } from '@/components/ui/tooltip';
 
 const SOURCE_LEVELS = [
-  { level: 1 as const, label: 'Critical', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
+  { level: 1 as const, label: 'Crítico', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
   { level: 2 as const, label: 'Sanciones', desc: '+ Sanciones, Terrorismo, Law Enforcement restantes' },
   { level: 3 as const, label: 'PEP & Compliance', desc: '+ PEP, Inhabilitaciones, Regulatorio, Fiscal' },
-  { level: 4 as const, label: 'Completo', desc: 'Todas las fuentes (Corporate, Media, Otros)' },
+  { level: 4 as const, label: 'Completo', desc: 'Todas las fuentes oficiales (Corporate, Media, Otros)' },
+  { level: 5 as const, label: 'Interés', desc: '+ Personas de interés (Wikidata: familiares, asociados)' },
 ] as const;
 
 interface SourceLevelSelectorProps {
-  value: 1 | 2 | 3 | 4;
-  onChange: (level: 1 | 2 | 3 | 4) => void;
+  value: 1 | 2 | 3 | 4 | 5;
+  onChange: (level: 1 | 2 | 3 | 4 | 5) => void;
   className?: string;
   size?: 'sm' | 'md';
 }

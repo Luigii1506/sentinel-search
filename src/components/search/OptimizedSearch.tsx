@@ -55,7 +55,7 @@ export function OptimizedSearch({
   const [results, setResults] = useState<OptimizedSearchResult[]>([]);
   const [metrics, setMetrics] = useState<SearchMetrics | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(2);
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(2);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Mutation para búsqueda optimizada

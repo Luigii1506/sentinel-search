@@ -179,6 +179,10 @@ export const adminService = {
     sort_by?: string;
     match_method?: string;
     source_filter?: string;
+    search?: string;
+    entity_type?: string;
+    min_confidence?: number;
+    max_confidence?: number;
   }): Promise<MergeReviewResponse> {
     const response = await api.get('/api/v2/admin/merges/review', { params });
     return response.data;

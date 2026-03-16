@@ -6,7 +6,7 @@ export interface OptimizedSearchRequest {
   query: string;
   max_results?: number;
   min_confidence?: number;
-  source_level?: 1 | 2 | 3 | 4;
+  source_level?: 1 | 2 | 3 | 4 | 5;
   use_cache?: boolean;
   timeout_ms?: number;
 }
@@ -141,6 +141,7 @@ export const screeningService = {
     });
     
     // Transform ScreeningResponse to OptimizedSearchResponse format
+    // Uses spread to pass through ALL API fields, only overriding what needs transformation
     const data: OptimizedSearchResponse = {
       query: response.data.query,
       strategy: 'hybrid',
@@ -148,39 +149,15 @@ export const screeningService = {
       execution_time_ms: response.data.execution_time_ms,
       sources_used: ['opensearch', 'phonetic'],
       from_cache: false,
-      matches: response.data.matches.map((match: any) => ({
-        entity_id: match.entity_id,
-        name: match.name,
-        entity_type: match.entity_type?.toUpperCase() || 'INDIVIDUAL',
-        risk_score: match.risk_score || 50,
-        risk_level: match.risk_level || 'medium',
-        sources: match.sources || [],
-        score: match.match_score / 100,
-        confidence: match.confidence,
-        match_type: match.match_type || 'hybrid',
-        match_sources: match.matched_fields || ['name'],
-        // Pass through all entity fields for display
-        birth_date: match.birth_date,
-        gender: match.gender,
-        countries: match.countries,
-        nationalities: match.nationalities,
-        topics: match.topics,
-        aliases: match.aliases,
-        identifiers: match.identifiers,
-        addresses: match.addresses,
-        entity_subtype: match.entity_subtype,
-        is_current_pep: match.is_current_pep,
-        pep_category: match.pep_category,
-        pep_positions: match.pep_positions,
-        sanctions_details: match.sanctions_details,
-        has_adverse_media: match.has_adverse_media,
-        adverse_media_categories: match.adverse_media_categories,
-        adverse_media_severity: match.adverse_media_severity,
-        freshness_factor: match.freshness_factor,
-        days_since_update: match.days_since_update,
-        match_score: match.match_score,
-        explanation: match.explanation,
-        matched_name: match.matched_name,
+      matches: response.data.matches.map((m: any) => ({
+        ...m,
+        entity_type: m.entity_type?.toUpperCase() || 'INDIVIDUAL',
+        risk_score: m.risk_score || 50,
+        risk_level: m.risk_level || 'medium',
+        sources: m.sources || [],
+        score: m.match_score / 100,
+        match_type: m.match_type || 'hybrid',
+        match_sources: m.matched_fields || ['name'],
       })),
     };
     
@@ -231,21 +208,17 @@ export const screeningService = {
       'ORGANIZATION': 'organization',
     };
 
+    // Uses spread to pass through ALL API fields, only overriding what needs transformation
     return {
       query: response.data.query,
       total_matches: response.data.total_matches,
       execution_time_ms: response.data.execution_time_ms,
       filters_applied: request.filters || {},
       matches: response.data.matches.map((m: any) => ({
-        entity_id: m.entity_id,
-        canonical_id: m.canonical_id,
-        name: m.name,
-        match_score: m.match_score,
-        confidence: m.confidence,
+        ...m,
         match_type: m.match_type || 'opensearch',
         entity_type: entityTypeMap[m.entity_type?.toUpperCase()] || 'person',
         risk_level: m.risk_level || 'medium',
-        risk_score: m.risk_score,
         sources: m.sources || [],
         source_count: m.source_count || (m.sources || []).length,
         aliases: m.aliases || [],
@@ -253,28 +226,6 @@ export const screeningService = {
         countries: m.countries || [],
         matched_fields: ['name'],
         explanation: m.explanation || '',
-        highlight: m.highlight,
-        is_current_pep: m.is_current_pep,
-        pep_category: m.pep_category,
-        pep_positions: m.pep_positions,
-        opensearch_score: m.opensearch_score,
-        // Person info
-        birth_date: m.birth_date,
-        gender: m.gender,
-        topics: m.topics,
-        identifiers: m.identifiers,
-        addresses: m.addresses,
-        entity_subtype: m.entity_subtype,
-        matched_name: m.matched_name,
-        sanctions_details: m.sanctions_details,
-        // Adverse Media
-        has_adverse_media: m.has_adverse_media,
-        adverse_media_categories: m.adverse_media_categories,
-        adverse_media_severity: m.adverse_media_severity,
-        adverse_media_details: m.adverse_media_details,
-        // Freshness
-        freshness_factor: m.freshness_factor,
-        days_since_update: m.days_since_update,
       })),
     };
   },

@@ -13,7 +13,7 @@ import {
   Ship,
   Plane,
   Users,
-  ArrowRight,
+  ExternalLink,
   AlertCircle,
   FileSearch,
   Sparkles,
@@ -24,6 +24,9 @@ import {
   Siren,
   Newspaper,
   Clock,
+  Calendar,
+  MapPin,
+  Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -217,29 +220,80 @@ function getCountryFromSources(sources: string[]): string | null {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  US: "\u{1F1FA}\u{1F1F8}", MX: "\u{1F1F2}\u{1F1FD}", BR: "\u{1F1E7}\u{1F1F7}",
-  CO: "\u{1F1E8}\u{1F1F4}", INT: "\u{1F30D}", EU: "\u{1F1EA}\u{1F1FA}",
-  GB: "\u{1F1EC}\u{1F1E7}", CA: "\u{1F1E8}\u{1F1E6}", UY: "\u{1F1FA}\u{1F1FE}",
-  AR: "\u{1F1E6}\u{1F1F7}", CL: "\u{1F1E8}\u{1F1F1}", PE: "\u{1F1F5}\u{1F1EA}",
-  VE: "\u{1F1FB}\u{1F1EA}", PA: "\u{1F1F5}\u{1F1E6}", CU: "\u{1F1E8}\u{1F1FA}",
-  RU: "\u{1F1F7}\u{1F1FA}", CN: "\u{1F1E8}\u{1F1F3}", IR: "\u{1F1EE}\u{1F1F7}",
-  KP: "\u{1F1F0}\u{1F1F5}", SY: "\u{1F1F8}\u{1F1FE}", AF: "\u{1F1E6}\u{1F1EB}",
-  BO: "\u{1F1E7}\u{1F1F4}", PY: "\u{1F1F5}\u{1F1FE}", EC: "\u{1F1EA}\u{1F1E8}",
-  ES: "\u{1F1EA}\u{1F1F8}", FR: "\u{1F1EB}\u{1F1F7}", DE: "\u{1F1E9}\u{1F1EA}",
-  IT: "\u{1F1EE}\u{1F1F9}", NL: "\u{1F1F3}\u{1F1F1}", TR: "\u{1F1F9}\u{1F1F7}",
-  UA: "\u{1F1FA}\u{1F1E6}", NG: "\u{1F1F3}\u{1F1EC}", ZA: "\u{1F1FF}\u{1F1E6}",
-  AU: "\u{1F1E6}\u{1F1FA}", JP: "\u{1F1EF}\u{1F1F5}", IN: "\u{1F1EE}\u{1F1F3}",
+  US: "\u{1F1FA}\u{1F1F8}",
+  MX: "\u{1F1F2}\u{1F1FD}",
+  BR: "\u{1F1E7}\u{1F1F7}",
+  CO: "\u{1F1E8}\u{1F1F4}",
+  INT: "\u{1F30D}",
+  EU: "\u{1F1EA}\u{1F1FA}",
+  GB: "\u{1F1EC}\u{1F1E7}",
+  CA: "\u{1F1E8}\u{1F1E6}",
+  UY: "\u{1F1FA}\u{1F1FE}",
+  AR: "\u{1F1E6}\u{1F1F7}",
+  CL: "\u{1F1E8}\u{1F1F1}",
+  PE: "\u{1F1F5}\u{1F1EA}",
+  VE: "\u{1F1FB}\u{1F1EA}",
+  PA: "\u{1F1F5}\u{1F1E6}",
+  CU: "\u{1F1E8}\u{1F1FA}",
+  RU: "\u{1F1F7}\u{1F1FA}",
+  CN: "\u{1F1E8}\u{1F1F3}",
+  IR: "\u{1F1EE}\u{1F1F7}",
+  KP: "\u{1F1F0}\u{1F1F5}",
+  SY: "\u{1F1F8}\u{1F1FE}",
+  AF: "\u{1F1E6}\u{1F1EB}",
+  BO: "\u{1F1E7}\u{1F1F4}",
+  PY: "\u{1F1F5}\u{1F1FE}",
+  EC: "\u{1F1EA}\u{1F1E8}",
+  ES: "\u{1F1EA}\u{1F1F8}",
+  FR: "\u{1F1EB}\u{1F1F7}",
+  DE: "\u{1F1E9}\u{1F1EA}",
+  IT: "\u{1F1EE}\u{1F1F9}",
+  NL: "\u{1F1F3}\u{1F1F1}",
+  TR: "\u{1F1F9}\u{1F1F7}",
+  UA: "\u{1F1FA}\u{1F1E6}",
+  NG: "\u{1F1F3}\u{1F1EC}",
+  ZA: "\u{1F1FF}\u{1F1E6}",
+  AU: "\u{1F1E6}\u{1F1FA}",
+  JP: "\u{1F1EF}\u{1F1F5}",
+  IN: "\u{1F1EE}\u{1F1F3}",
 };
 
 const COUNTRY_NAMES: Record<string, string> = {
-  MX: 'México', US: 'EE.UU.', BR: 'Brasil', CO: 'Colombia', UY: 'Uruguay',
-  AR: 'Argentina', CL: 'Chile', PE: 'Perú', VE: 'Venezuela', PA: 'Panamá',
-  GB: 'Reino Unido', ES: 'España', FR: 'Francia', DE: 'Alemania', IT: 'Italia',
-  RU: 'Rusia', CN: 'China', JP: 'Japón', IN: 'India', CA: 'Canadá',
-  AU: 'Australia', CU: 'Cuba', BO: 'Bolivia', PY: 'Paraguay', EC: 'Ecuador',
-  IR: 'Irán', KP: 'Corea del Norte', SY: 'Siria', AF: 'Afganistán',
-  TR: 'Turquía', UA: 'Ucrania', NG: 'Nigeria', ZA: 'Sudáfrica',
-  NL: 'Países Bajos', EU: 'Unión Europea',
+  MX: "México",
+  US: "EE.UU.",
+  BR: "Brasil",
+  CO: "Colombia",
+  UY: "Uruguay",
+  AR: "Argentina",
+  CL: "Chile",
+  PE: "Perú",
+  VE: "Venezuela",
+  PA: "Panamá",
+  GB: "Reino Unido",
+  ES: "España",
+  FR: "Francia",
+  DE: "Alemania",
+  IT: "Italia",
+  RU: "Rusia",
+  CN: "China",
+  JP: "Japón",
+  IN: "India",
+  CA: "Canadá",
+  AU: "Australia",
+  CU: "Cuba",
+  BO: "Bolivia",
+  PY: "Paraguay",
+  EC: "Ecuador",
+  IR: "Irán",
+  KP: "Corea del Norte",
+  SY: "Siria",
+  AF: "Afganistán",
+  TR: "Turquía",
+  UA: "Ucrania",
+  NG: "Nigeria",
+  ZA: "Sudáfrica",
+  NL: "Países Bajos",
+  EU: "Unión Europea",
 };
 
 const CATEGORY_CONFIG: Record<
@@ -255,40 +309,114 @@ const CATEGORY_CONFIG: Record<
   other: { label: "Otro", color: "text-gray-400", Icon: Globe },
 };
 
+const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
+  sanctions: "border-red-500/20 text-red-400/80",
+  pep: "border-purple-500/20 text-purple-400/80",
+  debarment: "border-amber-500/20 text-amber-400/80",
+  regulatory: "border-blue-500/20 text-blue-400/80",
+  law_enforcement: "border-indigo-500/20 text-indigo-400/80",
+  tax: "border-orange-500/20 text-orange-400/80",
+  other: "border-white/10 text-gray-400",
+};
+
 function getMatchTypeLabel(matchType: string, score: number): string {
-  if (score >= 99) return "Coincidencia exacta";
-  if (matchType === "phonetic") return "Coincidencia fonética";
-  if (score >= 90) return "Coincidencia alta";
-  return "Coincidencia aproximada";
+  if (score >= 99) return "Exacta";
+  if (matchType === "phonetic") return "Fonética";
+  if (score >= 90) return "Alta";
+  return "Aproximada";
 }
 
-// Search Result Card
+// ═══════════════════════════════════════════════════
+// Search Result Card — Collapsible (OpenSanctions-inspired)
+// ═══════════════════════════════════════════════════
+
+const CATEGORY_BADGE_CONFIG: Record<
+  SourceCat,
+  {
+    label: string;
+    icon: typeof Shield;
+    bg: string;
+    text: string;
+    border: string;
+  }
+> = {
+  sanctions: {
+    label: "Sanciones",
+    icon: Shield,
+    bg: "bg-red-500/15",
+    text: "text-red-400",
+    border: "border-red-500/30",
+  },
+  pep: {
+    label: "PEP",
+    icon: Flag,
+    bg: "bg-purple-500/15",
+    text: "text-purple-400",
+    border: "border-purple-500/30",
+  },
+  debarment: {
+    label: "Inhabilitación",
+    icon: Ban,
+    bg: "bg-amber-500/15",
+    text: "text-amber-400",
+    border: "border-amber-500/30",
+  },
+  regulatory: {
+    label: "Regulatorio",
+    icon: Landmark,
+    bg: "bg-blue-500/15",
+    text: "text-blue-400",
+    border: "border-blue-500/30",
+  },
+  law_enforcement: {
+    label: "Ley",
+    icon: Siren,
+    bg: "bg-indigo-500/15",
+    text: "text-indigo-400",
+    border: "border-indigo-500/30",
+  },
+  tax: {
+    label: "Fiscal",
+    icon: FileText,
+    bg: "bg-orange-500/15",
+    text: "text-orange-400",
+    border: "border-orange-500/30",
+  },
+  other: {
+    label: "Otro",
+    icon: Globe,
+    bg: "bg-gray-500/15",
+    text: "text-gray-400",
+    border: "border-gray-500/30",
+  },
+};
+
 function SearchResultCard({
   result,
-  onClick,
-  queryName,
+  onViewEntity,
   onCreateAlert,
 }: {
   result: ReturnType<typeof useScreening>["results"][0];
-  onClick: () => void;
-  queryName?: string;
+  onViewEntity: () => void;
   onCreateAlert?: (
     result: ReturnType<typeof useScreening>["results"][0],
   ) => void;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const entity = result;
-  const Icon = entityTypeIcons[entity.entity_type as EntityType] || User;
+  const TypeIcon = entityTypeIcons[entity.entity_type as EntityType] || User;
   const riskColor = getRiskColor(entity.risk_level);
 
-  // Derive intelligence from data
   const sources = entity.sources || [];
   const categories = new Set(sources.map(getSourceCategory));
-  const country = entity.countries?.[0] || entity.nationalities?.[0] || getCountryFromSources(sources);
+  const country =
+    entity.countries?.[0] ||
+    entity.nationalities?.[0] ||
+    getCountryFromSources(sources);
   const countryFlag = country ? COUNTRY_FLAGS[country] : null;
   const isPep =
     entity.is_current_pep || !!entity.pep_category || categories.has("pep");
 
-  // Get first PEP position for display
   const pepPosition = entity.pep_positions?.[0] as
     | {
         cargo?: string;
@@ -299,512 +427,585 @@ function SearchResultCard({
       }
     | undefined;
 
+  const hasExpandableContent =
+    sources.length > 0 ||
+    (entity.sanctions_details && entity.sanctions_details.length > 0) ||
+    (entity.addresses && entity.addresses.length > 0) ||
+    (entity.identifiers && Object.keys(entity.identifiers).length > 0) ||
+    (entity.aliases && entity.aliases.length > 0) ||
+    (isPep && pepPosition) ||
+    (entity.adverse_media_details && entity.adverse_media_details.length > 0) ||
+    entity.explainability;
+
+  const genderLabel =
+    entity.gender === "male"
+      ? "Masculino"
+      : entity.gender === "female"
+        ? "Femenino"
+        : entity.gender;
+
   return (
     <motion.div
       variants={itemVariants}
-      onClick={onClick}
-      whileHover={{ scale: 1.01, transition: { duration: 0.2 } }}
-      className="glass rounded-xl p-5 cursor-pointer card-hover group relative overflow-hidden"
+      className="glass rounded-xl relative overflow-hidden"
     >
-      {/* Risk indicator line */}
+      {/* Risk indicator stripe */}
       <div
         className="absolute left-0 top-0 bottom-0 w-1"
         style={{ backgroundColor: riskColor }}
       />
 
-      <div className="flex items-start gap-4 pl-3">
-        {/* Icon with risk-colored background */}
-        <motion.div
-          whileHover={{ scale: 1.1, rotate: 5 }}
-          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors"
-          style={{ backgroundColor: `${riskColor}15` }}
-        >
-          <Icon className="w-6 h-6" style={{ color: riskColor }} />
-        </motion.div>
+      {/* ── HEADER (always visible) ── */}
+      <div
+        onClick={() => setIsExpanded(!isExpanded)}
+        className="px-5 py-3.5 pl-6 cursor-pointer hover:bg-white/[0.02] transition-colors select-none"
+      >
+        <div className="flex items-start gap-3">
+          {/* Entity type icon */}
+          <div
+            className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
+            style={{ backgroundColor: `${riskColor}12` }}
+          >
+            <TypeIcon className="w-5 h-5" style={{ color: riskColor }} />
+          </div>
 
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Row 1: Name + badges */}
-          <div className="flex flex-wrap items-center gap-2 mb-2">
-            <h3 className="text-lg font-medium text-white group-hover:text-blue-400 transition-colors">
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            {/* Name + aliases */}
+            <h3 className="text-[15px] font-semibold text-white leading-tight">
               {entity.name}
             </h3>
-            <Badge
-              className="capitalize text-xs"
-              style={{
-                backgroundColor: `${riskColor}20`,
-                color: riskColor,
-                borderColor: `${riskColor}40`,
-              }}
-            >
-              {entity.risk_level || "unknown"}
-              {entity.risk_score != null &&
-                ` · ${Math.round(entity.risk_score)}`}
-            </Badge>
-            <Badge variant="outline" className="text-[10px] bg-white/5">
-              {Math.round(entity.match_score || 0)}% coincidencia
-            </Badge>
-            {/* Topics badges */}
-            {entity.topics?.map((topic) => {
-              const topicColors: Record<string, string> = {
-                sanction: "bg-red-500/10 text-red-400 border-red-500/20",
-                pep: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-                crime: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-                debarment: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-                poi: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-              };
-              return (
-                <Badge
-                  key={topic}
-                  variant="outline"
-                  className={`text-[10px] capitalize ${topicColors[topic] || "bg-gray-500/10 text-gray-400 border-gray-500/20"}`}
-                >
-                  {topic}
+            {entity.aliases && entity.aliases.length > 0 && (
+              <p className="text-xs text-gray-500 mt-0.5">
+                aka: {entity.aliases.slice(0, 2).join(", ")}
+                {entity.aliases.length > 2 && ` +${entity.aliases.length - 2}`}
+              </p>
+            )}
+
+            {/* Badges row: Risk + Match + Freshness */}
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <Badge
+                className="text-[10px] px-2 py-0.5 gap-1 font-medium uppercase"
+                style={{
+                  backgroundColor: `${riskColor}20`,
+                  color: riskColor,
+                  borderColor: `${riskColor}40`,
+                }}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full inline-block"
+                  style={{ backgroundColor: riskColor }}
+                />
+                {entity.risk_level || "unknown"} Risk
+                {entity.risk_score != null &&
+                  ` · Score ${Math.round(entity.risk_score)}`}
+              </Badge>
+              <Badge className="text-[10px] px-2 py-0.5 gap-1 font-medium bg-green-500/15 text-green-400 border-green-500/30">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+                {getMatchTypeLabel(entity.match_type, entity.match_score || 0)}{" "}
+                · {Math.round(entity.match_score || 0)}%
+              </Badge>
+              {entity.has_adverse_media && (
+                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-400 border-red-500/30">
+                  <Newspaper className="w-3 h-3" />
+                  Adverse Media
                 </Badge>
-              );
-            })}
-            {/* Adverse Media badge */}
-            {entity.has_adverse_media && (
+              )}
+              {entity.freshness_factor != null &&
+                entity.freshness_factor < 0.5 && (
+                  <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                    <Clock className="w-3 h-3" />
+                    Freshness {Math.round(entity.freshness_factor * 100)}%
+                  </Badge>
+                )}
+            </div>
+
+            {/* Category badges row (like OpenSanctions: Sanctions, PEP, Debarment...) */}
+            <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+              {Array.from(categories).map((cat) => {
+                const cfg = CATEGORY_BADGE_CONFIG[cat];
+                const CatIcon = cfg.icon;
+                return (
+                  <span
+                    key={cat}
+                    className={`inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border ${cfg.bg} ${cfg.text} ${cfg.border}`}
+                  >
+                    <CatIcon className="w-3 h-3" />
+                    {cfg.label}
+                  </span>
+                );
+              })}
+              {isPep && entity.is_current_pep && !categories.has("pep") && (
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-purple-500/15 text-purple-400 border-purple-500/30">
+                  <Flag className="w-3 h-3" />
+                  PEP Activo
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Actions + chevron */}
+          <div className="flex items-center gap-1.5 flex-shrink-0 mt-1">
+            {onCreateAlert && (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge
-                      variant="outline"
-                      className="text-[10px] bg-red-500/10 text-red-400 border-red-500/20 gap-1"
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateAlert(result);
+                      }}
+                      className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-colors"
                     >
-                      <Newspaper className="w-3 h-3" />
-                      AM {entity.adverse_media_severity || 0}
-                    </Badge>
+                      <AlertCircle className="w-4 h-4" />
+                    </button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>
-                      Adverse Media:{" "}
-                      {entity.adverse_media_categories?.join(", ")}
-                    </p>
+                    <p>Crear alerta</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             )}
-            {/* Freshness warning */}
-            {entity.freshness_factor != null &&
-              entity.freshness_factor < 0.8 && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge
-                        variant="outline"
-                        className={`text-[10px] gap-1 ${
-                          entity.freshness_factor < 0.3
-                            ? "bg-red-500/10 text-red-400 border-red-500/20"
-                            : entity.freshness_factor < 0.5
-                              ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
-                              : "bg-yellow-500/10 text-yellow-400 border-yellow-500/20"
-                        }`}
-                      >
-                        <Clock className="w-3 h-3" />
-                        {Math.round(entity.freshness_factor * 100)}%
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        Freshness: {Math.round(entity.freshness_factor * 100)}%
-                        {entity.days_since_update != null &&
-                          ` — ${entity.days_since_update} dias sin actualizar`}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-          </div>
-
-          {/* Row 2: Type + country + birth_date + gender + match type */}
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400 mb-3">
-            <span className="capitalize">
-              {getEntityTypeLabel(entity.entity_type)}
-            </span>
-            {entity.entity_subtype && (
-              <>
-                <span className="text-gray-600">·</span>
-                <span className="capitalize text-gray-500">
-                  {entity.entity_subtype}
-                </span>
-              </>
-            )}
-            {country && (
-              <>
-                <span className="text-gray-600">·</span>
-                <span>
-                  {countryFlag || '🌍'} {COUNTRY_NAMES[country] || country}
-                </span>
-              </>
-            )}
-            {entity.nationalities && entity.nationalities.length > 0 &&
-             !(entity.nationalities.length === 1 && entity.nationalities[0] === country) && (
-              <>
-                <span className="text-gray-600">·</span>
-                <span>Nac: {entity.nationalities.map((n: string) => COUNTRY_NAMES[n] || n).join(", ")}</span>
-              </>
-            )}
-            {(entity.birth_date || entity.date_of_birth) && (
-              <>
-                <span className="text-gray-600">·</span>
-                <span className="flex items-center gap-1">
-                  Nac. {entity.birth_date || entity.date_of_birth}
-                </span>
-              </>
-            )}
-            {entity.gender && (
-              <>
-                <span className="text-gray-600">·</span>
-                <span>{entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender}</span>
-              </>
-            )}
-            <span className="text-gray-600">·</span>
-            <span className="text-gray-300">
-              {getMatchTypeLabel(entity.match_type, entity.match_score || 0)}
-            </span>
-          </div>
-
-          {/* Row 3: Category badges (data-driven) */}
-          <div className="flex flex-wrap gap-3 mb-3">
-            {Array.from(categories).map((cat) => {
-              const cfg = CATEGORY_CONFIG[cat];
-              return (
-                <TooltipProvider key={cat}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div
-                        className={`flex items-center gap-1 text-xs ${cfg.color}`}
-                      >
-                        <cfg.Icon className="w-3.5 h-3.5" />
-                        <span>{cfg.label}</span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>
-                        {sources
-                          .filter((s) => getSourceCategory(s) === cat)
-                          .map(formatSourceName)
-                          .join(", ")}
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              );
-            })}
-            {isPep && entity.is_current_pep && !categories.has("pep") && (
-              <div className="flex items-center gap-1 text-xs text-purple-400">
-                <Flag className="w-3.5 h-3.5" />
-                <span>PEP Activo</span>
-              </div>
-            )}
-          </div>
-
-          {/* Row 4: PEP position detail (if available) */}
-          {isPep && pepPosition && (
-            <div className="mb-3 px-3 py-2 rounded-lg bg-purple-500/5 border border-purple-500/10">
-              <div className="flex items-center gap-2 text-xs text-purple-300">
-                <Flag className="w-3 h-3 flex-shrink-0" />
-                <span className="font-medium">
-                  {pepPosition.cargo || entity.pep_category}
-                </span>
-                {pepPosition.dependencia && (
-                  <>
-                    <span className="text-purple-500">·</span>
-                    <span className="text-purple-400">
-                      {pepPosition.dependencia}
-                    </span>
-                  </>
-                )}
-              </div>
-              {(pepPosition.start_date || pepPosition.end_date) && (
-                <p className="text-[10px] text-purple-500 mt-1 ml-5">
-                  {pepPosition.start_date?.slice(0, 4)}
-                  {pepPosition.end_date
-                    ? ` — ${pepPosition.end_date.slice(0, 4)}`
-                    : " — presente"}
-                  {pepPosition.is_current === false && " (histórico)"}
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Row 5: Data Sources (formatted names) */}
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {sources.slice(0, 4).map((source) => {
-              const cat = getSourceCategory(source);
-              const colorMap: Record<SourceCat, string> = {
-                sanctions: "border-red-500/20 text-red-400/80",
-                pep: "border-purple-500/20 text-purple-400/80",
-                debarment: "border-amber-500/20 text-amber-400/80",
-                regulatory: "border-blue-500/20 text-blue-400/80",
-                law_enforcement: "border-indigo-500/20 text-indigo-400/80",
-                tax: "border-orange-500/20 text-orange-400/80",
-                other: "border-white/10 text-gray-400",
-              };
-              return (
-                <span
-                  key={source}
-                  className={`text-[10px] px-2 py-0.5 rounded-full bg-white/5 border ${colorMap[cat]}`}
-                >
-                  {formatSourceName(source)}
-                </span>
-              );
-            })}
-            {sources.length > 4 && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-500">
-                +{sources.length - 4}
-              </span>
-            )}
-          </div>
-
-          {/* Addresses */}
-          {entity.addresses && entity.addresses.length > 0 && (
-            <div className="mb-3 text-sm text-gray-400">
-              <span className="text-gray-500">📍</span>{" "}
-              {entity.addresses.slice(0, 2).map((addr, i) => (
-                <span key={i}>
-                  {typeof addr === "string" ? addr : addr.address}
-                  {i < Math.min(entity.addresses!.length, 2) - 1 && " | "}
-                </span>
-              ))}
-              {entity.addresses.length > 2 && (
-                <span className="text-gray-500">
-                  {" "}
-                  +{entity.addresses.length - 2} más
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Identifiers */}
-          {entity.identifiers && Object.keys(entity.identifiers).length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-3">
-              {Object.entries(entity.identifiers)
-                .slice(0, 3)
-                .map(([key, value]) => (
-                  <span
-                    key={key}
-                    className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewEntity();
+                    }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 hover:text-blue-300 transition-colors"
                   >
-                    {key}: {value}
-                  </span>
-                ))}
-              {Object.keys(entity.identifiers).length > 3 && (
-                <span className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-gray-500">
-                  +{Object.keys(entity.identifiers).length - 3} más
-                </span>
-              )}
-            </div>
-          )}
+                    <ExternalLink className="w-4 h-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ver perfil completo</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            {hasExpandableContent && (
+              <motion.div
+                animate={{ rotate: isExpanded ? 180 : 0 }}
+                transition={{ duration: 0.2 }}
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-gray-300"
+              >
+                <ChevronDown className="w-4 h-4" />
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
 
-          {/* Sanctions Details */}
-          {entity.sanctions_details && entity.sanctions_details.length > 0 && (
-            <div className="mb-3 p-3 rounded-lg bg-red-500/5 border border-red-500/10">
-              <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-4 h-4 text-red-400" />
-                <span className="text-sm font-medium text-red-400">
-                  {entity.sanctions_details.length} sanción(es)
-                </span>
-              </div>
-              <div className="space-y-1.5">
-                {entity.sanctions_details.slice(0, 2).map((sanction, i) => (
-                  <div key={i} className="text-xs">
-                    <span className="text-gray-300 font-medium">
-                      {sanction.authority}
-                    </span>
-                    {sanction.program && (
-                      <span className="text-gray-400">
-                        {" "}
-                        — {sanction.program}
-                      </span>
-                    )}
-                    {sanction.reason && (
-                      <p className="text-gray-500 text-[10px] mt-0.5">
-                        {sanction.reason}
-                      </p>
-                    )}
-                  </div>
-                ))}
-                {entity.sanctions_details.length > 2 && (
-                  <p className="text-[10px] text-gray-500">
-                    +{entity.sanctions_details.length - 2} sanciones más...
+      {/* ── EXPANDED DETAIL ── */}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <div className="px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
+              {/* ─ Personal Info Grid (like OpenSanctions) ─ */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5 rounded-lg overflow-hidden border border-white/5">
+                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    Tipo
                   </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Adverse Media Details */}
-          {entity.adverse_media_details &&
-            entity.adverse_media_details.length > 0 && (
-              <div className="mb-3 p-3 rounded-lg bg-orange-500/5 border border-orange-500/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <Newspaper className="w-4 h-4 text-orange-400" />
-                  <span className="text-sm font-medium text-orange-400">
-                    Adverse Media — Severidad {entity.adverse_media_severity}
-                  </span>
+                  <p className="text-sm text-white font-medium mt-0.5 capitalize">
+                    {getEntityTypeLabel(entity.entity_type)}
+                  </p>
                 </div>
-                <div className="space-y-1.5">
-                  {entity.adverse_media_details.map((am, i) => (
-                    <div key={i} className="text-xs">
-                      <span className="text-gray-300 font-medium capitalize">
-                        {am.category}
-                      </span>
-                      <span className="text-gray-500">
-                        {" "}
-                        — sev. {am.severity}
-                      </span>
-                      <p className="text-gray-500 text-[10px] mt-0.5">
-                        {am.details}
+                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    Género
+                  </p>
+                  <p className="text-sm text-white font-medium mt-0.5">
+                    {genderLabel || "—"}
+                  </p>
+                </div>
+                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    Fecha Nacimiento
+                  </p>
+                  <p className="text-sm text-white font-medium mt-0.5">
+                    {entity.birth_date || entity.date_of_birth || "—"}
+                  </p>
+                </div>
+                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    Nacionalidad
+                  </p>
+                  <p className="text-sm text-white font-medium mt-0.5">
+                    {country ? (
+                      <>
+                        {countryFlag} {COUNTRY_NAMES[country] || country}
+                      </>
+                    ) : (
+                      "—"
+                    )}
+                  </p>
+                </div>
+                {entity.addresses && entity.addresses.length > 0 && (
+                  <div className="bg-[#0d0d0d] px-3 py-2.5 col-span-2">
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                      Ubicación
+                    </p>
+                    <p className="text-sm text-white font-medium mt-0.5 truncate">
+                      {typeof entity.addresses[0] === "string"
+                        ? entity.addresses[0]
+                        : entity.addresses[0].address}
+                      {entity.addresses.length > 1 && (
+                        <span className="text-gray-500 text-xs">
+                          {" "}
+                          +{entity.addresses.length - 1}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                )}
+                {entity.nationalities &&
+                  entity.nationalities.length > 0 &&
+                  !(
+                    entity.nationalities.length === 1 &&
+                    entity.nationalities[0] === country
+                  ) && (
+                    <div className="bg-[#0d0d0d] px-3 py-2.5 col-span-2">
+                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                        Nacionalidades
+                      </p>
+                      <p className="text-sm text-white font-medium mt-0.5">
+                        {entity.nationalities
+                          .map(
+                            (n: string) =>
+                              `${COUNTRY_FLAGS[n] || ""} ${COUNTRY_NAMES[n] || n}`,
+                          )
+                          .join("  ·  ")}
                       </p>
                     </div>
-                  ))}
+                  )}
+              </div>
+
+              {/* ─ POSITION section ─ */}
+              {isPep && pepPosition && (
+                <div>
+                  <h4 className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">
+                    Posición
+                  </h4>
+                  <div className="rounded-lg bg-purple-500/5 border border-purple-500/15 px-4 py-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Flag className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-white">
+                            {pepPosition.cargo || entity.pep_category}
+                          </p>
+                          {pepPosition.dependencia && (
+                            <p className="text-xs text-gray-400 mt-0.5">
+                              {pepPosition.dependencia}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        {(pepPosition.start_date || pepPosition.end_date) && (
+                          <p className="text-xs text-purple-400 font-medium">
+                            {pepPosition.start_date?.slice(0, 4)}
+                            {pepPosition.end_date
+                              ? ` – ${pepPosition.end_date.slice(0, 4)}`
+                              : " – Presente"}
+                          </p>
+                        )}
+                        {(pepPosition.start_date || pepPosition.end_date) && (
+                          <p className="text-[10px] text-gray-500 mt-0.5">
+                            {pepPosition.is_current !== false &&
+                            !pepPosition.end_date
+                              ? "Presente"
+                              : pepPosition.end_date?.slice(0, 4)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-          {/* Row 6: Explanation }}
-          {entity.explanation && (
-            <p className="text-xs text-gray-500 line-clamp-2">
-              {entity.explanation}
-            </p>
-          )}
+              {/* ─ Sanctioning Authorities + Records ─ */}
+              {entity.sanctions_details &&
+                entity.sanctions_details.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">
+                      Sanction Records ({entity.sanctions_details.length})
+                    </h4>
 
-          {/* Explainability Section (Level 5) */}
-          {entity.explainability && (
-            <div className="mt-3 pt-3 border-t border-white/10">
-              <div className="flex items-center justify-between text-[10px] text-gray-500 mb-2">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 text-purple-400" />
-                  <span>Análisis del Algoritmo v3.1</span>
-                </div>
-                {entity.ml_probability !== undefined && (
-                  <span className="text-purple-400 font-medium">
-                    ML: {Math.round(entity.ml_probability * 100)}%
-                  </span>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[10px] mb-2">
-                {entity.explainability.structural_analysis && (
-                  <>
-                    <span className="text-gray-600">Tokens:</span>
-                    <span className="text-gray-400">
-                      {entity.explainability.structural_analysis.tokens_matched}
-                    </span>
-                  </>
-                )}
-                {entity.explainability.structural_analysis?.surnames_matched !==
-                  undefined && (
-                  <>
-                    <span className="text-gray-600">Apellidos:</span>
-                    <span
-                      className={
-                        entity.explainability.structural_analysis
-                          .surnames_matched
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }
-                    >
-                      {entity.explainability.structural_analysis
-                        .surnames_matched
-                        ? "\u2713 Coinciden"
-                        : "\u2717 No coinciden"}
-                    </span>
-                  </>
-                )}
-                {entity.explainability.text_score_components && (
-                  <>
-                    <span className="text-gray-600">Similitud:</span>
-                    <span className="text-gray-400">
-                      {Math.round(
-                        (entity.explainability.text_score_components
-                          .avg_jaro_similarity || 0) * 100,
-                      )}
-                      %
-                    </span>
-                  </>
-                )}
-                {entity.context_breakdown && (
-                  <>
-                    <span className="text-gray-600">Contexto:</span>
-                    <span className="text-blue-400">
-                      +
-                      {Math.round(
-                        (entity.context_breakdown.country_boost || 0) * 100,
-                      )}
-                      %
-                    </span>
-                  </>
-                )}
-              </div>
-
-              {/* Boosts y Penalizaciones */}
-              {entity.explainability.boosts_applied &&
-                Object.keys(entity.explainability.boosts_applied).length >
-                  0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {Object.entries(entity.explainability.boosts_applied).map(
-                      ([key, value]) => (
+                    {/* Authority badges */}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      <span className="text-xs text-gray-400">
+                        Autoridades:
+                      </span>
+                      {[
+                        ...new Set(
+                          entity.sanctions_details.map((s) => s.authority),
+                        ),
+                      ].map((auth) => (
                         <span
-                          key={key}
-                          className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20"
+                          key={auth}
+                          className="text-[10px] px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium"
                         >
-                          {key}: {value}
+                          {auth}
                         </span>
-                      ),
+                      ))}
+                    </div>
+
+                    {/* Records */}
+                    <div className="rounded-lg border border-red-500/15 overflow-hidden divide-y divide-red-500/10">
+                      {entity.sanctions_details.slice(0, 4).map((s, i) => (
+                        <div key={i} className="px-4 py-2.5 bg-red-500/[0.03]">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="text-xs text-gray-300">
+                                <span className="text-gray-500">
+                                  Autoridad:
+                                </span>{" "}
+                                <span className="font-medium">
+                                  {s.authority}
+                                </span>
+                              </p>
+                              {s.program && (
+                                <p className="text-xs text-gray-300 mt-0.5">
+                                  <span className="text-gray-500">
+                                    Programa:
+                                  </span>{" "}
+                                  {s.program}
+                                </p>
+                              )}
+                              {s.reason && (
+                                <p className="text-xs text-gray-300 mt-0.5">
+                                  <span className="text-gray-500">Razón:</span>{" "}
+                                  {s.reason}
+                                </p>
+                              )}
+                            </div>
+                            <span className="flex items-center gap-1 text-[10px] text-green-400 font-medium flex-shrink-0">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+                              Activo
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {entity.sanctions_details.length > 4 && (
+                      <p className="text-[10px] text-gray-500 mt-1">
+                        +{entity.sanctions_details.length - 4} registros más...
+                      </p>
                     )}
                   </div>
                 )}
-              {entity.explainability.penalties_applied &&
-                Object.keys(entity.explainability.penalties_applied).length >
-                  0 && (
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {Object.entries(
-                      entity.explainability.penalties_applied,
-                    ).map(([key, value]) => (
+
+              {/* ─ Adverse Media ─ */}
+              {entity.adverse_media_details &&
+                entity.adverse_media_details.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">
+                      Adverse Media — Severidad {entity.adverse_media_severity}
+                    </h4>
+                    <div className="rounded-lg border border-orange-500/15 overflow-hidden divide-y divide-orange-500/10">
+                      {entity.adverse_media_details.map((am, i) => (
+                        <div
+                          key={i}
+                          className="px-4 py-2.5 bg-orange-500/[0.03]"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Newspaper className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
+                            <span className="text-xs text-gray-300 font-medium capitalize">
+                              {am.category}
+                            </span>
+                            <span className="text-[10px] text-gray-500">
+                              sev. {am.severity}
+                            </span>
+                          </div>
+                          {am.details && (
+                            <p className="text-[11px] text-gray-500 mt-1 ml-5">
+                              {am.details}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              {/* ─ Identifiers ─ */}
+              {entity.identifiers &&
+                Object.keys(entity.identifiers).length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">
+                      Identificadores
+                    </h4>
+                    <div className="flex flex-wrap gap-1.5">
+                      {Object.entries(entity.identifiers)
+                        .slice(0, 6)
+                        .map(([key, value]) => (
+                          <span
+                            key={key}
+                            className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                          >
+                            {key}: {value}
+                          </span>
+                        ))}
+                      {Object.keys(entity.identifiers).length > 6 && (
+                        <span className="text-[10px] text-gray-500">
+                          +{Object.keys(entity.identifiers).length - 6}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* ─ Explainability ─ */}
+              {entity.explainability && (
+                <div className="pt-3 border-t border-white/5">
+                  <div className="flex items-center justify-between text-[10px] text-gray-500 mb-2">
+                    <div className="flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3 text-purple-400" />
+                      <span>Análisis del Algoritmo</span>
+                    </div>
+                    {entity.ml_probability !== undefined && (
+                      <span className="text-purple-400 font-medium">
+                        ML: {Math.round(entity.ml_probability * 100)}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
+                    {entity.explainability.structural_analysis && (
+                      <>
+                        <span className="text-gray-600">Tokens:</span>
+                        <span className="text-gray-400">
+                          {
+                            entity.explainability.structural_analysis
+                              .tokens_matched
+                          }
+                        </span>
+                      </>
+                    )}
+                    {entity.explainability.structural_analysis
+                      ?.surnames_matched !== undefined && (
+                      <>
+                        <span className="text-gray-600">Apellidos:</span>
+                        <span
+                          className={
+                            entity.explainability.structural_analysis
+                              .surnames_matched
+                              ? "text-green-400"
+                              : "text-red-400"
+                          }
+                        >
+                          {entity.explainability.structural_analysis
+                            .surnames_matched
+                            ? "\u2713 Coinciden"
+                            : "\u2717 No coinciden"}
+                        </span>
+                      </>
+                    )}
+                    {entity.explainability.text_score_components && (
+                      <>
+                        <span className="text-gray-600">Similitud:</span>
+                        <span className="text-gray-400">
+                          {Math.round(
+                            (entity.explainability.text_score_components
+                              .avg_jaro_similarity || 0) * 100,
+                          )}
+                          %
+                        </span>
+                      </>
+                    )}
+                    {entity.context_breakdown && (
+                      <>
+                        <span className="text-gray-600">Contexto:</span>
+                        <span className="text-blue-400">
+                          +
+                          {Math.round(
+                            (entity.context_breakdown.country_boost || 0) * 100,
+                          )}
+                          %
+                        </span>
+                      </>
+                    )}
+                  </div>
+                  {entity.explainability.boosts_applied &&
+                    Object.keys(entity.explainability.boosts_applied).length >
+                      0 && (
+                      <div className="flex flex-wrap gap-1 mt-1.5">
+                        {Object.entries(
+                          entity.explainability.boosts_applied,
+                        ).map(([key, value]) => (
+                          <span
+                            key={key}
+                            className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20"
+                          >
+                            {key}: {value}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  {entity.explainability.penalties_applied &&
+                    Object.keys(entity.explainability.penalties_applied)
+                      .length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {Object.entries(
+                          entity.explainability.penalties_applied,
+                        ).map(([key, value]) => (
+                          <span
+                            key={key}
+                            className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20"
+                          >
+                            {key}: {value}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                </div>
+              )}
+
+              {/* ─ Source + Entity ID footer ─ */}
+              <div className="flex items-center gap-4 pt-3 border-t border-white/5">
+                <div className="flex-1">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
+                    Fuentes ({sources.length})
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {sources.map((source) => (
                       <span
-                        key={key}
-                        className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20"
+                        key={source}
+                        className={`text-[10px] px-2 py-0.5 rounded-full bg-white/5 border ${SOURCE_COLOR_MAP[getSourceCategory(source)]}`}
                       >
-                        {key}: {value}
+                        {formatSourceName(source)}
                       </span>
                     ))}
                   </div>
-                )}
+                </div>
+                <div className="flex-shrink-0 text-right">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
+                    Entity ID
+                  </p>
+                  <p className="text-[11px] text-gray-400 font-mono">
+                    {entity.entity_id?.slice(0, 12)}...
+                  </p>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col items-center gap-2 flex-shrink-0">
-          {onCreateAlert && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onCreateAlert(result);
-              }}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-colors"
-              title="Crear alerta de compliance"
-            >
-              <AlertCircle className="w-3.5 h-3.5 inline mr-1" />
-              Alertar
-            </button>
-          )}
-          <motion.div
-            initial={{ x: 0, opacity: 0.5 }}
-            whileHover={{ x: 5, opacity: 1 }}
-          >
-            <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
           </motion.div>
-        </div>
-      </div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
 
+// ═══════════════════════════════════════════════════
 // Filter Panel
+// ═══════════════════════════════════════════════════
 function FilterPanel({
   filters,
   onFilterChange,
@@ -889,7 +1090,7 @@ function FilterPanel({
         </h4>
         <div className="space-y-2">
           {entityTypes.map((type) => {
-            const Icon = entityTypeIcons[type];
+            const EIcon = entityTypeIcons[type];
             return (
               <motion.label
                 key={type}
@@ -902,7 +1103,7 @@ function FilterPanel({
                   onChange={() => toggleEntityType(type)}
                   className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
                 />
-                <Icon className="w-4 h-4 text-gray-500" />
+                <EIcon className="w-4 h-4 text-gray-500" />
                 <span className="text-sm text-gray-300 capitalize">
                   {getEntityTypeLabel(type)}
                 </span>
@@ -986,8 +1187,8 @@ export function SearchPage() {
   const initialQuery = searchParams.get("q") || "";
   const initialSourceLevel = parseInt(
     searchParams.get("source_level") || "2",
-  ) as 1 | 2 | 3 | 4;
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(
+  ) as 1 | 2 | 3 | 4 | 5;
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(
     initialSourceLevel,
   );
 
@@ -1045,7 +1246,6 @@ export function SearchPage() {
   const handleModeChange = (mode: "traditional" | "semantic" | "auto") => {
     setSearchMode(mode);
     if (query.trim().length >= 2) {
-      // Re-execute search with new mode
       if (mode === "semantic") {
         executeSemanticSearch(query);
       } else {
@@ -1250,14 +1450,15 @@ export function SearchPage() {
                       variants={containerVariants}
                       initial="hidden"
                       animate="show"
-                      className="space-y-3"
+                      className="space-y-2"
                     >
                       {results.map((result) => (
                         <SearchResultCard
                           key={result.entity_id}
                           result={result}
-                          onClick={() => handleSelectResult(result.entity_id)}
-                          queryName={query}
+                          onViewEntity={() =>
+                            handleSelectResult(result.entity_id)
+                          }
                           onCreateAlert={handleCreateAlert}
                         />
                       ))}

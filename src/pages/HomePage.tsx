@@ -168,7 +168,7 @@ export function HomePage() {
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   
   const { stats, isLoading } = useDashboard();
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(2);
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(2);
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}&source_level=${sourceLevel}`);

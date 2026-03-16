@@ -22,7 +22,7 @@ interface IntelligentSearchProps {
   placeholder?: string;
   autoFocus?: boolean;
   initialQuery?: string;
-  sourceLevel?: 1 | 2 | 3 | 4;
+  sourceLevel?: 1 | 2 | 3 | 4 | 5;
 }
 
 const entityTypeFilters = [

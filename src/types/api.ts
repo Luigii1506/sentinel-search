@@ -31,7 +31,7 @@ export interface ScreeningRequest {
   entity_type?: 'person' | 'company' | 'vessel' | 'aircraft' | 'organization';
   min_confidence?: number;
   max_results?: number;
-  source_level?: 1 | 2 | 3 | 4;
+  source_level?: 1 | 2 | 3 | 4 | 5;
   filters?: {
     sources?: string[];
     countries?: string[];
@@ -261,6 +261,10 @@ export interface APIPepEntry {
   start_date?: string;
   end_date?: string;
   is_current: boolean;
+  party?: string;
+  department?: string;
+  state?: string;
+  source?: string;
 }
 
 export interface APISourceRecord {

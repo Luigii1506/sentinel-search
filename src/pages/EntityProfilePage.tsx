@@ -86,6 +86,141 @@ const countryNames: Record<string, string> = {
   SE: 'Suecia', NO: 'Noruega', PL: 'Polonia', CZ: 'Chequia', RO: 'Rumania',
 };
 
+// Traduccion de subtipos de relaciones al español
+const subtypeLabels: Record<string, string> = {
+  // Familiares
+  spouse: 'Cónyuge', wife: 'Esposa', husband: 'Esposo',
+  child: 'Hijo/a', son: 'Hijo', daughter: 'Hija',
+  parent: 'Padre/Madre', father: 'Padre', mother: 'Madre',
+  relative: 'Familiar', family: 'Familiar', relation: 'Familiar',
+  sibling: 'Hermano/a', brother: 'Hermano', sister: 'Hermana',
+  grandparent: 'Abuelo/a', grandmother: 'Abuela', grandfather: 'Abuelo',
+  grandchild: 'Nieto/a', grandson: 'Nieto', granddaughter: 'Nieta',
+  uncle: 'Tío', aunt: 'Tía', cousin: 'Primo/a',
+  nephew: 'Sobrino', niece: 'Sobrina',
+  'in-law': 'Pariente político', 'father-in-law': 'Suegro', 'mother-in-law': 'Suegra',
+  'son-in-law': 'Yerno', 'daughter-in-law': 'Nuera',
+  'brother-in-law': 'Cuñado', 'sister-in-law': 'Cuñada',
+  stepfather: 'Padrastro', stepmother: 'Madrastra',
+  stepson: 'Hijastro', stepdaughter: 'Hijastra',
+  // Compuestos familiares (e.g., "son's daughter")
+  "son's daughter": 'Nieta', "son's son": 'Nieto',
+  "daughter's daughter": 'Nieta', "daughter's son": 'Nieto',
+  "son's wife": 'Nuera', "daughter's husband": 'Yerno',
+  "wife's son": 'Hijastro', "wife's daughter": 'Hijastra',
+  "husband's son": 'Hijastro', "husband's daughter": 'Hijastra',
+  grandson: 'Nieto', granddaughter: 'Nieta',
+  "ex-spouse": 'Excónyuge', "ex-wife": 'Exesposa', "ex-husband": 'Exesposo',
+  "former spouse": 'Excónyuge',
+  "male first cousin": 'Primo', "female first cousin": 'Prima',
+  "first cousin": 'Primo/a', "second cousin": 'Primo/a segundo',
+  "half-brother": 'Medio hermano', "half-sister": 'Media hermana',
+  "wife's father": 'Suegro', "wife's mother": 'Suegra',
+  "husband's father": 'Suegro', "husband's mother": 'Suegra',
+  // Sobrinos/primos con calificador
+  "fraternal niece": 'Sobrina', "fraternal nephew": 'Sobrino',
+  "maternal niece": 'Sobrina', "maternal nephew": 'Sobrino',
+  "paternal niece": 'Sobrina', "paternal nephew": 'Sobrino',
+  "male paternal parallel cousin": 'Primo paterno',
+  "female paternal parallel cousin": 'Prima paterna',
+  "paternal cousin": 'Primo/a paterno', "maternal cousin": 'Primo/a materno',
+  // Otros compuestos familiares
+  stepbrother: 'Hermanastro', stepsister: 'Hermanastra',
+  "younger brother": 'Hermano menor', "older brother": 'Hermano mayor',
+  "younger sister": 'Hermana menor', "older sister": 'Hermana mayor',
+  godparent: 'Padrino/Madrina', godfather: 'Padrino', godmother: 'Madrina',
+  godson: 'Ahijado', goddaughter: 'Ahijada',
+  fiancé: 'Prometido', fiancée: 'Prometida', fiance: 'Prometido/a',
+  cohabitant: 'Concubino/a', cohabitator: 'Concubino/a',
+  // Asociados / genéricos
+  "significant person": 'Persona relevante', "significant other": 'Pareja',
+  "close associate": 'Asociado cercano', "business partner": 'Socio comercial',
+  "known associate": 'Asociado conocido',
+  // Corporativas
+  owner: 'Propietario', shareholder: 'Accionista', beneficiary: 'Beneficiario',
+  director: 'Director', board_member: 'Consejero', chairman: 'Presidente',
+  ceo: 'Director General', cfo: 'Director Financiero', coo: 'Director Operaciones',
+  secretary: 'Secretario', treasurer: 'Tesorero',
+  member: 'Miembro', employee: 'Empleado', manager: 'Gerente',
+  founder: 'Fundador', partner: 'Socio',
+  subsidiary: 'Subsidiaria', parent_company: 'Empresa Matriz',
+  // Politicas
+  advisor: 'Asesor', representative: 'Representante', agent: 'Agente',
+  nominee: 'Nominado', appointee: 'Designado',
+  // Asociados
+  associate: 'Asociado', colleague: 'Colega', ally: 'Aliado',
+  linked: 'Vinculado', related: 'Relacionado',
+};
+
+const translateOne = (term: string): string => {
+  const lower = term.toLowerCase().trim();
+  if (subtypeLabels[lower]) return subtypeLabels[lower];
+  // Match sin guiones/espacios/apóstrofes (e.g., "daughter-in-law" → "daughterinlaw")
+  const normalized = lower.replace(/[-_\s']/g, '');
+  for (const [key, val] of Object.entries(subtypeLabels)) {
+    if (key.replace(/[-_\s']/g, '') === normalized) return val;
+  }
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+};
+
+const translateSubtype = (subtype: string): string => {
+  // Soporta múltiples valores separados por " · " (como viene del FTM)
+  if (subtype.includes(' · ')) {
+    const parts = subtype.split(' · ').map(translateOne);
+    // Deduplicar traducciones idénticas (e.g., "child · father" → "Hijo/a · Padre/Madre")
+    const unique = [...new Set(parts)];
+    return unique.join(' · ');
+  }
+  return translateOne(subtype);
+};
+
+// Formatear nombre de fuente — mostrar origen comprensible para compliance
+const sourceDisplayNames: Record<string, string> = {
+  OS_DEFAULT: 'Wikidata',
+  OS_WIKIDATA_RELATED: 'Wikidata',
+  OS_US_OFAC_SDN: 'OFAC SDN',
+  OS_US_OFAC_NONSDN: 'OFAC No-SDN',
+  OS_US_OFAC_CONS: 'OFAC Consolidado',
+  OS_UN_SC_SANCTIONS: 'ONU Sanciones',
+  OS_EU_SANCTIONS: 'UE Sanciones',
+  OS_GB_HMT_SANCTIONS: 'Reino Unido OFSI',
+  OS_CA_DFATD: 'Canadá Sanciones',
+  OS_INTERPOL_RED: 'Interpol',
+  OS_EU_EUROPOL: 'Europol',
+  OFAC_SDN: 'OFAC SDN',
+  OFAC_NON_SDN: 'OFAC No-SDN',
+  US_FBI_MOST_WANTED: 'FBI',
+  US_DEA_FUGITIVES: 'DEA',
+  INTERPOL_RED_NOTICES: 'Interpol',
+};
+
+const formatSourceName = (source: string): string | null => {
+  if (!source) return null;
+  if (sourceDisplayNames[source]) return sourceDisplayNames[source];
+  // Genérico: quitar prefijo OS_ y humanizar
+  if (source.startsWith('OS_')) {
+    const clean = source.slice(3);
+    // Detectar país/org del prefijo
+    if (clean.startsWith('US_')) return 'EE.UU. ' + clean.slice(3).replace(/_/g, ' ');
+    if (clean.startsWith('EU_')) return 'UE ' + clean.slice(3).replace(/_/g, ' ');
+    if (clean.startsWith('GB_')) return 'UK ' + clean.slice(3).replace(/_/g, ' ');
+    if (clean.startsWith('CA_')) return 'Canadá ' + clean.slice(3).replace(/_/g, ' ');
+    if (clean.startsWith('UN_')) return 'ONU ' + clean.slice(3).replace(/_/g, ' ');
+    return clean.replace(/_/g, ' ');
+  }
+  if (source.startsWith('PEP_')) return 'PEP ' + source.slice(4).replace(/_/g, ' ');
+  return source.replace(/_/g, ' ');
+};
+
+// Mapeo extendido de entity types (el FTM usa variantes)
+const entityTypeLabelExtended: Record<string, string> = {
+  person: 'Persona', individual: 'Persona',
+  company: 'Empresa', legalentity: 'Entidad Legal',
+  vessel: 'Embarcación', aircraft: 'Aeronave',
+  organization: 'Organización', publicbody: 'Entidad Pública',
+  unknown: '', // No mostrar
+};
+
 const amCategoryLabels: Record<string, string> = {
   terrorism: 'Terrorismo', sanctions_evasion: 'Evasion Sanciones', wanted: 'Buscados',
   crime: 'Crimen', human_rights: 'DDHH', financial_crime: 'Crimen Financiero',
@@ -872,14 +1007,14 @@ export function EntityProfilePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
-  const [graphDepth, setGraphDepth] = useState(2);
+  const [graphDepth, setGraphDepth] = useState(1);
 
   const sourceLevelParam = searchParams.get('source_level');
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4>(
-    sourceLevelParam ? (parseInt(sourceLevelParam) as 1 | 2 | 3 | 4) : 2
+  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(
+    sourceLevelParam ? (parseInt(sourceLevelParam) as 1 | 2 | 3 | 4 | 5) : 2
   );
 
-  const handleSourceLevelChange = (level: 1 | 2 | 3 | 4) => {
+  const handleSourceLevelChange = (level: 1 | 2 | 3 | 4 | 5) => {
     setSourceLevel(level);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('source_level', String(level));
@@ -1138,88 +1273,209 @@ export function EntityProfilePage() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
+            {/* Row 1: Executive Alert Banner */}
+            {(() => {
+              const hasSanctions = entity.sanctions.length > 0;
+              const activeSanctions = entity.sanctions.filter(s => s.status === 'active');
+              const isPep = entity.is_current_pep === true;
+              const hasAdverseMedia = entity.adverse_media?.length > 0;
+              const riskFactorLabels: Record<string, string> = {
+                sanctions: 'Sanciones', pep: 'PEP', adverse_media: 'Medios Adversos',
+                geographic: 'Geográfico', network: 'Red', transactional: 'Transaccional',
+              };
+              const criticalFactors = entity.risk_factors.filter(f => f.level === 'critical' || f.level === 'high');
+
+              if (!hasSanctions && !isPep && !hasAdverseMedia && criticalFactors.length === 0) {
+                return (
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                    className="glass rounded-xl p-5 border-l-4 border-green-500/60">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
+                      <div>
+                        <p className="text-white font-medium">Sin alertas activas</p>
+                        <p className="text-sm text-gray-400">
+                          Esta entidad no tiene sanciones, registros PEP ni medios adversos. Presente en {entity.data_sources.length} fuente{entity.data_sources.length !== 1 ? 's' : ''}.
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              }
+
+              return (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  className={cn('glass rounded-xl p-5 border-l-4',
+                    entity.risk_level === 'critical' ? 'border-red-500/60' :
+                    entity.risk_level === 'high' ? 'border-orange-500/60' : 'border-yellow-500/60'
+                  )}>
+                  <div className="flex items-start gap-3">
+                    <AlertTriangle className={cn('w-6 h-6 shrink-0 mt-0.5',
+                      entity.risk_level === 'critical' ? 'text-red-400' :
+                      entity.risk_level === 'high' ? 'text-orange-400' : 'text-yellow-400'
+                    )} />
+                    <div className="flex-1">
+                      <p className="text-white font-medium mb-2">Resumen de Alertas</p>
+                      <div className="flex flex-wrap gap-3">
+                        {hasSanctions && (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
+                            <Shield className="w-4 h-4 text-red-400" />
+                            <span className="text-sm text-red-300 font-medium">
+                              {activeSanctions.length} sanción{activeSanctions.length !== 1 ? 'es' : ''} activa{activeSanctions.length !== 1 ? 's' : ''}
+                            </span>
+                          </div>
+                        )}
+                        {isPep && (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                            <Landmark className="w-4 h-4 text-purple-400" />
+                            <span className="text-sm text-purple-300 font-medium">
+                              Persona Políticamente Expuesta
+                            </span>
+                          </div>
+                        )}
+                        {hasAdverseMedia && (
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                            <Newspaper className="w-4 h-4 text-amber-400" />
+                            <span className="text-sm text-amber-300 font-medium">
+                              Medios adversos
+                            </span>
+                          </div>
+                        )}
+                        {criticalFactors.map((f, i) => (
+                          <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                            <AlertCircle className={cn('w-4 h-4', f.level === 'critical' ? 'text-red-400' : 'text-orange-400')} />
+                            <span className="text-sm text-gray-300">
+                              {riskFactorLabels[f.category] || f.category}: {f.score}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })()}
+
+            {/* Row 2: Sanctions Summary + PEP Summary (side by side) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Aliases */}
-              {entity.aliases.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="glass rounded-xl p-6"
-                >
+              {/* Sanciones Activas */}
+              {entity.sanctions.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+                  className="glass rounded-xl p-6">
                   <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-blue-400" />
-                    Alias Conocidos
+                    <Shield className="w-5 h-5 text-red-400" />
+                    Sanciones
+                    <Badge className="ml-auto bg-red-500/20 text-red-400 text-xs">{entity.sanctions.length}</Badge>
                   </h3>
-                  <div className="space-y-2">
-                    {entity.aliases.map((alias, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                        <span className="text-white">{alias.name}</span>
-                        <Badge variant="outline" className="text-xs text-gray-400">
-                          {alias.type}
-                        </Badge>
+                  <div className="space-y-3">
+                    {entity.sanctions.slice(0, 5).map((s, i) => (
+                      <div key={i} className={cn('p-3 rounded-lg border-l-2',
+                        s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-white/[0.02] border-gray-600/30'
+                      )}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-sm text-white font-medium">{s.source}</span>
+                          <Badge variant="outline" className={cn('text-[10px]',
+                            s.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
+                          )}>
+                            {s.status === 'active' ? 'Activa' : s.status === 'removed' ? 'Removida' : s.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-400">{s.program}</p>
+                        {s.reason && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{s.reason}</p>}
+                        <p className="text-[10px] text-gray-600 mt-1">Listado: {formatDate(s.listing_date)}</p>
                       </div>
                     ))}
+                    {entity.sanctions.length > 5 && (
+                      <button onClick={() => setActiveTab('sanctions')}
+                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        Ver {entity.sanctions.length - 5} más <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}
 
-              {/* Addresses */}
-              {entity.addresses.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
-                  className="glass rounded-xl p-6"
-                >
+              {/* PEP Status */}
+              {entity.pep_entries.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+                  className="glass rounded-xl p-6">
                   <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <MapPin className="w-5 h-5 text-blue-400" />
-                    Direcciones
+                    <Landmark className="w-5 h-5 text-purple-400" />
+                    Exposición Política (PEP)
+                    <Badge className={cn('ml-auto text-xs',
+                      entity.is_current_pep ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'
+                    )}>
+                      {entity.is_current_pep ? 'Activo' : 'Histórico'}
+                    </Badge>
                   </h3>
                   <div className="space-y-3">
-                    {entity.addresses.map((addr, i) => (
-                      <div key={i} className="p-3 rounded-lg bg-white/5">
-                        <p className="text-white text-sm">
-                          {[addr.street, addr.city, addr.state, addr.country].filter(Boolean).join(', ')}
-                        </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant="outline" className="text-[10px]">
-                            {addr.type}
-                          </Badge>
-                          {addr.is_current && (
-                            <Badge className="text-[10px] bg-green-500/20 text-green-400">
-                              Actual
-                            </Badge>
+                    {entity.pep_entries
+                      .sort((a, b) => {
+                        if (a.is_current !== b.is_current) return a.is_current ? -1 : 1;
+                        return (b.start_date || '').localeCompare(a.start_date || '');
+                      })
+                      .slice(0, 5).map((pep, i) => (
+                      <div key={i} className={cn('p-3 rounded-lg border-l-2',
+                        pep.is_current ? 'bg-purple-500/5 border-purple-500/50' : 'bg-white/[0.02] border-gray-600/30'
+                      )}>
+                        <p className="text-sm text-white font-medium">{pep.role}</p>
+                        {(pep.institution || pep.department) && (
+                          <p className="text-xs text-gray-400">{pep.department || pep.institution}</p>
+                        )}
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          <span className="text-[10px] text-gray-500">
+                            {countryNames[pep.country] || pep.country}
+                          </span>
+                          {pep.state && (
+                            <span className="text-[10px] text-gray-500">{pep.state}</span>
                           )}
+                          {pep.party && (
+                            <span className="text-[10px] text-blue-400">{pep.party}</span>
+                          )}
+                          {pep.start_date && (
+                            <span className="text-[10px] text-gray-600">
+                              {formatDate(pep.start_date)} — {pep.end_date ? formatDate(pep.end_date) : 'Presente'}
+                            </span>
+                          )}
+                          <Badge variant="outline" className={cn('text-[10px] ml-auto',
+                            pep.is_current ? 'text-purple-400 border-purple-500/30' : 'text-gray-500'
+                          )}>
+                            {pep.is_current ? 'Vigente' : 'Finalizado'}
+                          </Badge>
                         </div>
                       </div>
                     ))}
+                    {entity.pep_entries.length > 5 && (
+                      <button onClick={() => setActiveTab('pep')}
+                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        Ver {entity.pep_entries.length - 5} más <ArrowRight className="w-3 h-3" />
+                      </button>
+                    )}
                   </div>
                 </motion.div>
               )}
+            </div>
 
-              {/* Identifications */}
+            {/* Row 3: IDs + Aliases + Addresses */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Identificaciones */}
               {entity.identifications?.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="glass rounded-xl p-6"
-                >
-                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-blue-400" />
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="glass rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                    <CreditCard className="w-4 h-4" />
                     Identificaciones
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {entity.identifications.map((ident, i) => (
-                      <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                        <div className="flex items-center gap-3">
-                          <Badge className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
+                        <div className="flex items-center gap-2">
+                          <Badge className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                             {ident.label || ident.type.toUpperCase()}
                           </Badge>
                           <span className="text-white font-mono text-sm">{ident.number}</span>
                         </div>
                         {ident.country && (
-                          <span className="text-xs text-gray-500">{ident.country}</span>
+                          <span className="text-[10px] text-gray-500">{countryNames[ident.country] || ident.country}</span>
                         )}
                       </div>
                     ))}
@@ -1227,105 +1483,189 @@ export function EntityProfilePage() {
                 </motion.div>
               )}
 
-              {/* Source Records */}
-              {entity.source_records && entity.source_records.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className="glass rounded-xl p-6"
-                >
-                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <Database className="w-5 h-5 text-blue-400" />
-                    Registros por Fuente
+              {/* Aliases */}
+              {entity.aliases.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="glass rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                    <FileText className="w-4 h-4" />
+                    Alias Conocidos
+                    <span className="text-[10px] text-gray-600 ml-auto">{entity.aliases.length}</span>
+                  </h3>
+                  <div className="space-y-1">
+                    {entity.aliases.slice(0, 8).map((alias, i) => (
+                      <div key={i} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
+                        <span className="text-sm text-white truncate mr-2">{alias.name}</span>
+                        <Badge variant="outline" className="text-[10px] text-gray-500 shrink-0">
+                          {alias.type === 'also_known_as' ? 'AKA' : alias.type === 'primary' ? 'Principal' : alias.type}
+                        </Badge>
+                      </div>
+                    ))}
+                    {entity.aliases.length > 8 && (
+                      <p className="text-[10px] text-gray-600 pt-1">+{entity.aliases.length - 8} más</p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Direcciones */}
+              {entity.addresses.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                  className="glass rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                    <MapPin className="w-4 h-4" />
+                    Direcciones
+                  </h3>
+                  <div className="space-y-2">
+                    {entity.addresses.slice(0, 5).map((addr, i) => (
+                      <div key={i} className="p-2 rounded-lg bg-white/[0.03]">
+                        <p className="text-sm text-white">
+                          {[addr.street, addr.city, addr.state, countryNames[addr.country] || addr.country].filter(Boolean).join(', ')}
+                        </p>
+                        {addr.is_current && (
+                          <Badge className="text-[10px] bg-green-500/10 text-green-400 mt-1">Actual</Badge>
+                        )}
+                      </div>
+                    ))}
+                    {entity.addresses.length > 5 && (
+                      <p className="text-[10px] text-gray-600">+{entity.addresses.length - 5} más</p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Row 4: Risk Factors + Source Records */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Factores de Riesgo */}
+              {entity.risk_factors.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                  className="glass rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                    <AlertCircle className="w-4 h-4" />
+                    Factores de Riesgo
                   </h3>
                   <div className="space-y-3">
-                    {entity.source_records.map((rec, i) => (
-                      <div key={i} className="p-3 rounded-lg bg-white/5">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <span className="text-white text-sm font-medium">{rec.source_display || rec.source}</span>
-                            {rec.category && (
-                              <Badge variant="outline" className="text-[10px] text-gray-400">
-                                {rec.category}
-                              </Badge>
+                    {entity.risk_factors.map((factor, i) => {
+                      const factorLabels: Record<string, string> = {
+                        sanctions: 'Sanciones', pep: 'Exposición Política', adverse_media: 'Medios Adversos',
+                        geographic: 'Riesgo Geográfico', network: 'Riesgo de Red', transactional: 'Transaccional',
+                      };
+                      return (
+                        <div key={i} className="p-3 rounded-lg bg-white/[0.03]">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-sm text-gray-300">{factorLabels[factor.category] || factor.category}</span>
+                            <span className={cn('text-sm font-bold tabular-nums',
+                              factor.level === 'critical' ? 'text-red-400' :
+                              factor.level === 'high' ? 'text-orange-400' :
+                              factor.level === 'medium' ? 'text-yellow-400' : 'text-green-400'
+                            )}>
+                              {factor.score}
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${factor.score}%` }}
+                              transition={{ duration: 0.5, delay: i * 0.1 }}
+                              className={cn('h-full rounded-full',
+                                factor.level === 'critical' ? 'bg-red-500' :
+                                factor.level === 'high' ? 'bg-orange-500' :
+                                factor.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                              )}
+                            />
+                          </div>
+                          {factor.details && <p className="text-[10px] text-gray-500 mt-1.5">{factor.details}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Registros por Fuente */}
+              {entity.source_records && entity.source_records.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                  className="glass rounded-xl p-6">
+                  <h3 className="text-sm font-medium text-gray-400 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                    <Database className="w-4 h-4" />
+                    Registros por Fuente
+                    <span className="text-[10px] text-gray-600 ml-auto">{entity.source_records.length} fuentes</span>
+                  </h3>
+                  <div className="space-y-2">
+                    {entity.source_records.map((rec, i) => {
+                      const catLabels: Record<string, string> = {
+                        SANCTIONS: 'Sanciones', LAW_ENFORCEMENT: 'Ley', PEP: 'PEP',
+                        REGULATORY: 'Regulatorio', TAX: 'Fiscal', DEBARMENT: 'Inhabilitación',
+                      };
+                      const catColors: Record<string, string> = {
+                        SANCTIONS: 'bg-red-500/10 text-red-400 border-red-500/20',
+                        LAW_ENFORCEMENT: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+                        PEP: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                        REGULATORY: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                        TAX: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
+                        DEBARMENT: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
+                      };
+                      return (
+                        <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.03]">
+                          {rec.category && (
+                            <Badge variant="outline" className={cn('text-[10px] shrink-0', catColors[rec.category] || 'bg-white/5 text-gray-400')}>
+                              {catLabels[rec.category] || rec.category}
+                            </Badge>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm text-white">{rec.source_display || formatSourceName(rec.source) || rec.source}</span>
+                            {rec.country && (
+                              <span className="text-[10px] text-gray-500 ml-2">{countryNames[rec.country] || rec.country}</span>
                             )}
                           </div>
                           {rec.risk_level && (
-                            <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(rec.risk_level))}>
+                            <Badge variant="outline" className={cn('text-[10px] shrink-0', getRiskBadgeClasses(rec.risk_level))}>
                               {rec.risk_level}
                             </Badge>
                           )}
                         </div>
-                        {rec.external_id && (
-                          <p className="text-xs text-gray-500">
-                            <span className="text-gray-600">ID:</span> <span className="font-mono">{rec.external_id}</span>
-                          </p>
-                        )}
-                        {rec.country && (
-                          <p className="text-xs text-gray-500">
-                            <span className="text-gray-600">País:</span> {rec.country}
-                          </p>
-                        )}
-                        {rec.programs && rec.programs.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {rec.programs.map((prog, j) => (
-                              <span key={j} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-400">
-                                {prog}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </motion.div>
               )}
-
-              {/* Risk Factors */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="glass rounded-xl p-6 lg:col-span-2"
-              >
-                <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-blue-400" />
-                  Factores de Riesgo
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {entity.risk_factors.map((factor, i) => (
-                    <div key={i} className="p-4 rounded-lg bg-white/5">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-300 capitalize">{factor.category}</span>
-                        <span className={cn(
-                          'text-sm font-medium',
-                          factor.level === 'critical' ? 'text-red-400' :
-                          factor.level === 'high' ? 'text-orange-400' :
-                          factor.level === 'medium' ? 'text-yellow-400' : 'text-green-400'
-                        )}>
-                          {factor.score}%
-                        </span>
-                      </div>
-                      <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: `${factor.score}%` }}
-                          transition={{ duration: 0.5, delay: i * 0.1 }}
-                          className={cn(
-                            'h-full rounded-full',
-                            factor.level === 'critical' ? 'bg-red-500' :
-                            factor.level === 'high' ? 'bg-orange-500' :
-                            factor.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                          )}
-                        />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2">{factor.details}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
             </div>
+
+            {/* Row 5: Timeline */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+              className="glass rounded-xl p-6">
+              <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                <Clock className="w-4 h-4" />
+                Cronología
+              </h3>
+              <div className="flex flex-wrap gap-6">
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">Primera detección</p>
+                  <p className="text-sm text-white">{formatDate(entity.first_seen)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">Última actualización</p>
+                  <p className="text-sm text-white">{formatDate(entity.last_updated)}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-gray-500 uppercase">Fuentes de datos</p>
+                  <p className="text-sm text-white">{entity.data_sources.length} fuente{entity.data_sources.length !== 1 ? 's' : ''}</p>
+                </div>
+                {entity.sanctions.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-gray-500 uppercase">Sanciones activas</p>
+                    <p className="text-sm text-red-400 font-medium">{entity.sanctions.filter(s => s.status === 'active').length}</p>
+                  </div>
+                )}
+                {entity.pep_entries.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-gray-500 uppercase">Posiciones PEP</p>
+                    <p className="text-sm text-purple-400 font-medium">{entity.pep_entries.length}</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </TabsContent>
 
           {/* Sanctions Tab */}
@@ -1361,36 +1701,121 @@ export function EntityProfilePage() {
                 <p className="text-gray-400">Esta entidad no es Persona Políticamente Expuesta.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {entity.pep_entries.map((pep, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="glass rounded-lg p-6 border-l-4 border-pink-500"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-white font-medium text-lg">{pep.role}</h4>
-                        <p className="text-pink-400 text-sm">{pep.category}</p>
-                        {pep.institution && (
-                          <p className="text-gray-300 text-sm mt-1">{pep.institution}</p>
-                        )}
-                        <p className="text-gray-400 text-sm mt-1">{pep.country}</p>
+              <div className="space-y-2">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                    <Landmark className="w-5 h-5 text-purple-400" />
+                    Positions Held
+                  </h3>
+                  <Badge className={entity.is_current_pep ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'}>
+                    {entity.is_current_pep ? 'PEP Activo' : 'PEP Histórico'}
+                  </Badge>
+                </div>
+
+                {/* Timeline */}
+                <div className="relative">
+                  {entity.pep_entries
+                    .sort((a, b) => {
+                      // Current first, then by start_date descending
+                      if (a.is_current !== b.is_current) return a.is_current ? -1 : 1;
+                      const aDate = a.start_date || '';
+                      const bDate = b.start_date || '';
+                      return bDate.localeCompare(aDate);
+                    })
+                    .map((pep, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 }}
+                      className="relative pl-8 pb-4 last:pb-0"
+                    >
+                      {/* Timeline line */}
+                      {i < entity.pep_entries.length - 1 && (
+                        <div className="absolute left-[11px] top-6 bottom-0 w-px bg-gray-700" />
+                      )}
+                      {/* Timeline dot */}
+                      <div className={cn(
+                        'absolute left-0 top-1.5 w-6 h-6 rounded-full flex items-center justify-center',
+                        pep.is_current ? 'bg-purple-500/20 ring-2 ring-purple-500' : 'bg-gray-700 ring-2 ring-gray-600'
+                      )}>
+                        <Landmark className={cn('w-3 h-3', pep.is_current ? 'text-purple-400' : 'text-gray-400')} />
                       </div>
-                      <Badge className={pep.is_current ? 'bg-pink-500/20 text-pink-400' : 'bg-gray-500/20 text-gray-400'}>
-                        {pep.is_current ? 'En Cargo' : 'Histórico'}
-                      </Badge>
-                    </div>
-                    {(pep.start_date || pep.end_date) && (
-                      <p className="text-sm text-gray-500 mt-3">
-                        {pep.start_date && `Desde: ${formatDate(pep.start_date)}`}
-                        {pep.end_date && ` | Hasta: ${formatDate(pep.end_date)}`}
-                      </p>
-                    )}
-                  </motion.div>
-                ))}
+
+                      {/* Card */}
+                      <div className={cn(
+                        'glass rounded-lg p-5 border-l-4 transition-colors',
+                        pep.is_current ? 'border-purple-500 bg-purple-500/5' : 'border-gray-600 hover:border-gray-500'
+                      )}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-white font-medium text-base leading-tight">{pep.role}</h4>
+
+                            {/* Institution / Department */}
+                            {(pep.institution || pep.department) && (
+                              <p className="text-gray-300 text-sm mt-1 flex items-center gap-1.5">
+                                <Building2 className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
+                                {pep.department || pep.institution}
+                              </p>
+                            )}
+
+                            {/* Location details */}
+                            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                              {/* Country */}
+                              {pep.country && (
+                                <span className="text-sm text-gray-400 flex items-center gap-1">
+                                  <Globe className="w-3.5 h-3.5 text-gray-500" />
+                                  {countryNames[pep.country] || pep.country}
+                                </span>
+                              )}
+                              {/* State */}
+                              {pep.state && (
+                                <span className="text-sm text-gray-400 flex items-center gap-1">
+                                  <MapPin className="w-3.5 h-3.5 text-gray-500" />
+                                  {pep.state}
+                                </span>
+                              )}
+                              {/* Party */}
+                              {pep.party && (
+                                <span className="text-sm text-blue-400 flex items-center gap-1">
+                                  <Tag className="w-3.5 h-3.5 text-blue-500" />
+                                  {pep.party}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Dates */}
+                            {(pep.start_date || pep.end_date) && (
+                              <div className="flex items-center gap-1.5 mt-2">
+                                <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                                <span className="text-sm text-gray-500">
+                                  {pep.start_date ? formatDate(pep.start_date) : '?'}
+                                  {' — '}
+                                  {pep.end_date ? formatDate(pep.end_date) : 'Presente'}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Status badge */}
+                          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                            <Badge className={cn('text-xs',
+                              pep.is_current ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'
+                            )}>
+                              {pep.is_current ? 'En Cargo' : 'Histórico'}
+                            </Badge>
+                            {pep.category && pep.category !== 'PEP' && (
+                              <span className="text-[10px] text-gray-600 uppercase tracking-wide">
+                                {pep.category.replace(/_/g, ' ')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             )}
           </TabsContent>
@@ -1413,136 +1838,310 @@ export function EntityProfilePage() {
                 <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
                 <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
               </div>
-            ) : (
-              <div className="space-y-4">
-                {/* Level filter chips */}
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {[
-                    { key: undefined, label: 'Todos' },
-                    { key: 'DIRECT', label: 'Directas' },
-                    { key: 'AFFILIATION', label: 'Afiliacion' },
-                    { key: 'INDIRECT', label: 'Indirectas' },
-                  ].map((filter) => (
-                    <button
-                      key={filter.label}
-                      onClick={() => setRelLevelFilter(filter.key)}
-                      className={cn(
-                        'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                        relLevelFilter === filter.key
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                      )}
-                    >
-                      {filter.label}
-                    </button>
-                  ))}
-                </div>
+            ) : (() => {
+              // Group relationships by section (like OpenSanctions)
+              const sectionConfig: Array<{
+                key: string;
+                label: string;
+                icon: typeof Users;
+                types: string[];
+                color: string;
+                badgeColor: string;
+              }> = [
+                {
+                  key: 'family',
+                  label: 'Familiares',
+                  icon: Users,
+                  types: ['family'],
+                  color: 'text-purple-400',
+                  badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                },
+                {
+                  key: 'associates',
+                  label: 'Asociados',
+                  icon: Network,
+                  types: ['associate', 'unknown'],
+                  color: 'text-blue-400',
+                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                },
+                {
+                  key: 'corporate',
+                  label: 'Relaciones Corporativas',
+                  icon: Building2,
+                  types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
+                  color: 'text-cyan-400',
+                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+                },
+                {
+                  key: 'political',
+                  label: 'Cargos y Representacion',
+                  icon: Landmark,
+                  types: ['political', 'representation', 'occupancy'],
+                  color: 'text-amber-400',
+                  badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                },
+                {
+                  key: 'sanctions',
+                  label: 'Sanciones',
+                  icon: Shield,
+                  types: ['sanction'],
+                  color: 'text-red-400',
+                  badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
+                },
+                {
+                  key: 'other',
+                  label: 'Otras Relaciones',
+                  icon: Share2,
+                  types: [],
+                  color: 'text-gray-400',
+                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+                },
+              ];
 
-                {/* Summary by type */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {Object.entries(relationshipsList.by_type).map(([type, count]) => (
-                    <Badge key={type} variant="outline" className="text-xs capitalize">
-                      {type}: {count}
-                    </Badge>
-                  ))}
-                </div>
+              const knownTypes = new Set(sectionConfig.flatMap(s => s.types));
+              const grouped: Record<string, typeof relationshipsList.relationships> = {};
+              for (const section of sectionConfig) {
+                grouped[section.key] = [];
+              }
+              for (const rel of relationshipsList.relationships) {
+                const section = sectionConfig.find(s => s.types.includes(rel.type)) || sectionConfig[sectionConfig.length - 1];
+                grouped[section.key].push(rel);
+              }
 
-                {/* Relationships list */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {relationshipsList.relationships.map((rel, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                      className="glass rounded-lg p-4"
-                    >
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <p className="text-white font-medium">
-                            {rel.related_entity_name}
-                          </p>
-                          {rel.subtype && (
-                            <p className="text-sm text-gray-400 mt-0.5">
-                              {rel.subtype}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {/* Strength badge */}
-                          {rel.relationship_strength != null && (
-                            <span className={cn(
-                              'text-[10px] font-mono px-1.5 py-0.5 rounded',
-                              rel.relationship_strength > 0.7
-                                ? 'bg-red-500/15 text-red-400'
-                                : rel.relationship_strength > 0.4
-                                ? 'bg-orange-500/15 text-orange-400'
-                                : 'bg-gray-500/15 text-gray-400'
-                            )}>
-                              {rel.relationship_strength.toFixed(2)}
-                            </span>
-                          )}
-                          {/* Type badge */}
-                          <Badge
-                            variant="outline"
-                            className={cn(
-                              'text-xs',
-                              rel.type === 'family' ? 'bg-purple-500/10 text-purple-400 border-purple-500/20' :
-                              rel.type === 'beneficial_ownership' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                              rel.type === 'corporate' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                              rel.type === 'membership' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                              rel.type === 'political' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
-                              'bg-gray-500/10 text-gray-400 border-gray-500/20'
-                            )}
-                          >
-                            {rel.type === 'family' ? 'Familiar' :
-                             rel.type === 'beneficial_ownership' ? 'Propiedad' :
-                             rel.type === 'corporate' ? 'Corporativa' :
-                             rel.type === 'membership' ? 'Miembro' :
-                             rel.type === 'political' ? 'Politico' :
-                             rel.type === 'associate' ? 'Asociado' :
-                             rel.type === 'representation' ? 'Representante' :
-                             rel.type === 'sanction' ? 'Sancion' :
-                             rel.type === 'unknown' ? 'Vinculado' :
-                             rel.type}
+              return (
+                <div className="space-y-6">
+                  {/* Level filter chips */}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { key: undefined, label: 'Todos' },
+                      { key: 'DIRECT', label: 'Directas' },
+                      { key: 'AFFILIATION', label: 'Afiliacion' },
+                      { key: 'INDIRECT', label: 'Indirectas' },
+                    ].map((filter) => (
+                      <button
+                        key={filter.label}
+                        onClick={() => setRelLevelFilter(filter.key)}
+                        className={cn(
+                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                          relLevelFilter === filter.key
+                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                        )}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Summary counts */}
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(relationshipsList.by_type).map(([type, count]) => {
+                      const section = sectionConfig.find(s => s.types.includes(type));
+                      return (
+                        <Badge key={type} variant="outline" className={cn('text-xs', section?.badgeColor || 'text-gray-400')}>
+                          {type === 'family' ? 'Familiares' :
+                           type === 'associate' ? 'Asociados' :
+                           type === 'beneficial_ownership' ? 'Propiedad' :
+                           type === 'corporate' ? 'Corporativa' :
+                           type === 'directorship' ? 'Directivos' :
+                           type === 'membership' ? 'Miembros' :
+                           type === 'employment' ? 'Empleados' :
+                           type === 'political' ? 'Politico' :
+                           type === 'representation' ? 'Representacion' :
+                           type === 'sanction' ? 'Sanciones' :
+                           type === 'unknown' ? 'Vinculados' :
+                           type}: {count as number}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+
+                  {/* Sections by type */}
+                  {sectionConfig.map((section) => {
+                    const rels = grouped[section.key];
+                    if (!rels || rels.length === 0) return null;
+                    const SectionIcon = section.icon;
+
+                    return (
+                      <div key={section.key} className="space-y-3">
+                        {/* Section header */}
+                        <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+                          <SectionIcon className={cn('w-5 h-5', section.color)} />
+                          <h3 className={cn('text-lg font-semibold', section.color)}>
+                            {section.label}
+                          </h3>
+                          <Badge variant="outline" className={cn('text-xs ml-1', section.badgeColor)}>
+                            {rels.length}
                           </Badge>
                         </div>
-                      </div>
 
-                      <div className="flex items-center justify-between text-xs mt-2">
-                        <div className="flex items-center gap-2">
-                          {/* Level label */}
-                          {rel.relationship_level && (
-                            <span className={cn(
-                              'px-1.5 py-0.5 rounded text-[10px] font-medium',
-                              rel.relationship_level === 'DIRECT'
-                                ? 'bg-red-500/10 text-red-400'
-                                : rel.relationship_level === 'AFFILIATION'
-                                ? 'bg-yellow-500/10 text-yellow-400'
-                                : 'bg-gray-500/10 text-gray-400'
-                            )}>
-                              {rel.relationship_level === 'DIRECT' ? 'Directa' :
-                               rel.relationship_level === 'AFFILIATION' ? 'Afiliacion' :
-                               'Indirecta'}
-                            </span>
-                          )}
-                          <span className="text-gray-500">
-                            {rel.direction === 'outgoing'
-                              ? `Relacionado con ${rel.related_entity_name.split(' ')[0]}`
-                              : `${rel.related_entity_name.split(' ')[0]} vinculado a esta entidad`}
-                          </span>
+                        {/* Section items */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {rels.map((rel, i) => {
+                            const riskColor = rel.related_entity_risk_level === 'critical' ? 'text-red-400'
+                              : rel.related_entity_risk_level === 'high' ? 'text-orange-400'
+                              : rel.related_entity_risk_level === 'medium' ? 'text-yellow-400'
+                              : 'text-gray-400';
+                            const riskBg = rel.related_entity_risk_level === 'critical' ? 'bg-red-500/10 border-red-500/20'
+                              : rel.related_entity_risk_level === 'high' ? 'bg-orange-500/10 border-orange-500/20'
+                              : rel.related_entity_risk_level === 'medium' ? 'bg-yellow-500/10 border-yellow-500/20'
+                              : 'bg-gray-500/10 border-gray-500/20';
+                            const entityTypeKey = (rel.related_entity_type || '').toLowerCase();
+                            const entityTypeLabel = entityTypeLabelExtended[entityTypeKey] || null;
+                            const relCountries = (rel.related_entity_countries || []).slice(0, 3);
+                            const sourceName = rel.source ? formatSourceName(rel.source) : null;
+                            // Filtrar descriptions basura del FTM (contienen → o son solo nombres)
+                            const cleanDescription = rel.description && !rel.description.includes('→') && !rel.description.includes('—')
+                              ? rel.description : null;
+
+                            return (
+                            <motion.div
+                              key={`${section.key}-${i}`}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: i * 0.03 }}
+                              className="glass rounded-lg p-4 hover:bg-white/[0.04] transition-colors"
+                            >
+                              {/* Row 1: Name + badges */}
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <div className="flex-1 min-w-0">
+                                  {rel.related_entity_id ? (
+                                    <button
+                                      onClick={() => navigate(`/entity/${rel.related_entity_id}${sourceLevelParam ? `?source_level=${sourceLevelParam}` : ''}`)}
+                                      className="text-white font-medium hover:text-blue-400 transition-colors text-left cursor-pointer truncate block max-w-full"
+                                    >
+                                      {rel.related_entity_name}
+                                    </button>
+                                  ) : (
+                                    <p className="text-white font-medium truncate">
+                                      {rel.related_entity_name}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  {rel.related_entity_is_pep && (
+                                    <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                      PEP
+                                    </span>
+                                  )}
+                                  {rel.related_entity_risk_score != null && rel.related_entity_risk_score >= 40 && (
+                                    <span className={cn('px-1.5 py-0.5 rounded text-[10px] font-medium border', riskBg, riskColor)}>
+                                      {rel.related_entity_risk_level === 'critical' ? 'Crítico' :
+                                       rel.related_entity_risk_level === 'high' ? 'Alto' :
+                                       'Medio'} {rel.related_entity_risk_score}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Row 2: Subtype translated + context */}
+                              <div className="flex items-center gap-1.5 text-sm mb-2">
+                                {rel.subtype ? (
+                                  <span className={section.color}>
+                                    {translateSubtype(rel.subtype)}
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-500 text-xs">
+                                    {section.key === 'family' ? 'Familiar' :
+                                     section.key === 'associates' ? 'Vinculado' :
+                                     section.key === 'corporate' ? 'Relación corporativa' :
+                                     section.key === 'political' ? 'Cargo' :
+                                     section.key === 'sanctions' ? 'Sancionado' :
+                                     'Relacionado'}
+                                  </span>
+                                )}
+                                {entityTypeLabel && (
+                                  <>
+                                    <span className="text-gray-600 text-xs">·</span>
+                                    <span className="text-xs text-gray-500">{entityTypeLabel}</span>
+                                  </>
+                                )}
+                                {rel.percentage != null && (
+                                  <>
+                                    <span className="text-gray-600 text-xs">·</span>
+                                    <span className="text-xs text-cyan-400 font-medium">{rel.percentage}%</span>
+                                  </>
+                                )}
+                                {relCountries.length > 0 && (
+                                  <>
+                                    <span className="text-gray-600 text-xs">·</span>
+                                    <span className="text-xs text-gray-500">
+                                      {relCountries.map(c => countryNames[c] || c).join(', ')}
+                                    </span>
+                                  </>
+                                )}
+                              </div>
+
+                              {/* Row 3: Metadata chips — solo lo relevante */}
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                {/* Dates */}
+                                {(rel.start_date || rel.end_date) && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                    <Calendar className="w-3 h-3" />
+                                    {rel.start_date && rel.end_date
+                                      ? `${formatDate(rel.start_date)} — ${formatDate(rel.end_date)}`
+                                      : rel.start_date
+                                      ? `Desde ${formatDate(rel.start_date)}`
+                                      : `Hasta ${formatDate(rel.end_date!)}`}
+                                  </span>
+                                )}
+
+                                {/* Source — nombre limpio */}
+                                {sourceName && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                    <Database className="w-3 h-3" />
+                                    {sourceName}
+                                  </span>
+                                )}
+
+                                {/* Relationship level */}
+                                {rel.relationship_level && (
+                                  <span className={cn(
+                                    'px-1.5 py-0.5 rounded text-[10px] font-medium',
+                                    rel.relationship_level === 'DIRECT'
+                                      ? 'bg-red-500/10 text-red-400'
+                                      : rel.relationship_level === 'AFFILIATION'
+                                      ? 'bg-yellow-500/10 text-yellow-400'
+                                      : 'bg-gray-500/10 text-gray-400'
+                                  )}>
+                                    {rel.relationship_level === 'DIRECT' ? 'Directa' :
+                                     rel.relationship_level === 'AFFILIATION' ? 'Afiliación' :
+                                     'Indirecta'}
+                                  </span>
+                                )}
+
+                                {/* Unresolved */}
+                                {!rel.is_resolved && (
+                                  <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px]">
+                                    Sin identificar
+                                  </span>
+                                )}
+
+                                {/* Related entity sources count */}
+                                {rel.related_entity_sources && rel.related_entity_sources.length > 1 && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                    <FileText className="w-3 h-3" />
+                                    {rel.related_entity_sources.length} fuentes
+                                  </span>
+                                )}
+                              </div>
+
+                              {/* Row 4: Description solo si es legible */}
+                              {cleanDescription && (
+                                <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+                                  {cleanDescription}
+                                </p>
+                              )}
+                            </motion.div>
+                            );
+                          })}
                         </div>
-                        {!rel.is_resolved && (
-                          <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400">
-                            Sin identificar
-                          </span>
-                        )}
                       </div>
-                    </motion.div>
-                  ))}
+                    );
+                  })}
                 </div>
-              </div>
-            )}
+              );
+            })()}
           </TabsContent>
 
           {/* Network Tab */}
