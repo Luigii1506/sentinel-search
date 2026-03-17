@@ -144,10 +144,13 @@ const nodeTypes: NodeTypes = {
 // Edge styles by relationship type
 const edgeStyles: Record<string, { color: string; label: string }> = {
   ownership: { color: '#3b82f6', label: 'Propiedad' },
+  beneficial_ownership: { color: '#3b82f6', label: 'Beneficiario' },
+  corporate: { color: '#06b6d4', label: 'Corporativo' },
   family: { color: '#8b5cf6', label: 'Familiar' },
   directorship: { color: '#06b6d4', label: 'Directivo' },
   associate: { color: '#eab308', label: 'Asociado' },
-  sanction: { color: '#ef4444', label: 'Sancion' },
+  political: { color: '#f97316', label: 'Político' },
+  sanction: { color: '#ef4444', label: 'Sanción' },
   membership: { color: '#f97316', label: 'Miembro' },
   representation: { color: '#22c55e', label: 'Representante' },
   unknownlink: { color: '#6a6a6a', label: 'Otro' },
@@ -210,32 +213,61 @@ export function RelationshipGraph({
     return ids;
   }, [center, filteredEdges]);
 
-  // Create ReactFlow nodes from network nodes
+  // Create ReactFlow nodes from network nodes — concentric circle layout
   const initialNodes: Node[] = useMemo(() => {
     if (!center) return [];
 
     const allNodes = [center, ...nodes].filter(n => visibleNodeIds.has(n.id));
-    const nodeCount = allNodes.length;
 
-    return allNodes.map((node, index) => {
-      const isCenter = node.id === center.id;
-      const angle = isCenter ? 0 : (index * 2 * Math.PI) / Math.max(nodeCount - 1, 1);
-      const radius = isCenter ? 0 : 300;
-      const x = isCenter ? 400 : 400 + radius * Math.cos(angle);
-      const y = isCenter ? 300 : 300 + radius * Math.sin(angle);
+    // Separate direct connections (depth 1) from extended (depth 2+)
+    const directIds = new Set<string>();
+    for (const e of filteredEdges) {
+      if (e.source === center.id) directIds.add(e.target);
+      if (e.target === center.id) directIds.add(e.source);
+    }
 
-      return {
+    const directNodes = allNodes.filter(n => n.id !== center.id && directIds.has(n.id));
+    const extendedNodes = allNodes.filter(n => n.id !== center.id && !directIds.has(n.id));
+
+    const cx = 600, cy = 500;
+    const result: Node[] = [];
+
+    // Center node
+    result.push({
+      id: center.id,
+      type: 'entity',
+      position: { x: cx, y: cy },
+      data: { label: center.name, entity: center, isCenter: true } as unknown as Record<string, unknown>,
+    });
+
+    // Inner ring: direct connections
+    const r1 = Math.max(250, directNodes.length * 18);
+    directNodes.forEach((node, i) => {
+      const angle = (i * 2 * Math.PI) / Math.max(directNodes.length, 1) - Math.PI / 2;
+      result.push({
         id: node.id,
         type: 'entity',
-        position: { x, y },
-        data: {
-          label: node.name,
-          entity: node,
-          isCenter,
-        } as unknown as Record<string, unknown>,
-      };
+        position: { x: cx + r1 * Math.cos(angle), y: cy + r1 * Math.sin(angle) },
+        data: { label: node.name, entity: node, isCenter: false } as unknown as Record<string, unknown>,
+      });
     });
-  }, [center, nodes, visibleNodeIds]);
+
+    // Outer ring: extended connections
+    if (extendedNodes.length > 0) {
+      const r2 = r1 + Math.max(200, extendedNodes.length * 12);
+      extendedNodes.forEach((node, i) => {
+        const angle = (i * 2 * Math.PI) / Math.max(extendedNodes.length, 1) - Math.PI / 4;
+        result.push({
+          id: node.id,
+          type: 'entity',
+          position: { x: cx + r2 * Math.cos(angle), y: cy + r2 * Math.sin(angle) },
+          data: { label: node.name, entity: node, isCenter: false } as unknown as Record<string, unknown>,
+        });
+      });
+    }
+
+    return result;
+  }, [center, nodes, visibleNodeIds, filteredEdges]);
 
   // Create ReactFlow edges from filtered network edges
   const initialEdges: Edge[] = useMemo(() => {
@@ -332,11 +364,19 @@ export function RelationshipGraph({
     <div
       className={cn(
         'relative rounded-xl overflow-hidden border border-white/10',
-        isFullscreen ? 'h-full border-0 rounded-none' : '',
+        isFullscreen ? 'fixed inset-0 z-50 border-0 rounded-none' : '',
         className
       )}
-      style={isFullscreen ? undefined : { height }}
+      style={isFullscreen ? { height: '100vh' } : { height }}
     >
+      {isFullscreen && (
+        <button
+          onClick={() => setIsFullscreen(false)}
+          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-[#1a1a1a]/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      )}
       <ReactFlow
         nodes={flowNodes}
         edges={flowEdges}
@@ -525,20 +565,6 @@ export function RelationshipGraph({
       </ReactFlow>
     </div>
   );
-
-  if (isFullscreen) {
-    return (
-      <div className="fixed inset-0 z-50 bg-[#0a0a0a]">
-        <button
-          onClick={() => setIsFullscreen(false)}
-          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-[#1a1a1a]/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-        >
-          <X className="w-5 h-5" />
-        </button>
-        {graphContent}
-      </div>
-    );
-  }
 
   return graphContent;
 }

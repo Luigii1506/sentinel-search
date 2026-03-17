@@ -860,6 +860,45 @@ function InfoItem({ label, value, icon: Icon }: { label: string; value?: string;
   );
 }
 
+function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
+  label: string;
+  items?: string[] | string | null;
+  icon?: React.ComponentType<{className?: string}>;
+  maxVisible?: number;
+}) {
+  if (!items) return null;
+  const list = Array.isArray(items) ? items : [items];
+  if (list.length === 0) return null;
+
+  // Si solo hay 1 item, mostrarlo como InfoItem normal
+  if (list.length === 1) {
+    return <InfoItem label={label} value={list[0]} icon={Icon} />;
+  }
+
+  const visible = list.slice(0, maxVisible);
+  const remaining = list.length - maxVisible;
+
+  return (
+    <div className="flex items-start gap-3 py-2">
+      {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
+      <div>
+        <p className="text-xs text-gray-500 uppercase">{label}</p>
+        <ul className="text-sm text-white space-y-0.5 mt-0.5">
+          {visible.map((item, i) => (
+            <li key={i} className="flex items-start gap-1.5">
+              <span className="text-gray-600 mt-1">•</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        {remaining > 0 && (
+          <p className="text-xs text-gray-500 mt-1">+{remaining} más</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Risk level color for border
 function getRiskBorderColor(riesgo?: string): string {
   if (!riesgo) return 'border-red-500';
@@ -1168,6 +1207,11 @@ export function EntityProfilePage() {
                 {entity.nationalities && entity.nationalities.length > 0 && (
                   <InfoItem label="Nacionalidades" value={entity.nationalities.map((n: string) => countryNames[n] || n).join(', ')} icon={Globe} />
                 )}
+                <ListInfoItem label="Educación" items={entity.education} icon={FileText} maxVisible={5} />
+                <ListInfoItem label="Asociación Política" items={entity.political} icon={Landmark} />
+                <InfoItem label="Religión" value={Array.isArray(entity.religion) ? entity.religion[0] : entity.religion} icon={Tag} />
+                <InfoItem label="Etnicidad" value={Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity} icon={Tag} />
+                <ListInfoItem label="Cargos" items={entity.positions_held} icon={Shield} maxVisible={5} />
                 {entity.incorporation_date && (
                   <InfoItem label="Fecha de Constitución" value={formatDate(entity.incorporation_date)} icon={Calendar} />
                 )}
