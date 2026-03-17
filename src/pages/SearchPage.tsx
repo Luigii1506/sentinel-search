@@ -471,11 +471,16 @@ function SearchResultCard({
 
           {/* Main content */}
           <div className="flex-1 min-w-0">
-            {/* Name + aliases */}
+            {/* Name + description + aliases */}
             <h3 className="text-[15px] font-semibold text-white leading-tight">
-              {entity.name}
+              {entity.display_name || entity.name}
             </h3>
-            {entity.aliases && entity.aliases.length > 0 && (
+            {entity.description && (
+              <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                {entity.description}
+              </p>
+            )}
+            {entity.aliases && entity.aliases.length > 0 && !entity.description && (
               <p className="text-xs text-gray-500 mt-0.5">
                 aka: {entity.aliases.slice(0, 2).join(", ")}
                 {entity.aliases.length > 2 && ` +${entity.aliases.length - 2}`}
@@ -636,10 +641,22 @@ function SearchResultCard({
                 </div>
                 <div className="bg-[#0d0d0d] px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">
+                    Lugar Nacimiento
+                  </p>
+                  <p className="text-sm text-white font-medium mt-0.5">
+                    {entity.place_of_birth || "—"}
+                  </p>
+                </div>
+                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">
                     Nacionalidad
                   </p>
                   <p className="text-sm text-white font-medium mt-0.5">
-                    {country ? (
+                    {entity.nationalities_display && entity.nationalities_display.length > 0 ? (
+                      <>
+                        {countryFlag} {entity.nationalities_display.join(", ")}
+                      </>
+                    ) : country ? (
                       <>
                         {countryFlag} {COUNTRY_NAMES[country] || country}
                       </>
@@ -729,6 +746,64 @@ function SearchResultCard({
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* ─ Wikidata Enriched: Education, Political, Positions ─ */}
+              {(entity.education?.length || entity.political?.length || entity.positions?.length) && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {entity.positions && entity.positions.length > 0 && (
+                    <div className="rounded-lg bg-purple-500/5 border border-purple-500/15 px-3 py-2.5">
+                      <p className="text-[10px] text-purple-400 uppercase tracking-wider font-semibold mb-1.5">
+                        Cargos ({entity.positions.length})
+                      </p>
+                      <div className="space-y-1">
+                        {entity.positions.filter(Boolean).slice(0, 5).map((p, i) => (
+                          <p key={i} className="text-xs text-gray-300 leading-snug">
+                            {p}
+                          </p>
+                        ))}
+                        {entity.positions.filter(Boolean).length > 5 && (
+                          <p className="text-[10px] text-gray-500">
+                            +{entity.positions.filter(Boolean).length - 5} más
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {entity.education && entity.education.length > 0 && (
+                    <div className="rounded-lg bg-blue-500/5 border border-blue-500/15 px-3 py-2.5">
+                      <p className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold mb-1.5">
+                        Educación ({entity.education.length})
+                      </p>
+                      <div className="space-y-1">
+                        {entity.education.filter(Boolean).slice(0, 4).map((e, i) => (
+                          <p key={i} className="text-xs text-gray-300 leading-snug">
+                            {e}
+                          </p>
+                        ))}
+                        {entity.education.filter(Boolean).length > 4 && (
+                          <p className="text-[10px] text-gray-500">
+                            +{entity.education.filter(Boolean).length - 4} más
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {entity.political && entity.political.length > 0 && (
+                    <div className="rounded-lg bg-orange-500/5 border border-orange-500/15 px-3 py-2.5">
+                      <p className="text-[10px] text-orange-400 uppercase tracking-wider font-semibold mb-1.5">
+                        Afiliación Política ({entity.political.length})
+                      </p>
+                      <div className="space-y-1">
+                        {entity.political.filter(Boolean).map((p, i) => (
+                          <p key={i} className="text-xs text-gray-300 leading-snug">
+                            {p}
+                          </p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 

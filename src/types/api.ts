@@ -86,6 +86,14 @@ export interface ScreeningMatch {
     severity: number;
     details: string;
   }>;
+  // Wikidata bilingual enrichment
+  display_name?: string;
+  description?: string;
+  nationalities_display?: string[];
+  place_of_birth?: string;
+  education?: string[];
+  political?: string[];
+  positions?: string[];
   // Freshness / Risk Decay
   freshness_factor?: number;
   days_since_update?: number | null;
@@ -156,8 +164,15 @@ export interface APIEntity {
   // Person fields
   gender?: 'male' | 'female' | 'unknown';
   date_of_birth?: string;
+  birth_date?: string;
   place_of_birth?: string;
   nationalities?: string[];
+  education?: string | string[];
+  religion?: string | string[];
+  political?: string | string[];
+  ethnicity?: string | string[];
+  positions_held?: string[];
+  source_metadata?: Record<string, unknown>;
 
   // Company fields
   incorporation_date?: string;

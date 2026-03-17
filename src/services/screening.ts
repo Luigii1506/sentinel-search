@@ -9,6 +9,7 @@ export interface OptimizedSearchRequest {
   source_level?: 1 | 2 | 3 | 4 | 5;
   use_cache?: boolean;
   timeout_ms?: number;
+  lang?: 'es' | 'en';
 }
 
 export interface OptimizedSearchResult {
@@ -45,6 +46,14 @@ export interface OptimizedSearchResult {
   // Adverse media (Tier 2 — articles)
   article_count?: number;
   article_max_severity?: number;
+  // Wikidata bilingual enrichment
+  display_name?: string;
+  description?: string;
+  nationalities_display?: string[];
+  place_of_birth?: string;
+  education?: string[];
+  political?: string[];
+  positions?: string[];
   // Freshness
   freshness_factor?: number;
   days_since_update?: number;
@@ -96,7 +105,7 @@ const searchCache = new Map<string, { data: OptimizedSearchResponse; timestamp: 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
 function getCacheKey(request: OptimizedSearchRequest): string {
-  return `${request.query.toLowerCase().trim()}_${request.max_results}_${request.min_confidence}_${request.source_level || 'all'}`;
+  return `${request.query.toLowerCase().trim()}_${request.max_results}_${request.min_confidence}_${request.source_level || 'all'}_${request.lang || 'es'}`;
 }
 
 function getCachedResult(key: string): OptimizedSearchResponse | null {
@@ -131,13 +140,12 @@ export const screeningService = {
       return cached;
     }
 
-    // TEMP: Use /screen/gold endpoint while embeddings are being regenerated (47% complete)
-    // This ensures OpenSearch is always used for reliable results
     const response = await api.post('/api/v2/screen/gold', {
       name: request.query,
       max_results: request.max_results ?? 20,
       min_confidence: request.min_confidence ?? 0.3,
       source_level: request.source_level,
+      lang: request.lang ?? 'es',
     });
     
     // Transform ScreeningResponse to OptimizedSearchResponse format
@@ -198,6 +206,7 @@ export const screeningService = {
       max_results: request.max_results ?? 50,
       min_confidence: request.min_confidence ?? 0.5,
       source_level: request.source_level,
+      lang: 'es',
     });
 
     const entityTypeMap: Record<string, string> = {
