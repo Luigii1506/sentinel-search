@@ -539,25 +539,54 @@ function NetworkRiskTab({ entityId }: { entityId: string }) {
           <h3 className="text-lg font-medium text-white mb-4">
             Vecinos de Riesgo ({nr.risk_neighbors.length})
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2">
             {nr.risk_neighbors.map((neighbor: any, i: number) => {
               const nColor = neighbor.risk_level === 'critical' ? 'text-red-400' :
                             neighbor.risk_level === 'high' ? 'text-orange-400' :
                             neighbor.risk_level === 'medium' ? 'text-yellow-400' : 'text-green-400';
+              const relLabels: Record<string, string> = {
+                beneficial_ownership: 'Propiedad',
+                corporate: 'Corporativo',
+                family: 'Familiar',
+                political: 'Político',
+                associate: 'Asociado',
+                membership: 'Membresía',
+              };
               return (
                 <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
-                  <div>
-                    <p className="text-white font-medium">{neighbor.name || neighbor.entity_name}</p>
-                    <p className="text-xs text-gray-500">
-                      {neighbor.relationship_type} — Distancia: {neighbor.distance ?? 1}
-                    </p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={cn('w-2 h-2 rounded-full flex-shrink-0',
+                      neighbor.risk_level === 'critical' ? 'bg-red-400' :
+                      neighbor.risk_level === 'high' ? 'bg-orange-400' :
+                      neighbor.risk_level === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                    )} />
+                    <div className="min-w-0">
+                      <p className="text-white font-medium text-sm truncate">{neighbor.entity_name}</p>
+                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <span className="text-xs text-gray-500">
+                          {relLabels[neighbor.relationship_type] || neighbor.relationship_type}
+                          {neighbor.relationship_subtype ? ` · ${neighbor.relationship_subtype}` : ''}
+                        </span>
+                        <span className="text-xs text-gray-600">Dist: {neighbor.distance}</span>
+                        {neighbor.is_pep && (
+                          <Badge variant="outline" className="text-[10px] py-0 bg-purple-500/10 text-purple-400 border-purple-500/30">
+                            PEP
+                          </Badge>
+                        )}
+                        {neighbor.is_sanctioned && (
+                          <Badge variant="outline" className="text-[10px] py-0 bg-red-500/10 text-red-400 border-red-500/30">
+                            Sancionado
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right flex-shrink-0 ml-3">
                     <p className={cn('text-sm font-bold', nColor)}>
-                      {neighbor.risk_score ?? '-'}
+                      {neighbor.risk_score}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      Contribución: {neighbor.contribution != null ? `${Math.round(neighbor.contribution)}%` : '-'}
+                    <p className="text-[10px] text-gray-600">
+                      propaga {neighbor.propagated_risk}
                     </p>
                   </div>
                 </div>
@@ -606,12 +635,47 @@ function UBOTab({ entityId }: { entityId: string }) {
   }
 
   const ubo = data as any;
-  const owners = ubo.ultimate_beneficial_owners || ubo.ubos || [];
-  const chain = ubo.ownership_chain || [];
+  const owners = ubo.ubos || [];
+  const controlled = ubo.controlled_entities || [];
+  const keyRels = ubo.key_relationships || [];
+  const isIndividual = ubo.entity_type === 'INDIVIDUAL';
+
+  const riskColor = (level: string) =>
+    level === 'critical' ? 'text-red-400' :
+    level === 'high' ? 'text-orange-400' :
+    level === 'medium' ? 'text-yellow-400' : 'text-green-400';
+
+  const riskBorderColor = (level: string) =>
+    level === 'critical' ? 'border-red-500' :
+    level === 'high' ? 'border-orange-500' :
+    level === 'medium' ? 'border-yellow-500' : 'border-green-500';
+
+  const relTypeLabel: Record<string, string> = {
+    beneficial_ownership: 'Propiedad',
+    corporate: 'Corporativo',
+    family: 'Familiar',
+    associate: 'Asociado',
+    political: 'Político',
+    membership: 'Membresía',
+  };
+
+  const hasContent = owners.length > 0 || controlled.length > 0 || keyRels.length > 0;
+
+  if (!hasContent) {
+    return (
+      <div className="glass rounded-xl p-12 text-center">
+        <Landmark className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+        <h3 className="text-xl font-medium text-white mb-2">Sin Datos de Propiedad</h3>
+        <p className="text-gray-400">
+          No se encontraron relaciones de propiedad, control o vínculos de riesgo para esta entidad.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* UBO Summary */}
+      {/* Summary */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -619,27 +683,51 @@ function UBOTab({ entityId }: { entityId: string }) {
       >
         <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
           <Landmark className="w-5 h-5 text-blue-400" />
-          Beneficiario Final (UBO)
+          {isIndividual ? 'Análisis de Control y Exposición' : 'Beneficiario Final (UBO)'}
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-          <div>
-            <p className="text-xs text-gray-500">UBOs Identificados</p>
-            <p className="text-2xl font-bold text-white">{owners.length}</p>
-          </div>
-          <div>
-            <p className="text-xs text-gray-500">Niveles de Propiedad</p>
-            <p className="text-2xl font-bold text-white">{ubo.max_depth ?? chain.length}</p>
-          </div>
-          {ubo.total_ownership_resolved != null && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {owners.length > 0 && (
+            <>
+              <div>
+                <p className="text-xs text-gray-500">UBOs Identificados</p>
+                <p className="text-2xl font-bold text-white">{owners.length}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">UBOs &gt;25%</p>
+                <p className="text-2xl font-bold text-white">{ubo.ubos_above_25pct || 0}</p>
+              </div>
+            </>
+          )}
+          {controlled.length > 0 && (
+            <>
+              <div>
+                <p className="text-xs text-gray-500">Entidades Controladas</p>
+                <p className="text-2xl font-bold text-white">{controlled.length}</p>
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Controladas Sancionadas</p>
+                <p className={cn('text-2xl font-bold', ubo.controlled_sanctioned > 0 ? 'text-red-400' : 'text-white')}>
+                  {ubo.controlled_sanctioned || 0}
+                </p>
+              </div>
+            </>
+          )}
+          {keyRels.length > 0 && (
             <div>
-              <p className="text-xs text-gray-500">Propiedad Resuelta</p>
-              <p className="text-2xl font-bold text-white">{Math.round(ubo.total_ownership_resolved * 100)}%</p>
+              <p className="text-xs text-gray-500">Vínculos de Riesgo</p>
+              <p className="text-2xl font-bold text-white">{keyRels.length}</p>
+            </div>
+          )}
+          {ubo.risk_flag && (
+            <div>
+              <p className="text-xs text-gray-500">Alerta</p>
+              <p className="text-2xl font-bold text-red-400">RIESGO UBO</p>
             </div>
           )}
         </div>
       </motion.div>
 
-      {/* UBO List */}
+      {/* UBO List (incoming ownership — who owns this entity) */}
       {owners.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -649,94 +737,133 @@ function UBOTab({ entityId }: { entityId: string }) {
         >
           <h3 className="text-lg font-medium text-white mb-4">Beneficiarios Finales</h3>
           <div className="space-y-3">
-            {owners.map((owner: any, i: number) => {
-              const ownerRiskColor = owner.risk_level === 'critical' ? 'text-red-400' :
-                                    owner.risk_level === 'high' ? 'text-orange-400' :
-                                    owner.risk_level === 'medium' ? 'text-yellow-400' : 'text-green-400';
-              return (
-                <div key={i} className="p-4 rounded-lg bg-white/5 border-l-4 border-blue-500">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <p className="text-white font-medium text-lg">{owner.name || owner.entity_name}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        {owner.ownership_percentage != null && (
-                          <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
-                            {Math.round(owner.ownership_percentage * 100)}% propiedad
-                          </Badge>
-                        )}
-                        {owner.is_pep && (
-                          <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-400 border-purple-500/30">
-                            PEP
-                          </Badge>
-                        )}
-                        {owner.is_sanctioned && (
-                          <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
-                            Sancionado
-                          </Badge>
-                        )}
-                        {owner.country && (
-                          <span className="text-xs text-gray-500">{owner.country}</span>
-                        )}
-                      </div>
+            {owners.map((owner: any, i: number) => (
+              <div key={i} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(owner.risk_level))}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-white font-medium">{owner.ubo_name || owner.name}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      {owner.effective_ownership_pct != null && (
+                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                          {owner.effective_ownership_pct}% efectivo
+                        </Badge>
+                      )}
+                      {owner.is_pep && (
+                        <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-400 border-purple-500/30">
+                          PEP
+                        </Badge>
+                      )}
+                      {owner.is_sanctioned && (
+                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                          Sancionado
+                        </Badge>
+                      )}
+                      {owner.threshold_25pct && (
+                        <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/30">
+                          &gt;25% FATF
+                        </Badge>
+                      )}
                     </div>
-                    {owner.risk_score != null && (
-                      <div className="text-right">
-                        <p className={cn('text-lg font-bold', ownerRiskColor)}>{owner.risk_score}</p>
-                        <p className="text-xs text-gray-500">Risk Score</p>
-                      </div>
-                    )}
                   </div>
-                  {owner.path && owner.path.length > 0 && (
-                    <div className="mt-3 pt-3 border-t border-white/5">
-                      <p className="text-xs text-gray-500 mb-1">Cadena de propiedad:</p>
-                      <div className="flex items-center gap-1 flex-wrap">
-                        {owner.path.map((step: string, j: number) => (
-                          <span key={j} className="flex items-center gap-1">
-                            <span className="text-xs text-gray-300">{step}</span>
-                            {j < owner.path.length - 1 && (
-                              <span className="text-gray-600">→</span>
-                            )}
-                          </span>
-                        ))}
-                      </div>
+                  {owner.risk_score != null && (
+                    <div className="text-right">
+                      <p className={cn('text-lg font-bold', riskColor(owner.risk_level))}>{owner.risk_score}</p>
+                      <p className="text-xs text-gray-500">Risk</p>
                     </div>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </motion.div>
       )}
 
-      {/* Ownership Chain */}
-      {chain.length > 0 && (
+      {/* Controlled Entities (outgoing ownership — what does this entity own) */}
+      {controlled.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+          className="glass rounded-xl p-6"
+        >
+          <h3 className="text-lg font-medium text-white mb-1">Entidades Controladas</h3>
+          <p className="text-xs text-gray-500 mb-4">Empresas y entidades sobre las que tiene propiedad o dirección</p>
+          <div className="space-y-3">
+            {controlled.map((ent: any, i: number) => (
+              <div key={i} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(ent.risk_level))}>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-white font-medium">{ent.entity_name}</p>
+                    <div className="flex items-center gap-2 mt-1 flex-wrap">
+                      <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                        {ent.relationship_subtype || ent.relationship_type}
+                      </Badge>
+                      {ent.description && (
+                        <span className="text-xs text-gray-500">{ent.description}</span>
+                      )}
+                      {ent.percentage != null && (
+                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                          {ent.percentage}%
+                        </Badge>
+                      )}
+                      {ent.is_sanctioned && (
+                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                          Sancionado
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={cn('text-lg font-bold', riskColor(ent.risk_level))}>{ent.risk_score}</p>
+                    <p className="text-xs text-gray-500">Risk</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Key Risk Relationships */}
+      {keyRels.length > 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="glass rounded-xl p-6"
         >
-          <h3 className="text-lg font-medium text-white mb-4">Cadena de Propiedad</h3>
-          <div className="relative">
-            <div className="absolute left-4 top-0 bottom-0 w-px bg-white/10" />
-            {chain.map((link: any, i: number) => (
-              <div key={i} className="relative pl-10 py-3">
-                <div className="absolute left-2 w-5 h-5 rounded-full bg-[#0a0a0a] border-2 border-blue-500/50 flex items-center justify-center">
-                  <span className="text-[8px] text-blue-400 font-bold">{i + 1}</span>
-                </div>
-                <div className="flex items-center justify-between">
+          <h3 className="text-lg font-medium text-white mb-1">Vínculos de Riesgo</h3>
+          <p className="text-xs text-gray-500 mb-4">Relaciones familiares, políticas y asociaciones con entidades de riesgo medio-alto</p>
+          <div className="space-y-2">
+            {keyRels.map((rel: any, i: number) => (
+              <div key={i} className="p-3 rounded-lg bg-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={cn('w-2 h-2 rounded-full',
+                    rel.risk_level === 'critical' ? 'bg-red-400' :
+                    rel.risk_level === 'high' ? 'bg-orange-400' :
+                    rel.risk_level === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
+                  )} />
                   <div>
-                    <p className="text-white text-sm font-medium">{link.entity_name || link.name}</p>
-                    {link.relationship_type && (
-                      <p className="text-xs text-gray-500">{link.relationship_type}</p>
-                    )}
+                    <p className="text-white text-sm font-medium">{rel.entity_name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-xs text-gray-500">
+                        {relTypeLabel[rel.relationship_type] || rel.relationship_type}
+                        {rel.relationship_subtype ? ` · ${rel.relationship_subtype}` : ''}
+                      </span>
+                      {rel.is_pep && (
+                        <Badge variant="outline" className="text-[10px] py-0 bg-purple-500/10 text-purple-400 border-purple-500/30">
+                          PEP
+                        </Badge>
+                      )}
+                      {rel.is_sanctioned && (
+                        <Badge variant="outline" className="text-[10px] py-0 bg-red-500/10 text-red-400 border-red-500/30">
+                          Sancionado
+                        </Badge>
+                      )}
+                    </div>
                   </div>
-                  {link.ownership_share != null && (
-                    <Badge variant="outline" className="text-xs">
-                      {Math.round(link.ownership_share * 100)}%
-                    </Badge>
-                  )}
                 </div>
+                <p className={cn('text-sm font-bold', riskColor(rel.risk_level))}>{rel.risk_score}</p>
               </div>
             ))}
           </div>
@@ -746,8 +873,9 @@ function UBOTab({ entityId }: { entityId: string }) {
       {/* FATF Explanation */}
       <div className="glass rounded-xl p-4">
         <p className="text-xs text-gray-500">
-          Análisis UBO basado en FATF Recomendación 24/25. Se considera Beneficiario Final
+          Análisis basado en FATF Recomendación 24/25. Se considera Beneficiario Final
           a toda persona natural con participación directa o indirecta ≥25% o con control efectivo.
+          Para personas, se muestran entidades controladas y vínculos de riesgo por exposición.
         </p>
       </div>
     </div>
