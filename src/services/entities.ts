@@ -1,6 +1,122 @@
 import api from './api';
 import type { APIEntity } from '@/types/api';
 
+// ── Profile types (from /api/v2/entities/{id}/profile) ──
+
+export interface WikidataLink {
+  qid?: string;
+  name: string;
+  start?: string | null;
+  end?: string | null;
+  is_current?: boolean | null;
+}
+
+export interface ProfileNationality {
+  code: string;
+  name: string;
+}
+
+export interface ProfileHeader {
+  display_name: string;
+  canonical_name: string;
+  description?: string;
+  entity_type: string;
+  risk_level: string;
+  risk_score: number;
+  topics: string[];
+  wikidata_qid?: string;
+}
+
+export interface ProfileOverview {
+  nationalities: ProfileNationality[];
+  birth_date?: string;
+  birth_place?: string;
+  death_date?: string;
+  death_place?: string;
+  gender?: string;
+  all_names: string[];
+  sources: string[];
+  source_count: number;
+  is_pep: boolean;
+  is_current_pep?: boolean;
+  pep_category?: string;
+}
+
+export interface ProfileCareer {
+  positions: WikidataLink[];
+  education: WikidataLink[];
+  political: WikidataLink[];
+  occupations: string[];
+  pep_positions: Array<{
+    cargo: string;
+    estado?: string;
+    source?: string;
+    country?: string;
+    partido?: string;
+    is_current?: boolean;
+    start_date?: string;
+    pep_category?: string;
+  }>;
+}
+
+export interface ProfilePersonal {
+  religion?: string;
+  ethnicity?: string;
+  nicknames: string[];
+  pseudonyms: string[];
+}
+
+export interface ProfileConnections {
+  family: {
+    father?: WikidataLink;
+    mother?: WikidataLink;
+    spouses: WikidataLink[];
+    children: WikidataLink[];
+    siblings: WikidataLink[];
+  };
+  relationship_counts: Record<string, number>;
+  total_relationships: number;
+}
+
+export interface ProfileRisk {
+  sanctions_details: Array<{
+    authority: string;
+    program: string;
+    reason?: string;
+    start_date?: string;
+    end_date?: string;
+    listed_date?: string;
+    source_url?: string;
+    provisions?: string;
+  }>;
+  convicted_of: WikidataLink[];
+  military_rank?: string;
+  military_branch?: string;
+  conflicts: WikidataLink[];
+  net_worth?: string;
+  cause_of_death?: string;
+}
+
+export interface EntityProfile {
+  id: string;
+  lang: string;
+  header: ProfileHeader;
+  overview: ProfileOverview;
+  career: ProfileCareer;
+  personal: ProfilePersonal;
+  risk: ProfileRisk;
+  connections: ProfileConnections;
+  identifiers: Record<string, string>;
+  cross_references: {
+    os_id?: string;
+    datasets: string[];
+    referents: string[];
+  };
+  addresses: string[];
+  first_seen_at?: string;
+  last_seen_at?: string;
+}
+
 export const entityService = {
   /**
    * Get entity by ID
@@ -8,6 +124,16 @@ export const entityService = {
   async getById(id: string, source_level?: number): Promise<APIEntity> {
     const response = await api.get(`/api/v1/entity/${id}`, {
       params: source_level ? { source_level } : undefined,
+    });
+    return response.data;
+  },
+
+  /**
+   * Get enriched entity profile (Wikidata bilingual data)
+   */
+  async getProfile(id: string, lang: string = 'es'): Promise<EntityProfile> {
+    const response = await api.get(`/api/v2/entities/${id}/profile`, {
+      params: { lang },
     });
     return response.data;
   },

@@ -36,7 +36,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
-import { useEntity } from '@/hooks/useEntity';
+import { useEntity, useEntityProfile } from '@/hooks/useEntity';
 import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
@@ -1061,6 +1061,7 @@ export function EntityProfilePage() {
   };
 
   const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
+  const { profile } = useEntityProfile(id);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
   const { data: relationshipsList } = useRelationshipsList(id, {
     enabled: activeTab === 'relationships',
@@ -1145,8 +1146,11 @@ export function EntityProfilePage() {
                 </motion.div>
                 <div>
                   <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">
-                    {entity.primary_name}
+                    {profile?.header.display_name || entity.primary_name}
                   </h1>
+                  {profile?.header.description && (
+                    <p className="text-sm text-gray-400 mb-2">{profile.header.description}</p>
+                  )}
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="outline" className="text-gray-400">
                       {entityTypeLabels[entity.entity_type]}
@@ -1201,17 +1205,35 @@ export function EntityProfilePage() {
                 {entity.gender && (
                   <InfoItem label="Género" value={entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender} icon={User} />
                 )}
-                {entity.place_of_birth && (
-                  <InfoItem label="Lugar de Nacimiento" value={entity.place_of_birth} icon={MapPin} />
+                {(profile?.overview.birth_place || entity.place_of_birth) && (
+                  <InfoItem label="Lugar de Nacimiento" value={profile?.overview.birth_place || entity.place_of_birth} icon={MapPin} />
                 )}
-                {entity.nationalities && entity.nationalities.length > 0 && (
-                  <InfoItem label="Nacionalidades" value={entity.nationalities.map((n: string) => countryNames[n] || n).join(', ')} icon={Globe} />
+                {(profile?.overview.nationalities?.length || (entity.nationalities && entity.nationalities.length > 0)) && (
+                  <InfoItem
+                    label="Nacionalidades"
+                    value={profile?.overview.nationalities?.map(n => n.name).join(', ') || entity.nationalities?.map((n: string) => countryNames[n] || n).join(', ')}
+                    icon={Globe}
+                  />
                 )}
-                <ListInfoItem label="Educación" items={entity.education} icon={FileText} maxVisible={5} />
-                <ListInfoItem label="Asociación Política" items={entity.political} icon={Landmark} />
-                <InfoItem label="Religión" value={Array.isArray(entity.religion) ? entity.religion[0] : entity.religion} icon={Tag} />
-                <InfoItem label="Etnicidad" value={Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity} icon={Tag} />
-                <ListInfoItem label="Cargos" items={entity.positions_held} icon={Shield} maxVisible={5} />
+                <ListInfoItem
+                  label="Educación"
+                  items={profile?.career.education?.map(e => e.name + (e.start && e.end ? ` (${e.start}–${e.end})` : e.start ? ` (${e.start}–)` : '')) || entity.education}
+                  icon={FileText}
+                  maxVisible={5}
+                />
+                <ListInfoItem
+                  label="Asociación Política"
+                  items={profile?.career.political?.map(p => p.name + (p.is_current === false && p.end ? ` (hasta ${p.end})` : p.is_current ? ' (actual)' : '')) || entity.political}
+                  icon={Landmark}
+                />
+                <InfoItem label="Religión" value={profile?.personal.religion || (Array.isArray(entity.religion) ? entity.religion[0] : entity.religion)} icon={Tag} />
+                <InfoItem label="Etnicidad" value={profile?.personal.ethnicity || (Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity)} icon={Tag} />
+                <ListInfoItem
+                  label="Cargos"
+                  items={profile?.career.positions?.map(p => p.name + (p.start ? ` (${p.start}${p.end ? '–' + p.end : '–'})` : '')) || entity.positions_held}
+                  icon={Shield}
+                  maxVisible={5}
+                />
                 {entity.incorporation_date && (
                   <InfoItem label="Fecha de Constitución" value={formatDate(entity.incorporation_date)} icon={Calendar} />
                 )}
@@ -1676,7 +1698,80 @@ export function EntityProfilePage() {
               )}
             </div>
 
-            {/* Row 5: Timeline */}
+            {/* Row 5: Family Connections (from profile) */}
+            {profile?.connections && profile.connections.total_relationships > 0 && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
+                className="glass rounded-xl p-6">
+                <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                  <Users className="w-4 h-4" />
+                  Conexiones
+                  <Badge className="bg-white/10 text-gray-400 text-[10px]">{profile.connections.total_relationships}</Badge>
+                </h3>
+
+                {/* Family members */}
+                {(profile.connections.family.father || profile.connections.family.mother ||
+                  profile.connections.family.spouses.length > 0 || profile.connections.family.children.length > 0 ||
+                  profile.connections.family.siblings.length > 0) && (
+                  <div className="mb-4">
+                    <p className="text-xs text-purple-400 uppercase mb-2">Familia</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {profile.connections.family.father && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 w-16">Padre</span>
+                          <span className="text-white">{profile.connections.family.father.name}</span>
+                        </div>
+                      )}
+                      {profile.connections.family.mother && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 w-16">Madre</span>
+                          <span className="text-white">{profile.connections.family.mother.name}</span>
+                        </div>
+                      )}
+                      {profile.connections.family.spouses.map((s, i) => (
+                        <div key={`spouse-${i}`} className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 w-16">Cónyuge</span>
+                          <span className="text-white">{s.name}</span>
+                        </div>
+                      ))}
+                      {profile.connections.family.children.map((c, i) => (
+                        <div key={`child-${i}`} className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 w-16">Hijo/a</span>
+                          <span className="text-white">{c.name}</span>
+                        </div>
+                      ))}
+                      {profile.connections.family.siblings.map((s, i) => (
+                        <div key={`sibling-${i}`} className="flex items-center gap-2 text-sm">
+                          <span className="text-gray-500 w-16">Hermano/a</span>
+                          <span className="text-white">{s.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Relationship type counts */}
+                <div className="flex flex-wrap gap-3">
+                  {Object.entries(profile.connections.relationship_counts)
+                    .filter(([, count]) => count > 0)
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([type, count]) => {
+                      const typeLabels: Record<string, string> = {
+                        family: 'Familiar', associate: 'Asociado', corporate: 'Corporativo',
+                        beneficial_ownership: 'Beneficiario', membership: 'Miembro',
+                        political: 'Político', sanction: 'Sanción', unknown: 'Otro',
+                      };
+                      return (
+                        <div key={type} className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-500">{typeLabels[type] || type}</span>
+                          <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
+                        </div>
+                      );
+                    })}
+                </div>
+              </motion.div>
+            )}
+
+            {/* Row 6: Timeline */}
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
               className="glass rounded-xl p-6">
               <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
