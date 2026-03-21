@@ -117,6 +117,17 @@ export interface EntityProfile {
   last_seen_at?: string;
 }
 
+export interface ReferenceResolution {
+  found: boolean;
+  entity_id?: string;
+  canonical_name?: string;
+  entity_type?: string;
+  entity_category?: string;
+  match_by?: 'qid' | 'name';
+  qid?: string;
+  query_name?: string;
+}
+
 export const entityService = {
   /**
    * Get entity by ID
@@ -134,6 +145,16 @@ export const entityService = {
   async getProfile(id: string, lang: string = 'es'): Promise<EntityProfile> {
     const response = await api.get(`/api/v2/entities/${id}/profile`, {
       params: { lang },
+    });
+    return response.data;
+  },
+
+  /**
+   * Resolve a profile/reference item to a Gold entity if it exists.
+   */
+  async resolveReference(params: { qid?: string; name?: string }): Promise<ReferenceResolution> {
+    const response = await api.get('/api/v2/entities/resolve-reference', {
+      params,
     });
     return response.data;
   },

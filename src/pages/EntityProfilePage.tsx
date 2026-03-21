@@ -40,11 +40,12 @@ import { useEntity, useEntityProfile } from '@/hooks/useEntity';
 import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
-import type { EntityProfile } from '@/services/entities';
+import { entityService, type EntityProfile, type WikidataLink } from '@/services/entities';
 import { cn, getRiskColor, formatDate } from '@/lib/utils';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
 import type { APIEntity, APISanctionEntry } from '@/types/api';
+import { toast } from 'sonner';
 
 const entityTypeIcons = {
   person: User,
@@ -1098,6 +1099,54 @@ function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
   );
 }
 
+function ReferenceLinksList({
+  label,
+  items,
+  icon: Icon,
+  onOpenReference,
+  maxVisible = 5,
+}: {
+  label: string;
+  items?: WikidataLink[] | null;
+  icon?: React.ComponentType<{ className?: string }>;
+  onOpenReference: (item: WikidataLink) => void;
+  maxVisible?: number;
+}) {
+  if (!items || items.length === 0) return null;
+
+  const visible = items.slice(0, maxVisible);
+  const remaining = items.length - maxVisible;
+
+  return (
+    <div className="flex items-start gap-3 py-2">
+      {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
+      <div className="min-w-0">
+        <p className="text-xs text-gray-500 uppercase">{label}</p>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {visible.map((item, i) => (
+            <button
+              key={`${item.qid || item.name}-${i}`}
+              type="button"
+              onClick={() => onOpenReference(item)}
+              className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-left hover:bg-white/[0.06] transition-colors"
+            >
+              <span className="text-sm text-white truncate max-w-[240px]">
+                {item.name}
+              </span>
+              {item.qid && (
+                <span className="text-[10px] text-gray-500 shrink-0">{item.qid}</span>
+              )}
+            </button>
+          ))}
+        </div>
+        {remaining > 0 && (
+          <p className="text-xs text-gray-500 mt-1">+{remaining} más</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // Risk level color for border
 function getRiskBorderColor(riesgo?: string): string {
   if (!riesgo) return 'border-red-500';
@@ -1244,6 +1293,24 @@ export function EntityProfilePage() {
     const newParams = new URLSearchParams(searchParams);
     newParams.set('source_level', String(level));
     setSearchParams(newParams, { replace: true });
+  };
+
+  const handleOpenReference = async (item: WikidataLink) => {
+    try {
+      const resolved = await entityService.resolveReference({
+        qid: item.qid,
+        name: item.name,
+      });
+
+      if (resolved.found && resolved.entity_id) {
+        navigate(`/entity/${resolved.entity_id}?source_level=${sourceLevel}`);
+        return;
+      }
+
+      toast.message(`No existe aún un perfil local para "${item.name}"`);
+    } catch {
+      toast.error('No se pudo resolver la referencia');
+    }
   };
 
   const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
@@ -1415,25 +1482,54 @@ export function EntityProfilePage() {
                     icon={Globe}
                   />
                 )}
-                <ListInfoItem
-                  label="Educación"
-                  items={profile?.career.education?.map(e => e.name + (e.start && e.end ? ` (${e.start}–${e.end})` : e.start ? ` (${e.start}–)` : '')) || entity.education}
-                  icon={FileText}
-                  maxVisible={5}
-                />
-                <ListInfoItem
-                  label="Asociación Política"
-                  items={profile?.career.political?.map(p => p.name + (p.is_current === false && p.end ? ` (hasta ${p.end})` : p.is_current ? ' (actual)' : '')) || entity.political}
-                  icon={Landmark}
-                />
+                {profile?.career.education?.length ? (
+                  <ReferenceLinksList
+                    label="Educación"
+                    items={profile.career.education}
+                    icon={FileText}
+                    onOpenReference={handleOpenReference}
+                    maxVisible={5}
+                  />
+                ) : (
+                  <ListInfoItem
+                    label="Educación"
+                    items={entity.education}
+                    icon={FileText}
+                    maxVisible={5}
+                  />
+                )}
+                {profile?.career.political?.length ? (
+                  <ReferenceLinksList
+                    label="Asociación Política"
+                    items={profile.career.political}
+                    icon={Landmark}
+                    onOpenReference={handleOpenReference}
+                  />
+                ) : (
+                  <ListInfoItem
+                    label="Asociación Política"
+                    items={entity.political}
+                    icon={Landmark}
+                  />
+                )}
                 <InfoItem label="Religión" value={profile?.personal.religion || (Array.isArray(entity.religion) ? entity.religion[0] : entity.religion)} icon={Tag} />
                 <InfoItem label="Etnicidad" value={profile?.personal.ethnicity || (Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity)} icon={Tag} />
-                <ListInfoItem
-                  label="Cargos"
-                  items={profile?.career.positions?.map(p => p.name + (p.start ? ` (${p.start}${p.end ? '–' + p.end : '–'})` : '')) || entity.positions_held}
-                  icon={Shield}
-                  maxVisible={5}
-                />
+                {profile?.career.positions?.length ? (
+                  <ReferenceLinksList
+                    label="Cargos"
+                    items={profile.career.positions}
+                    icon={Shield}
+                    onOpenReference={handleOpenReference}
+                    maxVisible={5}
+                  />
+                ) : (
+                  <ListInfoItem
+                    label="Cargos"
+                    items={entity.positions_held}
+                    icon={Shield}
+                    maxVisible={5}
+                  />
+                )}
                 {entity.incorporation_date && (
                   <InfoItem label="Fecha de Constitución" value={formatDate(entity.incorporation_date)} icon={Calendar} />
                 )}
