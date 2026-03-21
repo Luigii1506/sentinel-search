@@ -153,7 +153,7 @@ export const entityService = {
    * Resolve a profile/reference item to a Gold entity if it exists.
    */
   async resolveReference(params: { qid?: string; name?: string }): Promise<ReferenceResolution> {
-    const response = await api.get('/api/v2/entities/resolve-reference', {
+    const response = await api.get('/api/v2/entities/references/resolve', {
       params,
     });
     return response.data;

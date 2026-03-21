@@ -1112,9 +1112,10 @@ function ReferenceLinksList({
   onOpenReference: (item: WikidataLink) => void;
   maxVisible?: number;
 }) {
+  const [isExpanded, setIsExpanded] = useState(false);
   if (!items || items.length === 0) return null;
 
-  const visible = items.slice(0, maxVisible);
+  const visible = isExpanded ? items : items.slice(0, maxVisible);
   const remaining = items.length - maxVisible;
 
   return (
@@ -1140,7 +1141,13 @@ function ReferenceLinksList({
           ))}
         </div>
         {remaining > 0 && (
-          <p className="text-xs text-gray-500 mt-1">+{remaining} más</p>
+          <button
+            type="button"
+            onClick={() => setIsExpanded((value) => !value)}
+            className="text-xs text-blue-400 hover:text-blue-300 mt-1"
+          >
+            {isExpanded ? 'Mostrar menos' : `Ver ${remaining} más`}
+          </button>
         )}
       </div>
     </div>
