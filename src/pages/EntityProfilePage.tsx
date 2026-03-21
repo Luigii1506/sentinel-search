@@ -281,6 +281,29 @@ function getRelationshipSignalSummary(profile?: EntityProfile): Array<{ label: s
   return summary.filter((item) => item.value > 0);
 }
 
+function formatAddressValue(address: {
+  street?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+}): string | null {
+  const parts = [
+    address.street?.trim(),
+    address.city?.trim(),
+    address.state?.trim(),
+    address.country?.trim() ? (countryNames[address.country.trim()] || address.country.trim()) : undefined,
+  ].filter(Boolean);
+
+  if (parts.length === 0) return null;
+  return parts.join(', ');
+}
+
+function getTopRiskFactors(entity: APIEntity) {
+  return [...entity.risk_factors]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+}
+
 function EntityAdverseMediaTab({ entityId }: { entityId: string }) {
   const { data: profile, isLoading } = useQuery({
     queryKey: ['adverse-media-entity', entityId],
@@ -1238,6 +1261,9 @@ export function EntityProfilePage() {
 
   const Icon = entityTypeIcons[entity.entity_type] || User;
   const riskColor = getRiskColor(entity.risk_level);
+  const validAddresses = entity.addresses.filter((address) => formatAddressValue(address));
+  const topRiskFactors = getTopRiskFactors(entity);
+  const relationshipSignals = getRelationshipSignalSummary(profile);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
@@ -1681,13 +1707,13 @@ export function EntityProfilePage() {
                   </div>
                 </div>
 
-                {getRelationshipSignalSummary(profile).length > 0 && (
+                {relationshipSignals.length > 0 && (
                   <div className="mt-5 pt-4 border-t border-white/5">
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
                       Señales relacionales
                     </p>
                     <div className="flex flex-wrap gap-2">
-                      {getRelationshipSignalSummary(profile).map((item) => (
+                      {relationshipSignals.map((item) => (
                         <Badge
                           key={item.label}
                           variant="outline"
@@ -1702,7 +1728,7 @@ export function EntityProfilePage() {
               </motion.div>
             </div>
 
-            {/* Row 2: Sanctions Summary + PEP Summary (side by side) */}
+            {/* Row 2: AML Evidence Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Sanciones Activas */}
               {entity.sanctions.length > 0 && (
@@ -1802,7 +1828,149 @@ export function EntityProfilePage() {
               )}
             </div>
 
-            {/* Row 3: IDs + Aliases + Addresses */}
+            {/* Row 3: Risk drivers + Connections */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {topRiskFactors.length > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+                  className="glass rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
+                      <AlertCircle className="w-4 h-4" />
+                      Drivers de Riesgo
+                    </h3>
+                    <Badge className="bg-white/10 text-gray-400 text-[10px]">
+                      {entity.risk_factors.length}
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {topRiskFactors.map((factor, i) => {
+                      const factorLabels: Record<string, string> = {
+                        sanctions: 'Sanciones', pep: 'Exposición Política', adverse_media: 'Medios Adversos',
+                        geographic: 'Riesgo Geográfico', network: 'Riesgo de Red', transactional: 'Transaccional',
+                      };
+                      return (
+                        <div key={i} className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-sm text-gray-300">{factorLabels[factor.category] || factor.category}</span>
+                            <span className={cn('text-sm font-bold tabular-nums',
+                              factor.level === 'critical' ? 'text-red-400' :
+                              factor.level === 'high' ? 'text-orange-400' :
+                              factor.level === 'medium' ? 'text-yellow-400' : 'text-green-400'
+                            )}>
+                              {factor.score}
+                            </span>
+                          </div>
+                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }}
+                              animate={{ width: `${factor.score}%` }}
+                              transition={{ duration: 0.5, delay: i * 0.08 }}
+                              className={cn('h-full rounded-full',
+                                factor.level === 'critical' ? 'bg-red-500' :
+                                factor.level === 'high' ? 'bg-orange-500' :
+                                factor.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                              )}
+                            />
+                          </div>
+                          {factor.details && <p className="text-[10px] text-gray-500 mt-1.5">{factor.details}</p>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+
+              {profile?.connections && profile.connections.total_relationships > 0 && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
+                  className="glass rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
+                      <Users className="w-4 h-4" />
+                      Contexto Relacional
+                    </h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setActiveTab('relationships')}
+                      className="text-xs text-blue-400 hover:text-blue-300"
+                    >
+                      Ver relaciones
+                    </Button>
+                  </div>
+
+                  {(profile.connections.family.father || profile.connections.family.mother ||
+                    profile.connections.family.spouses.length > 0 || profile.connections.family.children.length > 0 ||
+                    profile.connections.family.siblings.length > 0) ? (
+                    <div className="mb-4">
+                      <p className="text-xs text-purple-400 uppercase mb-2">Familia directa identificada</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        {profile.connections.family.father && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 w-16">Padre</span>
+                            <span className="text-white">{profile.connections.family.father.name}</span>
+                          </div>
+                        )}
+                        {profile.connections.family.mother && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 w-16">Madre</span>
+                            <span className="text-white">{profile.connections.family.mother.name}</span>
+                          </div>
+                        )}
+                        {profile.connections.family.spouses.slice(0, 2).map((s, i) => (
+                          <div key={`spouse-${i}`} className="flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 w-16">Cónyuge</span>
+                            <span className="text-white">{s.name}</span>
+                          </div>
+                        ))}
+                        {profile.connections.family.children.slice(0, 2).map((c, i) => (
+                          <div key={`child-${i}`} className="flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 w-16">Hijo/a</span>
+                            <span className="text-white">{c.name}</span>
+                          </div>
+                        ))}
+                        {profile.connections.family.siblings.slice(0, 2).map((s, i) => (
+                          <div key={`sibling-${i}`} className="flex items-center gap-2 text-sm">
+                            <span className="text-gray-500 w-16">Hermano/a</span>
+                            <span className="text-white">{s.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                      <p className="text-sm text-white">
+                        Se identificaron {profile.connections.total_relationships} relaciones, pero no hay familiares directos destacados en este resumen.
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        La mayor parte del contexto está en vínculos corporativos, asociados o políticos.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(profile.connections.relationship_counts)
+                      .filter(([, count]) => count > 0)
+                      .sort(([, a], [, b]) => b - a)
+                      .slice(0, 6)
+                      .map(([type, count]) => {
+                        const typeLabels: Record<string, string> = {
+                          family: 'Familiar', associate: 'Asociado', corporate: 'Corporativo',
+                          beneficial_ownership: 'Beneficiario', membership: 'Miembro',
+                          political: 'Político', sanction: 'Sanción', unknown: 'Otro',
+                        };
+                        return (
+                          <div key={type} className="flex items-center gap-1.5">
+                            <span className="text-xs text-gray-500">{typeLabels[type] || type}</span>
+                            <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Row 4: IDs + Aliases + Addresses */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Identificaciones */}
               {entity.identifications?.length > 0 && (
@@ -1856,7 +2024,7 @@ export function EntityProfilePage() {
               )}
 
               {/* Direcciones */}
-              {entity.addresses.length > 0 && (
+              {validAddresses.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                   className="glass rounded-xl p-6">
                   <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
@@ -1864,73 +2032,26 @@ export function EntityProfilePage() {
                     Direcciones
                   </h3>
                   <div className="space-y-2">
-                    {entity.addresses.slice(0, 5).map((addr, i) => (
+                    {validAddresses.slice(0, 5).map((addr, i) => (
                       <div key={i} className="p-2 rounded-lg bg-white/[0.03]">
                         <p className="text-sm text-white">
-                          {[addr.street, addr.city, addr.state, countryNames[addr.country] || addr.country].filter(Boolean).join(', ')}
+                          {formatAddressValue(addr)}
                         </p>
                         {addr.is_current && (
                           <Badge className="text-[10px] bg-green-500/10 text-green-400 mt-1">Actual</Badge>
                         )}
                       </div>
                     ))}
-                    {entity.addresses.length > 5 && (
-                      <p className="text-[10px] text-gray-600">+{entity.addresses.length - 5} más</p>
+                    {validAddresses.length > 5 && (
+                      <p className="text-[10px] text-gray-600">+{validAddresses.length - 5} más</p>
                     )}
                   </div>
                 </motion.div>
               )}
             </div>
 
-            {/* Row 4: Risk Factors + Source Records */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Factores de Riesgo */}
-              {entity.risk_factors.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-                  className="glass rounded-xl p-6">
-                  <h3 className="text-sm font-medium text-gray-400 mb-4 flex items-center gap-2 uppercase tracking-wide">
-                    <AlertCircle className="w-4 h-4" />
-                    Factores de Riesgo
-                  </h3>
-                  <div className="space-y-3">
-                    {entity.risk_factors.map((factor, i) => {
-                      const factorLabels: Record<string, string> = {
-                        sanctions: 'Sanciones', pep: 'Exposición Política', adverse_media: 'Medios Adversos',
-                        geographic: 'Riesgo Geográfico', network: 'Riesgo de Red', transactional: 'Transaccional',
-                      };
-                      return (
-                        <div key={i} className="p-3 rounded-lg bg-white/[0.03]">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm text-gray-300">{factorLabels[factor.category] || factor.category}</span>
-                            <span className={cn('text-sm font-bold tabular-nums',
-                              factor.level === 'critical' ? 'text-red-400' :
-                              factor.level === 'high' ? 'text-orange-400' :
-                              factor.level === 'medium' ? 'text-yellow-400' : 'text-green-400'
-                            )}>
-                              {factor.score}
-                            </span>
-                          </div>
-                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${factor.score}%` }}
-                              transition={{ duration: 0.5, delay: i * 0.1 }}
-                              className={cn('h-full rounded-full',
-                                factor.level === 'critical' ? 'bg-red-500' :
-                                factor.level === 'high' ? 'bg-orange-500' :
-                                factor.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                              )}
-                            />
-                          </div>
-                          {factor.details && <p className="text-[10px] text-gray-500 mt-1.5">{factor.details}</p>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Registros por Fuente */}
+            {/* Row 5: Source records */}
+            <div className="grid grid-cols-1 gap-6">
               {entity.source_records && entity.source_records.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                   className="glass rounded-xl p-6">
@@ -1978,114 +2099,6 @@ export function EntityProfilePage() {
                 </motion.div>
               )}
             </div>
-
-            {/* Row 5: Family Connections (from profile) */}
-            {profile?.connections && profile.connections.total_relationships > 0 && (
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }}
-                className="glass rounded-xl p-6">
-                <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
-                  <Users className="w-4 h-4" />
-                  Conexiones
-                  <Badge className="bg-white/10 text-gray-400 text-[10px]">{profile.connections.total_relationships}</Badge>
-                </h3>
-
-                {/* Family members */}
-                {(profile.connections.family.father || profile.connections.family.mother ||
-                  profile.connections.family.spouses.length > 0 || profile.connections.family.children.length > 0 ||
-                  profile.connections.family.siblings.length > 0) && (
-                  <div className="mb-4">
-                    <p className="text-xs text-purple-400 uppercase mb-2">Familia</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {profile.connections.family.father && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500 w-16">Padre</span>
-                          <span className="text-white">{profile.connections.family.father.name}</span>
-                        </div>
-                      )}
-                      {profile.connections.family.mother && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500 w-16">Madre</span>
-                          <span className="text-white">{profile.connections.family.mother.name}</span>
-                        </div>
-                      )}
-                      {profile.connections.family.spouses.map((s, i) => (
-                        <div key={`spouse-${i}`} className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500 w-16">Cónyuge</span>
-                          <span className="text-white">{s.name}</span>
-                        </div>
-                      ))}
-                      {profile.connections.family.children.map((c, i) => (
-                        <div key={`child-${i}`} className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500 w-16">Hijo/a</span>
-                          <span className="text-white">{c.name}</span>
-                        </div>
-                      ))}
-                      {profile.connections.family.siblings.map((s, i) => (
-                        <div key={`sibling-${i}`} className="flex items-center gap-2 text-sm">
-                          <span className="text-gray-500 w-16">Hermano/a</span>
-                          <span className="text-white">{s.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Relationship type counts */}
-                <div className="flex flex-wrap gap-3">
-                  {Object.entries(profile.connections.relationship_counts)
-                    .filter(([, count]) => count > 0)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([type, count]) => {
-                      const typeLabels: Record<string, string> = {
-                        family: 'Familiar', associate: 'Asociado', corporate: 'Corporativo',
-                        beneficial_ownership: 'Beneficiario', membership: 'Miembro',
-                        political: 'Político', sanction: 'Sanción', unknown: 'Otro',
-                      };
-                      return (
-                        <div key={type} className="flex items-center gap-1.5">
-                          <span className="text-xs text-gray-500">{typeLabels[type] || type}</span>
-                          <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
-                        </div>
-                      );
-                    })}
-                </div>
-              </motion.div>
-            )}
-
-            {/* Row 6: Timeline */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
-              className="glass rounded-xl p-6">
-              <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
-                <Clock className="w-4 h-4" />
-                Cronología
-              </h3>
-              <div className="flex flex-wrap gap-6">
-                <div>
-                  <p className="text-[10px] text-gray-500 uppercase">Primera detección</p>
-                  <p className="text-sm text-white">{formatDate(entity.first_seen)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-500 uppercase">Última actualización</p>
-                  <p className="text-sm text-white">{formatDate(entity.last_updated)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-gray-500 uppercase">Fuentes de datos</p>
-                  <p className="text-sm text-white">{entity.data_sources.length} fuente{entity.data_sources.length !== 1 ? 's' : ''}</p>
-                </div>
-                {entity.sanctions.length > 0 && (
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase">Sanciones activas</p>
-                    <p className="text-sm text-red-400 font-medium">{entity.sanctions.filter(s => s.status === 'active').length}</p>
-                  </div>
-                )}
-                {entity.pep_entries.length > 0 && (
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase">Posiciones PEP</p>
-                    <p className="text-sm text-purple-400 font-medium">{entity.pep_entries.length}</p>
-                  </div>
-                )}
-              </div>
-            </motion.div>
           </TabsContent>
 
           {/* Sanctions Tab */}
