@@ -1123,20 +1123,17 @@ function ReferenceLinksList({
       {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
       <div className="min-w-0">
         <p className="text-xs text-gray-500 uppercase">{label}</p>
-        <div className="flex flex-wrap gap-2 mt-1">
+        <div className="space-y-2 mt-1">
           {visible.map((item, i) => (
             <button
               key={`${item.qid || item.name}-${i}`}
               type="button"
               onClick={() => onOpenReference(item)}
-              className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-left hover:bg-white/[0.06] transition-colors"
+              className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:bg-white/[0.06] transition-colors"
             >
-              <span className="text-sm text-white truncate max-w-[240px]">
+              <span className="text-sm text-white leading-snug block">
                 {item.name}
               </span>
-              {item.qid && (
-                <span className="text-[10px] text-gray-500 shrink-0">{item.qid}</span>
-              )}
             </button>
           ))}
         </div>
