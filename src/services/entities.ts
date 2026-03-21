@@ -1,6 +1,12 @@
 import api from './api';
 import type { APIEntity } from '@/types/api';
 
+const referenceResolutionCache = new Map<string, ReferenceResolution>();
+
+function buildReferenceCacheKey(params: { qid?: string; name?: string }): string {
+  return `${params.qid || ''}::${(params.name || '').trim().toLowerCase()}`;
+}
+
 // ── Profile types (from /api/v2/entities/{id}/profile) ──
 
 export interface WikidataLink {
@@ -153,9 +159,16 @@ export const entityService = {
    * Resolve a profile/reference item to a Gold entity if it exists.
    */
   async resolveReference(params: { qid?: string; name?: string }): Promise<ReferenceResolution> {
+    const cacheKey = buildReferenceCacheKey(params);
+    const cached = referenceResolutionCache.get(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const response = await api.get('/api/v2/entities/references/resolve', {
       params,
     });
+    referenceResolutionCache.set(cacheKey, response.data);
     return response.data;
   },
 

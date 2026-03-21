@@ -1401,7 +1401,7 @@ export function EntityProfilePage() {
   const referenceLikeForQueries = entity ? isReferenceLikeEntity(entity, profile) : isWikidataOnlyProfile(profile);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
   const { data: familyRelationships } = useRelationshipsList(id, {
-    enabled: activeTab === 'overview',
+    enabled: activeTab === 'overview' && !referenceLikeForQueries,
     type: referenceLikeForQueries ? undefined : 'family',
     hide_noise: referenceLikeForQueries ? false : true,
     limit: 12,
@@ -2092,7 +2092,7 @@ export function EntityProfilePage() {
                   </Button>
                 </div>
 
-                {overviewFamilyRelationships.length > 0 ? (
+                {!referenceLike && overviewFamilyRelationships.length > 0 ? (
                   <div className="mb-4">
                     <p className="text-xs text-purple-400 uppercase mb-2">
                       {referenceLike ? 'Vínculos contextuales destacados' : 'Familiares relevantes detectados'}
@@ -2126,6 +2126,15 @@ export function EntityProfilePage() {
                         +{overviewFamilyRelationships.length - 6} {referenceLike ? 'vínculos más' : 'familiares más'} en la pestaña de relaciones
                       </p>
                     )}
+                  </div>
+                ) : referenceLike ? (
+                  <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-sm text-white">
+                      Se identificaron {profile.connections.total_relationships} relaciones para esta entidad contextual.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Para acelerar la apertura de referencias, el resumen general no carga el detalle completo de relaciones. Usa la pestaña de relaciones para ver personas y organizaciones vinculadas.
+                    </p>
                   </div>
                 ) : (
                   <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
