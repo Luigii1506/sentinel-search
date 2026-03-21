@@ -298,10 +298,16 @@ function formatAddressValue(address: {
   return parts.join(', ');
 }
 
-function getTopRiskFactors(entity: APIEntity) {
-  return [...entity.risk_factors]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 4);
+function getAliasTypeLabel(type: string): string {
+  const labels: Record<string, string> = {
+    primary: 'Principal',
+    alias: 'Alias',
+    also_known_as: 'AKA',
+    former_name: 'Nombre previo',
+    maiden_name: 'Apellido de soltera',
+    trading_as: 'Nombre comercial',
+  };
+  return labels[type] || type;
 }
 
 function EntityAdverseMediaTab({ entityId }: { entityId: string }) {
@@ -1222,6 +1228,7 @@ export function EntityProfilePage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
+  const [showAllAliases, setShowAllAliases] = useState(false);
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
   const [relContextFilter, setRelContextFilter] = useState<'aml_core' | 'affiliation' | 'profile_context' | undefined>(undefined);
   const [relPriorityFilter, setRelPriorityFilter] = useState<'critical' | 'high' | 'medium' | 'low' | undefined>(undefined);
@@ -1242,6 +1249,12 @@ export function EntityProfilePage() {
   const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
   const { profile } = useEntityProfile(id);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
+  const { data: familyRelationships } = useRelationshipsList(id, {
+    enabled: activeTab === 'overview',
+    type: 'family',
+    hide_noise: true,
+    limit: 12,
+  });
   const { data: relationshipsList } = useRelationshipsList(id, {
     enabled: activeTab === 'relationships',
     level: relLevelFilter,
@@ -1262,8 +1275,8 @@ export function EntityProfilePage() {
   const Icon = entityTypeIcons[entity.entity_type] || User;
   const riskColor = getRiskColor(entity.risk_level);
   const validAddresses = entity.addresses.filter((address) => formatAddressValue(address));
-  const topRiskFactors = getTopRiskFactors(entity);
   const relationshipSignals = getRelationshipSignalSummary(profile);
+  const overviewFamilyRelationships = familyRelationships?.relationships || [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
@@ -1391,6 +1404,9 @@ export function EntityProfilePage() {
                 )}
                 {(profile?.overview.birth_place || entity.place_of_birth) && (
                   <InfoItem label="Lugar de Nacimiento" value={profile?.overview.birth_place || entity.place_of_birth} icon={MapPin} />
+                )}
+                {validAddresses.length === 1 && (
+                  <InfoItem label="Ubicación principal" value={formatAddressValue(validAddresses[0]) || undefined} icon={MapPin} />
                 )}
                 {(profile?.overview.nationalities?.length || (entity.nationalities && entity.nationalities.length > 0)) && (
                   <InfoItem
@@ -1828,147 +1844,90 @@ export function EntityProfilePage() {
               )}
             </div>
 
-            {/* Row 3: Risk drivers + Connections */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {topRiskFactors.length > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
-                  className="glass rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
-                      <AlertCircle className="w-4 h-4" />
-                      Drivers de Riesgo
-                    </h3>
-                    <Badge className="bg-white/10 text-gray-400 text-[10px]">
-                      {entity.risk_factors.length}
-                    </Badge>
+            {/* Row 3: Relational context */}
+            {(profile?.connections && profile.connections.total_relationships > 0) && (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
+                className="glass rounded-xl p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
+                    <Users className="w-4 h-4" />
+                    Contexto Relacional
+                  </h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setActiveTab('relationships')}
+                    className="text-xs text-blue-400 hover:text-blue-300"
+                  >
+                    Ver relaciones
+                  </Button>
+                </div>
+
+                {overviewFamilyRelationships.length > 0 ? (
+                  <div className="mb-4">
+                    <p className="text-xs text-purple-400 uppercase mb-2">Familiares relevantes detectados</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+                      {overviewFamilyRelationships.slice(0, 6).map((rel, i) => (
+                        <div key={`${rel.related_entity_id || rel.related_entity_name}-${i}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                          <p className="text-sm text-white font-medium">{rel.related_entity_name}</p>
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
+                            {rel.subtype && (
+                              <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
+                                {translateSubtype(rel.subtype)}
+                              </Badge>
+                            )}
+                            {rel.related_entity_is_pep && (
+                              <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-400 border-purple-500/30">
+                                PEP
+                              </Badge>
+                            )}
+                            {rel.related_entity_risk_level && (
+                              <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(rel.related_entity_risk_level))}>
+                                {rel.related_entity_risk_level}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {overviewFamilyRelationships.length > 6 && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        +{overviewFamilyRelationships.length - 6} familiares más en la pestaña de relaciones
+                      </p>
+                    )}
                   </div>
-                  <div className="space-y-3">
-                    {topRiskFactors.map((factor, i) => {
-                      const factorLabels: Record<string, string> = {
-                        sanctions: 'Sanciones', pep: 'Exposición Política', adverse_media: 'Medios Adversos',
-                        geographic: 'Riesgo Geográfico', network: 'Riesgo de Red', transactional: 'Transaccional',
+                ) : (
+                  <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-sm text-white">
+                      Se identificaron {profile.connections.total_relationships} relaciones en total.
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(profile.connections.relationship_counts)
+                    .filter(([, count]) => count > 0)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 6)
+                    .map(([type, count]) => {
+                      const typeLabels: Record<string, string> = {
+                        family: 'Familiar', associate: 'Asociado', corporate: 'Corporativo',
+                        beneficial_ownership: 'Beneficiario', membership: 'Miembro',
+                        political: 'Político', sanction: 'Sanción', unknown: 'Otro',
                       };
                       return (
-                        <div key={i} className="p-3 rounded-lg bg-white/[0.03] border border-white/5">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-sm text-gray-300">{factorLabels[factor.category] || factor.category}</span>
-                            <span className={cn('text-sm font-bold tabular-nums',
-                              factor.level === 'critical' ? 'text-red-400' :
-                              factor.level === 'high' ? 'text-orange-400' :
-                              factor.level === 'medium' ? 'text-yellow-400' : 'text-green-400'
-                            )}>
-                              {factor.score}
-                            </span>
-                          </div>
-                          <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: `${factor.score}%` }}
-                              transition={{ duration: 0.5, delay: i * 0.08 }}
-                              className={cn('h-full rounded-full',
-                                factor.level === 'critical' ? 'bg-red-500' :
-                                factor.level === 'high' ? 'bg-orange-500' :
-                                factor.level === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                              )}
-                            />
-                          </div>
-                          {factor.details && <p className="text-[10px] text-gray-500 mt-1.5">{factor.details}</p>}
+                        <div key={type} className="flex items-center gap-1.5">
+                          <span className="text-xs text-gray-500">{typeLabels[type] || type}</span>
+                          <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
                         </div>
                       );
                     })}
-                  </div>
-                </motion.div>
-              )}
-
-              {profile?.connections && profile.connections.total_relationships > 0 && (
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
-                  className="glass rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
-                      <Users className="w-4 h-4" />
-                      Contexto Relacional
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setActiveTab('relationships')}
-                      className="text-xs text-blue-400 hover:text-blue-300"
-                    >
-                      Ver relaciones
-                    </Button>
-                  </div>
-
-                  {(profile.connections.family.father || profile.connections.family.mother ||
-                    profile.connections.family.spouses.length > 0 || profile.connections.family.children.length > 0 ||
-                    profile.connections.family.siblings.length > 0) ? (
-                    <div className="mb-4">
-                      <p className="text-xs text-purple-400 uppercase mb-2">Familia directa identificada</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {profile.connections.family.father && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-500 w-16">Padre</span>
-                            <span className="text-white">{profile.connections.family.father.name}</span>
-                          </div>
-                        )}
-                        {profile.connections.family.mother && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-500 w-16">Madre</span>
-                            <span className="text-white">{profile.connections.family.mother.name}</span>
-                          </div>
-                        )}
-                        {profile.connections.family.spouses.slice(0, 2).map((s, i) => (
-                          <div key={`spouse-${i}`} className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-500 w-16">Cónyuge</span>
-                            <span className="text-white">{s.name}</span>
-                          </div>
-                        ))}
-                        {profile.connections.family.children.slice(0, 2).map((c, i) => (
-                          <div key={`child-${i}`} className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-500 w-16">Hijo/a</span>
-                            <span className="text-white">{c.name}</span>
-                          </div>
-                        ))}
-                        {profile.connections.family.siblings.slice(0, 2).map((s, i) => (
-                          <div key={`sibling-${i}`} className="flex items-center gap-2 text-sm">
-                            <span className="text-gray-500 w-16">Hermano/a</span>
-                            <span className="text-white">{s.name}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
-                      <p className="text-sm text-white">
-                        Se identificaron {profile.connections.total_relationships} relaciones, pero no hay familiares directos destacados en este resumen.
-                      </p>
-                      <p className="text-xs text-gray-500 mt-1">
-                        La mayor parte del contexto está en vínculos corporativos, asociados o políticos.
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(profile.connections.relationship_counts)
-                      .filter(([, count]) => count > 0)
-                      .sort(([, a], [, b]) => b - a)
-                      .slice(0, 6)
-                      .map(([type, count]) => {
-                        const typeLabels: Record<string, string> = {
-                          family: 'Familiar', associate: 'Asociado', corporate: 'Corporativo',
-                          beneficial_ownership: 'Beneficiario', membership: 'Miembro',
-                          political: 'Político', sanction: 'Sanción', unknown: 'Otro',
-                        };
-                        return (
-                          <div key={type} className="flex items-center gap-1.5">
-                            <span className="text-xs text-gray-500">{typeLabels[type] || type}</span>
-                            <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
-                          </div>
-                        );
-                      })}
-                  </div>
-                </motion.div>
-              )}
-            </div>
+                </div>
+              </motion.div>
+            )}
 
             {/* Row 4: IDs + Aliases + Addresses */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -2004,27 +1963,41 @@ export function EntityProfilePage() {
                   className="glass rounded-xl p-6">
                   <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
                     <FileText className="w-4 h-4" />
-                    Alias Conocidos
+                    Nombres y Alias
                     <span className="text-[10px] text-gray-600 ml-auto">{entity.aliases.length}</span>
                   </h3>
-                  <div className="space-y-1">
-                    {entity.aliases.slice(0, 8).map((alias, i) => (
-                      <div key={i} className="flex items-center justify-between py-1 border-b border-white/5 last:border-0">
-                        <span className="text-sm text-white truncate mr-2">{alias.name}</span>
-                        <Badge variant="outline" className="text-[10px] text-gray-500 shrink-0">
-                          {alias.type === 'also_known_as' ? 'AKA' : alias.type === 'primary' ? 'Principal' : alias.type}
-                        </Badge>
-                      </div>
-                    ))}
-                    {entity.aliases.length > 8 && (
-                      <p className="text-[10px] text-gray-600 pt-1">+{entity.aliases.length - 8} más</p>
+                  <div className="space-y-3">
+                    <div className="flex flex-wrap gap-2">
+                      {(showAllAliases ? entity.aliases : entity.aliases.slice(0, 12)).map((alias, i) => (
+                        <div
+                          key={`${alias.name}-${i}`}
+                          className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5"
+                        >
+                          <span className="text-sm text-white truncate max-w-[220px]">{alias.name}</span>
+                          <Badge variant="outline" className="text-[10px] text-gray-400 shrink-0 border-white/10">
+                            {getAliasTypeLabel(alias.type)}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                    {entity.aliases.length > 12 && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowAllAliases((value) => !value)}
+                        className="text-xs text-blue-400 hover:text-blue-300 px-0"
+                      >
+                        {showAllAliases
+                          ? 'Mostrar menos'
+                          : `Ver todos los alias (${entity.aliases.length})`}
+                      </Button>
                     )}
                   </div>
                 </motion.div>
               )}
 
               {/* Direcciones */}
-              {validAddresses.length > 0 && (
+              {validAddresses.length > 1 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
                   className="glass rounded-xl p-6">
                   <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
