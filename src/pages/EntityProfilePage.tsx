@@ -351,6 +351,20 @@ function getReferenceRelationshipSummary(rel: {
   return null;
 }
 
+function getReferenceRelationshipSortScore(rel: {
+  related_entity_risk_score?: number;
+  related_entity_is_pep?: boolean;
+  related_entity_sources?: string[];
+  relationship_strength?: number;
+  related_entity_name: string;
+}): number {
+  const riskScore = rel.related_entity_risk_score || 0;
+  const pepBoost = rel.related_entity_is_pep ? 25 : 0;
+  const sourceBoost = Math.min((rel.related_entity_sources?.length || 0) * 1.5, 30);
+  const strengthBoost = (rel.relationship_strength || 0) * 10;
+  return riskScore + pepBoost + sourceBoost + strengthBoost;
+}
+
 type EntityTabId =
   | 'overview'
   | 'sanctions'
@@ -1403,7 +1417,15 @@ export function EntityProfilePage() {
 
   const validAddresses = entity?.addresses?.filter((address) => formatAddressValue(address)) || [];
   const relationshipSignals = getRelationshipSignalSummary(profile);
-  const overviewFamilyRelationships = familyRelationships?.relationships || [];
+  const overviewFamilyRelationships = [...(familyRelationships?.relationships || [])].sort((a, b) => {
+    if (referenceLikeForQueries) {
+      return getReferenceRelationshipSortScore(b) - getReferenceRelationshipSortScore(a)
+        || a.related_entity_name.localeCompare(b.related_entity_name);
+    }
+    return (b.related_entity_risk_score || 0) - (a.related_entity_risk_score || 0)
+      || Number(Boolean(b.related_entity_is_pep)) - Number(Boolean(a.related_entity_is_pep))
+      || a.related_entity_name.localeCompare(b.related_entity_name);
+  });
   const hasSanctions = (entity?.sanctions?.length || 0) > 0;
   const hasPep = (entity?.pep_entries?.length || 0) > 0 || entity?.is_current_pep === true || !!entity?.pep_category;
   const hasMedia = (entity?.adverse_media?.length || 0) > 0;
@@ -2606,6 +2628,19 @@ export function EntityProfilePage() {
                   : sectionConfig.find((section) => section.types.includes(rel.type))
                     || sectionConfig[sectionConfig.length - 1];
                 groupedByType[typeSection.key].push(rel);
+              }
+
+              for (const key of Object.keys(groupedByType)) {
+                groupedByType[key].sort((a, b) => {
+                  if (referenceLike) {
+                    return getReferenceRelationshipSortScore(b) - getReferenceRelationshipSortScore(a)
+                      || a.related_entity_name.localeCompare(b.related_entity_name);
+                  }
+                  return (b.relationship_strength || 0) - (a.relationship_strength || 0)
+                    || (b.related_entity_risk_score || 0) - (a.related_entity_risk_score || 0)
+                    || Number(Boolean(b.related_entity_is_pep)) - Number(Boolean(a.related_entity_is_pep))
+                    || a.related_entity_name.localeCompare(b.related_entity_name);
+                });
               }
 
               const priorityBadgeStyles: Record<string, string> = {
