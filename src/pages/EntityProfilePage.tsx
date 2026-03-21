@@ -143,6 +143,7 @@ const subtypeLabels: Record<string, string> = {
   ceo: 'Director General', cfo: 'Director Financiero', coo: 'Director Operaciones',
   secretary: 'Secretario', treasurer: 'Tesorero',
   member: 'Miembro', employee: 'Empleado', manager: 'Gerente',
+  education: 'Educación',
   founder: 'Fundador', partner: 'Socio',
   subsidiary: 'Subsidiaria', parent_company: 'Empresa Matriz',
   // Politicas
@@ -309,6 +310,16 @@ function getAliasTypeLabel(type: string): string {
     trading_as: 'Nombre comercial',
   };
   return labels[type] || type;
+}
+
+function getReferenceRelationshipSection(rel: {
+  related_entity_type?: string;
+  type: string;
+}): 'people' | 'organizations' | 'other' {
+  const relatedType = (rel.related_entity_type || '').toLowerCase();
+  if (relatedType === 'individual' || relatedType === 'person') return 'people';
+  if (relatedType === 'organization' || relatedType === 'company' || relatedType === 'legalentity') return 'organizations';
+  return 'other';
 }
 
 type EntityTabId =
@@ -2460,7 +2471,32 @@ export function EntityProfilePage() {
                 types: string[];
                 color: string;
                 badgeColor: string;
-              }> = [
+              }> = referenceLike ? [
+                {
+                  key: 'people',
+                  label: 'Personas vinculadas',
+                  icon: Users,
+                  types: [],
+                  color: 'text-blue-400',
+                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                },
+                {
+                  key: 'organizations',
+                  label: 'Organizaciones vinculadas',
+                  icon: Building2,
+                  types: [],
+                  color: 'text-cyan-400',
+                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+                },
+                {
+                  key: 'other',
+                  label: 'Otras conexiones',
+                  icon: Share2,
+                  types: [],
+                  color: 'text-gray-400',
+                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+                },
+              ] : [
                 {
                   key: 'family',
                   label: 'Familiares',
@@ -2535,8 +2571,11 @@ export function EntityProfilePage() {
                 groupedByContext[contextKey] = groupedByContext[contextKey] || [];
                 groupedByContext[contextKey].push(rel);
 
-                const typeSection = sectionConfig.find((section) => section.types.includes(rel.type))
-                  || sectionConfig[sectionConfig.length - 1];
+                const typeSection = referenceLike
+                  ? sectionConfig.find((section) => section.key === getReferenceRelationshipSection(rel))
+                    || sectionConfig[sectionConfig.length - 1]
+                  : sectionConfig.find((section) => section.types.includes(rel.type))
+                    || sectionConfig[sectionConfig.length - 1];
                 groupedByType[typeSection.key].push(rel);
               }
 
@@ -2702,6 +2741,7 @@ export function EntityProfilePage() {
                             const sourceName = rel.source ? formatSourceName(rel.source) : null;
                             // Filtrar descriptions basura del FTM (contienen → o son solo nombres)
                             const cleanDescription = rel.description && !rel.description.includes('→') && !rel.description.includes('—')
+                              && !rel.description.toLowerCase().startsWith('wikidata ')
                               ? rel.description : null;
 
                             return (
@@ -2757,7 +2797,8 @@ export function EntityProfilePage() {
                                   </span>
                                 ) : (
                                   <span className="text-gray-500 text-xs">
-                                    {section.key === 'family' ? 'Familiar' :
+                                    {referenceLike ? 'Vínculo contextual' :
+                                     section.key === 'family' ? 'Familiar' :
                                      section.key === 'associates' ? 'Asociado' :
                                      section.key === 'corporate' ? 'Relación corporativa' :
                                      section.key === 'political' ? 'Relación política' :
@@ -2772,7 +2813,7 @@ export function EntityProfilePage() {
                                     <span className="text-xs text-gray-500">{entityTypeLabel}</span>
                                   </>
                                 )}
-                                {rel.context_category && (
+                                {!referenceLike && rel.context_category && (
                                   <>
                                     <span className="text-gray-600 text-xs">·</span>
                                     <span className="text-xs text-gray-500">
@@ -2817,7 +2858,7 @@ export function EntityProfilePage() {
                                 {sourceName && (
                                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
                                     <Database className="w-3 h-3" />
-                                    {sourceName}
+                                    {referenceLike && sourceName?.toLowerCase() === 'wikidata' ? 'Wikidata' : sourceName}
                                   </span>
                                 )}
 
