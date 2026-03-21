@@ -1344,11 +1344,12 @@ export function EntityProfilePage() {
 
   const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
   const { profile } = useEntityProfile(id);
+  const referenceLikeForQueries = entity ? isReferenceLikeEntity(entity, profile) : isWikidataOnlyProfile(profile);
   const { data: networkData, isLoading: networkLoading } = useNetwork(id, { depth: graphDepth, enabled: activeTab === 'network' });
   const { data: familyRelationships } = useRelationshipsList(id, {
     enabled: activeTab === 'overview',
-    type: 'family',
-    hide_noise: true,
+    type: referenceLikeForQueries ? undefined : 'family',
+    hide_noise: referenceLikeForQueries ? false : true,
     limit: 12,
   });
   const { data: relationshipsList } = useRelationshipsList(id, {
@@ -1356,7 +1357,7 @@ export function EntityProfilePage() {
     level: relLevelFilter,
     aml_priority: relPriorityFilter,
     context_category: relContextFilter,
-    hide_noise: true,
+    hide_noise: referenceLikeForQueries ? false : true,
     limit: 200,
   });
 
@@ -2031,7 +2032,9 @@ export function EntityProfilePage() {
 
                 {overviewFamilyRelationships.length > 0 ? (
                   <div className="mb-4">
-                    <p className="text-xs text-purple-400 uppercase mb-2">Familiares relevantes detectados</p>
+                    <p className="text-xs text-purple-400 uppercase mb-2">
+                      {referenceLike ? 'Vínculos contextuales destacados' : 'Familiares relevantes detectados'}
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
                       {overviewFamilyRelationships.slice(0, 6).map((rel, i) => (
                         <div key={`${rel.related_entity_id || rel.related_entity_name}-${i}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
@@ -2058,7 +2061,7 @@ export function EntityProfilePage() {
                     </div>
                     {overviewFamilyRelationships.length > 6 && (
                       <p className="text-xs text-gray-500 mt-2">
-                        +{overviewFamilyRelationships.length - 6} familiares más en la pestaña de relaciones
+                        +{overviewFamilyRelationships.length - 6} {referenceLike ? 'vínculos más' : 'familiares más'} en la pestaña de relaciones
                       </p>
                     )}
                   </div>
@@ -2068,7 +2071,9 @@ export function EntityProfilePage() {
                       Se identificaron {profile.connections.total_relationships} relaciones en total.
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
-                      En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.
+                      {referenceLike
+                        ? 'En esta referencia no se encontraron vínculos destacados en el resumen rápido; revisa la pestaña de relaciones para ver el contexto completo.'
+                        : 'En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.'}
                     </p>
                   </div>
                 )}
