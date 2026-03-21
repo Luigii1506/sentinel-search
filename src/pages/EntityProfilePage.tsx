@@ -40,10 +40,11 @@ import { useEntity, useEntityProfile } from '@/hooks/useEntity';
 import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
+import type { EntityProfile } from '@/services/entities';
 import { cn, getRiskColor, formatDate } from '@/lib/utils';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
-import type { APISanctionEntry } from '@/types/api';
+import type { APIEntity, APISanctionEntry } from '@/types/api';
 
 const entityTypeIcons = {
   person: User,
@@ -237,6 +238,48 @@ const amCategoryColors: Record<string, string> = {
   offshore: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
   regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
 };
+
+function summarizeEntityExposure(entity: APIEntity, profile?: EntityProfile): string {
+  const activeSanctions = entity.sanctions.filter((item) => item.status === 'active').length;
+  const pepStatus = entity.is_current_pep ? 'PEP activa' : entity.pep_entries.length > 0 ? 'PEP histórica' : null;
+  const adverseMediaCount = entity.adverse_media?.length || 0;
+  const relationshipCount = profile?.connections?.total_relationships || 0;
+
+  if (activeSanctions > 0 && entity.is_current_pep) {
+    return `Entidad de alto interés AML: ${activeSanctions} sanción${activeSanctions !== 1 ? 'es' : ''} activa${activeSanctions !== 1 ? 's' : ''} y condición PEP vigente.`;
+  }
+  if (activeSanctions > 0) {
+    return `Entidad sancionada con ${activeSanctions} registro${activeSanctions !== 1 ? 's' : ''} activo${activeSanctions !== 1 ? 's' : ''} en fuentes primarias.`;
+  }
+  if (entity.is_current_pep) {
+    return `Entidad con exposición política vigente${entity.pep_category ? ` (${entity.pep_category})` : ''}.`;
+  }
+  if (adverseMediaCount > 0) {
+    return `Entidad sin sanciones activas, pero con ${adverseMediaCount} señal${adverseMediaCount !== 1 ? 'es' : ''} de adverse media para análisis.`;
+  }
+  if (relationshipCount > 0) {
+    return `Entidad sin alertas directas críticas, pero con ${relationshipCount} relacion${relationshipCount !== 1 ? 'es' : ''} disponibles para análisis contextual.`;
+  }
+  if (pepStatus) {
+    return `Entidad con ${pepStatus} y sin sanciones activas registradas.`;
+  }
+  return 'Entidad sin alertas directas críticas en la vista actual; el valor principal está en cobertura de fuentes y trazabilidad.';
+}
+
+function getRelationshipSignalSummary(profile?: EntityProfile): Array<{ label: string; value: number }> {
+  if (!profile?.connections) return [];
+
+  const counts = profile.connections.relationship_counts || {};
+  const summary = [
+    { label: 'Familiares', value: counts.family || 0 },
+    { label: 'Asociados', value: counts.associate || 0 },
+    { label: 'Corporativo', value: (counts.corporate || 0) + (counts.beneficial_ownership || 0) },
+    { label: 'Político', value: counts.political || 0 },
+    { label: 'Sancionatorio', value: counts.sanction || 0 },
+  ];
+
+  return summary.filter((item) => item.value > 0);
+}
 
 function EntityAdverseMediaTab({ entityId }: { entityId: string }) {
   const { data: profile, isLoading } = useQuery({
@@ -1535,6 +1578,129 @@ export function EntityProfilePage() {
                 </motion.div>
               );
             })()}
+
+            {/* Row 1.5: Executive Case Readout */}
+            <div className="grid grid-cols-1 xl:grid-cols-[1.5fr_1fr] gap-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.03 }}
+                className="glass rounded-xl p-6"
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+                      Lectura Ejecutiva
+                    </p>
+                    <h3 className="text-lg font-medium text-white">
+                      {summarizeEntityExposure(entity, profile)}
+                    </h3>
+                  </div>
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'text-xs shrink-0',
+                      entity.risk_level === 'critical'
+                        ? 'bg-red-500/10 text-red-400 border-red-500/30'
+                        : entity.risk_level === 'high'
+                          ? 'bg-orange-500/10 text-orange-400 border-orange-500/30'
+                          : entity.risk_level === 'medium'
+                            ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                            : 'bg-green-500/10 text-green-400 border-green-500/30'
+                    )}
+                  >
+                    Riesgo {riskLevelLabels[entity.risk_level]}
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
+                  <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wide">Sanciones activas</p>
+                    <p className="text-2xl font-bold text-white mt-1">
+                      {entity.sanctions.filter((item) => item.status === 'active').length}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wide">Estado PEP</p>
+                    <p className="text-sm font-semibold text-white mt-2">
+                      {entity.is_current_pep ? 'Activo' : entity.pep_entries.length > 0 ? 'Histórico' : 'No registrado'}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wide">Medios adversos</p>
+                    <p className="text-2xl font-bold text-white mt-1">
+                      {entity.adverse_media?.length || 0}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+                    <p className="text-[11px] text-gray-500 uppercase tracking-wide">Relaciones</p>
+                    <p className="text-2xl font-bold text-white mt-1">
+                      {profile?.connections?.total_relationships || 0}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.05 }}
+                className="glass rounded-xl p-6"
+              >
+                <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">
+                  Cobertura y Trazabilidad
+                </p>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Fuentes activas</span>
+                    <span className="text-sm font-semibold text-white">
+                      {profile?.overview.source_count || entity.data_sources.length}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Datasets</span>
+                    <span className="text-sm font-semibold text-white">
+                      {profile?.cross_references.datasets.length || entity.source_records?.length || 0}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Primera aparición</span>
+                    <span className="text-sm font-semibold text-white">
+                      {profile?.first_seen_at || entity.first_seen
+                        ? formatDate(profile?.first_seen_at || entity.first_seen)
+                        : '—'}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Última actualización</span>
+                    <span className="text-sm font-semibold text-white">
+                      {profile?.last_seen_at || entity.last_updated
+                        ? formatDate(profile?.last_seen_at || entity.last_updated)
+                        : '—'}
+                    </span>
+                  </div>
+                </div>
+
+                {getRelationshipSignalSummary(profile).length > 0 && (
+                  <div className="mt-5 pt-4 border-t border-white/5">
+                    <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+                      Señales relacionales
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {getRelationshipSignalSummary(profile).map((item) => (
+                        <Badge
+                          key={item.label}
+                          variant="outline"
+                          className="text-xs bg-white/5 text-gray-300 border-white/10"
+                        >
+                          {item.label}: {item.value}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </div>
 
             {/* Row 2: Sanctions Summary + PEP Summary (side by side) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
