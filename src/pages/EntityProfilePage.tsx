@@ -1151,22 +1151,6 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
   );
 }
 
-// Relationship Card
-function RelationshipCard({ rel }: { rel: { target_name?: string; type: string; description?: string; confidence: number } }) {
-  return (
-    <div className="glass rounded-lg p-4 flex items-center justify-between">
-      <div>
-        <h4 className="text-white font-medium">{rel.target_name || 'Entidad relacionada'}</h4>
-        <p className="text-sm text-gray-400">{rel.description || rel.type}</p>
-      </div>
-      <div className="text-right">
-        <div className="text-sm text-white">{rel.confidence}%</div>
-        <div className="text-xs text-gray-500">confianza</div>
-      </div>
-    </div>
-  );
-}
-
 export function EntityProfilePage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -2109,13 +2093,12 @@ export function EntityProfilePage() {
                 <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
               </div>
             ) : (() => {
-              const sectionConfig: Array<{
+              const contextSections: Array<{
                 key: 'aml_core' | 'affiliation' | 'profile_context' | 'unknown';
                 label: string;
                 icon: typeof Users;
                 color: string;
                 badgeColor: string;
-                emptyHint: string;
               }> = [
                 {
                   key: 'aml_core',
@@ -2123,7 +2106,6 @@ export function EntityProfilePage() {
                   icon: Shield,
                   color: 'text-red-400',
                   badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
-                  emptyHint: 'Relaciones con valor AML directo',
                 },
                 {
                   key: 'affiliation',
@@ -2131,7 +2113,6 @@ export function EntityProfilePage() {
                   icon: Building2,
                   color: 'text-cyan-400',
                   badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-                  emptyHint: 'Afiliaciones corporativas, políticas o institucionales',
                 },
                 {
                   key: 'profile_context',
@@ -2139,7 +2120,6 @@ export function EntityProfilePage() {
                   icon: FileText,
                   color: 'text-violet-400',
                   badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
-                  emptyHint: 'Contexto biográfico y de perfil',
                 },
                 {
                   key: 'unknown',
@@ -2147,21 +2127,94 @@ export function EntityProfilePage() {
                   icon: Share2,
                   color: 'text-gray-400',
                   badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-                  emptyHint: 'Relaciones no clasificadas o ambiguas',
                 },
               ];
 
-              const grouped: Record<string, typeof relationshipsList.relationships> = {
+              const sectionConfig: Array<{
+                key: string;
+                label: string;
+                icon: typeof Users;
+                types: string[];
+                color: string;
+                badgeColor: string;
+              }> = [
+                {
+                  key: 'family',
+                  label: 'Familiares',
+                  icon: Users,
+                  types: ['family'],
+                  color: 'text-purple-400',
+                  badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+                },
+                {
+                  key: 'associates',
+                  label: 'Asociados',
+                  icon: Network,
+                  types: ['associate'],
+                  color: 'text-blue-400',
+                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                },
+                {
+                  key: 'corporate',
+                  label: 'Propiedad y Corporativo',
+                  icon: Building2,
+                  types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
+                  color: 'text-cyan-400',
+                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+                },
+                {
+                  key: 'political',
+                  label: 'Política y Representación',
+                  icon: Landmark,
+                  types: ['political', 'representation', 'occupancy'],
+                  color: 'text-amber-400',
+                  badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+                },
+                {
+                  key: 'sanctions',
+                  label: 'Sanciones',
+                  icon: Shield,
+                  types: ['sanction'],
+                  color: 'text-red-400',
+                  badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
+                },
+                {
+                  key: 'profile',
+                  label: 'Perfil',
+                  icon: FileText,
+                  types: ['professional'],
+                  color: 'text-violet-400',
+                  badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+                },
+                {
+                  key: 'other',
+                  label: 'Otras Relaciones',
+                  icon: Share2,
+                  types: [],
+                  color: 'text-gray-400',
+                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+                },
+              ];
+
+              const groupedByContext: Record<string, typeof relationshipsList.relationships> = {
                 aml_core: [],
                 affiliation: [],
                 profile_context: [],
                 unknown: [],
               };
+              const groupedByType: Record<string, typeof relationshipsList.relationships> = {};
+              for (const section of sectionConfig) {
+                groupedByType[section.key] = [];
+              }
 
               for (const rel of relationshipsList.relationships) {
-                const sectionKey = rel.context_category || 'unknown';
-                grouped[sectionKey] = grouped[sectionKey] || [];
-                grouped[sectionKey].push(rel);
+                const contextKey = rel.context_category || 'unknown';
+                groupedByContext[contextKey] = groupedByContext[contextKey] || [];
+                groupedByContext[contextKey].push(rel);
+
+                const typeSection = sectionConfig.find((section) => section.types.includes(rel.type))
+                  || sectionConfig[sectionConfig.length - 1];
+                groupedByType[typeSection.key].push(rel);
               }
 
               const priorityBadgeStyles: Record<string, string> = {
@@ -2192,7 +2245,7 @@ export function EntityProfilePage() {
                 { key: 'low', label: 'Low' },
               ];
 
-              const totalByContext = Object.entries(grouped)
+              const totalByContext = Object.entries(groupedByContext)
                 .filter(([, rels]) => rels.length > 0)
                 .reduce<Record<string, number>>((acc, [key, rels]) => {
                   acc[key] = rels.length;
@@ -2260,7 +2313,7 @@ export function EntityProfilePage() {
 
                   {/* Summary counts */}
                   <div className="flex flex-wrap gap-2">
-                    {sectionConfig.map((section) => {
+                    {contextSections.map((section) => {
                       const count = totalByContext[section.key];
                       if (!count) return null;
                       return (
@@ -2290,9 +2343,9 @@ export function EntityProfilePage() {
                     ))}
                   </div>
 
-                  {/* Sections by AML context */}
+                  {/* Sections by human-readable relationship type */}
                   {sectionConfig.map((section) => {
-                    const rels = grouped[section.key];
+                    const rels = groupedByType[section.key];
                     if (!rels || rels.length === 0) return null;
                     const SectionIcon = section.icon;
 
@@ -2381,9 +2434,12 @@ export function EntityProfilePage() {
                                   </span>
                                 ) : (
                                   <span className="text-gray-500 text-xs">
-                                    {section.key === 'aml_core' ? 'Relación AML' :
-                                     section.key === 'affiliation' ? 'Afiliación' :
-                                     section.key === 'profile_context' ? 'Contexto de perfil' :
+                                    {section.key === 'family' ? 'Familiar' :
+                                     section.key === 'associates' ? 'Asociado' :
+                                     section.key === 'corporate' ? 'Relación corporativa' :
+                                     section.key === 'political' ? 'Relación política' :
+                                     section.key === 'sanctions' ? 'Relación sancionatoria' :
+                                     section.key === 'profile' ? 'Contexto de perfil' :
                                      'Relacionado'}
                                   </span>
                                 )}
