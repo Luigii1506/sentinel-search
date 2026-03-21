@@ -1379,6 +1379,11 @@ export function EntityProfilePage() {
   };
 
   const handleOpenReference = async (item: WikidataLink) => {
+    if (item.entity_id) {
+      navigate(`/entity/${item.entity_id}?source_level=${sourceLevel}`);
+      return;
+    }
+
     try {
       const resolved = await entityService.resolveReference({
         qid: item.qid,

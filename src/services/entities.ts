@@ -12,6 +12,7 @@ function buildReferenceCacheKey(params: { qid?: string; name?: string }): string
 export interface WikidataLink {
   qid?: string;
   name: string;
+  entity_id?: string;
   start?: string | null;
   end?: string | null;
   is_current?: boolean | null;
