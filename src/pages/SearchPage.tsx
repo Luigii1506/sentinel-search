@@ -24,9 +24,6 @@ import {
   Siren,
   Newspaper,
   Clock,
-  Calendar,
-  MapPin,
-  Fingerprint,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -296,19 +293,6 @@ const COUNTRY_NAMES: Record<string, string> = {
   EU: "Unión Europea",
 };
 
-const CATEGORY_CONFIG: Record<
-  SourceCat,
-  { label: string; color: string; Icon: typeof Shield }
-> = {
-  sanctions: { label: "Sanciones", color: "text-red-400", Icon: Shield },
-  pep: { label: "PEP", color: "text-purple-400", Icon: Flag },
-  debarment: { label: "Inhabilitación", color: "text-amber-400", Icon: Ban },
-  regulatory: { label: "Regulatorio", color: "text-blue-400", Icon: Landmark },
-  law_enforcement: { label: "Ley", color: "text-indigo-400", Icon: Siren },
-  tax: { label: "Fiscal", color: "text-orange-400", Icon: FileText },
-  other: { label: "Otro", color: "text-gray-400", Icon: Globe },
-};
-
 const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
   sanctions: "border-red-500/20 text-red-400/80",
   pep: "border-purple-500/20 text-purple-400/80",
@@ -324,6 +308,101 @@ function getMatchTypeLabel(matchType: string, score: number): string {
   if (matchType === "phonetic") return "Fonética";
   if (score >= 90) return "Alta";
   return "Aproximada";
+}
+
+function getConfidenceTone(confidence?: number): {
+  label: string;
+  className: string;
+} {
+  if (confidence == null) {
+    return {
+      label: "Confianza no disponible",
+      className: "bg-white/5 text-gray-400 border-white/10",
+    };
+  }
+  if (confidence >= 0.9) {
+    return {
+      label: `Confianza alta · ${Math.round(confidence * 100)}%`,
+      className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+    };
+  }
+  if (confidence >= 0.75) {
+    return {
+      label: `Confianza media · ${Math.round(confidence * 100)}%`,
+      className: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+    };
+  }
+  return {
+    label: `Confianza baja · ${Math.round(confidence * 100)}%`,
+    className: "bg-orange-500/15 text-orange-400 border-orange-500/30",
+  };
+}
+
+function getEvidenceSummary(
+  entity: ReturnType<typeof useScreening>["results"][0],
+  categories: Set<SourceCat>,
+): string {
+  const sanctionsCount = entity.sanctions_details?.length || 0;
+  const sourceCount = entity.sources?.length || 0;
+  const primaryPepPosition = entity.pep_positions?.[0] as
+    | { cargo?: string }
+    | undefined;
+
+  if (sanctionsCount > 0 && entity.is_current_pep) {
+    return `Sujeto con sanciones activas y perfil PEP; ${sourceCount} fuente${sourceCount === 1 ? "" : "s"} respaldan el perfil.`;
+  }
+  if (sanctionsCount > 0) {
+    const authorities = [
+      ...new Set(entity.sanctions_details?.map((item) => item.authority).filter(Boolean)),
+    ];
+    const topAuthorities = authorities.slice(0, 2).join(", ");
+    return topAuthorities
+      ? `Coincidencia con registros de sanciones en ${topAuthorities}${authorities.length > 2 ? " y otras listas" : ""}.`
+      : `Coincidencia con ${sanctionsCount} registro${sanctionsCount === 1 ? "" : "s"} de sanciones.`;
+  }
+  if (entity.is_current_pep || categories.has("pep")) {
+    const role = entity.pep_category || primaryPepPosition?.cargo;
+    return role
+      ? `Perfil PEP${entity.is_current_pep ? " activo" : ""}: ${role}.`
+      : `Perfil PEP${entity.is_current_pep ? " activo" : ""} respaldado por ${sourceCount} fuente${sourceCount === 1 ? "" : "s"}.`;
+  }
+  if (entity.has_adverse_media) {
+    return `Coincidencia con señales de adverse media${entity.adverse_media_severity != null ? ` de severidad ${entity.adverse_media_severity}` : ""}.`;
+  }
+  if (categories.has("law_enforcement")) {
+    return `Entidad relevante para screening por fuentes de cumplimiento y aplicación de la ley.`;
+  }
+  return `Coincidencia relevante para screening con ${sourceCount} fuente${sourceCount === 1 ? "" : "s"} activas.`;
+}
+
+function getMatchNarrative(
+  entity: ReturnType<typeof useScreening>["results"][0],
+): string {
+  if (entity.explanation) {
+    return entity.explanation;
+  }
+
+  const matchedFields = entity.matched_fields || [];
+  if (matchedFields.includes("alias")) {
+    return "Aparece por coincidencia de alias registrada en la entidad.";
+  }
+  if (entity.match_type === "phonetic") {
+    return "La coincidencia fue recuperada por similitud fonética del nombre.";
+  }
+  if (entity.match_type === "semantic") {
+    return "La coincidencia fue recuperada por similitud semántica.";
+  }
+  if (entity.match_score >= 99) {
+    return "Coincidencia textual prácticamente exacta con el nombre consultado.";
+  }
+  if (entity.match_score >= 90) {
+    return "Coincidencia textual alta con ligeras variaciones o tokens adicionales.";
+  }
+  return "Coincidencia aproximada que requiere validación analítica adicional.";
+}
+
+function getTopSourceLabels(sources: string[]): string[] {
+  return [...sources].slice(0, 3).map(formatSourceName);
 }
 
 // ═══════════════════════════════════════════════════
@@ -426,6 +505,10 @@ function SearchResultCard({
         is_current?: boolean;
       }
     | undefined;
+  const confidenceTone = getConfidenceTone(entity.confidence);
+  const evidenceSummary = getEvidenceSummary(entity, categories);
+  const matchNarrative = getMatchNarrative(entity);
+  const topSources = getTopSourceLabels(sources);
 
   const hasExpandableContent =
     sources.length > 0 ||
@@ -487,7 +570,23 @@ function SearchResultCard({
               </p>
             )}
 
-            {/* Badges row: Risk + Match + Freshness */}
+            <div className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] px-3 py-2">
+              <p className="text-[12px] font-medium text-gray-200 leading-relaxed">
+                {evidenceSummary}
+              </p>
+              <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-gray-400">
+                <span>{matchNarrative}</span>
+                {topSources.length > 0 && (
+                  <span className="text-gray-500">
+                    Fuentes clave: {topSources.join(", ")}
+                    {sources.length > topSources.length &&
+                      ` +${sources.length - topSources.length}`}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Badges row: Risk + Confidence + Match + Freshness */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <Badge
                 className="text-[10px] px-2 py-0.5 gap-1 font-medium uppercase"
@@ -501,15 +600,28 @@ function SearchResultCard({
                   className="w-1.5 h-1.5 rounded-full inline-block"
                   style={{ backgroundColor: riskColor }}
                 />
-                {entity.risk_level || "unknown"} Risk
+                Riesgo {entity.risk_level || "unknown"}
                 {entity.risk_score != null &&
                   ` · Score ${Math.round(entity.risk_score)}`}
               </Badge>
+              <Badge
+                className={cn(
+                  "text-[10px] px-2 py-0.5 font-medium border",
+                  confidenceTone.className,
+                )}
+              >
+                {confidenceTone.label}
+              </Badge>
               <Badge className="text-[10px] px-2 py-0.5 gap-1 font-medium bg-green-500/15 text-green-400 border-green-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                {getMatchTypeLabel(entity.match_type, entity.match_score || 0)}{" "}
-                · {Math.round(entity.match_score || 0)}%
+                Match {getMatchTypeLabel(entity.match_type, entity.match_score || 0)} ·{" "}
+                {Math.round(entity.match_score || 0)}%
               </Badge>
+              {entity.match_type && (
+                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-white/5 text-gray-300 border-white/10">
+                  Motor {entity.match_type}
+                </Badge>
+              )}
               {entity.has_adverse_media && (
                 <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-400 border-red-500/30">
                   <Newspaper className="w-3 h-3" />
