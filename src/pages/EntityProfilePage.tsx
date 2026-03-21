@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -309,6 +309,31 @@ function getAliasTypeLabel(type: string): string {
     trading_as: 'Nombre comercial',
   };
   return labels[type] || type;
+}
+
+type EntityTabId =
+  | 'overview'
+  | 'sanctions'
+  | 'pep'
+  | 'media'
+  | 'relationships'
+  | 'network'
+  | 'network-risk'
+  | 'ubo';
+
+function isWikidataOnlyProfile(profile?: EntityProfile): boolean {
+  const sources = profile?.overview.sources || [];
+  return sources.length > 0 && sources.every((source) => source === 'WIKIDATA');
+}
+
+function isReferenceLikeEntity(entity: APIEntity, profile?: EntityProfile): boolean {
+  const hasPrimarySignals =
+    entity.sanctions.length > 0 ||
+    entity.pep_entries.length > 0 ||
+    entity.is_current_pep === true ||
+    (entity.adverse_media?.length || 0) > 0;
+
+  return !hasPrimarySignals && isWikidataOnlyProfile(profile);
 }
 
 function EntityAdverseMediaTab({ entityId }: { entityId: string }) {
@@ -1348,6 +1373,61 @@ export function EntityProfilePage() {
   const validAddresses = entity.addresses.filter((address) => formatAddressValue(address));
   const relationshipSignals = getRelationshipSignalSummary(profile);
   const overviewFamilyRelationships = familyRelationships?.relationships || [];
+  const hasSanctions = entity.sanctions.length > 0;
+  const hasPep = entity.pep_entries.length > 0 || entity.is_current_pep === true || !!entity.pep_category;
+  const hasMedia = (entity.adverse_media?.length || 0) > 0;
+  const totalRelationships = profile?.connections?.total_relationships || 0;
+  const hasRelationships = totalRelationships > 0;
+  const hasContextualProfileData =
+    !!profile?.header.description ||
+    (profile?.career.positions?.length || 0) > 0 ||
+    (profile?.career.education?.length || 0) > 0 ||
+    (profile?.career.political?.length || 0) > 0 ||
+    validAddresses.length > 0;
+  const referenceLike = isReferenceLikeEntity(entity, profile);
+  const isCorporateEntity = entity.entity_type === 'company' || entity.entity_type === 'organization';
+  const showNetwork = hasRelationships;
+  const showNetworkRisk = !referenceLike && (entity.overall_risk_score >= 40 || hasRelationships);
+  const showUBO = isCorporateEntity && !referenceLike && hasRelationships;
+
+  const availableTabs = useMemo<Array<{ id: EntityTabId; label: string; count?: number; icon?: typeof Newspaper }>>(() => {
+    const tabs: Array<{ id: EntityTabId; label: string; count?: number; icon?: typeof Newspaper }> = [
+      { id: 'overview', label: referenceLike ? 'Contexto' : 'General' },
+    ];
+
+    if (hasSanctions) tabs.push({ id: 'sanctions', label: 'Sanciones', count: entity.sanctions.length });
+    if (hasPep) tabs.push({ id: 'pep', label: 'PEP', count: entity.pep_entries.length || undefined });
+    if (hasMedia && !referenceLike) tabs.push({ id: 'media', label: 'Medios', icon: Newspaper });
+    if (hasRelationships || hasContextualProfileData) {
+      tabs.push({ id: 'relationships', label: 'Relaciones', count: hasRelationships ? totalRelationships : undefined });
+    }
+    if (showNetwork) tabs.push({ id: 'network', label: 'Grafo' });
+    if (showNetworkRisk) tabs.push({ id: 'network-risk', label: 'Riesgo Red', icon: Network });
+    if (showUBO) tabs.push({ id: 'ubo', label: 'UBO', icon: Landmark });
+
+    return tabs;
+  }, [
+    entity.sanctions.length,
+    entity.pep_entries.length,
+    entity.entity_type,
+    entity.overall_risk_score,
+    hasContextualProfileData,
+    hasMedia,
+    hasPep,
+    hasRelationships,
+    hasSanctions,
+    referenceLike,
+    showNetwork,
+    showNetworkRisk,
+    showUBO,
+    totalRelationships,
+  ]);
+
+  useEffect(() => {
+    if (!availableTabs.some((tab) => tab.id === activeTab)) {
+      setActiveTab('overview');
+    }
+  }, [activeTab, availableTabs]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
@@ -1423,6 +1503,19 @@ export function EntityProfilePage() {
                     <Badge variant="outline" className="text-gray-400">
                       {entityTypeLabels[entity.entity_type]}
                     </Badge>
+                    {referenceLike ? (
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/30">
+                        Referencia contextual
+                      </Badge>
+                    ) : hasRelationships && !hasSanctions && !hasPep ? (
+                      <Badge variant="outline" className="bg-violet-500/10 text-violet-300 border-violet-500/30">
+                        Entidad relacionada
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+                        Sujeto principal
+                      </Badge>
+                    )}
                     <Badge
                       style={{
                         backgroundColor: `${riskColor}20`,
@@ -1588,53 +1681,25 @@ export function EntityProfilePage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white/5 border border-white/10 p-1">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-white/10">
-              General
-            </TabsTrigger>
-            <TabsTrigger value="sanctions" className="data-[state=active]:bg-white/10">
-              Sanciones
-              {entity.sanctions.length > 0 && (
-                <Badge className="ml-2 bg-red-500/20 text-red-400 text-[10px]">
-                  {entity.sanctions.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="pep" className="data-[state=active]:bg-white/10">
-              PEP
-              {entity.pep_entries.length > 0 && (
-                <Badge className="ml-2 bg-pink-500/20 text-pink-400 text-[10px]">
-                  {entity.pep_entries.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="media" className="data-[state=active]:bg-white/10">
-              <Newspaper className="w-4 h-4 mr-1" />
-              Medios
-            </TabsTrigger>
-            <TabsTrigger value="network" className="data-[state=active]:bg-white/10">
-              Grafo
-              {networkData && networkData.total_nodes > 0 && (
-                <Badge className="ml-2 bg-blue-500/20 text-blue-400 text-[10px]">
-                  {networkData.total_nodes}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="relationships" className="data-[state=active]:bg-white/10">
-              Relaciones
-              {relationshipsList && relationshipsList.total > 0 && (
-                <Badge className="ml-2 bg-purple-500/20 text-purple-400 text-[10px]">
-                  {relationshipsList.total}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="network-risk" className="data-[state=active]:bg-white/10">
-              <Network className="w-4 h-4 mr-1" />
-              Riesgo Red
-            </TabsTrigger>
-            <TabsTrigger value="ubo" className="data-[state=active]:bg-white/10">
-              <Landmark className="w-4 h-4 mr-1" />
-              UBO
-            </TabsTrigger>
+            {availableTabs.map((tab) => {
+              const TabIcon = tab.icon;
+              const dynamicCount =
+                tab.id === 'network' ? networkData?.total_nodes :
+                tab.id === 'relationships' ? (relationshipsList?.total || tab.count) :
+                tab.count;
+
+              return (
+                <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-white/10">
+                  {TabIcon ? <TabIcon className="w-4 h-4 mr-1" /> : null}
+                  {tab.label}
+                  {dynamicCount ? (
+                    <Badge className="ml-2 bg-white/10 text-gray-200 text-[10px]">
+                      {dynamicCount}
+                    </Badge>
+                  ) : null}
+                </TabsTrigger>
+              );
+            })}
           </TabsList>
 
           {/* Overview Tab */}
