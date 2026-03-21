@@ -1360,22 +1360,12 @@ export function EntityProfilePage() {
     limit: 200,
   });
 
-  if (isLoading) {
-    return <EntityProfileSkeleton />;
-  }
-
-  if (error || !entity) {
-    return <EntityNotFound />;
-  }
-
-  const Icon = entityTypeIcons[entity.entity_type] || User;
-  const riskColor = getRiskColor(entity.risk_level);
-  const validAddresses = entity.addresses.filter((address) => formatAddressValue(address));
+  const validAddresses = entity?.addresses?.filter((address) => formatAddressValue(address)) || [];
   const relationshipSignals = getRelationshipSignalSummary(profile);
   const overviewFamilyRelationships = familyRelationships?.relationships || [];
-  const hasSanctions = entity.sanctions.length > 0;
-  const hasPep = entity.pep_entries.length > 0 || entity.is_current_pep === true || !!entity.pep_category;
-  const hasMedia = (entity.adverse_media?.length || 0) > 0;
+  const hasSanctions = (entity?.sanctions?.length || 0) > 0;
+  const hasPep = (entity?.pep_entries?.length || 0) > 0 || entity?.is_current_pep === true || !!entity?.pep_category;
+  const hasMedia = (entity?.adverse_media?.length || 0) > 0;
   const totalRelationships = profile?.connections?.total_relationships || 0;
   const hasRelationships = totalRelationships > 0;
   const hasContextualProfileData =
@@ -1384,10 +1374,10 @@ export function EntityProfilePage() {
     (profile?.career.education?.length || 0) > 0 ||
     (profile?.career.political?.length || 0) > 0 ||
     validAddresses.length > 0;
-  const referenceLike = isReferenceLikeEntity(entity, profile);
-  const isCorporateEntity = entity.entity_type === 'company' || entity.entity_type === 'organization';
+  const referenceLike = entity ? isReferenceLikeEntity(entity, profile) : false;
+  const isCorporateEntity = entity?.entity_type === 'company' || entity?.entity_type === 'organization';
   const showNetwork = hasRelationships;
-  const showNetworkRisk = !referenceLike && (entity.overall_risk_score >= 40 || hasRelationships);
+  const showNetworkRisk = !referenceLike && ((entity?.overall_risk_score || 0) >= 40 || hasRelationships);
   const showUBO = isCorporateEntity && !referenceLike && hasRelationships;
 
   const availableTabs = useMemo<Array<{ id: EntityTabId; label: string; count?: number; icon?: typeof Newspaper }>>(() => {
@@ -1395,8 +1385,8 @@ export function EntityProfilePage() {
       { id: 'overview', label: referenceLike ? 'Contexto' : 'General' },
     ];
 
-    if (hasSanctions) tabs.push({ id: 'sanctions', label: 'Sanciones', count: entity.sanctions.length });
-    if (hasPep) tabs.push({ id: 'pep', label: 'PEP', count: entity.pep_entries.length || undefined });
+    if (hasSanctions) tabs.push({ id: 'sanctions', label: 'Sanciones', count: entity?.sanctions?.length });
+    if (hasPep) tabs.push({ id: 'pep', label: 'PEP', count: entity?.pep_entries?.length || undefined });
     if (hasMedia && !referenceLike) tabs.push({ id: 'media', label: 'Medios', icon: Newspaper });
     if (hasRelationships || hasContextualProfileData) {
       tabs.push({ id: 'relationships', label: 'Relaciones', count: hasRelationships ? totalRelationships : undefined });
@@ -1407,10 +1397,10 @@ export function EntityProfilePage() {
 
     return tabs;
   }, [
-    entity.sanctions.length,
-    entity.pep_entries.length,
-    entity.entity_type,
-    entity.overall_risk_score,
+    entity?.sanctions?.length,
+    entity?.pep_entries?.length,
+    entity?.entity_type,
+    entity?.overall_risk_score,
     hasContextualProfileData,
     hasMedia,
     hasPep,
@@ -1428,6 +1418,17 @@ export function EntityProfilePage() {
       setActiveTab('overview');
     }
   }, [activeTab, availableTabs]);
+
+  if (isLoading) {
+    return <EntityProfileSkeleton />;
+  }
+
+  if (error || !entity) {
+    return <EntityNotFound />;
+  }
+
+  const Icon = entityTypeIcons[entity.entity_type] || User;
+  const riskColor = getRiskColor(entity.risk_level);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
