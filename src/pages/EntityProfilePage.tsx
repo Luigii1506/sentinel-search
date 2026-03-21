@@ -322,6 +322,35 @@ function getReferenceRelationshipSection(rel: {
   return 'other';
 }
 
+function getReferenceRelationshipSummary(rel: {
+  type: string;
+  subtype?: string;
+}): string | null {
+  const type = rel.type?.toLowerCase();
+  const subtype = rel.subtype?.toLowerCase();
+
+  if (type === 'membership' && subtype === 'education') {
+    return 'Estudió en esta institución';
+  }
+  if (type === 'political' && subtype === 'member') {
+    return 'Miembro de este partido';
+  }
+  if (type === 'membership' && subtype === 'member') {
+    return 'Miembro de esta organización';
+  }
+  if (type === 'professional') {
+    return 'Vínculo profesional con esta entidad';
+  }
+  if (type === 'representation') {
+    return 'Representación vinculada a esta entidad';
+  }
+  if (type === 'sanction') {
+    return 'Relación sancionatoria con esta entidad';
+  }
+
+  return null;
+}
+
 type EntityTabId =
   | 'overview'
   | 'sanctions'
@@ -2739,6 +2768,7 @@ export function EntityProfilePage() {
                             const entityTypeLabel = entityTypeLabelExtended[entityTypeKey] || null;
                             const relCountries = (rel.related_entity_countries || []).slice(0, 3);
                             const sourceName = rel.source ? formatSourceName(rel.source) : null;
+                            const referenceSummary = referenceLike ? getReferenceRelationshipSummary(rel) : null;
                             // Filtrar descriptions basura del FTM (contienen → o son solo nombres)
                             const cleanDescription = rel.description && !rel.description.includes('→') && !rel.description.includes('—')
                               && !rel.description.toLowerCase().startsWith('wikidata ')
@@ -2791,7 +2821,11 @@ export function EntityProfilePage() {
 
                               {/* Row 2: Subtype translated + context */}
                               <div className="flex items-center gap-1.5 text-sm mb-2">
-                                {rel.subtype ? (
+                                {referenceSummary ? (
+                                  <span className={section.color}>
+                                    {referenceSummary}
+                                  </span>
+                                ) : rel.subtype ? (
                                   <span className={section.color}>
                                     {translateSubtype(rel.subtype)}
                                   </span>
