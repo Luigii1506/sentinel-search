@@ -1868,7 +1868,7 @@ export function EntityProfilePage() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-400">Datasets</span>
                     <span className="text-sm font-semibold text-white">
-                      {profile?.cross_references.datasets.length || entity.source_records?.length || 0}
+                      {(profile?.cross_references?.datasets?.length || entity.source_records?.length || 0)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -2130,7 +2130,7 @@ export function EntityProfilePage() {
                   <h3 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
                     <FileText className="w-4 h-4" />
                     Nombres y Alias
-                    <span className="text-[10px] text-gray-600 ml-auto">{entity.aliases.length}</span>
+                    <span className="text-[10px] text-gray-600 ml-auto">{entity.aliases?.length || 0}</span>
                   </h3>
                   <div className="space-y-3">
                     <div className="flex flex-wrap gap-2">
@@ -2155,7 +2155,7 @@ export function EntityProfilePage() {
                       >
                         {showAllAliases
                           ? 'Mostrar menos'
-                          : `Ver todos los alias (${entity.aliases.length})`}
+                          : `Ver todos los alias (${entity.aliases?.length || 0})`}
                       </Button>
                     )}
                   </div>
@@ -2197,7 +2197,7 @@ export function EntityProfilePage() {
                   <h3 className="text-sm font-medium text-gray-400 mb-4 flex items-center gap-2 uppercase tracking-wide">
                     <Database className="w-4 h-4" />
                     Registros por Fuente
-                    <span className="text-[10px] text-gray-600 ml-auto">{entity.source_records.length} fuentes</span>
+                    <span className="text-[10px] text-gray-600 ml-auto">{entity.source_records?.length || 0} fuentes</span>
                   </h3>
                   <div className="space-y-2">
                     {entity.source_records.map((rec, i) => {
