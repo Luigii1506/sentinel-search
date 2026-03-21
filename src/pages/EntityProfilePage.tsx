@@ -109,7 +109,6 @@ const subtypeLabels: Record<string, string> = {
   "son's wife": 'Nuera', "daughter's husband": 'Yerno',
   "wife's son": 'Hijastro', "wife's daughter": 'Hijastra',
   "husband's son": 'Hijastro', "husband's daughter": 'Hijastra',
-  grandson: 'Nieto', granddaughter: 'Nieta',
   "ex-spouse": 'Excónyuge', "ex-wife": 'Exesposa', "ex-husband": 'Exesposo',
   "former spouse": 'Excónyuge',
   "male first cousin": 'Primo', "female first cousin": 'Prima',
@@ -1174,6 +1173,8 @@ export function EntityProfilePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('overview');
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
+  const [relContextFilter, setRelContextFilter] = useState<'aml_core' | 'affiliation' | 'profile_context' | undefined>(undefined);
+  const [relPriorityFilter, setRelPriorityFilter] = useState<'critical' | 'high' | 'medium' | 'low' | undefined>(undefined);
   const [graphDepth, setGraphDepth] = useState(1);
 
   const sourceLevelParam = searchParams.get('source_level');
@@ -1194,6 +1195,8 @@ export function EntityProfilePage() {
   const { data: relationshipsList } = useRelationshipsList(id, {
     enabled: activeTab === 'relationships',
     level: relLevelFilter,
+    aml_priority: relPriorityFilter,
+    context_category: relContextFilter,
     hide_noise: true,
     limit: 200,
   });
@@ -1328,7 +1331,7 @@ export function EntityProfilePage() {
                   />
                 )}
                 {(entity.birth_date || entity.date_of_birth) && (
-                  <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.birth_date || entity.date_of_birth)} icon={Calendar} />
+                  <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.birth_date || entity.date_of_birth || '')} icon={Calendar} />
                 )}
                 {entity.gender && (
                   <InfoItem label="Género" value={entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender} icon={User} />
@@ -2106,78 +2109,99 @@ export function EntityProfilePage() {
                 <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
               </div>
             ) : (() => {
-              // Group relationships by section (like OpenSanctions)
               const sectionConfig: Array<{
-                key: string;
+                key: 'aml_core' | 'affiliation' | 'profile_context' | 'unknown';
                 label: string;
                 icon: typeof Users;
-                types: string[];
                 color: string;
                 badgeColor: string;
+                emptyHint: string;
               }> = [
                 {
-                  key: 'family',
-                  label: 'Familiares',
-                  icon: Users,
-                  types: ['family'],
-                  color: 'text-purple-400',
-                  badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-                },
-                {
-                  key: 'associates',
-                  label: 'Asociados',
-                  icon: Network,
-                  types: ['associate', 'unknown'],
-                  color: 'text-blue-400',
-                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-                },
-                {
-                  key: 'corporate',
-                  label: 'Relaciones Corporativas',
-                  icon: Building2,
-                  types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
-                  color: 'text-cyan-400',
-                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-                },
-                {
-                  key: 'political',
-                  label: 'Cargos y Representacion',
-                  icon: Landmark,
-                  types: ['political', 'representation', 'occupancy'],
-                  color: 'text-amber-400',
-                  badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-                },
-                {
-                  key: 'sanctions',
-                  label: 'Sanciones',
+                  key: 'aml_core',
+                  label: 'AML Core',
                   icon: Shield,
-                  types: ['sanction'],
                   color: 'text-red-400',
                   badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
+                  emptyHint: 'Relaciones con valor AML directo',
                 },
                 {
-                  key: 'other',
-                  label: 'Otras Relaciones',
+                  key: 'affiliation',
+                  label: 'Afiliaciones',
+                  icon: Building2,
+                  color: 'text-cyan-400',
+                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+                  emptyHint: 'Afiliaciones corporativas, políticas o institucionales',
+                },
+                {
+                  key: 'profile_context',
+                  label: 'Contexto de Perfil',
+                  icon: FileText,
+                  color: 'text-violet-400',
+                  badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+                  emptyHint: 'Contexto biográfico y de perfil',
+                },
+                {
+                  key: 'unknown',
+                  label: 'Contexto Adicional',
                   icon: Share2,
-                  types: [],
                   color: 'text-gray-400',
                   badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+                  emptyHint: 'Relaciones no clasificadas o ambiguas',
                 },
               ];
 
-              const knownTypes = new Set(sectionConfig.flatMap(s => s.types));
-              const grouped: Record<string, typeof relationshipsList.relationships> = {};
-              for (const section of sectionConfig) {
-                grouped[section.key] = [];
-              }
+              const grouped: Record<string, typeof relationshipsList.relationships> = {
+                aml_core: [],
+                affiliation: [],
+                profile_context: [],
+                unknown: [],
+              };
+
               for (const rel of relationshipsList.relationships) {
-                const section = sectionConfig.find(s => s.types.includes(rel.type)) || sectionConfig[sectionConfig.length - 1];
-                grouped[section.key].push(rel);
+                const sectionKey = rel.context_category || 'unknown';
+                grouped[sectionKey] = grouped[sectionKey] || [];
+                grouped[sectionKey].push(rel);
               }
+
+              const priorityBadgeStyles: Record<string, string> = {
+                critical: 'bg-red-500/10 text-red-400 border border-red-500/20',
+                high: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
+                medium: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
+                low: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+              };
+
+              const contextFilterOptions: Array<{
+                key: 'aml_core' | 'affiliation' | 'profile_context' | undefined;
+                label: string;
+              }> = [
+                { key: undefined, label: 'Todas las vistas' },
+                { key: 'aml_core', label: 'AML Core' },
+                { key: 'affiliation', label: 'Afiliaciones' },
+                { key: 'profile_context', label: 'Perfil' },
+              ];
+
+              const priorityFilterOptions: Array<{
+                key: 'critical' | 'high' | 'medium' | 'low' | undefined;
+                label: string;
+              }> = [
+                { key: undefined, label: 'Todas las prioridades' },
+                { key: 'critical', label: 'Critical' },
+                { key: 'high', label: 'High' },
+                { key: 'medium', label: 'Medium' },
+                { key: 'low', label: 'Low' },
+              ];
+
+              const totalByContext = Object.entries(grouped)
+                .filter(([, rels]) => rels.length > 0)
+                .reduce<Record<string, number>>((acc, [key, rels]) => {
+                  acc[key] = rels.length;
+                  return acc;
+                }, {});
 
               return (
                 <div className="space-y-6">
-                  {/* Level filter chips */}
+                  {/* Filter chips */}
                   <div className="flex flex-wrap gap-2">
                     {[
                       { key: undefined, label: 'Todos' },
@@ -2200,30 +2224,73 @@ export function EntityProfilePage() {
                     ))}
                   </div>
 
+                  <div className="flex flex-wrap gap-2">
+                    {contextFilterOptions.map((filter) => (
+                      <button
+                        key={filter.label}
+                        onClick={() => setRelContextFilter(filter.key)}
+                        className={cn(
+                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                          relContextFilter === filter.key
+                            ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                        )}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {priorityFilterOptions.map((filter) => (
+                      <button
+                        key={filter.label}
+                        onClick={() => setRelPriorityFilter(filter.key)}
+                        className={cn(
+                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                          relPriorityFilter === filter.key
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                        )}
+                      >
+                        {filter.label}
+                      </button>
+                    ))}
+                  </div>
+
                   {/* Summary counts */}
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(relationshipsList.by_type).map(([type, count]) => {
-                      const section = sectionConfig.find(s => s.types.includes(type));
+                    {sectionConfig.map((section) => {
+                      const count = totalByContext[section.key];
+                      if (!count) return null;
                       return (
-                        <Badge key={type} variant="outline" className={cn('text-xs', section?.badgeColor || 'text-gray-400')}>
-                          {type === 'family' ? 'Familiares' :
-                           type === 'associate' ? 'Asociados' :
-                           type === 'beneficial_ownership' ? 'Propiedad' :
-                           type === 'corporate' ? 'Corporativa' :
-                           type === 'directorship' ? 'Directivos' :
-                           type === 'membership' ? 'Miembros' :
-                           type === 'employment' ? 'Empleados' :
-                           type === 'political' ? 'Politico' :
-                           type === 'representation' ? 'Representacion' :
-                           type === 'sanction' ? 'Sanciones' :
-                           type === 'unknown' ? 'Vinculados' :
-                           type}: {count as number}
+                        <Badge key={section.key} variant="outline" className={cn('text-xs', section.badgeColor)}>
+                          {section.label}: {count}
                         </Badge>
                       );
                     })}
                   </div>
 
-                  {/* Sections by type */}
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(relationshipsList.by_type).map(([type, count]) => (
+                      <Badge key={type} variant="outline" className="text-xs text-gray-400 border-white/10">
+                        {type === 'family' ? 'Familiares' :
+                         type === 'associate' ? 'Asociados' :
+                         type === 'beneficial_ownership' ? 'Propiedad' :
+                         type === 'corporate' ? 'Corporativa' :
+                         type === 'directorship' ? 'Directivos' :
+                         type === 'membership' ? 'Miembros' :
+                         type === 'employment' ? 'Empleados' :
+                         type === 'political' ? 'Politico' :
+                         type === 'representation' ? 'Representacion' :
+                         type === 'sanction' ? 'Sanciones' :
+                         type === 'unknown' ? 'Vinculados' :
+                         type}: {count as number}
+                      </Badge>
+                    ))}
+                  </div>
+
+                  {/* Sections by AML context */}
                   {sectionConfig.map((section) => {
                     const rels = grouped[section.key];
                     if (!rels || rels.length === 0) return null;
@@ -2286,6 +2353,11 @@ export function EntityProfilePage() {
                                   )}
                                 </div>
                                 <div className="flex items-center gap-1.5 flex-shrink-0">
+                                  {rel.aml_priority && (
+                                    <span className={cn('px-1.5 py-0.5 rounded text-[10px] font-medium uppercase', priorityBadgeStyles[rel.aml_priority])}>
+                                      {rel.aml_priority}
+                                    </span>
+                                  )}
                                   {rel.related_entity_is_pep && (
                                     <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">
                                       PEP
@@ -2309,11 +2381,9 @@ export function EntityProfilePage() {
                                   </span>
                                 ) : (
                                   <span className="text-gray-500 text-xs">
-                                    {section.key === 'family' ? 'Familiar' :
-                                     section.key === 'associates' ? 'Vinculado' :
-                                     section.key === 'corporate' ? 'Relación corporativa' :
-                                     section.key === 'political' ? 'Cargo' :
-                                     section.key === 'sanctions' ? 'Sancionado' :
+                                    {section.key === 'aml_core' ? 'Relación AML' :
+                                     section.key === 'affiliation' ? 'Afiliación' :
+                                     section.key === 'profile_context' ? 'Contexto de perfil' :
                                      'Relacionado'}
                                   </span>
                                 )}
@@ -2321,6 +2391,17 @@ export function EntityProfilePage() {
                                   <>
                                     <span className="text-gray-600 text-xs">·</span>
                                     <span className="text-xs text-gray-500">{entityTypeLabel}</span>
+                                  </>
+                                )}
+                                {rel.context_category && (
+                                  <>
+                                    <span className="text-gray-600 text-xs">·</span>
+                                    <span className="text-xs text-gray-500">
+                                      {rel.context_category === 'aml_core' ? 'AML Core' :
+                                       rel.context_category === 'affiliation' ? 'Afiliación' :
+                                       rel.context_category === 'profile_context' ? 'Perfil' :
+                                       'Contexto'}
+                                    </span>
                                   </>
                                 )}
                                 {rel.percentage != null && (

@@ -209,6 +209,11 @@ export interface APIEntity {
   first_seen: string;
   last_updated: string;
   data_sources: string[];
+  data_sources_display?: Array<{
+    id: string;
+    display_name: string;
+    category: string;
+  }>;
 }
 
 export interface APIAlias {

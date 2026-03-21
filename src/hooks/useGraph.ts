@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { graphService } from '@/services/graph';
+import type { RelationshipsListResponse } from '@/services/graph';
 import type { NetworkData, GraphData } from '@/types/api';
 
 // Hook for API v2 network endpoint
@@ -30,44 +31,30 @@ export function useNetwork(entityId: string | undefined, options?: {
 export function useRelationshipsList(entityId: string | undefined, options?: {
   type?: string;
   level?: string;
+  aml_priority?: 'critical' | 'high' | 'medium' | 'low';
+  context_category?: 'aml_core' | 'affiliation' | 'profile_context' | 'unknown';
   min_strength?: number;
   hide_noise?: boolean;
   limit?: number;
   enabled?: boolean;
 }) {
-  const relationshipsQuery = useQuery<{
-    entity_id: string;
-    entity_name: string;
-    relationships: Array<{
-      direction: 'outgoing' | 'incoming';
-      type: string;
-      subtype?: string;
-      description?: string;
-      related_entity_name: string;
-      related_entity_id?: string;
-      related_entity_type?: string;
-      is_resolved: boolean;
-      confidence: number;
-      source?: string;
-      percentage?: number;
-      start_date?: string;
-      end_date?: string;
-      relationship_level?: string;
-      relationship_strength?: number;
-      is_noise: boolean;
-      related_entity_risk_score?: number;
-      related_entity_risk_level?: string;
-      related_entity_is_pep?: boolean;
-      related_entity_countries?: string[];
-      related_entity_sources?: string[];
-    }>;
-    total: number;
-    by_type: Record<string, number>;
-  }>({
-    queryKey: ['relationships', entityId, options?.type, options?.level, options?.min_strength, options?.hide_noise, options?.limit],
+  const relationshipsQuery = useQuery<RelationshipsListResponse>({
+    queryKey: [
+      'relationships',
+      entityId,
+      options?.type,
+      options?.level,
+      options?.aml_priority,
+      options?.context_category,
+      options?.min_strength,
+      options?.hide_noise,
+      options?.limit,
+    ],
     queryFn: () => graphService.getRelationshipsList(entityId!, {
       type: options?.type,
       level: options?.level,
+      aml_priority: options?.aml_priority,
+      context_category: options?.context_category,
       min_strength: options?.min_strength,
       hide_noise: options?.hide_noise,
       limit: options?.limit || 100,
