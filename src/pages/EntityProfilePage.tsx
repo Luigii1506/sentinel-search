@@ -2863,22 +2863,25 @@ export function EntityProfilePage() {
                           ))}
                         </div>
 
-                        <div className="relative max-w-md">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                          <input
-                            value={relSearch}
-                            onChange={(e) => setRelSearch(e.target.value)}
-                            placeholder="Buscar relaciones por nombre, tipo, país o fuente"
-                            className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
-                          />
-                        </div>
-
-                        {normalizedRelationshipSearch && (
-                          <p className="text-xs text-gray-400">
-                            {filteredRelationships.length} coincidencia{filteredRelationships.length === 1 ? '' : 's'} para "{relSearch.trim()}"
-                          </p>
-                        )}
                       </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="relative max-w-md">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                      <input
+                        value={relSearch}
+                        onChange={(e) => setRelSearch(e.target.value)}
+                        placeholder="Buscar relaciones por nombre, tipo, país o fuente"
+                        className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
+                      />
+                    </div>
+
+                    {normalizedRelationshipSearch && (
+                      <p className="text-xs text-gray-400">
+                        {filteredRelationships.length} coincidencia{filteredRelationships.length === 1 ? '' : 's'} para "{relSearch.trim()}"
+                      </p>
                     )}
                   </div>
 
