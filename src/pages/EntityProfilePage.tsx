@@ -1395,6 +1395,11 @@ export function EntityProfilePage() {
         return;
       }
 
+      if (resolved.reference_tier === 'suppress') {
+        toast.message(`"${item.name}" solo se conserva como contexto y no tiene ficha propia`);
+        return;
+      }
+
       toast.message(`No existe aún un perfil local para "${item.name}"`);
     } catch {
       toast.error('No se pudo resolver la referencia');
