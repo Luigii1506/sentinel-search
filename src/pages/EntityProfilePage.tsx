@@ -1585,6 +1585,24 @@ export function EntityProfilePage() {
                         Sujeto principal
                       </Badge>
                     )}
+                    {referenceLike && profile?.header.reference_tier ? (
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          'capitalize',
+                          profile.header.reference_tier === 'premium' && 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
+                          profile.header.reference_tier === 'graph_only' && 'bg-amber-500/10 text-amber-300 border-amber-500/30',
+                          profile.header.reference_tier === 'suppress' && 'bg-gray-500/10 text-gray-300 border-gray-500/30',
+                        )}
+                        title={profile.header.reference_tier_reason || undefined}
+                      >
+                        {profile.header.reference_tier === 'premium'
+                          ? 'Referencia premium'
+                          : profile.header.reference_tier === 'graph_only'
+                            ? 'Solo contexto'
+                            : 'Bajo valor'}
+                      </Badge>
+                    ) : null}
                     <Badge
                       style={{
                         backgroundColor: `${riskColor}20`,

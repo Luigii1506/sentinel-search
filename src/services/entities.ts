@@ -32,6 +32,8 @@ export interface ProfileHeader {
   risk_score: number;
   topics: string[];
   wikidata_qid?: string;
+  reference_tier?: 'premium' | 'graph_only' | 'suppress';
+  reference_tier_reason?: string;
 }
 
 export interface ProfileOverview {
@@ -130,6 +132,7 @@ export interface ReferenceResolution {
   canonical_name?: string;
   entity_type?: string;
   entity_category?: string;
+  reference_tier?: 'premium' | 'graph_only' | 'suppress';
   match_by?: 'qid' | 'name';
   qid?: string;
   query_name?: string;
