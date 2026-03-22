@@ -72,6 +72,7 @@ export interface ScreeningMatch {
   entity_subtype?: string;
   matched_fields?: string[];
   explanation?: string;
+  matched_name?: string;
   highlight?: string;
   is_current_pep?: boolean;
   pep_category?: string;

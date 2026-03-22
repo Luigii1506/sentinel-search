@@ -303,13 +303,6 @@ const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
   other: "border-white/10 text-gray-400",
 };
 
-function getMatchTypeLabel(matchType: string, score: number): string {
-  if (score >= 99) return "Exacta";
-  if (matchType === "phonetic") return "Fonética";
-  if (score >= 90) return "Alta";
-  return "Aproximada";
-}
-
 function getConfidenceTone(confidence?: number): {
   label: string;
   className: string;
@@ -373,6 +366,26 @@ function getEvidenceSummary(
     return `Entidad relevante para screening por fuentes de cumplimiento y aplicación de la ley.`;
   }
   return `Coincidencia relevante para screening con ${sourceCount} fuente${sourceCount === 1 ? "" : "s"} activas.`;
+}
+
+function getMatchSignalLabel(
+  entity: ReturnType<typeof useScreening>["results"][0],
+): string {
+  const matchedFields = entity.matched_fields || [];
+
+  if (matchedFields.includes('alias')) return 'Alias';
+  if (entity.match_type === 'phonetic') return 'Fonética';
+  if (entity.match_type === 'semantic') return 'Semántica';
+  if ((entity.match_score || 0) >= 99) return 'Exacta';
+  if ((entity.match_score || 0) >= 90) return 'Alta';
+  return 'Aproximada';
+}
+
+function getCoverageSummary(entity: ReturnType<typeof useScreening>["results"][0]): string {
+  const sourceCount = entity.sources?.length || 0;
+  if (sourceCount === 0) return 'Cobertura no disponible';
+  if (sourceCount === 1) return '1 fuente';
+  return `${sourceCount} fuentes`;
 }
 
 function getMatchNarrative(
@@ -508,6 +521,8 @@ function SearchResultCard({
   const confidenceTone = getConfidenceTone(entity.confidence);
   const evidenceSummary = getEvidenceSummary(entity, categories);
   const matchNarrative = getMatchNarrative(entity);
+  const matchSignalLabel = getMatchSignalLabel(entity);
+  const coverageSummary = getCoverageSummary(entity);
   const topSources = getTopSourceLabels(sources);
 
   const hasExpandableContent =
@@ -576,6 +591,9 @@ function SearchResultCard({
               </p>
               <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-gray-400">
                 <span>{matchNarrative}</span>
+                {entity.matched_name && entity.matched_name !== entity.name && (
+                  <span className="text-gray-500">Coincidió como: {humanizeEntityName(entity.matched_name)}</span>
+                )}
                 {topSources.length > 0 && (
                   <span className="text-gray-500">
                     Fuentes clave: {topSources.join(", ")}
@@ -586,7 +604,7 @@ function SearchResultCard({
               </div>
             </div>
 
-            {/* Badges row: Risk + Confidence + Match + Freshness */}
+            {/* Badges row: Risk + Confidence + Match + Coverage */}
             <div className="flex items-center gap-2 mt-2 flex-wrap">
               <Badge
                 className="text-[10px] px-2 py-0.5 gap-1 font-medium uppercase"
@@ -614,14 +632,11 @@ function SearchResultCard({
               </Badge>
               <Badge className="text-[10px] px-2 py-0.5 gap-1 font-medium bg-green-500/15 text-green-400 border-green-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-                Match {getMatchTypeLabel(entity.match_type, entity.match_score || 0)} ·{" "}
-                {Math.round(entity.match_score || 0)}%
+                Coincidencia {matchSignalLabel} · {Math.round(entity.match_score || 0)}%
               </Badge>
-              {entity.match_type && (
-                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-white/5 text-gray-300 border-white/10">
-                  Motor {entity.match_type}
-                </Badge>
-              )}
+              <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
+                {coverageSummary}
+              </Badge>
               {entity.has_adverse_media && (
                 <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-400 border-red-500/30">
                   <Newspaper className="w-3 h-3" />
@@ -725,6 +740,18 @@ function SearchResultCard({
             className="overflow-hidden"
           >
             <div className="px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
+                <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
+                  Motor {entity.match_type || 'opensearch'}
+                </Badge>
+                {entity.opensearch_score != null && (
+                  <span>OpenSearch {Math.round(entity.opensearch_score)}</span>
+                )}
+                {entity.source_count != null && entity.source_count > 0 && (
+                  <span>Cobertura declarada: {entity.source_count}</span>
+                )}
+              </div>
+
               {/* ─ Personal Info Grid (like OpenSanctions) ─ */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5 rounded-lg overflow-hidden border border-white/5">
                 <div className="bg-[#0d0d0d] px-3 py-2.5">
