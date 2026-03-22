@@ -2095,7 +2095,6 @@ export function EntityProfilePage() {
                             {pep.is_current ? 'Vigente' : 'Finalizado'}
                           </Badge>
                         </div>
-                        )}
                       </div>
                     ))}
                     {entity.pep_entries.length > 5 && (
@@ -2523,50 +2522,12 @@ export function EntityProfilePage() {
                 <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
               </div>
             ) : (() => {
-              const contextSections: Array<{
-                key: 'aml_core' | 'affiliation' | 'profile_context' | 'unknown';
-                label: string;
-                icon: typeof Users;
-                color: string;
-                badgeColor: string;
-              }> = [
-                {
-                  key: 'aml_core',
-                  label: 'AML Core',
-                  icon: Shield,
-                  color: 'text-red-400',
-                  badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
-                },
-                {
-                  key: 'affiliation',
-                  label: 'Afiliaciones',
-                  icon: Building2,
-                  color: 'text-cyan-400',
-                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-                },
-                {
-                  key: 'profile_context',
-                  label: 'Contexto de Perfil',
-                  icon: FileText,
-                  color: 'text-violet-400',
-                  badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
-                },
-                {
-                  key: 'unknown',
-                  label: 'Contexto Adicional',
-                  icon: Share2,
-                  color: 'text-gray-400',
-                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-                },
-              ];
-
               const sectionConfig: Array<{
                 key: string;
                 label: string;
                 icon: typeof Users;
                 types: string[];
                 color: string;
-                badgeColor: string;
               }> = referenceLike ? [
                 {
                   key: 'people',
@@ -2574,7 +2535,6 @@ export function EntityProfilePage() {
                   icon: Users,
                   types: [],
                   color: 'text-blue-400',
-                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
                 },
                 {
                   key: 'organizations',
@@ -2582,7 +2542,6 @@ export function EntityProfilePage() {
                   icon: Building2,
                   types: [],
                   color: 'text-cyan-400',
-                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
                 },
                 {
                   key: 'other',
@@ -2590,7 +2549,6 @@ export function EntityProfilePage() {
                   icon: Share2,
                   types: [],
                   color: 'text-gray-400',
-                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
                 },
               ] : [
                 {
@@ -2599,7 +2557,6 @@ export function EntityProfilePage() {
                   icon: Users,
                   types: ['family'],
                   color: 'text-purple-400',
-                  badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
                 },
                 {
                   key: 'associates',
@@ -2607,7 +2564,6 @@ export function EntityProfilePage() {
                   icon: Network,
                   types: ['associate'],
                   color: 'text-blue-400',
-                  badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
                 },
                 {
                   key: 'corporate',
@@ -2615,7 +2571,6 @@ export function EntityProfilePage() {
                   icon: Building2,
                   types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
                   color: 'text-cyan-400',
-                  badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
                 },
                 {
                   key: 'political',
@@ -2623,7 +2578,6 @@ export function EntityProfilePage() {
                   icon: Landmark,
                   types: ['political', 'representation', 'occupancy'],
                   color: 'text-amber-400',
-                  badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
                 },
                 {
                   key: 'sanctions',
@@ -2631,7 +2585,6 @@ export function EntityProfilePage() {
                   icon: Shield,
                   types: ['sanction'],
                   color: 'text-red-400',
-                  badgeColor: 'bg-red-500/10 text-red-400 border-red-500/20',
                 },
                 {
                   key: 'profile',
@@ -2639,7 +2592,6 @@ export function EntityProfilePage() {
                   icon: FileText,
                   types: ['professional'],
                   color: 'text-violet-400',
-                  badgeColor: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
                 },
                 {
                   key: 'other',
@@ -2647,7 +2599,6 @@ export function EntityProfilePage() {
                   icon: Share2,
                   types: [],
                   color: 'text-gray-400',
-                  badgeColor: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
                 },
               ];
 
@@ -2673,22 +2624,12 @@ export function EntityProfilePage() {
                   })
                 : relationshipsList.relationships;
 
-              const groupedByContext: Record<string, typeof filteredRelationships> = {
-                aml_core: [],
-                affiliation: [],
-                profile_context: [],
-                unknown: [],
-              };
               const groupedByType: Record<string, typeof filteredRelationships> = {};
               for (const section of sectionConfig) {
                 groupedByType[section.key] = [];
               }
 
               for (const rel of filteredRelationships) {
-                const contextKey = rel.context_category || 'unknown';
-                groupedByContext[contextKey] = groupedByContext[contextKey] || [];
-                groupedByContext[contextKey].push(rel);
-
                 const typeSection = referenceLike
                   ? sectionConfig.find((section) => section.key === getReferenceRelationshipSection(rel))
                     || sectionConfig[sectionConfig.length - 1]
@@ -2737,18 +2678,6 @@ export function EntityProfilePage() {
                 { key: 'medium', label: 'Medium' },
                 { key: 'low', label: 'Low' },
               ];
-
-              const totalByContext = Object.entries(groupedByContext)
-                .filter(([, rels]) => rels.length > 0)
-                .reduce<Record<string, number>>((acc, [key, rels]) => {
-                  acc[key] = rels.length;
-                  return acc;
-                }, {});
-
-              const filteredByType = filteredRelationships.reduce<Record<string, number>>((acc, rel) => {
-                acc[rel.type] = (acc[rel.type] || 0) + 1;
-                return acc;
-              }, {});
 
               return (
                 <div className="space-y-6">
@@ -2846,38 +2775,6 @@ export function EntityProfilePage() {
                     )}
                   </div>
 
-                  {/* Summary counts */}
-                  <div className="flex flex-wrap gap-2">
-                    {contextSections.map((section) => {
-                      const count = totalByContext[section.key];
-                      if (!count) return null;
-                      return (
-                        <Badge key={section.key} variant="outline" className={cn('text-xs', section.badgeColor)}>
-                          {section.label}: {count}
-                        </Badge>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(filteredByType).map(([type, count]) => (
-                      <Badge key={type} variant="outline" className="text-xs text-gray-400 border-white/10">
-                        {type === 'family' ? 'Familiares' :
-                         type === 'associate' ? 'Asociados' :
-                         type === 'beneficial_ownership' ? 'Propiedad' :
-                         type === 'corporate' ? 'Corporativa' :
-                         type === 'directorship' ? 'Directivos' :
-                         type === 'membership' ? 'Miembros' :
-                         type === 'employment' ? 'Empleados' :
-                         type === 'political' ? 'Politico' :
-                         type === 'representation' ? 'Representacion' :
-                         type === 'sanction' ? 'Sanciones' :
-                         type === 'unknown' ? 'Vinculados' :
-                         type}: {count as number}
-                      </Badge>
-                    ))}
-                  </div>
-
                   {filteredRelationships.length === 0 ? (
                     <div className="glass rounded-xl p-8 text-center">
                       <Search className="w-10 h-10 text-gray-500 mx-auto mb-3" />
@@ -2913,9 +2810,6 @@ export function EntityProfilePage() {
                             <h3 className={cn('text-lg font-semibold', section.color)}>
                               {section.label}
                             </h3>
-                            <Badge variant="outline" className={cn('text-xs ml-1', section.badgeColor)}>
-                              {rels.length}
-                            </Badge>
                           </div>
                         </button>
 
@@ -3104,6 +2998,7 @@ export function EntityProfilePage() {
                             );
                           })}
                         </div>
+                        )}
                       </div>
                     );
                   })}
