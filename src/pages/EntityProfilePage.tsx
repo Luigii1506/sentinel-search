@@ -41,7 +41,7 @@ import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
 import { entityService, type EntityProfile, type WikidataLink } from '@/services/entities';
-import { cn, getRiskColor, formatDate } from '@/lib/utils';
+import { cn, getRiskColor, formatDate, humanizeEntityName } from '@/lib/utils';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
 import type { APIEntity, APISanctionEntry } from '@/types/api';
@@ -1211,7 +1211,7 @@ function ReferenceLinksList({
               className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:bg-white/[0.06] transition-colors"
             >
               <span className="text-sm text-white leading-snug block">
-                {item.name}
+                {humanizeEntityName(item.name)}
               </span>
             </button>
           ))}
@@ -1568,7 +1568,7 @@ export function EntityProfilePage() {
                 </motion.div>
                 <div>
                   <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">
-                    {profile?.header.display_name || entity.primary_name}
+                    {humanizeEntityName(profile?.header.display_name || entity.primary_name)}
                   </h1>
                   {profile?.header.description && (
                     <p className="text-sm text-gray-400 mb-2">{profile.header.description}</p>
@@ -2128,7 +2128,7 @@ export function EntityProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
                       {overviewFamilyRelationships.slice(0, 6).map((rel, i) => (
                         <div key={`${rel.related_entity_id || rel.related_entity_name}-${i}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
-                          <p className="text-sm text-white font-medium">{rel.related_entity_name}</p>
+                          <p className="text-sm text-white font-medium">{humanizeEntityName(rel.related_entity_name)}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {rel.subtype && (
                               <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
@@ -2862,11 +2862,11 @@ export function EntityProfilePage() {
                                       onClick={() => navigate(`/entity/${rel.related_entity_id}${sourceLevelParam ? `?source_level=${sourceLevelParam}` : ''}`)}
                                       className="text-white font-medium hover:text-blue-400 transition-colors text-left cursor-pointer truncate block max-w-full"
                                     >
-                                      {rel.related_entity_name}
+                                      {humanizeEntityName(rel.related_entity_name)}
                                     </button>
                                   ) : (
                                     <p className="text-white font-medium truncate">
-                                      {rel.related_entity_name}
+                                      {humanizeEntityName(rel.related_entity_name)}
                                     </p>
                                   )}
                                 </div>

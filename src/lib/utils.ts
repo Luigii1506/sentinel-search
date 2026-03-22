@@ -222,6 +222,55 @@ export function truncateText(text: string, maxLength: number): string {
   return text.slice(0, maxLength) + '...';
 }
 
+const HUMAN_NAME_SMALL_WORDS = new Set([
+  'de', 'del', 'la', 'las', 'los', 'y', 'e', 'da', 'das', 'do', 'dos',
+  'di', 'du', 'des', 'van', 'von', 'der', 'den', 'of', 'the', 'and',
+]);
+
+function titleCaseSegment(segment: string): string {
+  return segment
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word, index) => {
+      const lower = word.toLowerCase();
+      if (/^[A-Z0-9]{2,}$/.test(word) && !/[a-z]/.test(word)) {
+        return word;
+      }
+      if (/^q\d+$/i.test(word)) {
+        return word.toUpperCase();
+      }
+      if (index > 0 && HUMAN_NAME_SMALL_WORDS.has(lower)) {
+        return lower;
+      }
+      return lower.charAt(0).toUpperCase() + lower.slice(1);
+    })
+    .join(' ');
+}
+
+export function humanizeEntityName(name?: string | null): string {
+  if (!name) return '';
+
+  const trimmed = name.trim().replace(/\s+/g, ' ');
+  if (!trimmed) return '';
+
+  const mostlyUppercase = trimmed === trimmed.toUpperCase();
+  if (!mostlyUppercase) {
+    return trimmed.replace(/\s+[–—-]\s+/g, ' – ');
+  }
+
+  return trimmed
+    .replace(/\s+[–—-]\s+/g, ' – ')
+    .split(/([–—-])/)
+    .map((part) => {
+      if (part === '-' || part === '–' || part === '—') {
+        return part;
+      }
+      return titleCaseSegment(part);
+    })
+    .join('')
+    .replace(/\s+([–—-])\s+/g, ' $1 ');
+}
+
 // Generate initials from name
 export function getInitials(name: string): string {
   return name

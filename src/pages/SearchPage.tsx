@@ -38,7 +38,7 @@ import { IntelligentSearch } from "@/components/search/IntelligentSearch";
 import { SourceLevelSelector } from "@/components/SourceLevelSelector";
 import { SemanticSearchToggle } from "@/components/search/SemanticSearchToggle";
 import { SemanticResults } from "@/components/search/SemanticResults";
-import { cn, getRiskColor, getEntityTypeLabel } from "@/lib/utils";
+import { cn, getRiskColor, getEntityTypeLabel, humanizeEntityName } from "@/lib/utils";
 import { useScreening } from "@/hooks/useScreening";
 import { complianceService } from "@/services/compliance";
 import type { EntityType, RiskLevel, DataSource } from "@/types";
@@ -556,7 +556,7 @@ function SearchResultCard({
           <div className="flex-1 min-w-0">
             {/* Name + description + aliases */}
             <h3 className="text-[15px] font-semibold text-white leading-tight">
-              {entity.display_name || entity.name}
+              {humanizeEntityName(entity.display_name || entity.name)}
             </h3>
             {entity.description && (
               <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
@@ -565,7 +565,7 @@ function SearchResultCard({
             )}
             {entity.aliases && entity.aliases.length > 0 && !entity.description && (
               <p className="text-xs text-gray-500 mt-0.5">
-                aka: {entity.aliases.slice(0, 2).join(", ")}
+                aka: {entity.aliases.slice(0, 2).map((alias) => humanizeEntityName(alias)).join(", ")}
                 {entity.aliases.length > 2 && ` +${entity.aliases.length - 2}`}
               </p>
             )}
