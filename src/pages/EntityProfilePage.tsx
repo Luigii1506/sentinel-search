@@ -408,6 +408,60 @@ function getRelationshipSubgroup(rel: {
   }
 }
 
+function getRelationshipSubgroupPriority(sectionKey: string, subgroupLabel: string, referenceLike: boolean): number {
+  const referencePriority: Record<string, number> = {
+    'Personas vinculadas': 10,
+    'Educación': 20,
+    'Afiliación y membresía': 30,
+    'Cargos y funciones': 40,
+    'Representación': 50,
+    'Organizaciones vinculadas': 60,
+    'Otras conexiones': 90,
+  };
+
+  const sectionPriority: Record<string, Record<string, number>> = {
+    family: {
+      'Pareja': 10,
+      'Hijos': 20,
+      'Padres': 30,
+      'Hermanos': 40,
+      'Familia extendida': 50,
+      'Otros familiares': 90,
+    },
+    associates: {
+      'Socios': 10,
+      'Operadores y representantes': 20,
+      'Asociados': 90,
+    },
+    corporate: {
+      'Propiedad y control': 10,
+      'Dirección y consejo': 20,
+      'Empleo': 30,
+      'Membresías': 40,
+      'Otras corporativas': 90,
+    },
+    political: {
+      'Cargos y función pública': 10,
+      'Representación': 20,
+      'Partidos y militancia': 30,
+      'Otras políticas': 90,
+    },
+    sanctions: {
+      'Vínculos sancionatorios': 10,
+    },
+    profile: {
+      'Educación': 10,
+      'Perfil y trayectoria': 90,
+    },
+  };
+
+  if (referenceLike) {
+    return referencePriority[subgroupLabel] ?? 999;
+  }
+
+  return sectionPriority[sectionKey]?.[subgroupLabel] ?? 999;
+}
+
 function getReferenceRelationshipSortScore(rel: {
   related_entity_risk_score?: number;
   related_entity_is_pep?: boolean;
@@ -2850,7 +2904,14 @@ export function EntityProfilePage() {
                     const subgroupEntries = Object.entries(subgroupMap);
                     const showSubgroups = subgroupEntries.length > 1;
                     const relationshipGroups: Array<{ label: string; items: typeof rels }> = showSubgroups
-                      ? subgroupEntries.map(([label, items]) => ({ label, items }))
+                      ? subgroupEntries
+                        .map(([label, items]) => ({ label, items }))
+                        .sort((a, b) => {
+                          const priorityDiff = getRelationshipSubgroupPriority(section.key, a.label, referenceLike)
+                            - getRelationshipSubgroupPriority(section.key, b.label, referenceLike);
+                          if (priorityDiff !== 0) return priorityDiff;
+                          return a.label.localeCompare(b.label);
+                        })
                       : [{ label: '', items: rels }];
 
                     return (
