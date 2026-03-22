@@ -31,6 +31,9 @@ import {
   Tag,
   ArrowRight,
   Search,
+  ChevronDown,
+  ChevronRight,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -1366,6 +1369,8 @@ export function EntityProfilePage() {
   const [relContextFilter, setRelContextFilter] = useState<'aml_core' | 'affiliation' | 'profile_context' | undefined>(undefined);
   const [relPriorityFilter, setRelPriorityFilter] = useState<'critical' | 'high' | 'medium' | 'low' | undefined>(undefined);
   const [relSearch, setRelSearch] = useState('');
+  const [showRelationshipFilters, setShowRelationshipFilters] = useState(true);
+  const [collapsedRelationshipSections, setCollapsedRelationshipSections] = useState<Record<string, boolean>>({});
   const [graphDepth, setGraphDepth] = useState(1);
 
   const sourceLevelParam = searchParams.get('source_level');
@@ -2090,6 +2095,7 @@ export function EntityProfilePage() {
                             {pep.is_current ? 'Vigente' : 'Finalizado'}
                           </Badge>
                         </div>
+                        )}
                       </div>
                     ))}
                     {entity.pep_entries.length > 5 && (
@@ -2746,77 +2752,98 @@ export function EntityProfilePage() {
 
               return (
                 <div className="space-y-6">
-                  <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                    <input
-                      value={relSearch}
-                      onChange={(e) => setRelSearch(e.target.value)}
-                      placeholder="Buscar relaciones por nombre, tipo, país o fuente"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
-                    />
-                  </div>
+                  <div className="glass rounded-xl border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setShowRelationshipFilters((prev) => !prev)}
+                      className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <SlidersHorizontal className="w-4 h-4 text-blue-400" />
+                        <span className="text-sm font-medium text-white">Filtros de relaciones</span>
+                      </div>
+                      {showRelationshipFilters ? (
+                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-gray-400" />
+                      )}
+                    </button>
 
-                  {normalizedRelationshipSearch && (
-                    <p className="text-xs text-gray-400">
-                      {filteredRelationships.length} coincidencia{filteredRelationships.length === 1 ? '' : 's'} para "{relSearch.trim()}"
-                    </p>
-                  )}
+                    {showRelationshipFilters && (
+                      <div className="px-4 pb-4 space-y-4 border-t border-white/10">
+                        <div className="flex flex-wrap gap-2 pt-4">
+                          {[
+                            { key: undefined, label: 'Todos' },
+                            { key: 'DIRECT', label: 'Directas' },
+                            { key: 'AFFILIATION', label: 'Afiliacion' },
+                            { key: 'INDIRECT', label: 'Indirectas' },
+                          ].map((filter) => (
+                            <button
+                              key={filter.label}
+                              onClick={() => setRelLevelFilter(filter.key)}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                                relLevelFilter === filter.key
+                                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                              )}
+                            >
+                              {filter.label}
+                            </button>
+                          ))}
+                        </div>
 
-                  {/* Filter chips */}
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { key: undefined, label: 'Todos' },
-                      { key: 'DIRECT', label: 'Directas' },
-                      { key: 'AFFILIATION', label: 'Afiliacion' },
-                      { key: 'INDIRECT', label: 'Indirectas' },
-                    ].map((filter) => (
-                      <button
-                        key={filter.label}
-                        onClick={() => setRelLevelFilter(filter.key)}
-                        className={cn(
-                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                          relLevelFilter === filter.key
-                            ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                        <div className="flex flex-wrap gap-2">
+                          {contextFilterOptions.map((filter) => (
+                            <button
+                              key={filter.label}
+                              onClick={() => setRelContextFilter(filter.key)}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                                relContextFilter === filter.key
+                                  ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                              )}
+                            >
+                              {filter.label}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          {priorityFilterOptions.map((filter) => (
+                            <button
+                              key={filter.label}
+                              onClick={() => setRelPriorityFilter(filter.key)}
+                              className={cn(
+                                'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+                                relPriorityFilter === filter.key
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                              )}
+                            >
+                              {filter.label}
+                            </button>
+                          ))}
+                        </div>
+
+                        <div className="relative max-w-md">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                          <input
+                            value={relSearch}
+                            onChange={(e) => setRelSearch(e.target.value)}
+                            placeholder="Buscar relaciones por nombre, tipo, país o fuente"
+                            className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
+                          />
+                        </div>
+
+                        {normalizedRelationshipSearch && (
+                          <p className="text-xs text-gray-400">
+                            {filteredRelationships.length} coincidencia{filteredRelationships.length === 1 ? '' : 's'} para "{relSearch.trim()}"
+                          </p>
                         )}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {contextFilterOptions.map((filter) => (
-                      <button
-                        key={filter.label}
-                        onClick={() => setRelContextFilter(filter.key)}
-                        className={cn(
-                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                          relContextFilter === filter.key
-                            ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                        )}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    {priorityFilterOptions.map((filter) => (
-                      <button
-                        key={filter.label}
-                        onClick={() => setRelPriorityFilter(filter.key)}
-                        className={cn(
-                          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-                          relPriorityFilter === filter.key
-                            ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                            : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
-                        )}
-                      >
-                        {filter.label}
-                      </button>
-                    ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Summary counts */}
@@ -2868,17 +2895,31 @@ export function EntityProfilePage() {
                     return (
                       <div key={section.key} className="space-y-3">
                         {/* Section header */}
-                        <div className="flex items-center gap-2 pb-2 border-b border-white/10">
-                          <SectionIcon className={cn('w-5 h-5', section.color)} />
-                          <h3 className={cn('text-lg font-semibold', section.color)}>
-                            {section.label}
-                          </h3>
-                          <Badge variant="outline" className={cn('text-xs ml-1', section.badgeColor)}>
-                            {rels.length}
-                          </Badge>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setCollapsedRelationshipSections((prev) => ({
+                            ...prev,
+                            [section.key]: !prev[section.key],
+                          }))}
+                          className="w-full flex items-center justify-between gap-3 pb-2 border-b border-white/10 text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            {collapsedRelationshipSections[section.key] ? (
+                              <ChevronRight className="w-4 h-4 text-gray-500" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4 text-gray-500" />
+                            )}
+                            <SectionIcon className={cn('w-5 h-5', section.color)} />
+                            <h3 className={cn('text-lg font-semibold', section.color)}>
+                              {section.label}
+                            </h3>
+                            <Badge variant="outline" className={cn('text-xs ml-1', section.badgeColor)}>
+                              {rels.length}
+                            </Badge>
+                          </div>
+                        </button>
 
-                        {/* Section items */}
+                        {!collapsedRelationshipSections[section.key] && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {rels.map((rel, i) => {
                             const riskColor = rel.related_entity_risk_level === 'critical' ? 'text-red-400'
