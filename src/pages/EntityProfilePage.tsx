@@ -30,6 +30,7 @@ import {
   Brain,
   Tag,
   ArrowRight,
+  Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -1364,6 +1365,7 @@ export function EntityProfilePage() {
   const [relLevelFilter, setRelLevelFilter] = useState<string | undefined>(undefined);
   const [relContextFilter, setRelContextFilter] = useState<'aml_core' | 'affiliation' | 'profile_context' | undefined>(undefined);
   const [relPriorityFilter, setRelPriorityFilter] = useState<'critical' | 'high' | 'medium' | 'low' | undefined>(undefined);
+  const [relSearch, setRelSearch] = useState('');
   const [graphDepth, setGraphDepth] = useState(1);
 
   const sourceLevelParam = searchParams.get('source_level');
@@ -2643,18 +2645,40 @@ export function EntityProfilePage() {
                 },
               ];
 
-              const groupedByContext: Record<string, typeof relationshipsList.relationships> = {
+              const normalizedRelationshipSearch = relSearch.trim().toLowerCase();
+              const filteredRelationships = normalizedRelationshipSearch
+                ? relationshipsList.relationships.filter((rel) => {
+                    const searchableParts = [
+                      rel.related_entity_name,
+                      rel.type,
+                      rel.subtype,
+                      rel.description,
+                      rel.source,
+                      rel.relationship_level,
+                      rel.context_category,
+                      rel.related_entity_type,
+                      ...(rel.related_entity_sources || []),
+                      ...(rel.related_entity_countries || []),
+                    ]
+                      .filter(Boolean)
+                      .map((value) => String(value).toLowerCase());
+
+                    return searchableParts.some((value) => value.includes(normalizedRelationshipSearch));
+                  })
+                : relationshipsList.relationships;
+
+              const groupedByContext: Record<string, typeof filteredRelationships> = {
                 aml_core: [],
                 affiliation: [],
                 profile_context: [],
                 unknown: [],
               };
-              const groupedByType: Record<string, typeof relationshipsList.relationships> = {};
+              const groupedByType: Record<string, typeof filteredRelationships> = {};
               for (const section of sectionConfig) {
                 groupedByType[section.key] = [];
               }
 
-              for (const rel of relationshipsList.relationships) {
+              for (const rel of filteredRelationships) {
                 const contextKey = rel.context_category || 'unknown';
                 groupedByContext[contextKey] = groupedByContext[contextKey] || [];
                 groupedByContext[contextKey].push(rel);
@@ -2715,8 +2739,29 @@ export function EntityProfilePage() {
                   return acc;
                 }, {});
 
+              const filteredByType = filteredRelationships.reduce<Record<string, number>>((acc, rel) => {
+                acc[rel.type] = (acc[rel.type] || 0) + 1;
+                return acc;
+              }, {});
+
               return (
                 <div className="space-y-6">
+                  <div className="relative max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                    <input
+                      value={relSearch}
+                      onChange={(e) => setRelSearch(e.target.value)}
+                      placeholder="Buscar relaciones por nombre, tipo, país o fuente"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
+                    />
+                  </div>
+
+                  {normalizedRelationshipSearch && (
+                    <p className="text-xs text-gray-400">
+                      {filteredRelationships.length} coincidencia{filteredRelationships.length === 1 ? '' : 's'} para "{relSearch.trim()}"
+                    </p>
+                  )}
+
                   {/* Filter chips */}
                   <div className="flex flex-wrap gap-2">
                     {[
@@ -2788,7 +2833,7 @@ export function EntityProfilePage() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {Object.entries(relationshipsList.by_type).map(([type, count]) => (
+                    {Object.entries(filteredByType).map(([type, count]) => (
                       <Badge key={type} variant="outline" className="text-xs text-gray-400 border-white/10">
                         {type === 'family' ? 'Familiares' :
                          type === 'associate' ? 'Asociados' :
@@ -2805,6 +2850,14 @@ export function EntityProfilePage() {
                       </Badge>
                     ))}
                   </div>
+
+                  {filteredRelationships.length === 0 ? (
+                    <div className="glass rounded-xl p-8 text-center">
+                      <Search className="w-10 h-10 text-gray-500 mx-auto mb-3" />
+                      <h3 className="text-lg font-medium text-white mb-2">Sin coincidencias</h3>
+                      <p className="text-gray-400">No hay relaciones que coincidan con ese filtro de búsqueda.</p>
+                    </div>
+                  ) : null}
 
                   {/* Sections by human-readable relationship type */}
                   {sectionConfig.map((section) => {
