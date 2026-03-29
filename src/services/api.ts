@@ -6,7 +6,7 @@ const TOKEN_KEY = 'pld_token';
 const REFRESH_TOKEN_KEY = 'pld_refresh_token';
 
 // API Configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8001';
 const API_KEY = import.meta.env.VITE_API_KEY || 'sk-dev-test-key-12345';
 
 // Create axios instance
