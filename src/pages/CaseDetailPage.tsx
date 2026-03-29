@@ -20,12 +20,10 @@ import {
   ExternalLink,
   Gavel,
   FileWarning,
-  Ban,
   HelpCircle,
   ArrowUpRight,
   CircleDot,
   Download,
-  Printer,
   Hash,
   Building2,
   CalendarDays,
@@ -284,11 +282,11 @@ export function CaseDetailPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-400 mb-3">
-                  {primaryDecisionConfig.description}
+                  {String(primaryDecisionConfig.description)}
                 </p>
 
                 {/* Decision reason */}
-                {primaryDecision?.reason && (
+                {!!primaryDecision?.reason && (
                   <div className="bg-black/20 rounded-lg p-3 mb-3">
                     <p className="text-xs text-gray-500 mb-1">Razon del analista:</p>
                     <p className="text-sm text-gray-300">{String(primaryDecision.reason)}</p>
@@ -629,14 +627,14 @@ export function CaseDetailPage() {
                           <div>
                             <span className="text-sm text-gray-300">{config.label}</span>
                             {description && (
-                              <span className="text-sm text-gray-500 ml-2">— {description}</span>
+                              <span className="text-sm text-gray-500 ml-2">— {String(description)}</span>
                             )}
                           </div>
                           <span className="text-[11px] text-gray-600 flex-shrink-0 ml-4">
                             {formatDateTime(event.created_at as string)}
                           </span>
                         </div>
-                        {event.old_value && event.new_value && (
+                        {event.old_value != null && event.new_value != null && (
                           <div className="flex items-center gap-2 mt-1 text-xs">
                             <span className="px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
                               {statusConfig[String(event.old_value)]?.label || String(event.old_value)}

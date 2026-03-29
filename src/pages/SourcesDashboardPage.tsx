@@ -10,11 +10,9 @@ import {
   AlertTriangle,
   RefreshCw,
   Search,
-  Filter,
   Activity,
   ExternalLink,
   Download,
-  Zap,
   ChevronDown,
   ChevronUp,
   Eye,
@@ -101,6 +99,7 @@ const STATUS_CONFIG = {
   pending: { label: 'Pendiente', icon: Clock, color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' },
   error: { label: 'Error', icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
   stale: { label: 'Desactualizado', icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+  disappeared: { label: 'Desaparecida', icon: Shield, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
 };
 
 // ── Helpers ──

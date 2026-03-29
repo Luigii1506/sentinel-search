@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GitMerge,
@@ -15,7 +15,6 @@ import {
   ExternalLink,
   Shield,
   Globe,
-  Calendar,
   Clock,
   Users,
   Building2,
@@ -24,8 +23,9 @@ import {
   X,
   TrendingUp,
   Database,
+  type LucideIcon,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,7 +33,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useMergeReview, useMergeDetail, usePrefetchMerge } from '@/hooks/useMergeReview';
-import type { MergedEntitySummary, MergedEntityDetail, MergeChildInfo } from '@/types/api';
+import type { MergedEntitySummary, MergeChildInfo, MergeReviewSortBy } from '@/types/api';
 import { useNavigate } from 'react-router-dom';
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
@@ -253,7 +253,7 @@ function StatCard({
 }: { 
   title: string; 
   value: number; 
-  icon: React.ElementType; 
+  icon: LucideIcon;
   color: string;
   subtitle?: string;
 }) {
@@ -278,7 +278,7 @@ function StatCard({
 export function MergeReviewPage() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [sortBy, setSortBy] = useState('confidence_asc');
+  const [sortBy, setSortBy] = useState<MergeReviewSortBy>('confidence_asc');
   const [matchMethod, setMatchMethod] = useState<string>('all');
   const [minSources, setMinSources] = useState(2);
   const [sourceFilter, setSourceFilter] = useState('');
@@ -362,8 +362,8 @@ export function MergeReviewPage() {
                   <TooltipTrigger asChild>
                     <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
                       <Clock className="w-3.5 h-3.5" />
-                      {meta.elapsed_ms}ms
-                      {meta.cached_count && (
+                      {String(meta.elapsed_ms)}ms
+                      {!!meta.cached_count && (
                         <span className="text-green-400">(cached)</span>
                       )}
                     </div>
@@ -453,7 +453,7 @@ export function MergeReviewPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={sortBy} onValueChange={(v) => { setSortBy(v); setPage(0); }}>
+              <Select value={sortBy} onValueChange={(v) => { setSortBy(v as MergeReviewSortBy); setPage(0); }}>
                 <SelectTrigger className="w-[180px] bg-white/5 border-white/10 text-gray-300">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>

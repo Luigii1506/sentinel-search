@@ -486,6 +486,198 @@ export interface SystemHealth {
   };
 }
 
+export interface RedisDurabilityStatus {
+  connected: boolean;
+  ping: boolean;
+  appendonly?: string;
+  appendfsync?: string;
+  save?: string;
+  aof_enabled: boolean;
+  rdb_enabled: boolean;
+  loading?: boolean;
+  last_save_time?: number | null;
+  notes: string[];
+}
+
+export interface FreshnessViolation {
+  source_id: string;
+  display_name: string;
+  tier: number;
+  slo_hours: number;
+  age_hours: number;
+  status: string;
+  last_sync?: string | null;
+  queue?: string;
+  provider?: string;
+}
+
+export interface FreshnessSloResponse {
+  evaluated_at: string;
+  total_sources: number;
+  total_breached: number;
+  total_never_synced: number;
+  tiers: Record<string, {
+    sources: number;
+    within_slo: number;
+    breached: number;
+    never_synced: number;
+    slo_hours: number;
+  }>;
+  sources: FreshnessViolation[];
+  violations: FreshnessViolation[];
+}
+
+export interface DataQualityReportResponse {
+  evaluated_at: string;
+  counts: {
+    bronze: number;
+    silver: number;
+    gold: number;
+    gold_screenable: number;
+    mappings: number;
+    silver_unmapped: number;
+  };
+  ratios: {
+    mapping_coverage: number;
+    gold_dedup: number;
+    raw_to_silver: number;
+  };
+  health: {
+    mapping_coverage_status: string;
+    dedup_status: string;
+  };
+}
+
+export interface DataQualityBySourceEntry {
+  source_id: string;
+  counts: {
+    bronze: number;
+    silver: number;
+    mapped: number;
+    gold: number;
+    silver_unmapped: number;
+  };
+  ratios: {
+    mapping_coverage: number;
+    gold_dedup: number;
+    raw_to_silver: number;
+  };
+  health: {
+    mapping_coverage_status: string;
+  };
+}
+
+export interface DataQualityBySourceResponse {
+  evaluated_at: string;
+  total_sources: number;
+  sources: DataQualityBySourceEntry[];
+}
+
+export interface FalsePositiveSample {
+  id: string;
+  created_at: string;
+  label: string;
+  query_name: string;
+  matched_entity_id: string;
+  matched_entity_name: string;
+  match_confidence: number;
+  match_type: string;
+  entity_risk_score?: number | null;
+  source_count?: number | null;
+  entity_sources: string[];
+  alert_id?: string | null;
+}
+
+export interface FalsePositiveSamplingReport {
+  evaluated_at: string;
+  period_days: number;
+  total_feedback: number;
+  false_positive_count: number;
+  true_positive_count: number;
+  fp_rate: number;
+  high_confidence_false_positive_count: number;
+  low_confidence_true_positive_count: number;
+  samples: Record<string, FalsePositiveSample[]>;
+}
+
+export interface SearchSyncDlqEntry {
+  entity_id: string;
+  action: string;
+  attempts: number;
+  last_error?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface SearchSyncDlqResponse {
+  dead_letters: SearchSyncDlqEntry[];
+  total: number;
+}
+
+export interface TaskDlqEntry {
+  id: string;
+  task_name: string;
+  source: string;
+  step: string;
+  queue?: string | null;
+  error_type: string;
+  status: string;
+  attempts: number;
+  max_attempts: number;
+  payload: Record<string, unknown>;
+  last_error?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  requeued_at?: string | null;
+  resolved_at?: string | null;
+}
+
+export interface TaskDlqResponse {
+  stats: Record<string, number>;
+  dead_letters: TaskDlqEntry[];
+}
+
+export interface DisappearedSourceCandidate {
+  source_id: string;
+  consecutive_failures: number;
+  last_failure_at?: string | null;
+  sample_errors: string[];
+}
+
+export interface DisappearedSourceEntry {
+  source_id: string;
+  status: string;
+  error_message?: string | null;
+  last_sync?: string | null;
+  updated_at?: string | null;
+}
+
+export interface DisappearedSourcesAuditResponse {
+  evaluated_at: string;
+  period_days: number;
+  min_failures: number;
+  total_candidates: number;
+  candidates: DisappearedSourceCandidate[];
+  marked_disappeared: DisappearedSourceEntry[];
+}
+
+export interface SourceLifecycleEvent {
+  id: string;
+  source_id: string;
+  event_type: string;
+  entity_source_id?: string | null;
+  triggered_by: string;
+  reason?: string | null;
+  event_metadata: Record<string, unknown>;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface SourceLifecycleEventsResponse {
+  total_events: number;
+  events: SourceLifecycleEvent[];
+}
+
 export interface SystemCounts {
   bronze: number;
   silver: number;
@@ -554,12 +746,26 @@ export interface MergedEntityDetail extends MergedEntitySummary {
   children: MergeChildInfo[];
 }
 
+export type MergeReviewSortBy =
+  | 'confidence_asc'
+  | 'confidence_desc'
+  | 'sources_desc'
+  | 'recent'
+  | 'name_asc';
+
+export interface MergeReviewMeta {
+  elapsed_ms?: number;
+  [key: string]: unknown;
+}
+
 export interface MergeReviewResponse {
   total: number;
   offset: number;
   limit: number;
   entities: MergedEntitySummary[];
   stats: Record<string, number>;
+  meta?: MergeReviewMeta;
+  _meta?: MergeReviewMeta;
 }
 
 // API Error Response

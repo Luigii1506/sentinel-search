@@ -14,7 +14,6 @@ import {
   CheckCircle,
   UserCircle,
   Building,
-  AlertTriangle,
   Clock,
   TrendingUp,
   Zap,
@@ -25,7 +24,6 @@ import {
 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, formatDate, getSourceBadgeClass, getRelationshipTypeLabel } from '@/lib/utils';

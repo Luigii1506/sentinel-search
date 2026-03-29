@@ -21,7 +21,15 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
-import type { JobsResponse, SystemHealth } from '@/types/api';
+import type {
+  JobsResponse,
+  SystemHealth,
+  FreshnessSloResponse,
+  DataQualityReportResponse,
+  TaskDlqResponse,
+  RedisDurabilityStatus,
+  DisappearedSourcesAuditResponse,
+} from '@/types/api';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -118,6 +126,36 @@ export function MonitoringPage() {
     refetchInterval: 30000,
   });
 
+  const { data: freshness } = useQuery<FreshnessSloResponse>({
+    queryKey: ['admin', 'freshness', 'slo'],
+    queryFn: () => adminService.getFreshnessSlo(),
+    refetchInterval: 60000,
+  });
+
+  const { data: dataQuality } = useQuery<DataQualityReportResponse>({
+    queryKey: ['admin', 'data-quality'],
+    queryFn: () => adminService.getDataQuality(),
+    refetchInterval: 60000,
+  });
+
+  const { data: taskDlq } = useQuery<TaskDlqResponse>({
+    queryKey: ['admin', 'dlq'],
+    queryFn: () => adminService.getTaskDlq(20),
+    refetchInterval: 60000,
+  });
+
+  const { data: redisDurability } = useQuery<RedisDurabilityStatus>({
+    queryKey: ['admin', 'redis', 'durability'],
+    queryFn: () => adminService.getRedisDurability(),
+    refetchInterval: 60000,
+  });
+
+  const { data: disappeared } = useQuery<DisappearedSourcesAuditResponse>({
+    queryKey: ['admin', 'sources', 'disappeared'],
+    queryFn: () => adminService.getDisappearedSources(),
+    refetchInterval: 120000,
+  });
+
   if (jobsLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
@@ -161,6 +199,14 @@ export function MonitoringPage() {
 
   const counts = detailed?.counts;
   const services = health?.services;
+  const freshnessBreached = freshness?.total_breached || 0;
+  const freshnessNeverSynced = freshness?.total_never_synced || 0;
+  const taskDeadLetters = taskDlq?.stats?.dead_letter || 0;
+  const disappearedMarked = disappeared?.marked_disappeared?.length || 0;
+  const mappingCoverage = dataQuality?.ratios?.mapping_coverage ?? 0;
+  const goldDedup = dataQuality?.ratios?.gold_dedup ?? 0;
+  const topViolations = freshness?.violations?.slice(0, 5) || [];
+  const topDlq = taskDlq?.dead_letters?.slice(0, 5) || [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -345,6 +391,165 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
         </motion.div>
+
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8"
+        >
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-orange-400" />
+                  <span className="text-xs text-gray-400">SLO rotos</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{freshnessBreached}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs text-gray-400">Nunca sync</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{freshnessNeverSynced}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Database className="w-4 h-4 text-green-400" />
+                  <span className="text-xs text-gray-400">Coverage</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{Math.round(mappingCoverage * 100)}%</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Layers className="w-4 h-4 text-yellow-400" />
+                  <span className="text-xs text-gray-400">Dedup Gold</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{Math.round(goldDedup * 100)}%</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <XCircle className="w-4 h-4 text-red-400" />
+                  <span className="text-xs text-gray-400">DLQ tasks</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{taskDeadLetters}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-fuchsia-400" />
+                  <span className="text-xs text-gray-400">Disappeared</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{disappearedMarked}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <Card className="bg-[#1a1a1a] border-white/5">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">Freshness y Riesgo Operativo</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-white/5 p-3">
+                  <p className="text-xs text-gray-500 mb-1">Fuentes evaluadas</p>
+                  <p className="text-xl font-bold text-white">{freshness?.total_sources || 0}</p>
+                </div>
+                <div className="rounded-lg bg-white/5 p-3">
+                  <p className="text-xs text-gray-500 mb-1">Redis durability</p>
+                  <p className="text-sm font-medium text-white">
+                    {redisDurability?.connected
+                      ? `${redisDurability.aof_enabled ? 'AOF on' : 'AOF off'} / ${redisDurability.rdb_enabled ? 'RDB on' : 'RDB off'}`
+                      : 'Sin datos'}
+                  </p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white mb-3">Top violaciones SLO</p>
+                <div className="space-y-2">
+                  {topViolations.length > 0 ? topViolations.map((item) => (
+                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3 flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm text-white font-medium">{item.source_id}</p>
+                        <p className="text-xs text-gray-500">
+                          Tier {item.tier} · {item.age_hours.toFixed(1)}h · SLO {item.slo_hours}h
+                        </p>
+                      </div>
+                      <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/20">
+                        {item.status}
+                      </Badge>
+                    </div>
+                  )) : (
+                    <p className="text-sm text-gray-500">No hay violaciones SLO activas.</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-[#1a1a1a] border-white/5">
+            <CardHeader>
+              <CardTitle className="text-white text-lg">DLQ y Calidad</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-white/5 p-3">
+                  <p className="text-xs text-gray-500 mb-1">Silver unmapped</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(dataQuality?.counts?.silver_unmapped || 0)}</p>
+                </div>
+                <div className="rounded-lg bg-white/5 p-3">
+                  <p className="text-xs text-gray-500 mb-1">Gold screenable</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(dataQuality?.counts?.gold_screenable || 0)}</p>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-white mb-3">Top dead letters</p>
+                <div className="space-y-2">
+                  {topDlq.length > 0 ? topDlq.map((item) => (
+                    <div key={item.id} className="rounded-lg bg-white/5 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm text-white truncate">{item.source || item.task_name}</p>
+                          <p className="text-xs text-gray-500 truncate">{item.step} · {item.task_name}</p>
+                        </div>
+                        <Badge className="bg-red-500/10 text-red-400 border-red-500/20">
+                          {item.attempts}/{item.max_attempts}
+                        </Badge>
+                      </div>
+                      {item.last_error && (
+                        <p className="text-xs text-red-300/80 mt-2 truncate">{item.last_error}</p>
+                      )}
+                    </div>
+                  )) : (
+                    <p className="text-sm text-gray-500">No hay dead letters abiertos.</p>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Running Jobs */}
         <motion.div

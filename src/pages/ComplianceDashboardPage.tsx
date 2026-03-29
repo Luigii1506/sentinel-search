@@ -8,14 +8,10 @@ import {
   CheckCircle,
   XCircle,
   Eye,
-  Clock,
   Trash2,
   Plus,
   FileText,
   BarChart3,
-  Users,
-  Activity,
-  RefreshCw,
   ChevronRight,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,7 +42,6 @@ import type {
   ComplianceAlert,
   WhitelistEntry,
   WatchlistEntry,
-  ComplianceDashboard,
 } from '@/services/compliance';
 
 const containerVariants = {

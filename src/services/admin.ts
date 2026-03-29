@@ -1,5 +1,25 @@
 import api from './api';
-import type { DashboardStats, AuditLogEntry, User, SourceSummary, JobsResponse, SourceDetail, SystemHealth, SystemCounts, MergeReviewResponse, MergedEntityDetail } from '@/types/api';
+import type {
+  DashboardStats,
+  AuditLogEntry,
+  User,
+  SourceSummary,
+  JobsResponse,
+  SourceDetail,
+  SystemHealth,
+  SystemCounts,
+  MergeReviewResponse,
+  MergedEntityDetail,
+  FreshnessSloResponse,
+  DataQualityReportResponse,
+  DataQualityBySourceResponse,
+  FalsePositiveSamplingReport,
+  SearchSyncDlqResponse,
+  TaskDlqResponse,
+  RedisDurabilityStatus,
+  DisappearedSourcesAuditResponse,
+  SourceLifecycleEventsResponse,
+} from '@/types/api';
 
 export const adminService = {
   /**
@@ -209,6 +229,55 @@ export const adminService = {
     error?: string;
   }> {
     const response = await api.post(`/api/v2/admin/sources/${sourceId}/check-url`);
+    return response.data;
+  },
+
+  async getFreshnessSlo(): Promise<FreshnessSloResponse> {
+    const response = await api.get('/api/v2/admin/freshness/slo');
+    return response.data;
+  },
+
+  async getDataQuality(): Promise<DataQualityReportResponse> {
+    const response = await api.get('/api/v2/admin/data-quality');
+    return response.data;
+  },
+
+  async getDataQualityBySource(): Promise<DataQualityBySourceResponse> {
+    const response = await api.get('/api/v2/admin/data-quality/by-source');
+    return response.data;
+  },
+
+  async getFalsePositiveSampling(): Promise<FalsePositiveSamplingReport> {
+    const response = await api.get('/api/v2/admin/data-quality/false-positive-samples');
+    return response.data;
+  },
+
+  async getSearchSyncDlq(): Promise<SearchSyncDlqResponse> {
+    const response = await api.get('/api/v2/admin/search-sync/dlq');
+    return response.data;
+  },
+
+  async getTaskDlq(limit: number = 50): Promise<TaskDlqResponse> {
+    const response = await api.get('/api/v2/admin/dlq', { params: { limit } });
+    return response.data;
+  },
+
+  async getRedisDurability(): Promise<RedisDurabilityStatus> {
+    const response = await api.get('/api/v2/admin/redis/durability');
+    return response.data;
+  },
+
+  async getDisappearedSources(days: number = 30, minFailures: number = 3): Promise<DisappearedSourcesAuditResponse> {
+    const response = await api.get('/api/v2/admin/sources/disappeared', {
+      params: { days, min_failures: minFailures },
+    });
+    return response.data;
+  },
+
+  async getSourceLifecycleEvents(limit: number = 100): Promise<SourceLifecycleEventsResponse> {
+    const response = await api.get('/api/v2/admin/sources/lifecycle/events', {
+      params: { limit },
+    });
     return response.data;
   },
 };

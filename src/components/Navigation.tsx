@@ -4,8 +4,6 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Search,
   LayoutDashboard,
-  Bell,
-  FileText,
   Settings,
   Shield,
   Menu,

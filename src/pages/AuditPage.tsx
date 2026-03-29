@@ -11,7 +11,6 @@ import {
   RefreshCw,
   Database,
   ShieldCheck,
-  TrendingUp,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -60,6 +59,7 @@ function StatusBadge({ status }: { status: string }) {
     error: { label: 'Error', class: 'bg-red-500/10 text-red-400 border-red-500/20' },
     pending: { label: 'Pendiente', class: 'bg-gray-500/10 text-gray-400 border-gray-500/20' },
     importing: { label: 'Importando', class: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
+    disappeared: { label: 'Desaparecida', class: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' },
   };
   const c = config[status] || config.pending;
   return <Badge variant="outline" className={`text-xs ${c.class}`}>{c.label}</Badge>;
@@ -79,6 +79,16 @@ export function AuditPage() {
   const { data: jobsData } = useQuery<JobsResponse>({
     queryKey: ['admin', 'jobs', 'audit'],
     queryFn: () => adminService.getJobs(20),
+  });
+
+  const { data: disappearedData } = useQuery({
+    queryKey: ['admin', 'sources', 'disappeared', 'audit'],
+    queryFn: () => adminService.getDisappearedSources(),
+  });
+
+  const { data: lifecycleData } = useQuery({
+    queryKey: ['admin', 'sources', 'lifecycle', 'events'],
+    queryFn: () => adminService.getSourceLifecycleEvents(20),
   });
 
   const sources = useMemo(() => {
@@ -106,7 +116,7 @@ export function AuditPage() {
         const bTime = b.last_sync ? new Date(b.last_sync).getTime() : 0;
         cmp = aTime - bTime;
       } else if (sortField === 'status') {
-        const order: Record<string, number> = { error: 0, stale: 1, importing: 2, pending: 3, active: 4 };
+        const order: Record<string, number> = { error: 0, stale: 1, disappeared: 2, importing: 3, pending: 4, active: 5 };
         cmp = (order[a.status] ?? 5) - (order[b.status] ?? 5);
       }
       return sortDir === 'asc' ? cmp : -cmp;
@@ -148,6 +158,8 @@ export function AuditPage() {
 
   const byStatus = sourcesData?.by_status || {};
   const recentFailed = jobsData?.recent?.filter((j) => j.status === 'failed') || [];
+  const disappearedMarked = disappearedData?.marked_disappeared || [];
+  const lifecycleEvents = lifecycleData?.events || [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -231,6 +243,16 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">Sin primer sync</p>
             </CardContent>
           </Card>
+          <Card className="bg-[#1a1a1a] border-white/5">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="w-4 h-4 text-fuchsia-400" />
+                <span className="text-xs text-gray-400">Disappeared</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{byStatus.disappeared || disappearedMarked.length || 0}</div>
+              <p className="text-xs text-gray-500">Marcadas manualmente</p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Recent Failed Jobs */}
@@ -293,9 +315,70 @@ export function AuditPage() {
               <SelectItem value="stale">Desactualizados</SelectItem>
               <SelectItem value="error">Con error</SelectItem>
               <SelectItem value="pending">Pendientes</SelectItem>
+              <SelectItem value="disappeared">Desaparecidas</SelectItem>
             </SelectContent>
           </Select>
         </motion.div>
+
+        {(disappearedMarked.length > 0 || lifecycleEvents.length > 0) && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8"
+          >
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <h2 className="text-base font-semibold text-white mb-3">Fuentes Desaparecidas</h2>
+                <div className="space-y-2">
+                  {disappearedMarked.length > 0 ? disappearedMarked.slice(0, 6).map((item: any) => (
+                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-white font-medium">{item.source_id}</p>
+                          <p className="text-xs text-gray-500">{formatDate(item.updated_at)}</p>
+                        </div>
+                        <StatusBadge status={item.status} />
+                      </div>
+                      {item.error_message && (
+                        <p className="text-xs text-fuchsia-300/80 mt-2">{item.error_message}</p>
+                      )}
+                    </div>
+                  )) : (
+                    <p className="text-sm text-gray-500">No hay fuentes marcadas como desaparecidas.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <h2 className="text-base font-semibold text-white mb-3">Eventos de Lifecycle</h2>
+                <div className="space-y-2">
+                  {lifecycleEvents.length > 0 ? lifecycleEvents.slice(0, 6).map((event: any) => (
+                    <div key={event.id} className="rounded-lg bg-white/5 p-3">
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="text-sm text-white font-medium">{event.source_id}</p>
+                          <p className="text-xs text-gray-500">
+                            {event.event_type} · {event.triggered_by} · {formatDate(event.created_at)}
+                          </p>
+                        </div>
+                        <Badge variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+                          {event.entity_source_id || 'source'}
+                        </Badge>
+                      </div>
+                      {event.reason && (
+                        <p className="text-xs text-gray-400 mt-2">{event.reason}</p>
+                      )}
+                    </div>
+                  )) : (
+                    <p className="text-sm text-gray-500">No hay eventos recientes de lifecycle.</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
 
         {/* Sources Table */}
         <motion.div
