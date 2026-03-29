@@ -1576,7 +1576,7 @@ export function EntityProfilePage() {
     if (hasPep) tabs.push({ id: 'pep', label: 'PEP', count: entity?.pep_entries?.length || undefined });
     if (hasMedia && !referenceLike) tabs.push({ id: 'media', label: 'Medios', icon: Newspaper });
     if (hasRelationships || hasContextualProfileData) {
-      tabs.push({ id: 'relationships', label: 'Relaciones', count: hasRelationships ? totalRelationships : undefined });
+      tabs.push({ id: 'relationships', label: 'Relaciones' });
     }
     if (showNetwork) tabs.push({ id: 'network', label: 'Grafo' });
     if (showNetworkRisk) tabs.push({ id: 'network-risk', label: 'Riesgo Red', icon: Network });
@@ -1891,7 +1891,7 @@ export function EntityProfilePage() {
               const TabIcon = tab.icon;
               const dynamicCount =
                 tab.id === 'network' ? networkData?.total_nodes :
-                tab.id === 'relationships' ? (relationshipsList?.total || tab.count) :
+                tab.id === 'relationships' ? relationshipsList?.total :
                 tab.count;
 
               return (
@@ -2630,7 +2630,16 @@ export function EntityProfilePage() {
               <div className="glass rounded-xl p-12 text-center">
                 <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
                 <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
-                <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
+                <p className="text-gray-400">
+                  {profile?.connections?.total_relationships
+                    ? 'Las relaciones detectadas para esta entidad son contextuales y quedaron ocultas por la vista AML priorizada.'
+                    : 'No se encontraron relaciones para esta entidad.'}
+                </p>
+                {profile?.connections?.total_relationships ? (
+                  <p className="mt-2 text-sm text-gray-500">
+                    Se detectaron {profile.connections.total_relationships} vínculos en total, pero no hay relaciones priorizadas para esta vista.
+                  </p>
+                ) : null}
               </div>
             ) : (() => {
               const sectionConfig: Array<{
