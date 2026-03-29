@@ -85,6 +85,8 @@ export interface ProfileConnections {
   };
   relationship_counts: Record<string, number>;
   total_relationships: number;
+  aml_visible_relationships: number;
+  contextual_relationships: number;
 }
 
 export interface ProfileRisk {

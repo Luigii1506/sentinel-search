@@ -249,7 +249,8 @@ function summarizeEntityExposure(entity: APIEntity, profile?: EntityProfile): st
   const activeSanctions = entity.sanctions.filter((item) => item.status === 'active').length;
   const pepStatus = entity.is_current_pep ? 'PEP activa' : entity.pep_entries.length > 0 ? 'PEP histórica' : null;
   const adverseMediaCount = entity.adverse_media?.length || 0;
-  const relationshipCount = profile?.connections?.total_relationships || 0;
+  const relationshipCount = profile?.connections?.aml_visible_relationships || 0;
+  const contextualCount = profile?.connections?.contextual_relationships || 0;
 
   if (activeSanctions > 0 && entity.is_current_pep) {
     return `Entidad de alto interés AML: ${activeSanctions} sanción${activeSanctions !== 1 ? 'es' : ''} activa${activeSanctions !== 1 ? 's' : ''} y condición PEP vigente.`;
@@ -265,6 +266,9 @@ function summarizeEntityExposure(entity: APIEntity, profile?: EntityProfile): st
   }
   if (relationshipCount > 0) {
     return `Entidad sin alertas directas críticas, pero con ${relationshipCount} relacion${relationshipCount !== 1 ? 'es' : ''} disponibles para análisis contextual.`;
+  }
+  if (contextualCount > 0) {
+    return `Entidad sin relaciones AML visibles, pero con ${contextualCount} vínculo${contextualCount !== 1 ? 's' : ''} contextuales disponibles para perfil enriquecido.`;
   }
   if (pepStatus) {
     return `Entidad con ${pepStatus} y sin sanciones activas registradas.`;
@@ -1554,7 +1558,9 @@ export function EntityProfilePage() {
   const hasPep = (entity?.pep_entries?.length || 0) > 0 || entity?.is_current_pep === true || !!entity?.pep_category;
   const hasMedia = (entity?.adverse_media?.length || 0) > 0;
   const totalRelationships = profile?.connections?.total_relationships || 0;
-  const hasRelationships = totalRelationships > 0;
+  const amlVisibleRelationships = profile?.connections?.aml_visible_relationships ?? totalRelationships;
+  const contextualRelationships = profile?.connections?.contextual_relationships ?? Math.max(totalRelationships - amlVisibleRelationships, 0);
+  const hasRelationships = amlVisibleRelationships > 0;
   const hasContextualProfileData =
     !!profile?.header.description ||
     (profile?.career.positions?.length || 0) > 0 ||
@@ -2048,7 +2054,7 @@ export function EntityProfilePage() {
                   <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
                     <p className="text-[11px] text-gray-500 uppercase tracking-wide">Relaciones</p>
                     <p className="text-2xl font-bold text-white mt-1">
-                      {profile?.connections?.total_relationships || 0}
+                      {amlVisibleRelationships}
                     </p>
                   </div>
                 </div>
@@ -2285,12 +2291,14 @@ export function EntityProfilePage() {
                 ) : (
                   <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
                     <p className="text-sm text-white">
-                      Se identificaron {profile.connections.total_relationships} relaciones en total.
+                      Se identificaron {amlVisibleRelationships} relaciones AML visibles de {profile.connections.total_relationships} relaciones totales.
                     </p>
                     <p className="text-xs text-gray-500 mt-1">
                       {referenceLike
                         ? 'En esta referencia no se encontraron vínculos destacados en el resumen rápido; revisa la pestaña de relaciones para ver el contexto completo.'
-                        : 'En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.'}
+                        : contextualRelationships > 0
+                          ? `Hay ${contextualRelationships} vínculos adicionales de contexto/perfil fuera de la vista AML principal.`
+                          : 'En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.'}
                     </p>
                   </div>
                 )}
