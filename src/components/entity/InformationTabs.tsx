@@ -171,27 +171,27 @@ function IdentityTab({ entity }: { entity: Entity }) {
         </h3>
         <div className="space-y-4">
           {entity.gender && (
-            <div className="flex justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Gender</span>
-              <span className="text-white capitalize">{entity.gender}</span>
+              <span className="text-white capitalize break-words sm:text-right">{entity.gender}</span>
             </div>
           )}
           {entity.dateOfBirth && (
-            <div className="flex justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Date of Birth</span>
-              <span className="text-white">{formatDate(entity.dateOfBirth)}</span>
+              <span className="text-white break-words sm:text-right">{formatDate(entity.dateOfBirth)}</span>
             </div>
           )}
           {entity.placeOfBirth && (
-            <div className="flex justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Place of Birth</span>
-              <span className="text-white">{entity.placeOfBirth}</span>
+              <span className="text-white break-words sm:text-right">{entity.placeOfBirth}</span>
             </div>
           )}
           {entity.nationalities && entity.nationalities.length > 0 && (
-            <div className="flex justify-between">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Nationality</span>
-              <span className="text-white">{entity.nationalities.join(', ')}</span>
+              <span className="text-white break-words sm:text-right">{entity.nationalities.join(', ')}</span>
             </div>
           )}
         </div>
@@ -206,25 +206,25 @@ function IdentityTab({ entity }: { entity: Entity }) {
           </h3>
           <div className="space-y-4">
             {entity.incorporationDate && (
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Incorporation Date</span>
-                <span className="text-white">{formatDate(entity.incorporationDate)}</span>
+                <span className="text-white break-words sm:text-right">{formatDate(entity.incorporationDate)}</span>
               </div>
             )}
             {entity.incorporationCountry && (
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Incorporation Country</span>
-                <span className="text-white">{entity.incorporationCountry}</span>
+                <span className="text-white break-words sm:text-right">{entity.incorporationCountry}</span>
               </div>
             )}
             {entity.companyType && (
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Company Type</span>
-                <span className="text-white">{entity.companyType}</span>
+                <span className="text-white break-words sm:text-right">{entity.companyType}</span>
               </div>
             )}
             {entity.status && (
-              <div className="flex justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Status</span>
                 <Badge
                   variant="outline"
@@ -265,7 +265,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
                   </Badge>
                 )}
               </div>
-              <p className="text-white text-sm">
+              <p className="text-white text-sm break-words">
                 {address.street && <>{address.street}<br /></>}
                 {address.city}{address.state && `, ${address.state}`}{address.postalCode && ` ${address.postalCode}`}
                 <br />
@@ -287,7 +287,39 @@ function IdentityTab({ entity }: { entity: Entity }) {
           <CreditCard className="w-5 h-5 text-amber-400" />
           Identifications ({entity.identifications.length})
         </h3>
-        <div className="overflow-x-auto">
+        <div className="space-y-3 md:hidden">
+          {entity.identifications.map((id) => (
+            <div key={id.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] uppercase tracking-wide text-gray-500">Type</span>
+                  <span className="text-white capitalize break-words">{id.type.replace('_', ' ')}</span>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-[11px] uppercase tracking-wide text-gray-500">Number</span>
+                  <span className="text-white font-mono break-all">{id.number}</span>
+                </div>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[11px] uppercase tracking-wide text-gray-500">Country</span>
+                    <span className="text-gray-300 break-words">{id.country || '-'}</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-[11px] uppercase tracking-wide text-gray-500">Source</span>
+                    {id.source ? (
+                      <span className={cn('inline-flex w-fit text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(id.source))}>
+                        {id.source}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300">-</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead>
               <tr className="border-b border-white/10">
@@ -540,7 +572,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
       {/* Risk Profile Summary — enhanced gauge */}
       {riskProfile && riskProfile.total_articles > 0 && (
         <div className="glass rounded-xl p-5">
-          <div className="flex items-center gap-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-6">
             {/* Risk Score Gauge */}
             <div className="relative w-20 h-20 shrink-0">
               <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
@@ -563,7 +595,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
               </div>
             </div>
 
-            <div className="flex-1 grid grid-cols-3 gap-4">
+            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
                 <p className="text-lg font-bold text-white">{riskProfile.total_articles}</p>
                 <p className="text-xs text-gray-400">Articulos</p>
@@ -601,9 +633,9 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
           </h4>
           <div className="space-y-2">
             {structured.categories.map((cat, i) => (
-              <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
-                <span className="text-sm text-white">{categoryLabels[cat.category] || cat.category}</span>
-                <div className="flex items-center gap-2">
+              <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg bg-white/[0.02]">
+                <span className="text-sm text-white break-words">{categoryLabels[cat.category] || cat.category}</span>
+                <div className="flex items-center gap-2 sm:justify-end">
                   <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
                     <div className={cn('h-full rounded-full', severityBg(cat.severity))} style={{ width: `${cat.severity}%` }} />
                   </div>
@@ -618,7 +650,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
       {/* Articles (Tier 2) */}
       {articles.length > 0 && (
         <div>
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h4 className="text-sm font-medium text-gray-400 flex items-center gap-2">
               <Newspaper className="w-4 h-4" />
               Articulos de Noticias ({articles.length})
@@ -652,10 +684,10 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                   'border-blue-500/40'
                 )}
               >
-                <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
                   <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
                   {article.severity > 0 && (
-                    <div className="flex items-center gap-1 shrink-0">
+                    <div className="flex items-center gap-1 shrink-0 sm:self-start">
                       <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
                         <div className={cn('h-full rounded-full', severityBg(article.severity))} style={{ width: `${article.severity}%` }} />
                       </div>
@@ -688,7 +720,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                     </Badge>
                   )}
 
-                  <span className="text-gray-500 flex items-center gap-1 ml-auto">
+                  <span className="text-gray-500 flex items-center gap-1 break-words sm:ml-auto">
                     {sourceDomain && (
                       <>
                         <Globe className="w-3 h-3" />

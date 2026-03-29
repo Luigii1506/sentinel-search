@@ -29,8 +29,8 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30">
             <Brain className="w-4 h-4 text-purple-400" />
             <span className="text-sm font-medium text-purple-300">Smart Search v5.0</span>
@@ -64,7 +64,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
               )}
               onClick={() => onSelectEntity?.(result.entity_id)}
             >
-              <div className="flex items-start gap-4">
+              <div className="flex flex-col sm:flex-row items-start gap-4">
                 {/* Similarity Score */}
                 <div className="flex-shrink-0">
                   <div className={cn(
@@ -82,14 +82,14 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   {/* Header */}
-                  <div className="flex items-start justify-between gap-4 mb-2">
-                    <h3 className="text-lg font-semibold text-white truncate group-hover:text-purple-300 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
+                    <h3 className="text-base sm:text-lg font-semibold text-white break-words group-hover:text-purple-300 transition-colors">
                       {result.canonical_name ?? result.name}
                     </h3>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="self-start sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
                       Ver detalles
                       <ArrowRight className="w-4 h-4 ml-1" />

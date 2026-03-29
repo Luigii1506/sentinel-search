@@ -23,8 +23,9 @@ interface SourceLevelSelectorProps {
 
 export function SourceLevelSelector({ value, onChange, className, size = 'md' }: SourceLevelSelectorProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <span className={cn("text-gray-500 mr-1", size === 'sm' ? 'text-[10px]' : 'text-xs')}>Nivel:</span>
+    <div className={cn("space-y-2", className)}>
+      <span className={cn("block text-gray-500", size === 'sm' ? 'text-[10px]' : 'text-xs')}>Nivel de cobertura</span>
+      <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
       {SOURCE_LEVELS.map(({ level, label, desc }) => (
         <TooltipProvider key={level}>
           <Tooltip>
@@ -32,8 +33,8 @@ export function SourceLevelSelector({ value, onChange, className, size = 'md' }:
               <button
                 onClick={() => onChange(level)}
                 className={cn(
-                  "font-medium border transition-all duration-200",
-                  size === 'sm' ? 'px-2 py-0.5 rounded-full text-[10px]' : 'px-3 py-1 rounded-full text-xs',
+                  "shrink-0 font-medium border transition-all duration-200 whitespace-nowrap",
+                  size === 'sm' ? 'px-2.5 py-1 rounded-full text-[10px]' : 'px-3 py-1.5 rounded-full text-xs',
                   value === level
                     ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
                     : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20 hover:text-gray-300"
@@ -48,6 +49,7 @@ export function SourceLevelSelector({ value, onChange, className, size = 'md' }:
           </Tooltip>
         </TooltipProvider>
       ))}
+      </div>
     </div>
   );
 }

@@ -556,9 +556,9 @@ function SearchResultCard({
       {/* ── HEADER (always visible) ── */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="px-5 py-3.5 pl-6 cursor-pointer hover:bg-white/[0.02] transition-colors select-none"
+        className="px-4 sm:px-5 py-3.5 sm:pl-6 cursor-pointer hover:bg-white/[0.02] transition-colors select-none"
       >
-        <div className="flex items-start gap-3">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
           {/* Entity type icon */}
           <div
             className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
@@ -677,7 +677,7 @@ function SearchResultCard({
           </div>
 
           {/* Actions + chevron */}
-          <div className="flex items-center gap-1.5 flex-shrink-0 mt-1">
+          <div className="flex items-center justify-end sm:justify-start gap-1.5 flex-shrink-0 mt-1">
             {onCreateAlert && (
               <TooltipProvider>
                 <Tooltip>
@@ -739,7 +739,7 @@ function SearchResultCard({
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
+            <div className="px-4 sm:px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
               <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
                 <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
                   Motor {entity.match_type || 'opensearch'}
@@ -809,7 +809,7 @@ function SearchResultCard({
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider">
                       Ubicación
                     </p>
-                    <p className="text-sm text-white font-medium mt-0.5 truncate">
+                    <p className="text-sm text-white font-medium mt-0.5 break-words">
                       {typeof entity.addresses[0] === "string"
                         ? entity.addresses[0]
                         : entity.addresses[0].address}
@@ -851,7 +851,7 @@ function SearchResultCard({
                     Posición
                   </h4>
                   <div className="rounded-lg bg-purple-500/5 border border-purple-500/15 px-4 py-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-2">
                         <Flag className="w-4 h-4 text-purple-400 flex-shrink-0" />
                         <div>
@@ -865,7 +865,7 @@ function SearchResultCard({
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-left sm:text-right">
                         {(pepPosition.start_date || pepPosition.end_date) && (
                           <p className="text-xs text-purple-400 font-medium">
                             {pepPosition.start_date?.slice(0, 4)}
@@ -977,7 +977,7 @@ function SearchResultCard({
                     <div className="rounded-lg border border-red-500/15 overflow-hidden divide-y divide-red-500/10">
                       {entity.sanctions_details.slice(0, 4).map((s, i) => (
                         <div key={i} className="px-4 py-2.5 bg-red-500/[0.03]">
-                          <div className="flex items-start justify-between">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div>
                               <p className="text-xs text-gray-300">
                                 <span className="text-gray-500">
@@ -1081,7 +1081,7 @@ function SearchResultCard({
               {/* ─ Explainability ─ */}
               {entity.explainability && (
                 <div className="pt-3 border-t border-white/5">
-                  <div className="flex items-center justify-between text-[10px] text-gray-500 mb-2">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-[10px] text-gray-500 mb-2">
                     <div className="flex items-center gap-1.5">
                       <Sparkles className="w-3 h-3 text-purple-400" />
                       <span>Análisis del Algoritmo</span>
@@ -1092,7 +1092,7 @@ function SearchResultCard({
                       </span>
                     )}
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
                     {entity.explainability.structural_analysis && (
                       <>
                         <span className="text-gray-600">Tokens:</span>
@@ -1184,7 +1184,7 @@ function SearchResultCard({
               )}
 
               {/* ─ Source + Entity ID footer ─ */}
-              <div className="flex items-center gap-4 pt-3 border-t border-white/5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 pt-3 border-t border-white/5">
                 <div className="flex-1">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
                     Fuentes ({sources.length})
@@ -1200,7 +1200,7 @@ function SearchResultCard({
                     ))}
                   </div>
                 </div>
-                <div className="flex-shrink-0 text-right">
+                <div className="flex-shrink-0 text-left sm:text-right">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">
                     Entity ID
                   </p>
@@ -1279,8 +1279,8 @@ function FilterPanel({
     filters.sources.length > 0;
 
   return (
-    <div className="glass rounded-xl p-5 space-y-5">
-      <div className="flex items-center justify-between">
+    <div className="glass rounded-xl p-4 sm:p-5 space-y-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-sm font-medium text-white flex items-center gap-2">
           <Filter className="w-4 h-4" />
           Filtros
@@ -1302,14 +1302,14 @@ function FilterPanel({
         <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
           Tipo de Entidad
         </h4>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {entityTypes.map((type) => {
             const EIcon = entityTypeIcons[type];
             return (
               <motion.label
                 key={type}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
               >
                 <input
                   type="checkbox"
@@ -1318,7 +1318,7 @@ function FilterPanel({
                   className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
                 />
                 <EIcon className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-300 capitalize">
+                <span className="text-xs sm:text-sm text-gray-300 capitalize">
                   {getEntityTypeLabel(type)}
                 </span>
               </motion.label>
@@ -1332,7 +1332,7 @@ function FilterPanel({
         <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
           Nivel de Riesgo
         </h4>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {riskLevels.map((level) => {
             const colors: Record<string, string> = {
               critical: "text-red-400",
@@ -1345,7 +1345,7 @@ function FilterPanel({
               <motion.label
                 key={level}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
               >
                 <input
                   type="checkbox"
@@ -1353,7 +1353,7 @@ function FilterPanel({
                   onChange={() => toggleRiskLevel(level)}
                   className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
                 />
-                <span className={cn("text-sm capitalize", colors[level])}>
+                <span className={cn("text-xs sm:text-sm capitalize", colors[level])}>
                   {level === "critical"
                     ? "Crítico"
                     : level === "high"
@@ -1373,12 +1373,12 @@ function FilterPanel({
         <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
           Fuente de Datos
         </h4>
-        <div className="space-y-2">
+        <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {sources.map((source) => (
             <motion.label
               key={source}
               whileHover={{ x: 2 }}
-              className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+              className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
             >
               <input
                 type="checkbox"
@@ -1386,7 +1386,7 @@ function FilterPanel({
                 onChange={() => toggleSource(source)}
                 className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
               />
-              <span className="text-sm text-gray-300">{source}</span>
+              <span className="text-xs sm:text-sm text-gray-300">{source}</span>
             </motion.label>
           ))}
         </div>
@@ -1511,7 +1511,7 @@ export function SearchPage() {
     localFilters.sources.length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
+    <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Search Header */}
         <motion.div
@@ -1532,7 +1532,7 @@ export function SearchPage() {
             onSearch={handleSearch}
             onSelectResult={handleSelectResult}
             initialQuery={initialQuery}
-            className="max-w-3xl"
+            className="w-full max-w-4xl"
             sourceLevel={sourceLevel}
           />
           <SourceLevelSelector
@@ -1555,7 +1555,7 @@ export function SearchPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="grid grid-cols-1 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6"
             >
               {/* Filters Sidebar */}
               <div className="lg:col-span-1">
@@ -1591,7 +1591,7 @@ export function SearchPage() {
               </div>
 
               {/* Results List */}
-              <div className="lg:col-span-3">
+              <div className="lg:col-span-3 min-w-0">
                 {/* Results Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div>

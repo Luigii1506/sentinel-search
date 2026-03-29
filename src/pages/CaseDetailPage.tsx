@@ -295,14 +295,14 @@ export function CaseDetailPage() {
 
                 {/* Action items for True Positive */}
                 {caseData.status === 'closed_tp' && !caseData.sar_filed && (
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-white/5">
+                    <div className="flex items-start gap-3">
                       <FileWarning className="w-4 h-4 text-amber-400 flex-shrink-0" />
                       <span className="text-sm text-amber-400">
                         Accion pendiente: Presentar Reporte de Operacion Sospechosa (SAR/ROS)
                       </span>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
                       <Button
                         size="sm"
                         variant="outline"
@@ -324,8 +324,8 @@ export function CaseDetailPage() {
                   </div>
                 )}
                 {caseData.sar_filed && (
-                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                    <div className="flex items-center gap-3">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-white/5">
+                    <div className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
                       <span className="text-sm text-blue-400">SAR/ROS presentado ante el regulador</span>
                     </div>
@@ -392,7 +392,7 @@ export function CaseDetailPage() {
           )}
 
           {/* Key info grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 pt-4 border-t border-white/5">
             <div>
               <p className="text-[11px] text-gray-500 uppercase tracking-wider mb-1">Riesgo</p>
               <div className="flex items-center gap-2">
@@ -478,8 +478,8 @@ export function CaseDetailPage() {
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1 min-w-0">
                           {/* Entity matched */}
-                          <div className="flex items-center gap-2 mb-2">
-                            <p className="text-white font-medium truncate">{alert.matched_entity_name}</p>
+                          <div className="flex items-start gap-2 mb-2">
+                            <p className="text-white font-medium break-words">{alert.matched_entity_name}</p>
                             <Badge variant="outline" className={cn('text-[10px] flex-shrink-0',
                               alert.severity === 'critical' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
                               alert.severity === 'high' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
@@ -560,7 +560,7 @@ export function CaseDetailPage() {
           {/* Progress indicator — only for open cases */}
           {alerts.length > 0 && !isClosed && (
             <div className="mt-4 glass rounded-lg p-4">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-start justify-between gap-3 mb-2">
                 <span className="text-xs text-gray-400">Progreso de revision</span>
                 <span className="text-xs text-gray-400">{decidedAlerts.length}/{alerts.length}</span>
               </div>
@@ -623,11 +623,11 @@ export function CaseDetailPage() {
                         )}>
                           <EventIcon className="w-3 h-3 text-gray-500" />
                         </div>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-sm text-gray-300">{config.label}</span>
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <span className="text-sm text-gray-300 break-words">{config.label}</span>
                             {description && (
-                              <span className="text-sm text-gray-500 ml-2">— {String(description)}</span>
+                              <span className="text-sm text-gray-500 block sm:inline sm:ml-2">— {String(description)}</span>
                             )}
                           </div>
                           <span className="text-[11px] text-gray-600 flex-shrink-0 ml-4">
@@ -735,9 +735,9 @@ export function CaseDetailPage() {
               {/* Context card */}
               <div className="p-4 rounded-xl bg-white/5 border border-white/5">
                 <p className="text-white font-medium mb-1">{decisionDialog.matched_entity_name}</p>
-                <div className="flex items-center gap-3 text-sm text-gray-400">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 text-sm text-gray-400">
                   <span>Busqueda: "{decisionDialog.query_name}"</span>
-                  <span className="text-gray-600">|</span>
+                  <span className="hidden sm:inline text-gray-600">|</span>
                   <span className={cn('font-mono',
                     decisionDialog.match_confidence >= 0.9 ? 'text-red-400' :
                     decisionDialog.match_confidence >= 0.7 ? 'text-orange-400' : 'text-yellow-400'
@@ -912,7 +912,7 @@ export function CaseDetailPage() {
       <Dialog open={showSarReport} onOpenChange={setShowSarReport}>
         <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <DialogTitle className="text-lg flex items-center gap-2">
                 <FileWarning className="w-5 h-5 text-amber-400" />
                 Reporte de Actividad Sospechosa (SAR/ROS)
@@ -964,7 +964,7 @@ export function CaseDetailPage() {
                   <p className="text-white font-medium text-lg mb-2">
                     {(sarReport as any).sar_report?.subject?.entity_name || caseData.entity_name}
                   </p>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     {(sarReport as any).sar_report?.subject?.entity_type && (
                       <div>
                         <span className="text-gray-500">Tipo: </span>
@@ -1002,7 +1002,7 @@ export function CaseDetailPage() {
                   <ListChecks className="w-4 h-4" />
                   Resumen
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="glass rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold text-white">
                       {(sarReport as any).sar_report?.summary?.total_alerts || 0}
@@ -1056,8 +1056,8 @@ export function CaseDetailPage() {
                   <div className="space-y-2">
                     {((sarReport as any).sar_report?.alerts || []).map((alert: any, i: number) => (
                       <div key={i} className="glass rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-white font-medium">{alert.matched_entity}</span>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
+                          <span className="text-white font-medium break-words">{alert.matched_entity}</span>
                           {alert.decision && (
                             <Badge variant="outline" className={cn('text-[10px]',
                               decisionConfig[alert.decision]?.bgColor || ''
@@ -1068,7 +1068,7 @@ export function CaseDetailPage() {
                             </Badge>
                           )}
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-sm text-gray-400">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-400">
                           <div>Busqueda: "{alert.query_name}"</div>
                           <div>Confianza: <span className="font-mono text-white">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
                           <div>Riesgo: <span className="font-mono text-white">{alert.risk_score}</span></div>
@@ -1095,7 +1095,7 @@ export function CaseDetailPage() {
                   <div className="space-y-2">
                     {((sarReport as any).sar_report?.decisions || []).map((dec: any, i: number) => (
                       <div key={i} className="glass rounded-xl p-4">
-                        <div className="flex items-center justify-between mb-1">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1">
                           <span className={cn('font-medium', decisionConfig[dec.decision]?.color || 'text-white')}>
                             {decisionConfig[dec.decision]?.label || dec.decision}
                           </span>
@@ -1121,8 +1121,8 @@ export function CaseDetailPage() {
                   <div className="glass rounded-xl p-4">
                     <div className="space-y-2">
                       {((sarReport as any).sar_report?.timeline || []).map((event: any, i: number) => (
-                        <div key={i} className="flex items-center justify-between text-sm py-1 border-b border-white/5 last:border-0">
-                          <span className="text-gray-300">
+                        <div key={i} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm py-1 border-b border-white/5 last:border-0">
+                          <span className="text-gray-300 break-words">
                             {eventTypeConfig[event.event]?.label || event.event}
                           </span>
                           <span className="text-xs text-gray-500">{formatDateTime(event.timestamp)}</span>

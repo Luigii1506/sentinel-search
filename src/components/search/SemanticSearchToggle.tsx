@@ -17,14 +17,14 @@ interface SemanticSearchToggleProps {
 export function SemanticSearchToggle({ mode, onChange, className }: SemanticSearchToggleProps) {
   return (
     <TooltipProvider>
-      <div className={cn('flex items-center gap-2', className)}>
+      <div className={cn('flex flex-col sm:flex-row sm:items-center gap-2', className)}>
         {/* Toggle Switch */}
-        <div className="flex items-center bg-white/5 rounded-xl p-1 border border-white/10">
+        <div className="flex w-full sm:w-auto items-center bg-white/5 rounded-xl p-1 border border-white/10 overflow-x-auto">
           {/* Traditional Button */}
           <button
             onClick={() => onChange('traditional')}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'traditional'
                 ? 'bg-blue-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -38,7 +38,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
           <button
             onClick={() => onChange('semantic')}
             className={cn(
-              'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+              'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'semantic'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
                 : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -53,7 +53,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
         {/* Info Tooltip */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400">
+            <button className="hidden sm:inline-flex p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400">
               <Info className="w-4 h-4" />
             </button>
           </TooltipTrigger>

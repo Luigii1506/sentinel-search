@@ -762,7 +762,7 @@ function NetworkRiskTab({ entityId }: { entityId: string }) {
           <Network className="w-5 h-5 text-blue-400" />
           Riesgo Propagado por Red
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-xs text-gray-500">Riesgo Directo</p>
             <p className="text-2xl font-bold text-white">{nr.direct_risk_score ?? '-'}</p>
@@ -815,7 +815,7 @@ function NetworkRiskTab({ entityId }: { entityId: string }) {
                 membership: 'Membresía',
               };
               return (
-                <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5">
+                <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-white/5">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={cn('w-2 h-2 rounded-full flex-shrink-0',
                       neighbor.risk_level === 'critical' ? 'bg-red-400' :
@@ -843,7 +843,7 @@ function NetworkRiskTab({ entityId }: { entityId: string }) {
                       </div>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0 ml-3">
+                  <div className="text-left sm:text-right flex-shrink-0 sm:ml-3">
                     <p className={cn('text-sm font-bold', nColor)}>
                       {neighbor.risk_score}
                     </p>
@@ -947,7 +947,7 @@ function UBOTab({ entityId }: { entityId: string }) {
           <Landmark className="w-5 h-5 text-blue-400" />
           {isIndividual ? 'Análisis de Control y Exposición' : 'Beneficiario Final (UBO)'}
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {owners.length > 0 && (
             <>
               <div>
@@ -1001,9 +1001,9 @@ function UBOTab({ entityId }: { entityId: string }) {
           <div className="space-y-3">
             {owners.map((owner: any, i: number) => (
               <div key={i} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(owner.risk_level))}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-white font-medium">{owner.ubo_name || owner.name}</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-white font-medium break-words">{owner.ubo_name || owner.name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {owner.effective_ownership_pct != null && (
                         <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
@@ -1028,7 +1028,7 @@ function UBOTab({ entityId }: { entityId: string }) {
                     </div>
                   </div>
                   {owner.risk_score != null && (
-                    <div className="text-right">
+                    <div className="sm:text-right">
                       <p className={cn('text-lg font-bold', riskColor(owner.risk_level))}>{owner.risk_score}</p>
                       <p className="text-xs text-gray-500">Risk</p>
                     </div>
@@ -1053,9 +1053,9 @@ function UBOTab({ entityId }: { entityId: string }) {
           <div className="space-y-3">
             {controlled.map((ent: any, i: number) => (
               <div key={i} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(ent.risk_level))}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-white font-medium">{ent.entity_name}</p>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-white font-medium break-words">{ent.entity_name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
                         {ent.relationship_subtype || ent.relationship_type}
@@ -1075,7 +1075,7 @@ function UBOTab({ entityId }: { entityId: string }) {
                       )}
                     </div>
                   </div>
-                  <div className="text-right">
+                  <div className="sm:text-right">
                     <p className={cn('text-lg font-bold', riskColor(ent.risk_level))}>{ent.risk_score}</p>
                     <p className="text-xs text-gray-500">Risk</p>
                   </div>
@@ -1098,17 +1098,17 @@ function UBOTab({ entityId }: { entityId: string }) {
           <p className="text-xs text-gray-500 mb-4">Relaciones familiares, políticas y asociaciones con entidades de riesgo medio-alto</p>
           <div className="space-y-2">
             {keyRels.map((rel: any, i: number) => (
-              <div key={i} className="p-3 rounded-lg bg-white/5 flex items-center justify-between">
-                <div className="flex items-center gap-3">
+              <div key={i} className="p-3 rounded-lg bg-white/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3 min-w-0">
                   <div className={cn('w-2 h-2 rounded-full',
                     rel.risk_level === 'critical' ? 'bg-red-400' :
                     rel.risk_level === 'high' ? 'bg-orange-400' :
                     rel.risk_level === 'medium' ? 'bg-yellow-400' : 'bg-green-400'
                   )} />
-                  <div>
-                    <p className="text-white text-sm font-medium">{rel.entity_name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500">
+                  <div className="min-w-0">
+                    <p className="text-white text-sm font-medium break-words">{rel.entity_name}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                      <span className="text-xs text-gray-500 break-words">
                         {relTypeLabel[rel.relationship_type] || rel.relationship_type}
                         {rel.relationship_subtype ? ` · ${rel.relationship_subtype}` : ''}
                       </span>
@@ -1125,7 +1125,7 @@ function UBOTab({ entityId }: { entityId: string }) {
                     </div>
                   </div>
                 </div>
-                <p className={cn('text-sm font-bold', riskColor(rel.risk_level))}>{rel.risk_score}</p>
+                <p className={cn('text-sm font-bold sm:text-right', riskColor(rel.risk_level))}>{rel.risk_score}</p>
               </div>
             ))}
           </div>
@@ -1242,9 +1242,9 @@ function InfoItem({ label, value, icon: Icon }: { label: string; value?: string;
   return (
     <div className="flex items-start gap-3 py-2">
       {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
-      <div>
+      <div className="min-w-0">
         <p className="text-xs text-gray-500 uppercase">{label}</p>
-        <p className="text-sm text-white">{value}</p>
+        <p className="text-sm text-white break-words">{value}</p>
       </div>
     </div>
   );
@@ -1367,12 +1367,12 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
 
   return (
     <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
-      <div className="flex items-start justify-between mb-2">
-        <div>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
+        <div className="min-w-0">
           <h4 className="text-white font-medium">{entry.source}</h4>
           <p className="text-sm text-gray-400">{entry.program}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {details?.riesgo && (
             <Badge variant="outline" className={cn('text-xs', getRiskBadgeClasses(details.riesgo))}>
               {details.riesgo}
@@ -1391,47 +1391,47 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
       {/* Enriched details grid */}
       {details && Object.keys(details).length > 0 && (
         <div className="mt-3 pt-3 border-t border-white/5">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {details.rfc && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">RFC</p>
-                <p className="text-sm text-white font-mono">{details.rfc}</p>
+                <p className="text-sm text-white font-mono break-all">{details.rfc}</p>
               </div>
             )}
             {details.dataset_label && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Dataset</p>
-                <p className="text-sm text-white">{details.dataset_label}</p>
+                <p className="text-sm text-white break-words">{details.dataset_label}</p>
               </div>
             )}
             {details.supuesto && (
               <div className="col-span-2 md:col-span-1">
                 <p className="text-[10px] text-gray-500 uppercase">Supuesto</p>
-                <p className="text-sm text-white">{details.supuesto}</p>
+                <p className="text-sm text-white break-words">{details.supuesto}</p>
               </div>
             )}
             {details.monto && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Monto</p>
-                <p className="text-sm text-white">{details.monto}</p>
+                <p className="text-sm text-white break-words">{details.monto}</p>
               </div>
             )}
             {details.entidad_federativa && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Entidad Federativa</p>
-                <p className="text-sm text-white">{details.entidad_federativa}</p>
+                <p className="text-sm text-white break-words">{details.entidad_federativa}</p>
               </div>
             )}
             {details.tipo_persona && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Tipo Persona</p>
-                <p className="text-sm text-white">{details.tipo_persona}</p>
+                <p className="text-sm text-white break-words">{details.tipo_persona}</p>
               </div>
             )}
             {details.fecha_publicacion && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Fecha Publicacion</p>
-                <p className="text-sm text-white">{details.fecha_publicacion}</p>
+                <p className="text-sm text-white break-words">{details.fecha_publicacion}</p>
               </div>
             )}
           </div>
@@ -1446,12 +1446,12 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
                 {details.datasets.map((ds, idx) => {
                   const d = ds as Record<string, unknown>;
                   return (
-                    <div key={idx} className="flex items-center gap-3 p-2 rounded bg-white/5">
+                    <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 p-2 rounded bg-white/5">
                       <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(String(d.riesgo || '')))}>
                         {String(d.riesgo || 'N/A')}
                       </Badge>
-                      <span className="text-xs text-white">{String(d.dataset_label || d.dataset || '')}</span>
-                      {d.supuesto ? <span className="text-xs text-gray-500 truncate max-w-[200px]">{String(d.supuesto)}</span> : null}
+                      <span className="text-xs text-white break-words">{String(d.dataset_label || d.dataset || '')}</span>
+                      {d.supuesto ? <span className="text-xs text-gray-500 break-words">{String(d.supuesto)}</span> : null}
                     </div>
                   );
                 })}
@@ -1755,7 +1755,7 @@ export function EntityProfilePage() {
               </div>
 
               {/* Quick Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-6 min-w-0">
                 {entity.country && (
                   <InfoItem label="País" value={countryNames[entity.country] || entity.country} icon={Globe} />
                 )}
@@ -1850,7 +1850,7 @@ export function EntityProfilePage() {
 
               {/* Data Sources */}
               <div className="mt-6">
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
                   <p className="text-xs text-gray-500 uppercase">Fuentes de Datos</p>
                   <SourceLevelSelector value={sourceLevel} onChange={handleSourceLevelChange} size="sm" />
                 </div>
@@ -1868,7 +1868,7 @@ export function EntityProfilePage() {
                         key={src.id}
                         className={`text-xs px-2 py-1 rounded-full border ${catColors[src.category] || 'bg-white/5 text-gray-400 border-white/10'}`}
                       >
-                        {src.display_name}
+                        <span className="break-words">{src.display_name}</span>
                       </span>
                     );
                   })}
@@ -1895,7 +1895,7 @@ export function EntityProfilePage() {
                 tab.count;
 
               return (
-                <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-white/10">
+                <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-white/10 whitespace-nowrap">
                   {TabIcon ? <TabIcon className="w-4 h-4 sm:mr-1" /> : null}
                   {tab.label}
                   {dynamicCount ? (
@@ -1993,19 +1993,19 @@ export function EntityProfilePage() {
             })()}
 
             {/* Row 1.5: Executive Case Readout */}
-            <div className="grid grid-cols-1 xl:grid-cols-[1.5fr_1fr] gap-6">
+            <div className="grid grid-cols-1 xl:grid-cols-[1.5fr_1fr] gap-6 min-w-0">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.03 }}
                 className="glass rounded-xl p-6"
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
                       Lectura Ejecutiva
                     </p>
-                    <h3 className="text-lg font-medium text-white">
+                    <h3 className="text-lg font-medium text-white break-words">
                       {summarizeEntityExposure(entity, profile)}
                     </h3>
                   </div>
@@ -2026,7 +2026,7 @@ export function EntityProfilePage() {
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-5">
                   <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
                     <p className="text-[11px] text-gray-500 uppercase tracking-wide">Sanciones activas</p>
                     <p className="text-2xl font-bold text-white mt-1">
@@ -2064,29 +2064,29 @@ export function EntityProfilePage() {
                   Cobertura y Trazabilidad
                 </p>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <span className="text-sm text-gray-400">Fuentes activas</span>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-white text-right break-words">
                       {profile?.overview.source_count || entity.data_sources.length}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <span className="text-sm text-gray-400">Datasets</span>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-white text-right break-words">
                       {(profile?.cross_references?.datasets?.length || entity.source_records?.length || 0)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <span className="text-sm text-gray-400">Primera aparición</span>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-white text-right break-words">
                       {profile?.first_seen_at || entity.first_seen
                         ? formatDate(profile?.first_seen_at || entity.first_seen)
                         : '—'}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-start justify-between gap-3">
                     <span className="text-sm text-gray-400">Última actualización</span>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-white text-right break-words">
                       {profile?.last_seen_at || entity.last_updated
                         ? formatDate(profile?.last_seen_at || entity.last_updated)
                         : '—'}
@@ -2121,26 +2121,28 @@ export function EntityProfilePage() {
               {entity.sanctions.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
                   className="glass rounded-xl p-6">
-                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-red-400" />
-                    Sanciones
-                    <Badge className="ml-auto bg-red-500/20 text-red-400 text-xs">{entity.sanctions.length}</Badge>
-                  </h3>
+                  <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                      <Shield className="w-5 h-5 text-red-400" />
+                      Sanciones
+                    </h3>
+                    <Badge className="w-fit bg-red-500/20 text-red-400 text-xs">{entity.sanctions.length}</Badge>
+                  </div>
                   <div className="space-y-3">
                     {entity.sanctions.slice(0, 5).map((s, i) => (
                       <div key={i} className={cn('p-3 rounded-lg border-l-2',
                         s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-white/[0.02] border-gray-600/30'
                       )}>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-white font-medium">{s.source}</span>
+                        <div className="mb-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <span className="text-sm text-white font-medium break-words">{s.source}</span>
                           <Badge variant="outline" className={cn('text-[10px]',
                             s.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
                           )}>
                             {s.status === 'active' ? 'Activa' : s.status === 'removed' ? 'Removida' : s.status}
                           </Badge>
                         </div>
-                        <p className="text-xs text-gray-400">{s.program}</p>
-                        {s.reason && <p className="text-xs text-gray-500 mt-1 line-clamp-1">{s.reason}</p>}
+                        <p className="text-xs text-gray-400 break-words">{s.program}</p>
+                        {s.reason && <p className="text-xs text-gray-500 mt-1 break-words">{s.reason}</p>}
                         <p className="text-[10px] text-gray-600 mt-1">Listado: {formatDate(s.listing_date)}</p>
                       </div>
                     ))}
@@ -2158,15 +2160,17 @@ export function EntityProfilePage() {
               {entity.pep_entries.length > 0 && (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
                   className="glass rounded-xl p-6">
-                  <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
-                    <Landmark className="w-5 h-5 text-purple-400" />
-                    Exposición Política (PEP)
-                    <Badge className={cn('ml-auto text-xs',
+                  <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                      <Landmark className="w-5 h-5 text-purple-400" />
+                      Exposición Política (PEP)
+                    </h3>
+                    <Badge className={cn('w-fit text-xs',
                       entity.is_current_pep ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'
                     )}>
                       {entity.is_current_pep ? 'Activo' : 'Histórico'}
                     </Badge>
-                  </h3>
+                  </div>
                   <div className="space-y-3">
                     {entity.pep_entries
                       .sort((a, b) => {
@@ -2177,11 +2181,11 @@ export function EntityProfilePage() {
                       <div key={i} className={cn('p-3 rounded-lg border-l-2',
                         pep.is_current ? 'bg-purple-500/5 border-purple-500/50' : 'bg-white/[0.02] border-gray-600/30'
                       )}>
-                        <p className="text-sm text-white font-medium">{pep.role}</p>
+                        <p className="text-sm text-white font-medium break-words">{pep.role}</p>
                         {(pep.institution || pep.department) && (
-                          <p className="text-xs text-gray-400">{pep.department || pep.institution}</p>
+                          <p className="text-xs text-gray-400 break-words">{pep.department || pep.institution}</p>
                         )}
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                        <div className="mt-1 flex flex-wrap items-center gap-2">
                           <span className="text-[10px] text-gray-500">
                             {countryNames[pep.country] || pep.country}
                           </span>
@@ -2196,7 +2200,7 @@ export function EntityProfilePage() {
                               {formatDate(pep.start_date)} — {pep.end_date ? formatDate(pep.end_date) : 'Presente'}
                             </span>
                           )}
-                          <Badge variant="outline" className={cn('text-[10px] ml-auto',
+                          <Badge variant="outline" className={cn('text-[10px]',
                             pep.is_current ? 'text-purple-400 border-purple-500/30' : 'text-gray-500'
                           )}>
                             {pep.is_current ? 'Vigente' : 'Finalizado'}
@@ -2219,7 +2223,7 @@ export function EntityProfilePage() {
             {(profile?.connections && profile.connections.total_relationships > 0) && (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }}
                 className="glass rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                   <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
                     <Users className="w-4 h-4" />
                     Contexto Relacional
@@ -2242,7 +2246,7 @@ export function EntityProfilePage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
                       {overviewFamilyRelationships.slice(0, 6).map((rel, i) => (
                         <div key={`${rel.related_entity_id || rel.related_entity_name}-${i}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
-                          <p className="text-sm text-white font-medium">{humanizeEntityName(rel.related_entity_name)}</p>
+                          <p className="text-sm text-white font-medium break-words">{humanizeEntityName(rel.related_entity_name)}</p>
                           <div className="flex items-center gap-2 mt-1 flex-wrap">
                             {rel.subtype && (
                               <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
@@ -2325,12 +2329,12 @@ export function EntityProfilePage() {
                   </h3>
                   <div className="space-y-2">
                     {entity.identifications.map((ident, i) => (
-                      <div key={i} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
-                        <div className="flex items-center gap-2">
+                      <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between py-1.5 border-b border-white/5 last:border-0">
+                        <div className="flex items-center gap-2 min-w-0">
                           <Badge className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                             {ident.label || ident.type.toUpperCase()}
                           </Badge>
-                          <span className="text-white font-mono text-sm">{ident.number}</span>
+                          <span className="text-white font-mono text-sm break-all">{ident.number}</span>
                         </div>
                         {ident.country && (
                           <span className="text-[10px] text-gray-500">{countryNames[ident.country] || ident.country}</span>
@@ -2357,7 +2361,7 @@ export function EntityProfilePage() {
                           key={`${alias.name}-${i}`}
                           className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5"
                         >
-                          <span className="text-sm text-white truncate max-w-[220px]">{alias.name}</span>
+                          <span className="text-sm text-white break-words max-w-full">{alias.name}</span>
                           <Badge variant="outline" className="text-[10px] text-gray-400 shrink-0 border-white/10">
                             {getAliasTypeLabel(alias.type)}
                           </Badge>
@@ -2982,22 +2986,22 @@ export function EntityProfilePage() {
                               className="glass rounded-lg p-4 hover:bg-white/[0.04] transition-colors"
                             >
                               {/* Row 1: Name + badges */}
-                              <div className="flex items-start justify-between gap-2 mb-1">
+                              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-1">
                                 <div className="flex-1 min-w-0">
                                   {rel.related_entity_id ? (
                                     <button
                                       onClick={() => navigate(`/entity/${rel.related_entity_id}${sourceLevelParam ? `?source_level=${sourceLevelParam}` : ''}`)}
-                                      className="text-white font-medium hover:text-blue-400 transition-colors text-left cursor-pointer truncate block max-w-full"
+                                    className="text-white font-medium hover:text-blue-400 transition-colors text-left cursor-pointer break-words block max-w-full"
                                     >
                                       {humanizeEntityName(rel.related_entity_name)}
                                     </button>
                                   ) : (
-                                    <p className="text-white font-medium truncate">
+                                    <p className="text-white font-medium break-words">
                                       {humanizeEntityName(rel.related_entity_name)}
                                     </p>
                                   )}
                                 </div>
-                                <div className="flex items-center gap-1.5 flex-shrink-0">
+                                <div className="flex flex-wrap items-center gap-1.5">
                                   {rel.aml_priority && (
                                     <span className={cn('px-1.5 py-0.5 rounded text-[10px] font-medium uppercase', priorityBadgeStyles[rel.aml_priority])}>
                                       {rel.aml_priority}
@@ -3019,7 +3023,7 @@ export function EntityProfilePage() {
                               </div>
 
                               {/* Row 2: Subtype translated + context */}
-                              <div className="flex items-center gap-1.5 text-sm mb-2">
+                              <div className="flex flex-wrap items-center gap-1.5 text-sm mb-2">
                                 {referenceSummary ? (
                                   <span className={section.color}>
                                     {referenceSummary}
