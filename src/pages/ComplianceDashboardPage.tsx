@@ -819,7 +819,7 @@ export function ComplianceDashboardPage() {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex items-center justify-between mb-8"
+          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8"
         >
           <div>
             <h1 className="text-2xl font-bold text-white mb-2">
@@ -829,11 +829,11 @@ export function ComplianceDashboardPage() {
               Gestión de casos, alertas, whitelist y monitoreo continuo
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Button
               size="sm"
               onClick={() => setShowCreateCase(true)}
-              className="bg-blue-600 hover:bg-blue-700 gap-1"
+              className="bg-blue-600 hover:bg-blue-700 gap-1 w-full sm:w-auto"
             >
               <Plus className="w-4 h-4" />
               Nuevo Caso
@@ -938,7 +938,7 @@ export function ComplianceDashboardPage() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <TabsList className="bg-white/5 border border-white/10 p-1">
               <TabsTrigger value="overview" className="data-[state=active]:bg-white/10">
                 <FileText className="w-4 h-4 mr-2" />
@@ -964,7 +964,7 @@ export function ComplianceDashboardPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowAddWatchlist(true)}
-                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5"
+                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5 w-full sm:w-auto"
               >
                 <Plus className="w-3 h-3" /> Agregar
               </Button>
@@ -974,7 +974,7 @@ export function ComplianceDashboardPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowAddWhitelist(true)}
-                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5"
+                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5 w-full sm:w-auto"
               >
                 <Plus className="w-3 h-3" /> Agregar
               </Button>

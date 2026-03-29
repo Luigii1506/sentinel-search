@@ -105,6 +105,12 @@ const methodLabels: Record<string, { label: string; color: string; icon: typeof 
   unknown: { label: 'Sin clasificar', color: 'bg-gray-500/10 text-gray-500 border-gray-500/30', icon: Cpu },
 };
 
+const sourceTypeColors: Record<string, string> = {
+  rss: 'bg-green-500/10 text-green-400 border-green-500/30',
+  api: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+  gdelt: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+};
+
 function getSeverityColor(severity: number): string {
   if (severity >= 90) return 'text-red-400 bg-red-500/10 border-red-500/30';
   if (severity >= 70) return 'text-orange-400 bg-orange-500/10 border-orange-500/30';
@@ -216,7 +222,7 @@ function ArticlesTab() {
     <div className="space-y-4">
       {/* Filters */}
       <div className="glass rounded-xl p-4">
-        <div className="flex flex-wrap gap-3 items-end">
+        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-stretch sm:items-end">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -229,7 +235,7 @@ function ArticlesTab() {
             </div>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[180px] bg-white/5 border-white/10">
+            <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10">
               <Filter className="w-4 h-4 mr-2 text-gray-400" />
               <SelectValue placeholder="Categoria" />
             </SelectTrigger>
@@ -241,7 +247,7 @@ function ArticlesTab() {
             </SelectContent>
           </Select>
           <Select value={selectedDays} onValueChange={setSelectedDays}>
-            <SelectTrigger className="w-[140px] bg-white/5 border-white/10">
+            <SelectTrigger className="w-full sm:w-[140px] bg-white/5 border-white/10">
               <Clock className="w-4 h-4 mr-2 text-gray-400" />
               <SelectValue />
             </SelectTrigger>
@@ -253,7 +259,7 @@ function ArticlesTab() {
               <SelectItem value="365">1 ano</SelectItem>
             </SelectContent>
           </Select>
-          <div className="w-[180px]">
+          <div className="w-full sm:w-[180px]">
             <p className="text-[10px] text-gray-500 mb-1">
               Severity min: <span className="text-white font-mono">{minSeverity}</span>
             </p>
@@ -265,7 +271,7 @@ function ArticlesTab() {
               className="w-full"
             />
           </div>
-          <Button variant="outline" size="sm" onClick={() => refetch()} className="border-white/10">
+          <Button variant="outline" size="sm" onClick={() => refetch()} className="w-full sm:w-auto border-white/10">
             <RefreshCw className="w-4 h-4 mr-1" />
             Refresh
           </Button>
@@ -321,7 +327,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
       className="glass rounded-xl p-5 hover:bg-white/[0.04] transition-colors cursor-pointer group"
       onClick={onClick}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-2 flex-wrap">
             {article.severity > 0 && (
@@ -373,7 +379,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
 
         {/* Severity bar */}
         {article.severity > 0 && (
-          <div className="w-20 flex flex-col items-center gap-1 shrink-0">
+          <div className="w-full sm:w-20 flex sm:flex-col items-start sm:items-center gap-2 sm:gap-1 shrink-0">
             <span className={cn('text-xs font-mono font-bold',
               article.severity >= 90 ? 'text-red-400' :
               article.severity >= 70 ? 'text-orange-400' :
@@ -394,7 +400,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
           href={article.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
+          className="self-start text-blue-400 hover:text-blue-300 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink className="w-4 h-4" />
@@ -468,7 +474,7 @@ function SourcesTab() {
       </div>
 
       {/* Filter by type */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         <span className="text-xs text-gray-500">Filtrar:</span>
         {['all', 'rss', 'api', 'gdelt'].map((type) => (
           <Button
@@ -491,7 +497,57 @@ function SourcesTab() {
         <h3 className="text-sm font-medium text-gray-400 mb-3">
           Fuentes Activas ({filteredActive.length})
         </h3>
-        <div className="glass rounded-xl overflow-hidden">
+        <div className="space-y-3 md:hidden">
+          {filteredActive
+            .sort((a, b) => b.total_articles - a.total_articles)
+            .map((source) => (
+              <div key={source.id} className="glass rounded-xl p-4 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <div className={cn('w-2 h-2 rounded-full', source.error_count > 5 ? 'bg-red-500' : 'bg-green-500')} />
+                      <span className="text-white font-medium break-words">{source.display_name}</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 mt-1 break-all">{source.source_key}</p>
+                  </div>
+                  <Badge variant="outline" className={cn('text-[10px]', sourceTypeColors[source.source_type] || '')}>
+                    {source.source_type.toUpperCase()}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Articulos</p>
+                    <p className="text-white font-mono">{source.total_articles}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Calidad</p>
+                    <p className="text-gray-300">{source.quality_score}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Errores</p>
+                    <p className={cn(source.error_count > 5 ? 'text-red-400' : source.error_count > 0 ? 'text-orange-400' : 'text-gray-500')}>
+                      {source.error_count}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Ultimo Crawl</p>
+                    <p className="text-gray-300">{formatDate(source.last_crawled_at)}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => crawlMutation.mutate(source.source_key)}
+                  disabled={crawlMutation.isPending}
+                  className="w-full border-white/10 text-gray-300"
+                >
+                  <RefreshCw className={cn('w-3.5 h-3.5 mr-2', crawlMutation.isPending && 'animate-spin')} />
+                  Ejecutar Crawl
+                </Button>
+              </div>
+            ))}
+        </div>
+        <div className="hidden md:block glass rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/5">
@@ -526,7 +582,32 @@ function SourcesTab() {
           <h3 className="text-sm font-medium text-gray-500 mb-3">
             Fuentes Inactivas ({inactiveSources.length})
           </h3>
-          <div className="glass rounded-xl overflow-hidden opacity-60">
+          <div className="space-y-3 md:hidden opacity-60">
+            {inactiveSources.map((source) => (
+              <div key={source.id} className="glass rounded-xl p-4 space-y-2">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-gray-400 break-words">{source.display_name}</p>
+                    <p className="text-[11px] text-gray-600 mt-1 break-all">{source.source_key}</p>
+                  </div>
+                  <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-gray-500">
+                    {source.source_type}
+                  </Badge>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-600 mb-1">Articulos</p>
+                    <p className="text-gray-500">{source.total_articles}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-gray-600 mb-1">Errores</p>
+                    <p className="text-red-400/60">{source.error_count}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="hidden md:block glass rounded-xl overflow-hidden opacity-60">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-white/5">
@@ -567,12 +648,6 @@ function SourceRow({
   onCrawl: () => void;
   isCrawling: boolean;
 }) {
-  const typeColors: Record<string, string> = {
-    rss: 'bg-green-500/10 text-green-400 border-green-500/30',
-    api: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-    gdelt: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  };
-
   return (
     <tr className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
       <td className="p-3">
@@ -583,7 +658,7 @@ function SourceRow({
         </div>
       </td>
       <td className="p-3">
-        <Badge variant="outline" className={cn('text-[10px]', typeColors[source.source_type] || '')}>
+        <Badge variant="outline" className={cn('text-[10px]', sourceTypeColors[source.source_type] || '')}>
           {source.source_type.toUpperCase()}
         </Badge>
       </td>

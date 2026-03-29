@@ -302,7 +302,7 @@ export function SourcesDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-[1600px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
             {[...Array(5)].map((_, i) => (
@@ -317,7 +317,7 @@ export function SourcesDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar fuentes</h2>
@@ -341,8 +341,8 @@ export function SourcesDashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
               <Database className="w-8 h-8 text-blue-400" />
               <div>
                 <h1 className="text-3xl font-bold text-white">Dashboard de Fuentes</h1>
@@ -351,7 +351,7 @@ export function SourcesDashboardPage() {
                 </p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => refetch()} className="border-white/10">
+            <Button variant="outline" onClick={() => refetch()} className="border-white/10 w-full sm:w-auto">
               <RefreshCw className="w-4 h-4 mr-2" />
               Actualizar
             </Button>
@@ -424,7 +424,7 @@ export function SourcesDashboardPage() {
         </div>
 
         {/* Category Tabs */}
-        <div className="flex flex-wrap gap-2 mb-4">
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
           <button
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
@@ -489,8 +489,72 @@ export function SourcesDashboardPage() {
           </Select>
         </div>
 
+        <div className="md:hidden space-y-3">
+          {filteredSources.map((source: SourceInfo) => {
+            const statusCfg = STATUS_CONFIG[source.status] || STATUS_CONFIG.pending;
+            const StatusIcon = statusCfg.icon;
+
+            return (
+              <Card key={source.source_id} className="bg-[#1a1a1a] border-white/5">
+                <CardContent className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-white">{source.display_name}</p>
+                      <p className="text-xs text-gray-500 font-mono break-all">{source.source_id}</p>
+                    </div>
+                    <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${statusCfg.bg} ${statusCfg.border} border`}>
+                      <StatusIcon className={`w-3 h-3 ${statusCfg.color}`} />
+                      <span className={`text-[10px] ${statusCfg.color}`}>{statusCfg.label}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Badge
+                      variant="outline"
+                      className={`text-[10px] ${CATEGORY_COLORS[source.category] || CATEGORY_COLORS.other || CATEGORY_COLORS.OTHER}`}
+                    >
+                      {CATEGORY_LABELS[source.category] || source.category}
+                    </Badge>
+                    {source.country ? (
+                      <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-300 border-white/10">
+                        {source.country}
+                      </Badge>
+                    ) : null}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-lg bg-white/5 p-3">
+                      <p className="text-[11px] text-gray-500">Bronze</p>
+                      <p className="text-white font-mono">{source.bronze_count > 0 ? formatNumber(source.bronze_count) : '-'}</p>
+                    </div>
+                    <div className="rounded-lg bg-white/5 p-3">
+                      <p className="text-[11px] text-gray-500">Silver</p>
+                      <p className="text-white font-mono">{source.silver_count > 0 ? formatNumber(source.silver_count) : '-'}</p>
+                    </div>
+                    <div className="rounded-lg bg-white/5 p-3">
+                      <p className="text-[11px] text-gray-500">Gold</p>
+                      <p className="text-white font-mono">{source.gold_count > 0 ? formatNumber(source.gold_count) : '-'}</p>
+                    </div>
+                    <div className="rounded-lg bg-white/5 p-3">
+                      <p className="text-[11px] text-gray-500">Último sync</p>
+                      <p className="text-white">{formatDate(source.last_sync)}</p>
+                    </div>
+                  </div>
+
+                  <SourceDetailDialog sourceId={source.source_id}>
+                    <Button variant="outline" className="w-full border-white/10">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Ver detalle
+                    </Button>
+                  </SourceDetailDialog>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
         {/* Sources Table */}
-        <div className="bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden">
+        <div className="hidden md:block bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-white/5 border-b border-white/5">

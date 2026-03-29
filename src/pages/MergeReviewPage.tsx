@@ -345,7 +345,7 @@ export function MergeReviewPage() {
     <div className="min-h-screen bg-[#0a0a0a] pt-24 px-4 sm:px-6 lg:px-8 pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-white flex items-center gap-3">
               <GitMerge className="w-7 h-7 text-purple-400" />
@@ -355,7 +355,7 @@ export function MergeReviewPage() {
               Auditar entidades Gold con multiples fuentes fusionadas
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             {meta?.elapsed_ms && (
               <TooltipProvider>
                 <Tooltip>

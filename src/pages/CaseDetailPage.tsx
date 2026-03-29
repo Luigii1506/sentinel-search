@@ -354,8 +354,8 @@ export function CaseDetailPage() {
           className="glass rounded-2xl p-6 mb-6"
         >
           {/* Top row: number + badges */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-3">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-sm text-gray-500 font-mono">{caseData.case_number}</span>
               <Badge variant="outline" className={cn('text-xs gap-1', status.color)}>
                 <StatusIcon className="w-3 h-3" />
@@ -375,7 +375,7 @@ export function CaseDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate(`/entity/${caseData.entity_id}`)}
-                className="text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
+                className="w-full sm:w-auto text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                 Ver Entidad
@@ -475,7 +475,7 @@ export function CaseDetailPage() {
                     )}
 
                     <div className="p-5">
-                      <div className="flex items-start justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex-1 min-w-0">
                           {/* Entity matched */}
                           <div className="flex items-center gap-2 mb-2">
@@ -538,11 +538,11 @@ export function CaseDetailPage() {
 
                         {/* Decision button — only for pending alerts on open cases */}
                         {!alert.decision && !isClosed && (
-                          <div className="ml-4 flex-shrink-0">
+                          <div className="sm:ml-4 flex-shrink-0">
                             <Button
                               size="sm"
                               onClick={() => setDecisionDialog(alert)}
-                              className="bg-blue-600 hover:bg-blue-700"
+                              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
                             >
                               <Gavel className="w-3.5 h-3.5 mr-1.5" />
                               Decidir
@@ -686,7 +686,7 @@ export function CaseDetailPage() {
                   size="sm"
                   onClick={() => noteContent.trim() && noteMutation.mutate(noteContent.trim())}
                   disabled={!noteContent.trim() || noteMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
                 >
                   <Send className="w-3 h-3 mr-2" />
                   {noteMutation.isPending ? 'Guardando...' : 'Agregar nota'}
@@ -869,11 +869,11 @@ export function CaseDetailPage() {
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2 border-t border-white/5">
                 <Button
                   variant="ghost"
                   onClick={() => setDecisionDialog(null)}
-                  className="text-gray-400"
+                  className="w-full sm:w-auto text-gray-400"
                 >
                   Cancelar
                 </Button>
@@ -891,7 +891,7 @@ export function CaseDetailPage() {
                   }}
                   disabled={!decisionType || decisionReason.length < 5 || decisionMutation.isPending}
                   className={cn(
-                    'transition-colors',
+                    'w-full sm:w-auto transition-colors',
                     decisionType === 'true_positive' ? 'bg-red-600 hover:bg-red-700' :
                     decisionType === 'false_positive' ? 'bg-green-600 hover:bg-green-700' :
                     decisionType === 'escalate' ? 'bg-orange-600 hover:bg-orange-700' :

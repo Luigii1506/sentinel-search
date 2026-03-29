@@ -143,7 +143,7 @@ export function AuditPage() {
 
   if (sourcesLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
@@ -170,17 +170,17 @@ export function AuditPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
               <ClipboardList className="w-8 h-8 text-blue-400" />
               <div>
-                <h1 className="text-3xl font-bold text-white">Auditoria de Datos</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white">Auditoria de Datos</h1>
                 <p className="text-gray-400 mt-1">
                   Frescura, estado y confiabilidad de las fuentes de datos
                 </p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => refetch()}>
+            <Button variant="outline" onClick={() => refetch()} className="w-full sm:w-auto">
               <RefreshCw className="w-4 h-4 mr-2" />
               Actualizar
             </Button>
@@ -305,7 +305,7 @@ export function AuditPage() {
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[200px] bg-[#1a1a1a] border-white/10 text-white">
+            <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-white/10 text-white">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
@@ -393,7 +393,51 @@ export function AuditPage() {
             </h2>
           </div>
 
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <div className="space-y-3 md:hidden">
+            {sources.map((source, index) => {
+              const freshness = freshnessLabel(source.last_sync);
+              return (
+                <motion.div
+                  key={source.source_id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                >
+                  <Card className="bg-[#1a1a1a] border-white/5">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-white break-words">{source.source_id}</p>
+                          <p className="text-xs text-gray-500 break-words">{source.display_name}</p>
+                        </div>
+                        <StatusBadge status={source.status} />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Categoria</p>
+                          <p className="text-gray-300">{source.category || '-'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Records</p>
+                          <p className="text-gray-300 font-mono">{source.bronze_count.toLocaleString()}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Ultimo Sync</p>
+                          <p className="text-gray-300">{formatDate(source.last_sync)}</p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Frescura</p>
+                          <p className={`font-medium ${freshness.color}`}>{freshness.text}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          <Card className="hidden md:block bg-[#1a1a1a] border-white/5">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-white/5 border-b border-white/5">

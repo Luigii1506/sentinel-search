@@ -1621,7 +1621,7 @@ export function EntityProfilePage() {
     <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
       {/* Back Button & Actions */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -1631,7 +1631,7 @@ export function EntityProfilePage() {
             Volver
           </Button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
@@ -1639,7 +1639,7 @@ export function EntityProfilePage() {
               className="gap-2 text-gray-400 hover:text-white"
             >
               <RefreshCw className="w-4 h-4" />
-              Actualizar
+              <span className="hidden sm:inline">Actualizar</span>
             </Button>
             <Button
               variant="ghost"
@@ -1647,7 +1647,7 @@ export function EntityProfilePage() {
               className="gap-2 text-gray-400 hover:text-white"
             >
               <Share2 className="w-4 h-4" />
-              Compartir
+              <span className="hidden sm:inline">Compartir</span>
             </Button>
             <Button
               variant="ghost"
@@ -1896,7 +1896,7 @@ export function EntityProfilePage() {
 
               return (
                 <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-white/10">
-                  {TabIcon ? <TabIcon className="w-4 h-4 mr-1" /> : null}
+                  {TabIcon ? <TabIcon className="w-4 h-4 sm:mr-1" /> : null}
                   {tab.label}
                   {dynamicCount ? (
                     <Badge className="ml-2 bg-white/10 text-gray-200 text-[10px]">

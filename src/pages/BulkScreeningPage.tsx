@@ -222,9 +222,9 @@ export function BulkScreeningPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-start gap-3 mb-2">
             <FileSpreadsheet className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold text-white">Bulk Screening</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Bulk Screening</h1>
           </div>
           <p className="text-gray-400">
             Screening masivo de nombres contra la base de datos
@@ -242,7 +242,7 @@ export function BulkScreeningPage() {
               className="space-y-6"
             >
               {/* Input Method Toggle */}
-              <motion.div variants={itemVariants} className="flex gap-2">
+              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-2">
                 <Button
                   variant={inputMethod === 'file' ? 'default' : 'outline'}
                   onClick={() => setInputMethod('file')}
@@ -284,11 +284,11 @@ export function BulkScreeningPage() {
                       />
                       
                       {file ? (
-                        <div className="flex items-center justify-center gap-4">
-                          <div className="flex items-center gap-2">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
+                          <div className="flex items-center gap-2 min-w-0">
                             <FileText className="w-8 h-8 text-green-400" />
-                            <div className="text-left">
-                              <p className="text-white font-medium">{file.name}</p>
+                            <div className="text-left min-w-0">
+                              <p className="text-white font-medium break-all">{file.name}</p>
                               <p className="text-sm text-gray-400">
                                 {(file.size / 1024).toFixed(1)} KB
                               </p>
@@ -363,7 +363,7 @@ export function BulkScreeningPage() {
                       step={0.05}
                       className="py-4"
                     />
-                    <div className="flex justify-between text-sm text-gray-500">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm text-gray-500">
                       <span>50% (Mas resultados)</span>
                       <span>100% (Solo exactos)</span>
                     </div>
@@ -443,7 +443,7 @@ export function BulkScreeningPage() {
                     />
                   </div>
                   
-                  <div className="flex justify-center gap-6 text-sm">
+                  <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 text-sm">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-400" />
                       <span className="text-gray-300">{job?.completed_count} exitosos</span>
@@ -471,14 +471,14 @@ export function BulkScreeningPage() {
               <motion.div variants={itemVariants}>
                 <Card className="bg-[#1a1a1a] border-white/5">
                   <CardContent className="p-6">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <h2 className="text-2xl font-bold text-white mb-1">Resultados</h2>
                         <p className="text-gray-400">
                           {job?.completed_count} procesados · {job?.failed_count} fallidos
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full sm:w-auto">
                         <Button variant="outline" onClick={() => downloadResults('csv')}>
                           <Download className="w-4 h-4 mr-2" />
                           CSV
@@ -500,7 +500,62 @@ export function BulkScreeningPage() {
               {/* Results Table */}
               {job?.results && job.results.length > 0 && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-[#1a1a1a] border-white/5">
+                  <div className="space-y-3 md:hidden">
+                    {job.results.map((result, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                      >
+                        <Card className="bg-[#1a1a1a] border-white/5">
+                          <CardContent className="p-4 space-y-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <p className="text-sm text-white break-words">{result.query}</p>
+                              {result.status === 'found' ? (
+                                <Badge className="bg-green-500/10 text-green-400 border-green-500/20">Encontrado</Badge>
+                              ) : result.status === 'not_found' ? (
+                                <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/20">No encontrado</Badge>
+                              ) : (
+                                <Badge className="bg-red-500/10 text-red-400 border-red-500/20">Error</Badge>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-2 gap-3 text-sm">
+                              <div>
+                                <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Matches</p>
+                                <p className="text-gray-300">{result.match_count}</p>
+                              </div>
+                              <div>
+                                <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Score</p>
+                                {result.top_score ? (
+                                  <Badge
+                                    variant="outline"
+                                    className={cn(
+                                      result.top_score >= 90
+                                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                                        : result.top_score >= 70
+                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                        : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                    )}
+                                  >
+                                    {Math.round(result.top_score)}%
+                                  </Badge>
+                                ) : (
+                                  <span className="text-gray-500">-</span>
+                                )}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Mejor Coincidencia</p>
+                              <p className="text-sm text-gray-300 break-words">{result.top_match_name || '-'}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </div>
+
+                  <Card className="hidden md:block bg-[#1a1a1a] border-white/5">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-white/5 border-b border-white/5">

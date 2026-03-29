@@ -34,7 +34,7 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navigation />
-      <main className="pt-16">
+      <main className="pt-14 sm:pt-16">
         {children}
       </main>
     </>

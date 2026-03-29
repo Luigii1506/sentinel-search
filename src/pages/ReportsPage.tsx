@@ -85,9 +85,9 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="pt-24 px-8 max-w-7xl mx-auto">
+      <div className="pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <Skeleton className="h-8 w-64 mb-6" />
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}
         </div>
         <div className="grid grid-cols-2 gap-6">
@@ -98,9 +98,9 @@ export default function ReportsPage() {
   }
 
   return (
-    <div className="pt-24 px-8 max-w-7xl mx-auto pb-12">
+    <div className="pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto pb-12">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-3">
             <BarChart3 className="w-6 h-6 text-blue-400" />
@@ -110,9 +110,9 @@ export default function ReportsPage() {
             KPIs y métricas del sistema PLD/AML
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
           <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-[160px] bg-gray-800 border-gray-700">
+            <SelectTrigger className="w-full sm:w-[160px] bg-gray-800 border-gray-700">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

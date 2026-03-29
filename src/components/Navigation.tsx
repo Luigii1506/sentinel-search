@@ -77,6 +77,10 @@ export function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const handleLogout = async () => {
     await logout();
     navigate('/');
@@ -94,8 +98,8 @@ export function Navigation() {
           : 'bg-transparent'
       )}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-18">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between gap-3 h-14 sm:h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
@@ -104,8 +108,11 @@ export function Navigation() {
             >
               <Shield className="w-5 h-5 text-white" />
             </motion.div>
-            <span className="text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
+            <span className="hidden sm:inline text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
               Sentinel PLD
+            </span>
+            <span className="sm:hidden text-sm font-semibold text-white group-hover:text-blue-400 transition-colors">
+              Sentinel
             </span>
           </Link>
 
@@ -172,7 +179,7 @@ export function Navigation() {
           </nav>
 
           {/* Right Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isAuthenticated ? (
               /* User Menu */
               <DropdownMenu>
@@ -248,9 +255,9 @@ export function Navigation() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="lg:hidden bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5"
+          className="lg:hidden max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5"
         >
-          <nav className="px-4 py-4 space-y-1">
+          <nav className="px-3 py-3 space-y-1 pb-6">
             {mainNavLinks.map((link) => {
               const isActive = location.pathname === link.path ||
                 (link.path !== '/' && location.pathname.startsWith(link.path));

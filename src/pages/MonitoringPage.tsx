@@ -158,7 +158,7 @@ export function MonitoringPage() {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
@@ -176,7 +176,7 @@ export function MonitoringPage() {
 
   if (jobsError) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 px-8">
+      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar monitoreo</h2>
@@ -217,8 +217,8 @@ export function MonitoringPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
               <Activity className="w-8 h-8 text-blue-400" />
               <div>
                 <h1 className="text-3xl font-bold text-white">Monitoreo del Sistema</h1>
@@ -227,7 +227,7 @@ export function MonitoringPage() {
                 </p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => refetchJobs()}>
+            <Button variant="outline" onClick={() => refetchJobs()} className="w-full sm:w-auto">
               <RefreshCw className="w-4 h-4 mr-2" />
               Actualizar
             </Button>
@@ -490,7 +490,7 @@ export function MonitoringPage() {
                 <p className="text-sm font-medium text-white mb-3">Top violaciones SLO</p>
                 <div className="space-y-2">
                   {topViolations.length > 0 ? topViolations.map((item) => (
-                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3 flex items-center justify-between gap-3">
+                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm text-white font-medium">{item.source_id}</p>
                         <p className="text-xs text-gray-500">
@@ -529,7 +529,7 @@ export function MonitoringPage() {
                 <div className="space-y-2">
                   {topDlq.length > 0 ? topDlq.map((item) => (
                     <div key={item.id} className="rounded-lg bg-white/5 p-3">
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
                           <p className="text-sm text-white truncate">{item.source || item.task_name}</p>
                           <p className="text-xs text-gray-500 truncate">{item.step} · {item.task_name}</p>
