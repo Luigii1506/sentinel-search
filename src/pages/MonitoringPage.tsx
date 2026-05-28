@@ -29,6 +29,7 @@ import type {
   TaskDlqResponse,
   RedisDurabilityStatus,
   DisappearedSourcesAuditResponse,
+  SourceRuntimeHealthResponse,
 } from '@/types/api';
 
 const containerVariants = {
@@ -156,6 +157,12 @@ export function MonitoringPage() {
     refetchInterval: 120000,
   });
 
+  const { data: runtimeHealth } = useQuery<SourceRuntimeHealthResponse>({
+    queryKey: ['admin', 'sources', 'runtime-health', 'monitoring'],
+    queryFn: () => adminService.getSourceRuntimeHealth(),
+    refetchInterval: 60000,
+  });
+
   if (jobsLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
@@ -207,6 +214,9 @@ export function MonitoringPage() {
   const goldDedup = dataQuality?.ratios?.gold_dedup ?? 0;
   const topViolations = freshness?.violations?.slice(0, 5) || [];
   const topDlq = taskDlq?.dead_letters?.slice(0, 5) || [];
+  const runtimeAlerting = runtimeHealth?.alerting_sources || 0;
+  const changedNotMaterialized = runtimeHealth?.sources?.filter((item) => item.changed_not_materialized).length || 0;
+  const runtimeTracked = runtimeHealth?.total_sources || 0;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -396,7 +406,7 @@ export function MonitoringPage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8"
+          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8"
         >
           <motion.div variants={itemVariants}>
             <Card className="bg-[#1a1a1a] border-white/5">
@@ -461,6 +471,39 @@ export function MonitoringPage() {
                   <span className="text-xs text-gray-400">Disappeared</span>
                 </div>
                 <div className="text-2xl font-bold text-white">{disappearedMarked}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Server className="w-4 h-4 text-cyan-400" />
+                  <span className="text-xs text-gray-400">Runtime</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{runtimeTracked}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <span className="text-xs text-gray-400">Alertando</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{runtimeAlerting}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className="bg-[#1a1a1a] border-white/5">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <RefreshCw className="w-4 h-4 text-amber-400" />
+                  <span className="text-xs text-gray-400">Cambio pendiente</span>
+                </div>
+                <div className="text-2xl font-bold text-white">{changedNotMaterialized}</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -629,6 +672,7 @@ export function MonitoringPage() {
               <CardContent className="p-8 text-center">
                 <Clock className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-400">No hay jobs en ejecucion</p>
+                <p className="text-sm text-gray-500 mt-2">Los jobs recientes siguen apareciendo abajo.</p>
               </CardContent>
             </Card>
           )}

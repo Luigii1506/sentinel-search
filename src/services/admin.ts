@@ -4,6 +4,7 @@ import type {
   AuditLogEntry,
   User,
   SourceSummary,
+  SourceRuntimeHealthResponse,
   JobsResponse,
   SourceDetail,
   SystemHealth,
@@ -148,6 +149,11 @@ export const adminService = {
    */
   async getSourcesSummary(): Promise<SourceSummary> {
     const response = await api.get('/api/v2/admin/sources/summary', { timeout: 60000 });
+    return response.data;
+  },
+
+  async getSourceRuntimeHealth(): Promise<SourceRuntimeHealthResponse> {
+    const response = await api.get('/api/v2/admin/sources/runtime-health', { timeout: 60000 });
     return response.data;
   },
 

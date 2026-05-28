@@ -378,9 +378,10 @@ export interface SourceInfo {
   silver_count: number;
   gold_count: number;
   last_sync?: string;
-  status: 'active' | 'pending' | 'error' | 'stale';
+  status: 'active' | 'pending' | 'error' | 'stale' | 'disappeared' | 'importing';
   risk_score: number;
   is_pep: boolean;
+  provider?: string;
   // URLs
   source_url?: string;
   os_url?: string;
@@ -392,6 +393,28 @@ export interface SourceInfo {
   importer_type?: string;
   schedule_frequency?: string;
   queue?: string;
+  is_active?: boolean;
+  is_historical?: boolean;
+  freshness_class?: string;
+  change_detection_mode?: string;
+  change_check_interval_minutes?: number | null;
+  max_staleness_hours?: number | null;
+  is_critical?: boolean;
+  sync_strategy?: string;
+  next_due_at?: string | null;
+  last_runtime_status?: string | null;
+  last_successful_sync?: string | null;
+  last_failed_sync?: string | null;
+  failure_count_24h?: number | null;
+  success_rate_7d?: number | null;
+  remote_checksum?: string | null;
+  last_change_check_at?: string | null;
+  last_remote_change_at?: string | null;
+  last_remote_checksum?: string | null;
+  assertion_status?: string | null;
+  assertion_failures?: number;
+  consecutive_failures?: number;
+  is_alerting?: boolean;
 }
 
 export interface SourceDetail {
@@ -471,6 +494,33 @@ export interface JobsResponse {
   running: JobInfo[];
   recent: JobInfo[];
   stats: Record<string, number>;
+}
+
+export interface SourceRuntimeHealthEntry {
+  source_id: string;
+  display_name: string;
+  tier: number;
+  freshness_class: string;
+  sync_strategy: string;
+  runtime_status?: string | null;
+  last_successful_sync?: string | null;
+  last_failed_sync?: string | null;
+  failure_count_24h: number;
+  success_rate_7d?: number | null;
+  consecutive_failures: number;
+  last_change_check_at?: string | null;
+  last_remote_change_at?: string | null;
+  last_materialization_at?: string | null;
+  changed_not_materialized: boolean;
+  assertion_status?: string | null;
+  assertion_failures: number;
+  is_alerting: boolean;
+}
+
+export interface SourceRuntimeHealthResponse {
+  total_sources: number;
+  alerting_sources: number;
+  sources: SourceRuntimeHealthEntry[];
 }
 
 export interface SystemHealth {

@@ -28,7 +28,13 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
-import type { SourceSummary, JobsResponse } from '@/types/api';
+import type {
+  JobsResponse,
+  SourceInfo,
+  SourceRuntimeHealthEntry,
+  SourceRuntimeHealthResponse,
+  SourceSummary,
+} from '@/types/api';
 
 function formatDate(dateStr?: string | null): string {
   if (!dateStr) return '-';
@@ -44,7 +50,11 @@ function formatDate(dateStr?: string | null): string {
 
 function freshnessLabel(lastSync?: string | null): { text: string; color: string } {
   if (!lastSync) return { text: 'Sin datos', color: 'text-gray-500' };
-  const days = Math.floor((Date.now() - new Date(lastSync).getTime()) / (1000 * 60 * 60 * 24));
+  const diffMs = Date.now() - new Date(lastSync).getTime();
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const days = Math.floor(hours / 24);
+  if (hours < 1) return { text: '<1h', color: 'text-green-400' };
+  if (hours < 24) return { text: `${hours}h`, color: 'text-green-400' };
   if (days <= 1) return { text: 'Hoy', color: 'text-green-400' };
   if (days <= 7) return { text: `${days}d`, color: 'text-green-400' };
   if (days <= 14) return { text: `${days}d`, color: 'text-yellow-400' };
@@ -60,9 +70,34 @@ function StatusBadge({ status }: { status: string }) {
     pending: { label: 'Pendiente', class: 'bg-gray-500/10 text-gray-400 border-gray-500/20' },
     importing: { label: 'Importando', class: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
     disappeared: { label: 'Desaparecida', class: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' },
+    inactive: { label: 'Inactiva', class: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
   };
   const c = config[status] || config.pending;
   return <Badge variant="outline" className={`text-xs ${c.class}`}>{c.label}</Badge>;
+}
+
+type AuditSourceRow = SourceInfo & {
+  runtime?: SourceRuntimeHealthEntry;
+  audit_status: string;
+  audit_last_sync?: string | null;
+};
+
+function deriveAuditStatus(source: SourceInfo, runtime?: SourceRuntimeHealthEntry): string {
+  if (source.is_active === false) return 'inactive';
+  if (runtime?.is_alerting) return 'error';
+  if (runtime?.assertion_status === 'failed') return 'error';
+  if ((runtime?.consecutive_failures || 0) > 0) return 'error';
+  if (runtime?.changed_not_materialized) return 'stale';
+  if (runtime?.runtime_status === 'success') return 'active';
+  if (runtime?.runtime_status === 'failed') return 'error';
+  return source.status;
+}
+
+function deriveAuditLastSync(source: SourceInfo, runtime?: SourceRuntimeHealthEntry): string | null | undefined {
+  return runtime?.last_materialization_at
+    || runtime?.last_successful_sync
+    || source.last_successful_sync
+    || source.last_sync;
 }
 
 export function AuditPage() {
@@ -74,6 +109,11 @@ export function AuditPage() {
   const { data: sourcesData, isLoading: sourcesLoading, refetch } = useQuery<SourceSummary>({
     queryKey: ['admin', 'sources', 'summary'],
     queryFn: () => adminService.getSourcesSummary(),
+  });
+
+  const { data: runtimeHealth } = useQuery<SourceRuntimeHealthResponse>({
+    queryKey: ['admin', 'sources', 'runtime-health'],
+    queryFn: () => adminService.getSourceRuntimeHealth(),
   });
 
   const { data: jobsData } = useQuery<JobsResponse>({
@@ -91,11 +131,23 @@ export function AuditPage() {
     queryFn: () => adminService.getSourceLifecycleEvents(20),
   });
 
-  const sources = useMemo(() => {
+  const allSources = useMemo<AuditSourceRow[]>(() => {
     if (!sourcesData?.sources) return [];
+    const runtimeMap = new Map((runtimeHealth?.sources || []).map((item) => [item.source_id, item]));
+    return sourcesData.sources.map((source) => {
+      const runtime = runtimeMap.get(source.source_id);
+      return {
+        ...source,
+        runtime,
+        audit_status: deriveAuditStatus(source, runtime),
+        audit_last_sync: deriveAuditLastSync(source, runtime),
+      };
+    });
+  }, [runtimeHealth, sourcesData]);
 
-    let filtered = sourcesData.sources.filter((s) => {
-      if (statusFilter !== 'all' && s.status !== statusFilter) return false;
+  const sources = useMemo<AuditSourceRow[]>(() => {
+    let filtered = allSources.filter((s) => {
+      if (statusFilter !== 'all' && s.audit_status !== statusFilter) return false;
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         return (
@@ -112,18 +164,18 @@ export function AuditPage() {
       if (sortField === 'source_id') cmp = a.source_id.localeCompare(b.source_id);
       else if (sortField === 'bronze_count') cmp = a.bronze_count - b.bronze_count;
       else if (sortField === 'last_sync') {
-        const aTime = a.last_sync ? new Date(a.last_sync).getTime() : 0;
-        const bTime = b.last_sync ? new Date(b.last_sync).getTime() : 0;
+        const aTime = a.audit_last_sync ? new Date(a.audit_last_sync).getTime() : 0;
+        const bTime = b.audit_last_sync ? new Date(b.audit_last_sync).getTime() : 0;
         cmp = aTime - bTime;
       } else if (sortField === 'status') {
-        const order: Record<string, number> = { error: 0, stale: 1, disappeared: 2, importing: 3, pending: 4, active: 5 };
-        cmp = (order[a.status] ?? 5) - (order[b.status] ?? 5);
+        const order: Record<string, number> = { error: 0, stale: 1, disappeared: 2, importing: 3, pending: 4, inactive: 5, active: 6 };
+        cmp = (order[a.audit_status] ?? 6) - (order[b.audit_status] ?? 6);
       }
       return sortDir === 'asc' ? cmp : -cmp;
     });
 
     return filtered;
-  }, [sourcesData, statusFilter, searchQuery, sortField, sortDir]);
+  }, [allSources, searchQuery, sortDir, sortField, statusFilter]);
 
   const toggleSort = (field: typeof sortField) => {
     if (sortField === field) {
@@ -156,10 +208,16 @@ export function AuditPage() {
     );
   }
 
-  const byStatus = sourcesData?.by_status || {};
+  const byStatus = allSources.reduce<Record<string, number>>((acc, source) => {
+    acc[source.audit_status] = (acc[source.audit_status] || 0) + 1;
+    return acc;
+  }, {});
   const recentFailed = jobsData?.recent?.filter((j) => j.status === 'failed') || [];
   const disappearedMarked = disappearedData?.marked_disappeared || [];
   const lifecycleEvents = lifecycleData?.events || [];
+  const monitoredSources = runtimeHealth?.total_sources || 0;
+  const alertingSources = runtimeHealth?.alerting_sources || 0;
+  const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -197,10 +255,20 @@ export function AuditPage() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Database className="w-4 h-4 text-blue-400" />
-                <span className="text-xs text-gray-400">Registradas</span>
+                <span className="text-xs text-gray-400">Catalogo</span>
               </div>
               <div className="text-2xl font-bold text-white">{sourcesData?.total_registered || 0}</div>
               <p className="text-xs text-gray-500">{sourcesData?.total_with_data || 0} con datos</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#1a1a1a] border-white/5">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <ShieldCheck className="w-4 h-4 text-cyan-400" />
+                <span className="text-xs text-gray-400">Monitoreadas</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{monitoredSources}</div>
+              <p className="text-xs text-gray-500">Con runtime health</p>
             </CardContent>
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5">
@@ -210,47 +278,27 @@ export function AuditPage() {
                 <span className="text-xs text-gray-400">Activas</span>
               </div>
               <div className="text-2xl font-bold text-white">{byStatus.active || 0}</div>
-              <p className="text-xs text-gray-500">Datos frescos</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-orange-400" />
-                <span className="text-xs text-gray-400">Desactualizadas</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.stale || 0}</div>
-              <p className="text-xs text-gray-500">Requieren sync</p>
+              <p className="text-xs text-gray-500">Con sync valido</p>
             </CardContent>
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <XCircle className="w-4 h-4 text-red-400" />
-                <span className="text-xs text-gray-400">Con errores</span>
+                <span className="text-xs text-gray-400">Alertando</span>
               </div>
-              <div className="text-2xl font-bold text-white">{byStatus.error || 0}</div>
-              <p className="text-xs text-gray-500">Revisar</p>
+              <div className="text-2xl font-bold text-white">{alertingSources || byStatus.error || 0}</div>
+              <p className="text-xs text-gray-500">Runtime o assertions</p>
             </CardContent>
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-xs text-gray-400">Pendientes</span>
+                <span className="text-xs text-gray-400">Inactivas</span>
               </div>
-              <div className="text-2xl font-bold text-white">{byStatus.pending || 0}</div>
-              <p className="text-xs text-gray-500">Sin primer sync</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-fuchsia-400" />
-                <span className="text-xs text-gray-400">Disappeared</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.disappeared || disappearedMarked.length || 0}</div>
-              <p className="text-xs text-gray-500">Marcadas manualmente</p>
+              <div className="text-2xl font-bold text-white">{inactiveSources}</div>
+              <p className="text-xs text-gray-500">Fuera del scheduler</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -316,6 +364,7 @@ export function AuditPage() {
               <SelectItem value="error">Con error</SelectItem>
               <SelectItem value="pending">Pendientes</SelectItem>
               <SelectItem value="disappeared">Desaparecidas</SelectItem>
+              <SelectItem value="inactive">Inactivas</SelectItem>
             </SelectContent>
           </Select>
         </motion.div>
@@ -395,7 +444,7 @@ export function AuditPage() {
 
           <div className="space-y-3 md:hidden">
             {sources.map((source, index) => {
-              const freshness = freshnessLabel(source.last_sync);
+              const freshness = freshnessLabel(source.audit_last_sync);
               return (
                 <motion.div
                   key={source.source_id}
@@ -410,7 +459,7 @@ export function AuditPage() {
                           <p className="text-sm font-medium text-white break-words">{source.source_id}</p>
                           <p className="text-xs text-gray-500 break-words">{source.display_name}</p>
                         </div>
-                        <StatusBadge status={source.status} />
+                        <StatusBadge status={source.audit_status} />
                       </div>
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
@@ -423,7 +472,7 @@ export function AuditPage() {
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Ultimo Sync</p>
-                          <p className="text-gray-300">{formatDate(source.last_sync)}</p>
+                          <p className="text-gray-300">{formatDate(source.audit_last_sync)}</p>
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Frescura</p>
@@ -476,7 +525,7 @@ export function AuditPage() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {sources.map((source, index) => {
-                    const freshness = freshnessLabel(source.last_sync);
+                    const freshness = freshnessLabel(source.audit_last_sync);
                     return (
                       <motion.tr
                         key={source.source_id}
@@ -495,7 +544,7 @@ export function AuditPage() {
                           <span className="text-xs text-gray-400">{source.category}</span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <StatusBadge status={source.status} />
+                          <StatusBadge status={source.audit_status} />
                         </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-sm text-gray-300 font-mono">
@@ -504,7 +553,7 @@ export function AuditPage() {
                         </td>
                         <td className="px-4 py-3">
                           <span className="text-sm text-gray-400">
-                            {formatDate(source.last_sync)}
+                            {formatDate(source.audit_last_sync)}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">

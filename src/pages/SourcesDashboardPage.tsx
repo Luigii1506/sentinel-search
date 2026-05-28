@@ -100,7 +100,14 @@ const STATUS_CONFIG = {
   error: { label: 'Error', icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
   stale: { label: 'Desactualizado', icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
   disappeared: { label: 'Desaparecida', icon: Shield, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
+  inactive: { label: 'Inactiva', icon: Shield, color: 'text-zinc-400', bg: 'bg-zinc-500/10', border: 'border-zinc-500/20' },
 };
+
+function effectiveStatus(source: SourceInfo): keyof typeof STATUS_CONFIG {
+  if (source.is_active === false) return 'inactive';
+  if (source.status in STATUS_CONFIG) return source.status as keyof typeof STATUS_CONFIG;
+  return 'pending';
+}
 
 // ── Helpers ──
 
@@ -279,7 +286,7 @@ export function SourcesDashboardPage() {
         (source.os_dataset || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
         (source.country || '').toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = activeTab === 'all' || source.category === activeTab;
-      const matchesStatus = statusFilter === 'all' || source.status === statusFilter;
+      const matchesStatus = statusFilter === 'all' || effectiveStatus(source) === statusFilter;
       const matchesData = hasDataFilter === 'all' ||
         (hasDataFilter === 'has_data' && source.bronze_count > 0) ||
         (hasDataFilter === 'no_data' && source.bronze_count === 0);
@@ -473,6 +480,7 @@ export function SourcesDashboardPage() {
               <SelectItem value="pending">Pendiente ({data?.by_status?.pending || 0})</SelectItem>
               <SelectItem value="error">Error ({data?.by_status?.error || 0})</SelectItem>
               <SelectItem value="stale">Desactualizado ({data?.by_status?.stale || 0})</SelectItem>
+              <SelectItem value="inactive">Inactiva</SelectItem>
             </SelectContent>
           </Select>
 
@@ -491,7 +499,7 @@ export function SourcesDashboardPage() {
 
         <div className="md:hidden space-y-3">
           {filteredSources.map((source: SourceInfo) => {
-            const statusCfg = STATUS_CONFIG[source.status] || STATUS_CONFIG.pending;
+            const statusCfg = STATUS_CONFIG[effectiveStatus(source)] || STATUS_CONFIG.pending;
             const StatusIcon = statusCfg.icon;
 
             return (
@@ -596,7 +604,7 @@ export function SourcesDashboardPage() {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {filteredSources.map((source: SourceInfo, index: number) => {
-                  const statusCfg = STATUS_CONFIG[source.status] || STATUS_CONFIG.pending;
+                  const statusCfg = STATUS_CONFIG[effectiveStatus(source)] || STATUS_CONFIG.pending;
                   const StatusIcon = statusCfg.icon;
                   const isExpanded = expandedRows.has(source.source_id);
 
@@ -706,6 +714,9 @@ export function SourcesDashboardPage() {
                                 <p className="text-gray-500 text-xs mt-1">
                                   {source.schedule_frequency} · cola: {source.queue || 'default'}
                                 </p>
+                                <p className="text-gray-500 text-xs mt-1">
+                                  {source.sync_strategy || 'scheduled_snapshot'} · {source.freshness_class || 'n/a'}
+                                </p>
                               </div>
 
                               {/* PEP */}
@@ -716,6 +727,9 @@ export function SourcesDashboardPage() {
                                 ) : (
                                   <span className="text-gray-600 text-xs">No</span>
                                 )}
+                                <p className="text-gray-500 text-xs mt-2">
+                                  {source.is_active === false ? 'Inactiva en scheduler' : source.is_critical ? 'Fuente crítica' : 'Fuente normal'}
+                                </p>
                               </div>
 
                               {/* OS Links */}
