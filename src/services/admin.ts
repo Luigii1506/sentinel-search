@@ -5,6 +5,7 @@ import type {
   User,
   SourceSummary,
   SourceRuntimeHealthResponse,
+  MonitoringOverviewResponse,
   JobsResponse,
   SourceDetail,
   SystemHealth,
@@ -154,6 +155,14 @@ export const adminService = {
 
   async getSourceRuntimeHealth(): Promise<SourceRuntimeHealthResponse> {
     const response = await api.get('/api/v2/admin/sources/runtime-health', { timeout: 60000 });
+    return response.data;
+  },
+
+  async getMonitoringOverview(): Promise<MonitoringOverviewResponse> {
+    const response = await api.get('/api/v2/admin/monitoring/overview', {
+      params: { jobs_limit: 50 },
+      timeout: 60000,
+    });
     return response.data;
   },
 

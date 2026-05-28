@@ -7,13 +7,12 @@ export function useSourceDetail(sourceId: string | null, enabled: boolean = true
     queryKey: ['admin', 'sources', 'detail', sourceId],
     queryFn: async () => {
       if (!sourceId) throw new Error('No source ID provided');
-      console.log('🔍 Fetching source detail for:', sourceId);
-      const data = await adminService.getSourceDetail(sourceId, false);
-      console.log('✅ Source detail received:', data);
-      return data;
+      return adminService.getSourceDetail(sourceId, false);
     },
     enabled: !!sourceId && enabled,
-    staleTime: 60 * 1000, // 1 minute
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   return {

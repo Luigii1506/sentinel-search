@@ -22,14 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
 import type {
-  JobsResponse,
-  SystemHealth,
-  FreshnessSloResponse,
-  DataQualityReportResponse,
-  TaskDlqResponse,
-  RedisDurabilityStatus,
-  DisappearedSourcesAuditResponse,
-  SourceRuntimeHealthResponse,
+  MonitoringOverviewResponse,
 } from '@/types/api';
 
 const containerVariants = {
@@ -109,58 +102,13 @@ function ServiceStatusDot({ status }: { status: string }) {
 }
 
 export function MonitoringPage() {
-  const { data: jobs, isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useQuery<JobsResponse>({
-    queryKey: ['admin', 'jobs'],
-    queryFn: () => adminService.getJobs(50),
-    refetchInterval: 10000,
-  });
-
-  const { data: health } = useQuery<SystemHealth>({
-    queryKey: ['system', 'health'],
-    queryFn: () => adminService.getSystemHealth(),
+  const { data: overview, isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useQuery<MonitoringOverviewResponse>({
+    queryKey: ['admin', 'monitoring', 'overview'],
+    queryFn: () => adminService.getMonitoringOverview(),
+    staleTime: 30 * 1000,
+    gcTime: 5 * 60 * 1000,
     refetchInterval: 30000,
-  });
-
-  const { data: detailed } = useQuery({
-    queryKey: ['admin', 'health', 'detailed'],
-    queryFn: () => adminService.getHealthDetailed(),
-    refetchInterval: 30000,
-  });
-
-  const { data: freshness } = useQuery<FreshnessSloResponse>({
-    queryKey: ['admin', 'freshness', 'slo'],
-    queryFn: () => adminService.getFreshnessSlo(),
-    refetchInterval: 60000,
-  });
-
-  const { data: dataQuality } = useQuery<DataQualityReportResponse>({
-    queryKey: ['admin', 'data-quality'],
-    queryFn: () => adminService.getDataQuality(),
-    refetchInterval: 60000,
-  });
-
-  const { data: taskDlq } = useQuery<TaskDlqResponse>({
-    queryKey: ['admin', 'dlq'],
-    queryFn: () => adminService.getTaskDlq(20),
-    refetchInterval: 60000,
-  });
-
-  const { data: redisDurability } = useQuery<RedisDurabilityStatus>({
-    queryKey: ['admin', 'redis', 'durability'],
-    queryFn: () => adminService.getRedisDurability(),
-    refetchInterval: 60000,
-  });
-
-  const { data: disappeared } = useQuery<DisappearedSourcesAuditResponse>({
-    queryKey: ['admin', 'sources', 'disappeared'],
-    queryFn: () => adminService.getDisappearedSources(),
-    refetchInterval: 120000,
-  });
-
-  const { data: runtimeHealth } = useQuery<SourceRuntimeHealthResponse>({
-    queryKey: ['admin', 'sources', 'runtime-health', 'monitoring'],
-    queryFn: () => adminService.getSourceRuntimeHealth(),
-    refetchInterval: 60000,
+    refetchOnWindowFocus: false,
   });
 
   if (jobsLoading) {
@@ -196,6 +144,16 @@ export function MonitoringPage() {
       </div>
     );
   }
+
+  const jobs = overview?.jobs;
+  const health = overview?.system_health;
+  const detailed = overview?.detailed_health;
+  const freshness = overview?.freshness_slo;
+  const dataQuality = overview?.data_quality;
+  const taskDlq = overview?.task_dlq;
+  const redisDurability = overview?.redis_durability;
+  const disappeared = overview?.disappeared_sources;
+  const runtimeHealth = overview?.runtime_health;
 
   const stats = jobs?.stats || {};
   const running = stats.running || 0;

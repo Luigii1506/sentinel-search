@@ -523,6 +523,18 @@ export interface SourceRuntimeHealthResponse {
   sources: SourceRuntimeHealthEntry[];
 }
 
+export interface MonitoringOverviewResponse {
+  jobs: JobsResponse;
+  system_health: SystemHealth;
+  detailed_health: HealthDetailed;
+  freshness_slo: FreshnessSloResponse;
+  data_quality: DataQualityReportResponse;
+  task_dlq: TaskDlqResponse;
+  redis_durability: RedisDurabilityStatus;
+  disappeared_sources: DisappearedSourcesAuditResponse;
+  runtime_health: SourceRuntimeHealthResponse;
+}
+
 export interface SystemHealth {
   status: string;
   version: string;

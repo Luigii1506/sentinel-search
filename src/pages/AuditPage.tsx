@@ -31,8 +31,6 @@ import { adminService } from '@/services/admin';
 import type {
   JobsResponse,
   SourceInfo,
-  SourceRuntimeHealthEntry,
-  SourceRuntimeHealthResponse,
   SourceSummary,
 } from '@/types/api';
 
@@ -77,26 +75,22 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 type AuditSourceRow = SourceInfo & {
-  runtime?: SourceRuntimeHealthEntry;
   audit_status: string;
   audit_last_sync?: string | null;
 };
 
-function deriveAuditStatus(source: SourceInfo, runtime?: SourceRuntimeHealthEntry): string {
+function deriveAuditStatus(source: SourceInfo): string {
   if (source.is_active === false) return 'inactive';
-  if (runtime?.is_alerting) return 'error';
-  if (runtime?.assertion_status === 'failed') return 'error';
-  if ((runtime?.consecutive_failures || 0) > 0) return 'error';
-  if (runtime?.changed_not_materialized) return 'stale';
-  if (runtime?.runtime_status === 'success') return 'active';
-  if (runtime?.runtime_status === 'failed') return 'error';
+  if (source.is_alerting) return 'error';
+  if (source.assertion_status === 'failed') return 'error';
+  if ((source.consecutive_failures || 0) > 0) return 'error';
+  if (source.last_runtime_status === 'success') return 'active';
+  if (source.last_runtime_status === 'failed') return 'error';
   return source.status;
 }
 
-function deriveAuditLastSync(source: SourceInfo, runtime?: SourceRuntimeHealthEntry): string | null | undefined {
-  return runtime?.last_materialization_at
-    || runtime?.last_successful_sync
-    || source.last_successful_sync
+function deriveAuditLastSync(source: SourceInfo): string | null | undefined {
+  return source.last_successful_sync
     || source.last_sync;
 }
 
@@ -111,39 +105,37 @@ export function AuditPage() {
     queryFn: () => adminService.getSourcesSummary(),
   });
 
-  const { data: runtimeHealth } = useQuery<SourceRuntimeHealthResponse>({
-    queryKey: ['admin', 'sources', 'runtime-health'],
-    queryFn: () => adminService.getSourceRuntimeHealth(),
-  });
-
   const { data: jobsData } = useQuery<JobsResponse>({
     queryKey: ['admin', 'jobs', 'audit'],
     queryFn: () => adminService.getJobs(20),
+    staleTime: 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: disappearedData } = useQuery({
     queryKey: ['admin', 'sources', 'disappeared', 'audit'],
     queryFn: () => adminService.getDisappearedSources(),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const { data: lifecycleData } = useQuery({
     queryKey: ['admin', 'sources', 'lifecycle', 'events'],
     queryFn: () => adminService.getSourceLifecycleEvents(20),
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
   const allSources = useMemo<AuditSourceRow[]>(() => {
     if (!sourcesData?.sources) return [];
-    const runtimeMap = new Map((runtimeHealth?.sources || []).map((item) => [item.source_id, item]));
     return sourcesData.sources.map((source) => {
-      const runtime = runtimeMap.get(source.source_id);
       return {
         ...source,
-        runtime,
-        audit_status: deriveAuditStatus(source, runtime),
-        audit_last_sync: deriveAuditLastSync(source, runtime),
+        audit_status: deriveAuditStatus(source),
+        audit_last_sync: deriveAuditLastSync(source),
       };
     });
-  }, [runtimeHealth, sourcesData]);
+  }, [sourcesData]);
 
   const sources = useMemo<AuditSourceRow[]>(() => {
     let filtered = allSources.filter((s) => {
@@ -215,8 +207,8 @@ export function AuditPage() {
   const recentFailed = jobsData?.recent?.filter((j) => j.status === 'failed') || [];
   const disappearedMarked = disappearedData?.marked_disappeared || [];
   const lifecycleEvents = lifecycleData?.events || [];
-  const monitoredSources = runtimeHealth?.total_sources || 0;
-  const alertingSources = runtimeHealth?.alerting_sources || 0;
+  const monitoredSources = allSources.filter((source) => source.is_active !== false).length;
+  const alertingSources = allSources.filter((source) => source.is_alerting).length;
   const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (
