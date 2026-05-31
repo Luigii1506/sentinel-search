@@ -26,12 +26,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SyncSourceButton } from '@/components/SyncSourceButton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
 import type {
   JobsResponse,
   SourceInfo,
   SourceSummary,
+  SourcesHealthOverviewResponse,
 } from '@/types/api';
 
 function formatDate(dateStr?: string | null): string {
@@ -60,33 +62,44 @@ function freshnessLabel(lastSync?: string | null): { text: string; color: string
   return { text: `${days}d`, color: 'text-red-400' };
 }
 
+function HealthScoreBadge({ score, status }: { score?: number; status?: string }) {
+  if (score == null) return null;
+  const colorClass =
+    status === 'healthy' ? 'bg-green-500/15 text-green-300 border-green-500/30' :
+    status === 'warning' ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' :
+    status === 'critical' ? 'bg-red-500/15 text-red-300 border-red-500/30' :
+    'bg-zinc-500/15 text-zinc-300 border-zinc-500/30';
+  return (
+    <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border min-w-[40px] ${colorClass}`}>
+      {score}
+    </span>
+  );
+}
+
+
+// Estado consolidado: usa health_status del backend como SINGLE SOURCE OF TRUTH.
+// Combina freshness + failures + assertions con contexto real (no marca "error"
+// por un fallo aislado si después se recuperó).
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; class: string }> = {
-    active: { label: 'Activo', class: 'bg-green-500/10 text-green-400 border-green-500/20' },
-    stale: { label: 'Desactualizado', class: 'bg-orange-500/10 text-orange-400 border-orange-500/20' },
-    error: { label: 'Error', class: 'bg-red-500/10 text-red-400 border-red-500/20' },
-    pending: { label: 'Pendiente', class: 'bg-gray-500/10 text-gray-400 border-gray-500/20' },
-    importing: { label: 'Importando', class: 'bg-blue-500/10 text-blue-400 border-blue-500/20' },
-    disappeared: { label: 'Desaparecida', class: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' },
+    healthy: { label: 'Saludable', class: 'bg-green-500/10 text-green-400 border-green-500/20' },
+    warning: { label: 'Atención', class: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    critical: { label: 'Crítico', class: 'bg-red-500/10 text-red-400 border-red-500/20' },
     inactive: { label: 'Inactiva', class: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
   };
-  const c = config[status] || config.pending;
+  const c = config[status] || config.inactive;
   return <Badge variant="outline" className={`text-xs ${c.class}`}>{c.label}</Badge>;
 }
 
 type AuditSourceRow = SourceInfo & {
-  audit_status: string;
+  audit_status: string;                  // === health_status del backend
   audit_last_sync?: string | null;
 };
 
 function deriveAuditStatus(source: SourceInfo): string {
-  if (source.is_active === false) return 'inactive';
-  if (source.is_alerting) return 'error';
-  if (source.assertion_status === 'failed') return 'error';
-  if ((source.consecutive_failures || 0) > 0) return 'error';
-  if (source.last_runtime_status === 'success') return 'active';
-  if (source.last_runtime_status === 'failed') return 'error';
-  return source.status;
+  // Source of truth: health_status del backend.
+  // Fallback a 'inactive' si el backend aún no lo devuelve.
+  return source.health_status || (source.is_active === false ? 'inactive' : 'warning');
 }
 
 function deriveAuditLastSync(source: SourceInfo): string | null | undefined {
@@ -126,6 +139,14 @@ export function AuditPage() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: healthOverview } = useQuery<SourcesHealthOverviewResponse>({
+    queryKey: ['admin', 'sources', 'health-overview'],
+    queryFn: () => adminService.getSourcesHealthOverview(),
+    staleTime: 60 * 1000,
+    refetchInterval: 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
   const allSources = useMemo<AuditSourceRow[]>(() => {
     if (!sourcesData?.sources) return [];
     return sourcesData.sources.map((source) => {
@@ -160,8 +181,8 @@ export function AuditPage() {
         const bTime = b.audit_last_sync ? new Date(b.audit_last_sync).getTime() : 0;
         cmp = aTime - bTime;
       } else if (sortField === 'status') {
-        const order: Record<string, number> = { error: 0, stale: 1, disappeared: 2, importing: 3, pending: 4, inactive: 5, active: 6 };
-        cmp = (order[a.audit_status] ?? 6) - (order[b.audit_status] ?? 6);
+        const order: Record<string, number> = { critical: 0, warning: 1, healthy: 2, inactive: 3 };
+        cmp = (order[a.audit_status] ?? 4) - (order[b.audit_status] ?? 4);
       }
       return sortDir === 'asc' ? cmp : -cmp;
     });
@@ -237,6 +258,126 @@ export function AuditPage() {
           </div>
         </motion.div>
 
+        {/* Zombie jobs banner (solo si hay) */}
+        {healthOverview?.zombie_jobs && healthOverview.zombie_jobs.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4"
+          >
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-red-300">
+                  {healthOverview.zombie_jobs.length} jobs zombie detectados
+                </h3>
+                <p className="text-xs text-red-200/80 mt-1">
+                  Marcados como "running" en DB pero sin worker ejecutándolos.
+                  El cleanup automático los corrige en menos de 5 min.
+                </p>
+                <div className="mt-2 space-y-1">
+                  {healthOverview.zombie_jobs.slice(0, 3).map((z) => (
+                    <p key={z.job_id} className="text-xs text-red-200/90">
+                      • <span className="font-mono">{z.source}</span> ({z.job_type || 'job'}) — hace {z.age_hours?.toFixed(1) || '?'}h
+                    </p>
+                  ))}
+                  {healthOverview.zombie_jobs.length > 3 && (
+                    <p className="text-xs text-red-200/70">
+                      ...y {healthOverview.zombie_jobs.length - 3} más
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Cobertura 24h + Health buckets */}
+        {healthOverview && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"
+          >
+            {/* Cobertura 24h */}
+            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs text-gray-400 uppercase tracking-wide">Cobertura últimas 24h</span>
+                  <span className={`text-xs font-medium ${
+                    healthOverview.coverage_24h.coverage_pct >= 80 ? 'text-green-400' :
+                    healthOverview.coverage_24h.coverage_pct >= 50 ? 'text-amber-400' : 'text-red-400'
+                  }`}>
+                    {healthOverview.coverage_24h.coverage_pct}%
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-white mb-2">
+                  {healthOverview.coverage_24h.synced_in_24h} <span className="text-base text-gray-500 font-normal">/ {healthOverview.coverage_24h.total_active_sources}</span>
+                </div>
+                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full ${
+                      healthOverview.coverage_24h.coverage_pct >= 80 ? 'bg-green-400' :
+                      healthOverview.coverage_24h.coverage_pct >= 50 ? 'bg-amber-400' : 'bg-red-400'
+                    }`}
+                    style={{ width: `${Math.min(healthOverview.coverage_24h.coverage_pct, 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  fuentes activas sincronizadas en 24h
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Health buckets */}
+            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+              <CardContent className="p-4">
+                <span className="text-xs text-gray-400 uppercase tracking-wide">Estado de salud</span>
+                <div className="grid grid-cols-4 gap-2 mt-2">
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-green-400">{healthOverview.health_buckets.healthy}</div>
+                    <p className="text-[10px] text-gray-500 uppercase">healthy</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-amber-400">{healthOverview.health_buckets.warning}</div>
+                    <p className="text-[10px] text-gray-500 uppercase">warning</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-red-400">{healthOverview.health_buckets.critical}</div>
+                    <p className="text-[10px] text-gray-500 uppercase">critical</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-xl font-bold text-zinc-500">{healthOverview.health_buckets.inactive}</div>
+                    <p className="text-[10px] text-gray-500 uppercase">inactive</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Próximos syncs */}
+            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+              <CardContent className="p-4">
+                <span className="text-xs text-gray-400 uppercase tracking-wide">Próximos syncs</span>
+                <div className="mt-2 space-y-1.5 max-h-[120px] overflow-y-auto">
+                  {healthOverview.upcoming_syncs.slice(0, 4).map((u) => (
+                    <div key={u.source_id} className="flex items-center justify-between text-xs">
+                      <span className="text-gray-300 truncate flex-1 mr-2" title={u.display_name}>
+                        {u.source_id}
+                      </span>
+                      <span className="text-gray-500 flex-shrink-0">
+                        {u.minutes_until < 60 ? `${u.minutes_until}m` : `${Math.floor(u.minutes_until / 60)}h`}
+                      </span>
+                    </div>
+                  ))}
+                  {healthOverview.upcoming_syncs.length === 0 && (
+                    <p className="text-xs text-gray-500">Sin syncs próximos</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         {/* Stats */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -267,20 +408,30 @@ export function AuditPage() {
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle2 className="w-4 h-4 text-green-400" />
-                <span className="text-xs text-gray-400">Activas</span>
+                <span className="text-xs text-gray-400">Saludables</span>
               </div>
-              <div className="text-2xl font-bold text-white">{byStatus.active || 0}</div>
-              <p className="text-xs text-gray-500">Con sync valido</p>
+              <div className="text-2xl font-bold text-white">{byStatus.healthy || 0}</div>
+              <p className="text-xs text-gray-500">Score ≥ 80</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-[#1a1a1a] border-white/5">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-1">
+                <AlertTriangle className="w-4 h-4 text-amber-400" />
+                <span className="text-xs text-gray-400">En atención</span>
+              </div>
+              <div className="text-2xl font-bold text-white">{byStatus.warning || 0}</div>
+              <p className="text-xs text-gray-500">Stale o fallo reciente</p>
             </CardContent>
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <XCircle className="w-4 h-4 text-red-400" />
-                <span className="text-xs text-gray-400">Alertando</span>
+                <span className="text-xs text-gray-400">Críticas</span>
               </div>
-              <div className="text-2xl font-bold text-white">{alertingSources || byStatus.error || 0}</div>
-              <p className="text-xs text-gray-500">Runtime o assertions</p>
+              <div className="text-2xl font-bold text-white">{byStatus.critical || 0}</div>
+              <p className="text-xs text-gray-500">Fallos consecutivos</p>
             </CardContent>
           </Card>
           <Card className="bg-[#1a1a1a] border-white/5">
@@ -289,7 +440,7 @@ export function AuditPage() {
                 <Clock className="w-4 h-4 text-gray-400" />
                 <span className="text-xs text-gray-400">Inactivas</span>
               </div>
-              <div className="text-2xl font-bold text-white">{inactiveSources}</div>
+              <div className="text-2xl font-bold text-white">{byStatus.inactive || inactiveSources}</div>
               <p className="text-xs text-gray-500">Fuera del scheduler</p>
             </CardContent>
           </Card>
@@ -351,12 +502,10 @@ export function AuditPage() {
             </SelectTrigger>
             <SelectContent className="bg-[#1a1a1a] border-white/10">
               <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="active">Activos</SelectItem>
-              <SelectItem value="stale">Desactualizados</SelectItem>
-              <SelectItem value="error">Con error</SelectItem>
-              <SelectItem value="pending">Pendientes</SelectItem>
-              <SelectItem value="disappeared">Desaparecidas</SelectItem>
-              <SelectItem value="inactive">Inactivas</SelectItem>
+              <SelectItem value="critical">Crítico</SelectItem>
+              <SelectItem value="warning">Atención</SelectItem>
+              <SelectItem value="healthy">Saludable</SelectItem>
+              <SelectItem value="inactive">Inactiva</SelectItem>
             </SelectContent>
           </Select>
         </motion.div>
@@ -453,6 +602,12 @@ export function AuditPage() {
                         </div>
                         <StatusBadge status={source.audit_status} />
                       </div>
+                      {source.stale_reason && (
+                        <div className="flex items-center gap-2">
+                          <HealthScoreBadge score={source.health_score} status={source.health_status} />
+                          <p className="text-xs text-gray-400 break-words flex-1">{source.stale_reason}</p>
+                        </div>
+                      )}
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Categoria</p>
@@ -471,6 +626,14 @@ export function AuditPage() {
                           <p className={`font-medium ${freshness.color}`}>{freshness.text}</p>
                         </div>
                       </div>
+                      {source.is_active !== false && source.is_historical !== true && (
+                        <div className="pt-2 border-t border-white/5">
+                          <SyncSourceButton
+                            sourceId={source.source_id}
+                            invalidateKeys={[['admin', 'sources'], ['admin', 'jobs'], ['operations']]}
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -498,6 +661,9 @@ export function AuditPage() {
                     >
                       Estado <SortIcon field="status" />
                     </th>
+                    <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                      Salud
+                    </th>
                     <th
                       className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-white"
                       onClick={() => toggleSort('bronze_count')}
@@ -512,6 +678,9 @@ export function AuditPage() {
                     </th>
                     <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
                       Frescura
+                    </th>
+                    <th className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                      Acciones
                     </th>
                   </tr>
                 </thead>
@@ -538,6 +707,16 @@ export function AuditPage() {
                         <td className="px-4 py-3 text-center">
                           <StatusBadge status={source.audit_status} />
                         </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-2">
+                            <HealthScoreBadge score={source.health_score} status={source.health_status} />
+                            {source.stale_reason && (
+                              <span className="text-xs text-gray-400 truncate max-w-[220px]" title={source.stale_reason}>
+                                {source.stale_reason}
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-right">
                           <span className="text-sm text-gray-300 font-mono">
                             {source.bronze_count.toLocaleString()}
@@ -552,6 +731,14 @@ export function AuditPage() {
                           <span className={`text-sm font-medium ${freshness.color}`}>
                             {freshness.text}
                           </span>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {source.is_active !== false && source.is_historical !== true && (
+                            <SyncSourceButton
+                              sourceId={source.source_id}
+                              invalidateKeys={[['admin', 'sources'], ['admin', 'jobs'], ['operations']]}
+                            />
+                          )}
                         </td>
                       </motion.tr>
                     );

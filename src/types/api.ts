@@ -415,6 +415,211 @@ export interface SourceInfo {
   assertion_failures?: number;
   consecutive_failures?: number;
   is_alerting?: boolean;
+  // Sprint B: visibility
+  health_score?: number;       // 0-100
+  health_status?: 'healthy' | 'warning' | 'critical' | 'inactive';
+  stale_reason?: string | null;
+}
+
+export interface ZombieJobEntry {
+  job_id: string;
+  source: string;
+  job_type?: string | null;
+  age_hours?: number | null;
+  reason: string;
+}
+
+export interface UpcomingSyncEntry {
+  source_id: string;
+  display_name: string;
+  tier: number;
+  next_due_at: string;
+  minutes_until: number;
+  queue?: string | null;
+}
+
+export interface RecentSyncEntry {
+  source_id: string;
+  display_name: string;
+  status?: 'success' | 'failed' | 'skipped';
+  error_message?: string | null;
+  completed_at: string;
+  minutes_ago: number;
+  duration_seconds?: number | null;
+  records_processed?: number | null;
+  records_inserted?: number | null;
+  records_updated?: number | null;
+  job_type?: string | null;
+  is_skip?: boolean;
+}
+
+export interface CoverageByTier {
+  total: number;
+  within_slo?: number;
+  within_slo_pct?: number;
+  // Legacy (deprecated):
+  synced?: number;
+  coverage_pct?: number;
+}
+
+export interface SourcesHealthOverviewResponse {
+  evaluated_at: string;
+  coverage_24h: {
+    total_active_sources: number;
+    within_slo: number;
+    within_slo_pct: number;
+    breaching_slo_count: number;
+    never_synced: number;
+    synced_in_24h: number;
+    coverage_pct: number;
+    by_tier: Record<string, CoverageByTier>;
+  };
+  health_buckets: {
+    healthy: number;
+    warning: number;
+    critical: number;
+    inactive: number;
+  };
+  zombie_jobs: ZombieJobEntry[];
+  upcoming_syncs: UpcomingSyncEntry[];
+  recent_syncs: RecentSyncEntry[];
+}
+
+export interface SourceCurrentStage {
+  step: string;
+  started_at: string;
+  elapsed_seconds: number;
+  last_heartbeat_at?: string | null;
+  cursor?: string | null;
+}
+
+export interface SourceLastRun {
+  status: 'success' | 'failed' | 'skipped' | 'running';
+  completed_at?: string | null;
+  started_at?: string | null;
+  duration_seconds?: number | null;
+  records_processed?: number | null;
+  records_inserted?: number | null;
+  records_updated?: number | null;
+  error_message?: string | null;
+  is_skip: boolean;
+  minutes_ago?: number | null;
+}
+
+export interface SourceActivityEntry {
+  source_id: string;
+  display_name: string;
+  category?: string | null;
+  country?: string | null;
+  tier: number;
+  is_critical: boolean;
+  is_active: boolean;
+  is_historical: boolean;
+  state: 'idle' | 'running' | 'recent_success' | 'recent_failed' | 'stale' | 'never';
+  health_status: 'healthy' | 'warning' | 'critical' | 'inactive';
+  health_score: number;
+  current_stage?: SourceCurrentStage | null;
+  last_run?: SourceLastRun | null;
+  next_due_at?: string | null;
+  next_due_minutes?: number | null;
+  schedule_frequency?: string | null;
+  max_staleness_hours?: number | null;
+  last_dispatched_at?: string | null;
+  last_sync_result?: 'success' | 'skipped_smart' | 'skipped_lock' | 'failed' | string | null;
+  hours_since_last_dispatch?: number | null;
+  provider?: 'native' | 'opensanctions' | 'manual' | string | null;
+  os_last_change?: string | null;
+}
+
+export interface SchedulerPreviewEntry {
+  source_id: string;
+  tier: number;
+  frequency: string;
+  schedule_hour_utc: number;
+  schedule_minute_utc?: number | null;
+  eligible_now: boolean;
+  reason: string;
+  last_dispatched_at?: string | null;
+  last_sync_result?: string | null;
+  hours_since_last_dispatch?: number | null;
+  min_gap_hours: number;
+  queue: string;
+  consecutive_failures?: number;
+  backoff_until?: string | null;
+  backoff_hours?: number | null;
+  next_eligible_at?: string | null;
+  hours_until_eligible?: number | null;
+}
+
+export interface PipelineLayerProgress {
+  status: 'pending' | 'running' | 'complete' | string;
+  processed?: number | null;
+  expected?: number | null;
+  percent?: number | null;
+}
+
+export interface PipelineProgressResponse {
+  source_id: string;
+  evaluated_at: string;
+  current_stage?: string | null;
+  chunk_number?: number | null;
+  is_running: boolean;
+  bronze: PipelineLayerProgress;
+  silver: PipelineLayerProgress;
+  gold: PipelineLayerProgress;
+  opensearch: PipelineLayerProgress;
+}
+
+export interface SchedulerPreviewResponse {
+  evaluated_at: string;
+  total_scheduled: number;
+  eligible_now: number;
+  skipped_by_reason: Record<string, number>;
+  sources: SchedulerPreviewEntry[];
+}
+
+export interface SourceActivityResponse {
+  evaluated_at: string;
+  total: number;
+  counts: Record<string, number>;
+  sources: SourceActivityEntry[];
+}
+
+export interface SourceRunDetail {
+  id: string;
+  status: 'success' | 'failed' | 'skipped' | 'running';
+  job_type?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  duration_seconds?: number | null;
+  records_processed?: number | null;
+  records_inserted?: number | null;
+  records_updated?: number | null;
+  records_failed?: number | null;
+  error_message?: string | null;
+  is_skip: boolean;
+  minutes_ago?: number | null;
+}
+
+export interface SourceRunsResponse {
+  source_id: string;
+  total_returned: number;
+  runs: SourceRunDetail[];
+}
+
+export interface SourceTimelineDay {
+  date: string;
+  success: number;
+  failed: number;
+  skipped: number;
+  total_records_processed: number;
+  last_completed_at?: string | null;
+}
+
+export interface SourceTimelineResponse {
+  source_id: string;
+  days: number;
+  timeline: SourceTimelineDay[];
 }
 
 export interface SourceDetail {
@@ -523,6 +728,25 @@ export interface SourceRuntimeHealthResponse {
   sources: SourceRuntimeHealthEntry[];
 }
 
+export interface SnapshotHealthEntry {
+  scope: string;
+  computed_at?: string | null;
+  age_seconds?: number | null;
+  max_age_seconds: number;
+  is_stale: boolean;
+  is_critical: boolean;
+  last_duration_ms?: number | null;
+  status: 'ok' | 'stale' | 'missing' | 'critical';
+}
+
+export interface SnapshotsHealthResponse {
+  evaluated_at: string;
+  total_snapshots: number;
+  stale_snapshots: number;
+  critical_snapshots: number;
+  snapshots: SnapshotHealthEntry[];
+}
+
 export interface MonitoringOverviewResponse {
   jobs: JobsResponse;
   system_health: SystemHealth;
@@ -533,6 +757,7 @@ export interface MonitoringOverviewResponse {
   redis_durability: RedisDurabilityStatus;
   disappeared_sources: DisappearedSourcesAuditResponse;
   runtime_health: SourceRuntimeHealthResponse;
+  snapshots_health: SnapshotsHealthResponse;
 }
 
 export interface SystemHealth {

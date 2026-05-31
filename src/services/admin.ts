@@ -5,6 +5,8 @@ import type {
   User,
   SourceSummary,
   SourceRuntimeHealthResponse,
+  SourcesHealthOverviewResponse,
+  SourceTimelineResponse,
   MonitoringOverviewResponse,
   JobsResponse,
   SourceDetail,
@@ -98,6 +100,22 @@ export const adminService = {
   },
 
   /**
+   * v2: Trigger sync de una fuente específica (con validación de catálogo).
+   * Usa /api/v2/sync/{source} que valida que la fuente existe en SourceRegistry,
+   * elige la queue correcta y dispara el task de Celery.
+   */
+  async triggerSourceSync(
+    sourceId: string,
+    opts?: { force?: boolean }
+  ): Promise<{ status: string; source: string; task_id?: string; queue?: string }> {
+    const response = await api.post(`/api/v2/sync/${sourceId}`, null, {
+      params: { force: opts?.force ?? false },
+      timeout: 15000,
+    });
+    return response.data;
+  },
+
+  /**
    * Get sync status
    */
   async getSyncStatus(taskId: string): Promise<{
@@ -155,6 +173,60 @@ export const adminService = {
 
   async getSourceRuntimeHealth(): Promise<SourceRuntimeHealthResponse> {
     const response = await api.get('/api/v2/admin/sources/runtime-health', { timeout: 60000 });
+    return response.data;
+  },
+
+  async getSourcesHealthOverview(): Promise<SourcesHealthOverviewResponse> {
+    const response = await api.get('/api/v2/admin/sources/health-overview', { timeout: 30000 });
+    return response.data;
+  },
+
+  async getSourcesActivity(opts?: {
+    filter?: 'active' | 'all' | 'running' | 'failing' | 'critical' | 'never';
+    tier?: 1 | 2 | 3 | 4;
+    limit?: number;
+  }): Promise<import('@/types/api').SourceActivityResponse> {
+    const response = await api.get('/api/v2/admin/sources/activity', {
+      params: { filter: opts?.filter, tier: opts?.tier, limit: opts?.limit ?? 100 },
+      timeout: 15000,
+    });
+    return response.data;
+  },
+
+  // Dry-run del scheduler: qué decidiría AHORA. Útil para diagnosticar
+  // "por qué no corrió X" sin abrir psql o leer logs del worker.
+  async getSchedulerPreview(opts?: {
+    only_in_window?: boolean;
+  }): Promise<import('@/types/api').SchedulerPreviewResponse> {
+    const response = await api.get('/api/v2/admin/scheduler/preview', {
+      params: { only_in_window: opts?.only_in_window ?? false },
+      timeout: 15000,
+    });
+    return response.data;
+  },
+
+  // Progreso por capa (bronze/silver/gold/os) de un source. Cacheado 30s
+  // en backend — counts en tablas grandes cuestan segundos.
+  async getPipelineProgress(sourceId: string): Promise<import('@/types/api').PipelineProgressResponse> {
+    const response = await api.get(`/api/v2/admin/sources/${sourceId}/pipeline-progress`, {
+      timeout: 25000,
+    });
+    return response.data;
+  },
+
+  async getSourceTimeline(sourceId: string, days: number = 7): Promise<SourceTimelineResponse> {
+    const response = await api.get(`/api/v2/admin/sources/${sourceId}/timeline`, {
+      params: { days },
+      timeout: 15000,
+    });
+    return response.data;
+  },
+
+  async getSourceRuns(sourceId: string, limit: number = 15): Promise<import('@/types/api').SourceRunsResponse> {
+    const response = await api.get(`/api/v2/admin/sources/${sourceId}/runs`, {
+      params: { limit },
+      timeout: 10000,
+    });
     return response.data;
   },
 

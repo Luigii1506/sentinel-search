@@ -10,6 +10,7 @@ import { SearchPage } from '@/pages/SearchPage';
 import { EntityProfilePage } from '@/pages/EntityProfilePage';
 import { SourcesDashboardPage } from '@/pages/SourcesDashboardPage';
 import { MonitoringPage } from '@/pages/MonitoringPage';
+import { OperationsPage } from '@/pages/OperationsPage';
 import { BulkScreeningPage } from '@/pages/BulkScreeningPage';
 import { AuditPage } from '@/pages/AuditPage';
 import { MergeReviewPage } from '@/pages/MergeReviewPage';
@@ -140,6 +141,14 @@ function App() {
               />
 
               {/* All Routes Public for now */}
+              <Route
+                path="/operations"
+                element={
+                  <AuthenticatedLayout>
+                    <OperationsPage />
+                  </AuthenticatedLayout>
+                }
+              />
               <Route
                 path="/monitoring"
                 element={

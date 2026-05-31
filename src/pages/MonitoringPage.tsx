@@ -175,6 +175,19 @@ export function MonitoringPage() {
   const runtimeAlerting = runtimeHealth?.alerting_sources || 0;
   const changedNotMaterialized = runtimeHealth?.sources?.filter((item) => item.changed_not_materialized).length || 0;
   const runtimeTracked = runtimeHealth?.total_sources || 0;
+  const snapshotsHealth = overview?.snapshots_health;
+  const snapshotsStale = snapshotsHealth?.stale_snapshots || 0;
+  const snapshotsCritical = snapshotsHealth?.critical_snapshots || 0;
+  const dataQualitySnapshot = snapshotsHealth?.snapshots?.find((s) => s.scope === 'data_quality');
+  const dataQualityAgeSeconds = dataQualitySnapshot?.age_seconds ?? null;
+
+  const formatRelativeAge = (seconds: number | null | undefined): string => {
+    if (seconds == null) return 'sin datos';
+    if (seconds < 60) return `hace ${seconds}s`;
+    if (seconds < 3600) return `hace ${Math.floor(seconds / 60)} min`;
+    if (seconds < 86400) return `hace ${Math.floor(seconds / 3600)} h`;
+    return `hace ${Math.floor(seconds / 86400)} d`;
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -195,10 +208,33 @@ export function MonitoringPage() {
                 </p>
               </div>
             </div>
-            <Button variant="outline" onClick={() => refetchJobs()} className="w-full sm:w-auto">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Actualizar
-            </Button>
+            <div className="flex flex-col sm:items-end gap-2 sm:flex-row sm:items-center">
+              {dataQualitySnapshot && (
+                <div
+                  className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
+                    dataQualitySnapshot.is_critical
+                      ? 'border-red-500/30 bg-red-500/10 text-red-300'
+                      : dataQualitySnapshot.is_stale
+                        ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                        : 'border-white/10 bg-white/5 text-gray-400'
+                  }`}
+                  title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
+                >
+                  <div className={`w-1.5 h-1.5 rounded-full ${
+                    dataQualitySnapshot.is_critical
+                      ? 'bg-red-400'
+                      : dataQualitySnapshot.is_stale
+                        ? 'bg-amber-400'
+                        : 'bg-green-400'
+                  }`} />
+                  <span>Datos: {formatRelativeAge(dataQualityAgeSeconds)}</span>
+                </div>
+              )}
+              <Button variant="outline" onClick={() => refetchJobs()} className="w-full sm:w-auto">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Actualizar
+              </Button>
+            </div>
           </div>
         </motion.div>
 
@@ -462,6 +498,26 @@ export function MonitoringPage() {
                   <span className="text-xs text-gray-400">Cambio pendiente</span>
                 </div>
                 <div className="text-2xl font-bold text-white">{changedNotMaterialized}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <Card className={`bg-[#1a1a1a] ${snapshotsCritical > 0 ? 'border-red-500/30' : snapshotsStale > 0 ? 'border-amber-500/30' : 'border-white/5'}`}>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <HardDrive className={`w-4 h-4 ${snapshotsCritical > 0 ? 'text-red-400' : snapshotsStale > 0 ? 'text-amber-400' : 'text-green-400'}`} />
+                  <span className="text-xs text-gray-400">Snapshots</span>
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {(snapshotsHealth?.total_snapshots || 0) - snapshotsStale}/{snapshotsHealth?.total_snapshots || 0}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  {snapshotsCritical > 0
+                    ? `${snapshotsCritical} críticos`
+                    : snapshotsStale > 0
+                      ? `${snapshotsStale} stale`
+                      : 'todos frescos'}
+                </p>
               </CardContent>
             </Card>
           </motion.div>

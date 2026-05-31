@@ -42,10 +42,12 @@ const mainNavLinks = [
 ];
 
 const adminNavItems = [
+  // Operations es el hub principal: status, ahora, próximos, recientes, alertas
+  { path: '/operations', label: 'Operaciones', icon: Activity },
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
-  { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
-  { path: '/monitoring', label: 'Monitoreo', icon: Activity },
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
+  { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
+  { path: '/monitoring', label: 'Monitoreo (legacy)', icon: Activity },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/settings', label: 'Configuración', icon: Settings },
 ];
@@ -153,7 +155,7 @@ export function Navigation() {
                 <button
                   className={cn(
                     'relative px-4 py-2 text-sm font-medium transition-colors rounded-lg flex items-center gap-2',
-                    location.pathname.startsWith('/admin') || location.pathname === '/monitoring' || location.pathname === '/reports' || location.pathname === '/settings'
+                    location.pathname.startsWith('/admin') || location.pathname === '/operations' || location.pathname === '/monitoring' || location.pathname === '/reports' || location.pathname === '/settings'
                       ? 'text-white bg-white/10'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
                   )}
