@@ -229,7 +229,8 @@ export function AuditPage() {
   const disappearedMarked = disappearedData?.marked_disappeared || [];
   const lifecycleEvents = lifecycleData?.events || [];
   const monitoredSources = allSources.filter((source) => source.is_active !== false).length;
-  const alertingSources = allSources.filter((source) => source.is_alerting).length;
+  // alertingSources removed (was unused, kept the filter inline elsewhere)
+  void allSources.filter((source) => source.is_alerting).length;
   const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (

@@ -45,6 +45,7 @@ import { useNetwork, useRelationshipsList } from '@/hooks/useGraph';
 import { RelationshipGraph } from '@/components/graph/RelationshipGraph';
 import { complianceService } from '@/services/compliance';
 import { entityService, type EntityProfile, type WikidataLink } from '@/services/entities';
+import { ProvenancePanel } from '@/components/entity/ProvenancePanel';
 import { cn, getRiskColor, formatDate, humanizeEntityName } from '@/lib/utils';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
@@ -488,7 +489,8 @@ type EntityTabId =
   | 'relationships'
   | 'network'
   | 'network-risk'
-  | 'ubo';
+  | 'ubo'
+  | 'provenance';
 
 function isWikidataOnlyProfile(profile?: EntityProfile): boolean {
   const sources = profile?.overview.sources || [];
@@ -1587,6 +1589,8 @@ export function EntityProfilePage() {
     if (showNetwork) tabs.push({ id: 'network', label: 'Grafo' });
     if (showNetworkRisk) tabs.push({ id: 'network-risk', label: 'Riesgo Red', icon: Network });
     if (showUBO) tabs.push({ id: 'ubo', label: 'UBO', icon: Landmark });
+    // Provenance siempre disponible (motor nuevo, FtM-shaped)
+    tabs.push({ id: 'provenance', label: 'Provenance', icon: Database });
 
     return tabs;
   }, [
@@ -3211,6 +3215,11 @@ export function EntityProfilePage() {
           {/* UBO Tab */}
           <TabsContent value="ubo">
             <UBOTab entityId={id!} />
+          </TabsContent>
+
+          {/* Provenance Tab (FtM Statement-based: per-property audit trail + time-travel) */}
+          <TabsContent value="provenance">
+            <ProvenancePanel entityId={id!} />
           </TabsContent>
         </Tabs>
       </div>

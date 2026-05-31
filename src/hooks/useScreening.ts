@@ -54,7 +54,10 @@ const defaultFilters: SearchFilters = {
   countries: [],
 };
 
-export function useScreening(sourceLevel?: 1 | 2 | 3 | 4 | 5): UseScreeningReturn {
+export function useScreening(
+  sourceLevel?: 1 | 2 | 3 | 4 | 5,
+  engine: 'v1' | 'v2' = 'v1',
+): UseScreeningReturn {
   const [query, setQueryState] = useState('');
   const [suggestions, setSuggestions] = useState<ScreeningMatch[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
@@ -63,9 +66,10 @@ export function useScreening(sourceLevel?: 1 | 2 | 3 | 4 | 5): UseScreeningRetur
   const [performance, setPerformance] = useState<SearchPerformance | null>(null);
   const [cacheStats, setCacheStats] = useState(screeningService.getCacheStats());
 
-  // Optimized search mutation (Smart Search v3.0)
+  // Optimized search mutation (Smart Search v3.0). engine=v1 (legacy) o v2 (nomenklatura ML)
   const searchMutation = useMutation({
-    mutationFn: (request: ScreeningRequest) => screeningService.search(request),
+    mutationFn: (request: ScreeningRequest) =>
+      screeningService.search({ ...request, engine } as ScreeningRequest & { engine: 'v1' | 'v2' }),
     onSuccess: (data) => {
       setPerformance({
         executionTimeMs: data.execution_time_ms,

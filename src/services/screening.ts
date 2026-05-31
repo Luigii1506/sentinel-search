@@ -200,13 +200,14 @@ export const screeningService = {
    * Search entities with screening (Gold Layer)
    * Calls API directly to preserve all response fields
    */
-  async search(request: ScreeningRequest): Promise<ScreeningResponse> {
+  async search(request: ScreeningRequest & { engine?: 'v1' | 'v2' }): Promise<ScreeningResponse> {
     const response = await api.post('/api/v2/screen/gold', {
       name: request.name,
       max_results: request.max_results ?? 50,
       min_confidence: request.min_confidence ?? 0.5,
       source_level: request.source_level,
       lang: 'es',
+      ...(request.engine ? { engine: request.engine } : {}),
     });
 
     const entityTypeMap: Record<string, string> = {

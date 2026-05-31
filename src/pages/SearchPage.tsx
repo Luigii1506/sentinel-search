@@ -1405,6 +1405,9 @@ export function SearchPage() {
   const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(
     initialSourceLevel,
   );
+  // Engine: v1 (legacy hybrid) o v2 (nomenklatura ML-scored, multi-script)
+  const initialEngine = (searchParams.get("engine") === "v2" ? "v2" : "v1") as "v1" | "v2";
+  const [engine, setEngine] = useState<"v1" | "v2">(initialEngine);
 
   const {
     query,
@@ -1419,7 +1422,7 @@ export function SearchPage() {
     executeSearch,
     executeSemanticSearch,
     clearSearch,
-  } = useScreening(sourceLevel);
+  } = useScreening(sourceLevel, engine);
 
   const [showFilters, setShowFilters] = useState(false);
   const [localFilters, setLocalFilters] = useState({
@@ -1542,10 +1545,53 @@ export function SearchPage() {
               setSearchParams({
                 q: query || initialQuery,
                 source_level: String(level),
+                ...(engine === "v2" ? { engine } : {}),
               });
             }}
             className="mt-3"
           />
+          {/* Engine toggle: v1 legacy hybrid vs v2 nomenklatura ML multi-script */}
+          <div className="mt-3 flex items-center gap-2 text-xs text-gray-300">
+            <span>Motor:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setEngine("v1");
+                setSearchParams({
+                  q: query || initialQuery,
+                  source_level: String(sourceLevel),
+                });
+              }}
+              className={cn(
+                "px-3 py-1 rounded-full border transition",
+                engine === "v1"
+                  ? "bg-blue-500/20 border-blue-400 text-blue-200"
+                  : "border-white/10 text-gray-400 hover:bg-white/5",
+              )}
+            >
+              v1 Hybrid (legacy)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEngine("v2");
+                setSearchParams({
+                  q: query || initialQuery,
+                  source_level: String(sourceLevel),
+                  engine: "v2",
+                });
+              }}
+              className={cn(
+                "px-3 py-1 rounded-full border transition flex items-center gap-1",
+                engine === "v2"
+                  ? "bg-purple-500/20 border-purple-400 text-purple-200"
+                  : "border-white/10 text-gray-400 hover:bg-white/5",
+              )}
+              title="nomenklatura.DefaultAlgorithm: multi-script (Latin↔Cyrillic↔Chinese↔Arabic), ML-scored"
+            >
+              ✨ v2 ML Multi-script
+            </button>
+          </div>
         </motion.div>
 
         {/* Results Section */}
