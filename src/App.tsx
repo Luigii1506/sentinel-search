@@ -18,6 +18,8 @@ import { ComplianceDashboardPage } from '@/pages/ComplianceDashboardPage';
 import { CaseDetailPage } from '@/pages/CaseDetailPage';
 import ReportsPage from '@/pages/ReportsPage';
 import { AdverseMediaPage } from '@/pages/AdverseMediaPage';
+import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
+import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -82,6 +84,22 @@ function App() {
                 element={
                   <AuthenticatedLayout>
                     <BulkScreeningPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/federated"
+                element={
+                  <AuthenticatedLayout>
+                    <FederatedSearchPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/admin/resolver-review"
+                element={
+                  <AuthenticatedLayout>
+                    <ResolverReviewPage />
                   </AuthenticatedLayout>
                 }
               />

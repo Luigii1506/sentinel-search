@@ -19,6 +19,7 @@ import {
   BarChart3,
   GitMerge,
   Newspaper,
+  Globe,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -36,6 +37,7 @@ import { useAuth } from '@/contexts/AuthContext';
 const mainNavLinks = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/search', label: 'Búsqueda', icon: Search },
+  { path: '/federated', label: 'Federated', icon: Globe },
   { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload },
   { path: '/compliance', label: 'Compliance', icon: Shield },
   { path: '/adverse-media', label: 'Adverse Media', icon: Newspaper },
@@ -47,6 +49,7 @@ const adminNavItems = [
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
+  { path: '/admin/resolver-review', label: 'Resolver Review (UNSURE)', icon: GitMerge },
   { path: '/monitoring', label: 'Monitoreo (legacy)', icon: Activity },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/settings', label: 'Configuración', icon: Settings },
