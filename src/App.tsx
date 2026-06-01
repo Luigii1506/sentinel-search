@@ -20,6 +20,7 @@ import ReportsPage from '@/pages/ReportsPage';
 import { AdverseMediaPage } from '@/pages/AdverseMediaPage';
 import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
+import { YenteCatalogPage } from '@/pages/YenteCatalogPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -100,6 +101,14 @@ function App() {
                 element={
                   <AuthenticatedLayout>
                     <ResolverReviewPage />
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/yente"
+                element={
+                  <AuthenticatedLayout>
+                    <YenteCatalogPage />
                   </AuthenticatedLayout>
                 }
               />

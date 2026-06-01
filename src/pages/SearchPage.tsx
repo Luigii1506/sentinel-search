@@ -38,6 +38,7 @@ import { IntelligentSearch } from "@/components/search/IntelligentSearch";
 import { SourceLevelSelector } from "@/components/SourceLevelSelector";
 import { SemanticSearchToggle } from "@/components/search/SemanticSearchToggle";
 import { SemanticResults } from "@/components/search/SemanticResults";
+import { ProvenanceTooltip } from "@/components/search/ProvenanceTooltip";
 import { cn, getRiskColor, getEntityTypeLabel, humanizeEntityName } from "@/lib/utils";
 import { useScreening } from "@/hooks/useScreening";
 import { complianceService } from "@/services/compliance";
@@ -741,15 +742,30 @@ function SearchResultCard({
           >
             <div className="px-4 sm:px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
               <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
-                <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
-                  Motor {entity.match_type || 'opensearch'}
-                </Badge>
+                {(entity.match_type as string) === 'v2_ml' ? (
+                  <Badge
+                    className="text-[10px] px-2 py-0.5 bg-purple-500/15 text-purple-200 border-purple-400/40"
+                    title="Scored by nomenklatura.DefaultAlgorithm — ML model entrenado por OpenSanctions"
+                  >
+                    ✨ v2 ML-scored
+                  </Badge>
+                ) : (
+                  <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
+                    Motor {entity.match_type || 'opensearch'}
+                  </Badge>
+                )}
                 {entity.opensearch_score != null && (
-                  <span>OpenSearch {Math.round(entity.opensearch_score)}</span>
+                  <span>Score {Math.round(entity.opensearch_score)}</span>
                 )}
                 {entity.source_count != null && entity.source_count > 0 && (
                   <span>Cobertura declarada: {entity.source_count}</span>
                 )}
+                <div className="ml-auto">
+                  <ProvenanceTooltip
+                    entityId={entity.entity_id}
+                    canonicalName={entity.name}
+                  />
+                </div>
               </div>
 
               {/* ─ Personal Info Grid (like OpenSanctions) ─ */}

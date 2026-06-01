@@ -1,0 +1,182 @@
+/**
+ * ProvenanceTooltip — preview rapido de provenance per-property
+ * en search results, sin tener que abrir el entity profile.
+ *
+ * Usage:
+ *   <ProvenanceTooltip entityId={entity.entity_id} canonicalName={entity.name} />
+ */
+import { useState } from 'react';
+import { ChevronRight, Database, Loader2, AlertTriangle, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { provenanceService, type EntityProvenanceResponse } from '@/services';
+
+interface Props {
+  entityId: string;
+  canonicalName?: string;
+}
+
+export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
+  const [data, setData] = useState<EntityProvenanceResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [opened, setOpened] = useState(false);
+
+  const load = async () => {
+    if (data || loading) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const r = await provenanceService.getEntityProvenance(entityId);
+      setData(r);
+    } catch (e: any) {
+      setError(e?.response?.data?.detail || e?.message || 'Error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Popover
+      open={opened}
+      onOpenChange={(o) => {
+        setOpened(o);
+        if (o) void load();
+      }}
+    >
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 px-2 text-xs text-purple-300 hover:bg-purple-500/10 hover:text-purple-200"
+          onClick={(e) => e.stopPropagation()}
+          title="Ver provenance per-property"
+        >
+          <ChevronRight className="h-3 w-3 mr-1" />
+          Why?
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-96 max-h-96 overflow-y-auto bg-[#0d0d0d] border-white/10 text-gray-100"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-2 flex items-start justify-between gap-2 sticky top-0 bg-[#0d0d0d] pb-2 border-b border-white/5">
+          <div>
+            <div className="text-sm font-medium text-white">
+              {canonicalName || entityId.slice(0, 12) + '...'}
+            </div>
+            <div className="text-xs text-gray-500">Provenance per-property</div>
+          </div>
+          <Link
+            to={`/entity/${entityId}?tab=provenance`}
+            className="text-xs text-purple-300 hover:underline inline-flex items-center gap-1"
+          >
+            Full <ExternalLink className="h-3 w-3" />
+          </Link>
+        </div>
+
+        {loading && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+          </div>
+        )}
+
+        {error && (
+          <div className="text-xs text-red-400 py-2 flex items-start gap-1">
+            <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        {data && (
+          <div className="space-y-2 mt-2">
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <Stat label="Statements" value={data.statement_count} />
+              <Stat label="Datasets" value={data.datasets.length} />
+              <Stat
+                label="Conflicts"
+                value={data.has_conflicts ? 'YES' : 'no'}
+                accent={data.has_conflicts ? 'red' : 'gray'}
+              />
+            </div>
+
+            <div className="text-xs space-y-1.5 max-h-60 overflow-y-auto">
+              {Object.values(data.properties)
+                .sort((a, b) => (b.conflict ? 1 : 0) - (a.conflict ? 1 : 0))
+                .slice(0, 6)
+                .map((prop) => (
+                  <div
+                    key={prop.prop}
+                    className={`px-2 py-1 rounded border ${
+                      prop.conflict
+                        ? 'bg-red-500/10 border-red-500/30'
+                        : 'bg-white/5 border-white/10'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-mono text-purple-300">{prop.prop}</span>
+                      <div className="flex items-center gap-1">
+                        {prop.conflict && (
+                          <Badge variant="destructive" className="text-[9px] py-0">
+                            CONFLICT
+                          </Badge>
+                        )}
+                        <span className="text-gray-500">
+                          {prop.statements.length}{' '}
+                          <Database className="inline h-2.5 w-2.5" />
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-gray-300 truncate" title={prop.merged_values.join(' | ')}>
+                      {prop.merged_values.slice(0, 2).join(' · ')}
+                      {prop.merged_values.length > 2 && ` +${prop.merged_values.length - 2}`}
+                    </div>
+                    <div className="text-[10px] text-gray-500 mt-0.5">
+                      via{' '}
+                      {[...new Set(prop.statements.map((s) => s.dataset))]
+                        .slice(0, 3)
+                        .join(', ')}
+                      {prop.policy && (
+                        <span className="ml-1 text-purple-400">[{prop.policy}]</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              {Object.keys(data.properties).length > 6 && (
+                <div className="text-center text-gray-500 text-[10px] pt-1">
+                  +{Object.keys(data.properties).length - 6} more — click "Full" para ver todas
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  accent = 'gray',
+}: {
+  label: string;
+  value: number | string;
+  accent?: 'gray' | 'red';
+}) {
+  const valueColor = accent === 'red' ? 'text-red-400' : 'text-white';
+  return (
+    <div className="bg-white/5 rounded px-2 py-1 text-center">
+      <div className={`font-semibold ${valueColor}`}>{value}</div>
+      <div className="text-[9px] text-gray-500 uppercase">{label}</div>
+    </div>
+  );
+}
+
+export default ProvenanceTooltip;

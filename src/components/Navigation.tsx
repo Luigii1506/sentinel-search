@@ -50,6 +50,7 @@ const adminNavItems = [
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
   { path: '/admin/resolver-review', label: 'Resolver Review (UNSURE)', icon: GitMerge },
+  { path: '/yente', label: 'Yente Catalog', icon: Globe },
   { path: '/monitoring', label: 'Monitoreo (legacy)', icon: Activity },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/settings', label: 'Configuración', icon: Settings },
