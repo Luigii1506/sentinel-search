@@ -840,6 +840,19 @@ export function OperationsPage() {
     refetchOnWindowFocus: false,
   });
 
+  // Infra summary: skip rate, queue depths, workers
+  const { data: opsSummary } = useQuery<any>({
+    queryKey: ['operations', 'summary'],
+    queryFn: async () => {
+      const { api } = await import('@/services/api');
+      const { data } = await api.get('/api/v2/admin/operations-summary');
+      return data;
+    },
+    refetchInterval: 30000,
+    staleTime: 15000,
+    refetchOnWindowFocus: false,
+  });
+
   const sources = activity?.sources || [];
   const counts = activity?.counts || {};
   const services = overview?.system_health?.services as any;
@@ -906,6 +919,57 @@ export function OperationsPage() {
             </Button>
           </div>
         </div>
+
+        {/* ── Infra Summary Card ─────────────────────────────── */}
+        {opsSummary && (
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide text-gray-500">Skip rate 7d</span>
+              <span className="text-lg font-mono text-emerald-400">
+                {(opsSummary.execution_stats_7d?.skip_rate_pct ?? 0).toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-gray-600">
+                {opsSummary.execution_stats_7d?.skipped ?? 0} de {(opsSummary.execution_stats_7d?.total_runs ?? 0) - (opsSummary.execution_stats_7d?.running ?? 0)} terminados
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide text-gray-500">Success rate</span>
+              <span className="text-lg font-mono text-blue-400">
+                {(opsSummary.execution_stats_7d?.success_rate_pct ?? 0).toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-gray-600">
+                {opsSummary.execution_stats_7d?.success ?? 0} success
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide text-gray-500">Failure rate</span>
+              <span className={`text-lg font-mono ${(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0) > 10 ? 'text-red-400' : 'text-yellow-400'}`}>
+                {(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0).toFixed(1)}%
+              </span>
+              <span className="text-[10px] text-gray-600">
+                {opsSummary.execution_stats_7d?.failed ?? 0} failed
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide text-gray-500">Workers</span>
+              <span className="text-lg font-mono text-cyan-400">
+                {opsSummary.workers?.count ?? '?'}
+              </span>
+              <span className="text-[10px] text-gray-600 truncate" title={(opsSummary.workers?.names ?? []).join(', ')}>
+                {(opsSummary.workers?.names ?? []).map((n: string) => n.split('@')[0]).slice(0, 2).join(', ') || '—'}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-wide text-gray-500">Queues</span>
+              <span className="text-lg font-mono text-purple-400">
+                {Object.values(opsSummary.queues || {}).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) as number}
+              </span>
+              <span className="text-[10px] text-gray-600" title={JSON.stringify(opsSummary.queues)}>
+                default:{opsSummary.queues?.default ?? '?'} xl:{opsSummary.queues?.xl ?? '?'}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* ── Filtros: state + tier (combinables) ─────────────── */}
         <div className="flex items-center gap-2 flex-wrap">

@@ -1243,27 +1243,61 @@ function RiskScoreGauge({ score, level }: { score: number; level: RiskLevel }) {
 }
 
 // Information Item
-function InfoItem({ label, value, icon: Icon }: { label: string; value?: string; icon?: React.ComponentType<{className?: string}> }) {
-  if (!value) return null;
+function InfoItem({ label, value, icon: Icon }: { label: string; value?: any; icon?: React.ComponentType<{className?: string}> }) {
+  if (value == null || value === '') return null;
+  // Defensive: stringify objects so we never crash with "Objects are not valid as React child"
+  const displayValue =
+    typeof value === 'string' || typeof value === 'number'
+      ? String(value)
+      : _stringifyListItem(value);
+  if (!displayValue) return null;
   return (
     <div className="flex items-start gap-3 py-2">
       {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
       <div className="min-w-0">
         <p className="text-xs text-gray-500 uppercase">{label}</p>
-        <p className="text-sm text-white break-words">{value}</p>
+        <p className="text-sm text-white break-words">{displayValue}</p>
       </div>
     </div>
   );
 }
 
+// Normaliza un item potencialmente objeto a string legible. Soporta shapes comunes
+// del backend: education {institution, role, degree, start_date, end_date},
+// career {employer, role, ...}, political {party, role, ...}.
+function _stringifyListItem(item: any): string {
+  if (item == null) return '';
+  if (typeof item === 'string' || typeof item === 'number') return String(item);
+  if (typeof item !== 'object') return String(item);
+  // Try common education/career/political shapes
+  const role = item.role || item.degree || item.position || item.title;
+  const place = item.institution || item.employer || item.organization || item.party;
+  const start = item.start_date || item.from || '';
+  const end = item.end_date || item.to || '';
+  const dates = (start || end) ? ` (${start || '?'}–${end || 'present'})` : '';
+  if (role && place) return `${role} @ ${place}${dates}`;
+  if (place) return `${place}${dates}`;
+  if (role) return `${role}${dates}`;
+  if (item.description) return String(item.description);
+  if (item.name) return String(item.name);
+  // Fallback: don't crash — show JSON
+  try {
+    return JSON.stringify(item);
+  } catch {
+    return '[object]';
+  }
+}
+
 function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
   label: string;
-  items?: string[] | string | null;
+  items?: any[] | string | null;
   icon?: React.ComponentType<{className?: string}>;
   maxVisible?: number;
 }) {
   if (!items) return null;
-  const list = Array.isArray(items) ? items : [items];
+  const rawList = Array.isArray(items) ? items : [items];
+  // Normalize each item to string (defensive against objects)
+  const list = rawList.map(_stringifyListItem).filter(Boolean);
   if (list.length === 0) return null;
 
   // Si solo hay 1 item, mostrarlo como InfoItem normal
@@ -2144,7 +2178,14 @@ export function EntityProfilePage() {
                         s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-white/[0.02] border-gray-600/30'
                       )}>
                         <div className="mb-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                          <span className="text-sm text-white font-medium break-words">{s.source}</span>
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="text-sm text-white font-medium break-words">{s.source}</span>
+                            {s.authority && s.authority !== s.source && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                                {s.authority}
+                              </span>
+                            )}
+                          </div>
                           <Badge variant="outline" className={cn('text-[10px]',
                             s.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
                           )}>
@@ -2152,8 +2193,21 @@ export function EntityProfilePage() {
                           </Badge>
                         </div>
                         <p className="text-xs text-gray-400 break-words">{s.program}</p>
-                        {s.reason && <p className="text-xs text-gray-500 mt-1 break-words">{s.reason}</p>}
-                        <p className="text-[10px] text-gray-600 mt-1">Listado: {formatDate(s.listing_date)}</p>
+                        {s.reason && <p className="text-xs text-gray-500 mt-1 break-words line-clamp-2">{s.reason}</p>}
+                        <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
+                          <p className="text-[10px] text-gray-600">Listado: {formatDate(s.listing_date)}</p>
+                          {s.source_url && (
+                            <a
+                              href={s.source_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="inline-flex items-center gap-0.5 text-[10px] text-blue-400 hover:text-blue-300"
+                            >
+                              Fuente oficial <ExternalLink className="w-2.5 h-2.5" />
+                            </a>
+                          )}
+                        </div>
                       </div>
                     ))}
                     {entity.sanctions.length > 5 && (

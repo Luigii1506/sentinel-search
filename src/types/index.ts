@@ -108,6 +108,17 @@ export interface SanctionEntry {
   status: 'active' | 'suspended' | 'removed';
   additionalInfo?: Record<string, string>;
   referenceNumber?: string;
+
+  // FtM-derived enrichment (poblado vía _enrich_sanctions_from_bronze
+  // en el backend). authority es la entidad emisora real (ej. "OFAC",
+  // "Financial Crimes Enforcement Network") cuando difiere del source;
+  // source_url es el link al PDF/website oficial de la sanción.
+  authority?: string;
+  source_url?: string;
+  summary?: string;
+  provisions?: string;
+  start_date?: string;
+  end_date?: string;
 }
 
 // PEP Entry Interface

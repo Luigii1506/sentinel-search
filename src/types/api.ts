@@ -101,13 +101,18 @@ export interface ScreeningMatch {
   birth_date?: string; // Alternative field from API
   gender?: string;
   topics?: string[];
-  identifiers?: Record<string, unknown> & {
+  // identifier values: strings o, opcionalmente, sub-objetos/arrays (additional_documents).
+  // Mantener type-safe pero permitir consumir directo como string en mayoría de casos.
+  identifiers?: Record<string, string | string[] | AdditionalDocument[] | undefined> & {
     os_id?: string;
     wikidataId?: string;
     additional_documents?: AdditionalDocument[];
   };
   sanctions_details?: SanctionDetail[];
   addresses?: (string | { address: string; country?: string } | FtMAddress)[];
+  // Convenience flags / aggregates devueltos por v2 screening backend cuando aplican.
+  is_sanctioned?: boolean;
+  sanctions?: APISanctionEntry[];
   entity_subtype?: string;
   matched_fields?: string[];
   explanation?: string;
@@ -301,6 +306,13 @@ export interface APISanctionEntry {
   reason: string;
   status: 'active' | 'suspended' | 'removed';
   reference_number?: string;
+  // FtM enrichment from Sanction records (authority, link to PDF, etc.)
+  authority?: string;
+  source_url?: string;
+  summary?: string;
+  provisions?: string;
+  start_date?: string;
+  end_date?: string;
   details?: {
     rfc?: string;
     dataset?: string;

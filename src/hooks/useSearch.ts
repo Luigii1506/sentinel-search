@@ -1,15 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import type { SearchSuggestion, SearchFilters, SearchResult } from '@/types';
-import { mockSearchSuggestions, mockEntities } from '@/data/mockData';
+import { mockEntities } from '@/data/mockData';
 
-// Simple debounce implementation
-function debounce<T extends (arg: string) => void>(func: T, wait: number): (arg: string) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-  return (arg: string) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(arg), wait);
-  };
-}
+// Live-search desactivado — sólo busca al presionar Enter (executeSearch).
 
 interface UseSearchReturn {
   query: string;
@@ -39,44 +32,12 @@ export function useSearch(): UseSearchReturn {
   const [hasSearched, setHasSearched] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>(defaultFilters);
 
-  // Simulate API call for suggestions
-  const fetchSuggestions = useCallback((searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setSuggestions([]);
-      return;
-    }
-
-    setIsLoading(true);
-
-    // Simulate network delay
-    setTimeout(() => {
-      const normalizedQuery = searchQuery.toLowerCase();
-      
-      const filtered = mockSearchSuggestions.filter(suggestion => {
-        const nameMatch = suggestion.name.toLowerCase().includes(normalizedQuery);
-        const descriptionMatch = suggestion.description?.toLowerCase().includes(normalizedQuery);
-        const nationalityMatch = suggestion.nationality?.toLowerCase().includes(normalizedQuery);
-        return nameMatch || descriptionMatch || nationalityMatch;
-      });
-
-      // Sort by match score
-      const sorted = filtered.sort((a, b) => b.matchScore - a.matchScore);
-      
-      setSuggestions(sorted.slice(0, 8));
-      setIsLoading(false);
-    }, 150);
-  }, []);
-
-  // Debounced suggestion fetch
-  const debouncedFetchSuggestions = useRef(
-    debounce((q: string) => fetchSuggestions(q), 200)
-  ).current;
-
-  // Set query with suggestions
+  // DEPRECATED: live-search desactivado. Sólo busca al presionar Enter
+  // (executeSearch). Evita saturación de DB+OS con cada keystroke.
+  // Set query (solo actualiza state, NO dispara suggestions/search)
   const setQuery = useCallback((newQuery: string) => {
     setQueryState(newQuery);
-    debouncedFetchSuggestions(newQuery);
-  }, [debouncedFetchSuggestions]);
+  }, []);
 
   // Execute full search
   const executeSearch = useCallback((searchQuery: string) => {

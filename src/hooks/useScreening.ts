@@ -1,7 +1,7 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { screeningService } from '@/services/screening';
-import type { ScreeningRequest, ScreeningMatch } from '@/types/api';
+import type { ScreeningRequest, ScreeningMatch, ScreeningResponse } from '@/types/api';
 
 export interface SearchFilters {
   entityTypes: string[];
@@ -18,14 +18,8 @@ export interface SearchPerformance {
   totalMatches?: number;
 }
 
-// Simple debounce implementation
-function debounce<T extends (arg: string) => void>(func: T, wait: number): (arg: string) => void {
-  let timeout: ReturnType<typeof setTimeout> | null = null;
-  return (arg: string) => {
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => func(arg), wait);
-  };
-}
+// Live-search desactivado — debounce helper removido.
+// La búsqueda real se ejecuta solo en executeSearch (Enter explícito).
 
 export interface UseScreeningReturn {
   query: string;
@@ -66,21 +60,38 @@ export function useScreening(
   const [performance, setPerformance] = useState<SearchPerformance | null>(null);
   const [cacheStats, setCacheStats] = useState(screeningService.getCacheStats());
 
-  // Optimized search mutation (Smart Search v3.0). engine=v1 (legacy) o v2 (nomenklatura ML)
-  const searchMutation = useMutation({
-    mutationFn: (request: ScreeningRequest) =>
-      screeningService.search({ ...request, engine } as ScreeningRequest & { engine: 'v1' | 'v2' }),
-    onSuccess: (data) => {
+  // Manual state for screening results — bypasses React Query useMutation, which gets
+  // stuck in 'pending' status forever under StrictMode in dev even after onSuccess fires
+  // (verified with iid=1 logs: onSuccess fired, but status='pending' on every subsequent render).
+  const [searchData, setSearchData] = useState<ScreeningResponse | null>(null);
+  const [searchPending, setSearchPending] = useState(false);
+  const inFlightTokenRef = useRef(0);
+
+  const runSearch = useCallback(async (request: ScreeningRequest) => {
+    const token = ++inFlightTokenRef.current;
+    setSearchPending(true);
+    try {
+      const data = await screeningService.search(
+        { ...request, engine } as ScreeningRequest & { engine: 'v1' | 'v2' },
+      );
+      if (token !== inFlightTokenRef.current) return; // stale response, ignore
+      setSearchData(data);
       setPerformance({
         executionTimeMs: data.execution_time_ms,
-        fromCache: false, // Will be set by service
+        fromCache: false,
         strategy: 'hybrid',
         sourcesUsed: [],
       });
-      // Update cache stats after search
       setCacheStats(screeningService.getCacheStats());
-    },
-  });
+    } catch (err) {
+      if (token !== inFlightTokenRef.current) return;
+      console.error('[useScreening] search failed:', err);
+    } finally {
+      if (token === inFlightTokenRef.current) {
+        setSearchPending(false);
+      }
+    }
+  }, [engine]);
 
   // Optimized semantic search mutation
   const semanticSearchMutation = useMutation({
@@ -119,27 +130,14 @@ export function useScreening(
     },
   });
 
-  // Fetch suggestions from API (optimized)
-  const fetchSuggestions = useCallback(async (searchQuery: string) => {
-    const trimmedQuery = searchQuery.trim();
-    if (!trimmedQuery || trimmedQuery.length < 2) {
-      setSuggestions([]);
-      return;
-    }
+  // DEPRECATED: ya no hacemos search-as-you-type. La búsqueda real se ejecuta
+  // SOLO al presionar Enter (executeSearch). Esto evitaba hits masivos al DB
+  // (~16 connections "idle in transaction" de 14+ min cuando estaba activo).
 
-    suggestionsMutation.mutate(trimmedQuery);
-  }, [suggestionsMutation]);
-
-  // Debounced suggestion fetch
-  const debouncedFetchSuggestions = useRef(
-    debounce((q: string) => fetchSuggestions(q), 150) // Faster debounce (150ms vs 200ms)
-  ).current;
-
-  // Set query with suggestions
+  // Set query (solo actualiza state, NO dispara suggestions/search)
   const setQuery = useCallback((newQuery: string) => {
     setQueryState(newQuery);
-    debouncedFetchSuggestions(newQuery);
-  }, [debouncedFetchSuggestions]);
+  }, []);
 
   // Execute optimized search (auto mode)
   const executeSearch = useCallback((searchQuery: string) => {
@@ -163,8 +161,8 @@ export function useScreening(
       },
     };
 
-    searchMutation.mutate(request);
-  }, [filters, searchMutation, sourceLevel]);
+    void runSearch(request);
+  }, [filters, runSearch, sourceLevel]);
 
   // Execute optimized semantic search
   const executeSemanticSearch = useCallback((searchQuery: string) => {
@@ -189,9 +187,11 @@ export function useScreening(
     setSuggestions([]);
     setHasSearched(false);
     setPerformance(null);
-    searchMutation.reset();
+    inFlightTokenRef.current++; // invalidate any in-flight search
+    setSearchData(null);
+    setSearchPending(false);
     semanticSearchMutation.reset();
-  }, [searchMutation, semanticSearchMutation]);
+  }, [semanticSearchMutation]);
 
   // Clear cache
   const clearCache = useCallback(() => {
@@ -228,14 +228,16 @@ export function useScreening(
         is_current_pep: r.is_pep,
       }));
     }
-    return searchMutation.data?.matches || [];
+    return searchData?.matches || [];
   };
+
+  const isLoading = searchPending || semanticSearchMutation.isPending;
 
   return {
     query,
     suggestions,
     results: getResults(),
-    isLoading: searchMutation.isPending || semanticSearchMutation.isPending,
+    isLoading,
     isSuggestionsLoading: suggestionsMutation.isPending,
     hasSearched,
     filters,

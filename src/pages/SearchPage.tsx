@@ -39,6 +39,8 @@ import { SourceLevelSelector } from "@/components/SourceLevelSelector";
 import { SemanticSearchToggle } from "@/components/search/SemanticSearchToggle";
 import { SemanticResults } from "@/components/search/SemanticResults";
 import { ProvenanceTooltip } from "@/components/search/ProvenanceTooltip";
+import { RiskBadges } from "@/components/search/RiskBadges";
+import { MatchExplanation } from "@/components/search/MatchExplanation";
 import { cn, getRiskColor, getEntityTypeLabel, humanizeEntityName } from "@/lib/utils";
 import { useScreening } from "@/hooks/useScreening";
 import { complianceService } from "@/services/compliance";
@@ -117,6 +119,26 @@ const SOURCE_DISPLAY: Record<string, string> = {
   EU_CFSP: "EU CFSP",
   EU_EUROPOL: "Europol",
 };
+
+// Dedup global de executeSearch para evitar requests duplicados causados por:
+//   - React StrictMode (re-monta y re-ejecuta effects en dev)
+//   - Effects que disparan en distintos ticks pero con misma (query, sourceLevel)
+// Almacena el último signature ejecutado y su timestamp. Una nueva ejecución
+// del mismo signature dentro de 500ms se ignora silenciosamente.
+let _lastSearchSig: string = "";
+let _lastSearchTime: number = 0;
+const SEARCH_DEDUP_WINDOW_MS = 500;
+
+function shouldExecuteSearch(query: string, sourceLevel: number): boolean {
+  const sig = `${query}::${sourceLevel}`;
+  const now = Date.now();
+  if (_lastSearchSig === sig && now - _lastSearchTime < SEARCH_DEDUP_WINDOW_MS) {
+    return false;
+  }
+  _lastSearchSig = sig;
+  _lastSearchTime = now;
+  return true;
+}
 
 function formatSourceName(source: string): string {
   if (SOURCE_DISPLAY[source]) return SOURCE_DISPLAY[source];
@@ -590,6 +612,23 @@ function SearchResultCard({
               <p className="text-[12px] font-medium text-gray-200 leading-relaxed">
                 {evidenceSummary}
               </p>
+              {/* Risk classification badges (PEP / RCA / Sanctioned / Sanction-linked) */}
+              <RiskBadges
+                isSanctioned={entity.is_sanctioned ?? entity.sanctions?.length! > 0}
+                sanctionLinked={entity.sanction_linked}
+                isPep={entity.is_current_pep}
+                isRca={entity.is_rca}
+                pepCategory={entity.pep_category}
+                className="mt-2"
+              />
+              {/* Match explanation: WHY this is a match (Refinitiv-style audit trail) */}
+              {entity.match_explanation && entity.match_explanation.length > 0 && (
+                <MatchExplanation
+                  reasons={entity.match_explanation}
+                  riskScore={entity.risk_score}
+                  networkRisk={entity.network_risk}
+                />
+              )}
               <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-gray-400">
                 <span>{matchNarrative}</span>
                 {entity.matched_name && entity.matched_name !== entity.name && (
@@ -826,9 +865,13 @@ function SearchResultCard({
                       Ubicación
                     </p>
                     <p className="text-sm text-white font-medium mt-0.5 break-words">
-                      {typeof entity.addresses[0] === "string"
-                        ? entity.addresses[0]
-                        : entity.addresses[0].address}
+                      {(() => {
+                        const a = entity.addresses[0];
+                        if (typeof a === "string") return a;
+                        if ("address" in a) return a.address;
+                        // FtMAddress enriched shape
+                        return a.full || [a.street, a.city, a.country].filter(Boolean).join(", ");
+                      })()}
                       {entity.addresses.length > 1 && (
                         <span className="text-gray-500 text-xs">
                           {" "}
@@ -1076,13 +1119,20 @@ function SearchResultCard({
                     </h4>
                     <div className="flex flex-wrap gap-1.5">
                       {Object.entries(entity.identifiers)
+                        .filter(([key, value]) =>
+                          // additional_documents shows in its own UI; skip here.
+                          key !== 'additional_documents'
+                          && value !== null
+                          && value !== undefined
+                          && typeof value !== 'object'
+                        )
                         .slice(0, 6)
                         .map(([key, value]) => (
                           <span
                             key={key}
                             className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20"
                           >
-                            {key}: {value}
+                            {key}: {Array.isArray(value) ? value.join(', ') : String(value)}
                           </span>
                         ))}
                       {Object.keys(entity.identifiers).length > 6 && (
@@ -1421,8 +1471,10 @@ export function SearchPage() {
   const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(
     initialSourceLevel,
   );
-  // Engine: v1 (legacy hybrid) o v2 (nomenklatura ML-scored, multi-script)
-  const initialEngine = (searchParams.get("engine") === "v2" ? "v2" : "v1") as "v1" | "v2";
+  // Engine: v1 (legacy hybrid) o v2 (nomenklatura ML-scored, multi-script).
+  // Default v2 — mejor recall, BM25 hybrid scoring, cross-script (cirílico/chino),
+  // dedup agresivo, provenance per-property.
+  const initialEngine = (searchParams.get("engine") === "v1" ? "v1" : "v2") as "v1" | "v2";
   const [engine, setEngine] = useState<"v1" | "v2">(initialEngine);
 
   const {
@@ -1447,9 +1499,13 @@ export function SearchPage() {
     sources: filters.sources,
   });
 
-  // Execute search on mount if query param exists
+  // Execute search on mount if query param exists.
+  // StrictMode en dev re-monta componentes y re-ejecuta effects. Esto causaba
+  // 4 requests al mismo /screen/gold (2 mounts × 2 useEffects). Guardamos el
+  // último (query, sourceLevel) ejecutado a nivel de módulo para deduplicar
+  // dentro de una ventana de 500ms (suficiente para cubrir el StrictMode rerun).
   useEffect(() => {
-    if (initialQuery) {
+    if (initialQuery && shouldExecuteSearch(initialQuery, sourceLevel)) {
       executeSearch(initialQuery);
     }
   }, []);
@@ -1462,7 +1518,7 @@ export function SearchPage() {
       return;
     }
     const q = query || initialQuery;
-    if (q) {
+    if (q && shouldExecuteSearch(q, sourceLevel)) {
       executeSearch(q);
     }
   }, [sourceLevel]);
@@ -1567,7 +1623,7 @@ export function SearchPage() {
             className="mt-3"
           />
           {/* Engine toggle: v1 legacy hybrid vs v2 nomenklatura ML multi-script */}
-          <div className="mt-3 flex items-center gap-2 text-xs text-gray-300">
+          <div className="mt-3 flex items-center gap-2 text-xs text-gray-300 flex-wrap">
             <span>Motor:</span>
             <button
               type="button"
@@ -1576,6 +1632,7 @@ export function SearchPage() {
                 setSearchParams({
                   q: query || initialQuery,
                   source_level: String(sourceLevel),
+                  engine: "v1",
                 });
               }}
               className={cn(
@@ -1584,8 +1641,9 @@ export function SearchPage() {
                   ? "bg-blue-500/20 border-blue-400 text-blue-200"
                   : "border-white/10 text-gray-400 hover:bg-white/5",
               )}
+              title="Búsqueda clásica: BM25 fuzzy sobre nombres + fonética"
             >
-              v1 Hybrid (legacy)
+              Clásico
             </button>
             <button
               type="button"
@@ -1594,7 +1652,6 @@ export function SearchPage() {
                 setSearchParams({
                   q: query || initialQuery,
                   source_level: String(sourceLevel),
-                  engine: "v2",
                 });
               }}
               className={cn(
@@ -1603,10 +1660,18 @@ export function SearchPage() {
                   ? "bg-purple-500/20 border-purple-400 text-purple-200"
                   : "border-white/10 text-gray-400 hover:bg-white/5",
               )}
-              title="nomenklatura.DefaultAlgorithm: multi-script (Latin↔Cyrillic↔Chinese↔Arabic), ML-scored"
+              title="Inteligente (default): scoring ML híbrido + multi-script (Latín↔Cirílico↔Chino↔Árabe) + provenance per-propiedad"
             >
-              ✨ v2 ML Multi-script
+              ✨ Inteligente (ML)
             </button>
+            {engine === "v2" && (
+              <span
+                className="ml-2 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-200 text-[10px] uppercase tracking-wide"
+                title="Esta búsqueda usa nomenklatura.DefaultAlgorithm + BM25 hybrid + transliteración ICU"
+              >
+                ML
+              </span>
+            )}
           </div>
         </motion.div>
 

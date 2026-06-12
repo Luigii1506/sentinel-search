@@ -20,7 +20,7 @@ import ReportsPage from '@/pages/ReportsPage';
 import { AdverseMediaPage } from '@/pages/AdverseMediaPage';
 import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
-import { YenteCatalogPage } from '@/pages/YenteCatalogPage';
+import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -105,14 +105,13 @@ function App() {
                 }
               />
               <Route
-                path="/yente"
+                path="/admin/validation-review"
                 element={
                   <AuthenticatedLayout>
-                    <YenteCatalogPage />
+                    <ValidationReviewPage />
                   </AuthenticatedLayout>
                 }
               />
-
               {/* Admin Routes - Public for now */}
               <Route
                 path="/admin/sources"

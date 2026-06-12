@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn, getInitials } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import { HealthIndicator } from '@/components/HealthIndicator';
 
 // All navigation links - PUBLIC ACCESS
 const mainNavLinks = [
@@ -50,7 +51,7 @@ const adminNavItems = [
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
   { path: '/admin/resolver-review', label: 'Resolver Review (UNSURE)', icon: GitMerge },
-  { path: '/yente', label: 'Yente Catalog', icon: Globe },
+  { path: '/admin/validation-review', label: 'Validation Review', icon: Shield },
   { path: '/monitoring', label: 'Monitoreo (legacy)', icon: Activity },
   { path: '/reports', label: 'Reportes', icon: BarChart3 },
   { path: '/settings', label: 'Configuración', icon: Settings },
@@ -186,6 +187,7 @@ export function Navigation() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {isAuthenticated && <HealthIndicator />}
             {isAuthenticated ? (
               /* User Menu */
               <DropdownMenu>
