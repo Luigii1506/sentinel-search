@@ -22,6 +22,7 @@ import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
 import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
 import ApiKeysPage from '@/pages/ApiKeysPage';
+import { RoleGate } from '@/components/RoleGate';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -118,7 +119,9 @@ function App() {
                 path="/admin/api-keys"
                 element={
                   <AuthenticatedLayout>
-                    <ApiKeysPage />
+                    <RoleGate minimumRole="admin">
+                      <ApiKeysPage />
+                    </RoleGate>
                   </AuthenticatedLayout>
                 }
               />

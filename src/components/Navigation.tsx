@@ -34,6 +34,7 @@ import {
 import { cn, getInitials } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { HealthIndicator } from '@/components/HealthIndicator';
+import { usePermissions, type Role } from '@/hooks/usePermissions';
 
 // All navigation links - PUBLIC ACCESS
 const mainNavLinks = [
@@ -45,12 +46,21 @@ const mainNavLinks = [
   { path: '/adverse-media', label: 'Adverse Media', icon: Newspaper },
 ];
 
-const adminNavItems = [
+// Min role required to see each admin nav item. Mirrors the RoleGate config
+// on the corresponding route + the backend's @require_role guards.
+type AdminNavItem = {
+  path: string;
+  label: string;
+  icon: typeof Activity;
+  minRole?: Role;
+};
+
+const adminNavItems: AdminNavItem[] = [
   // Operations es el hub principal: status, ahora, próximos, recientes, alertas
-  { path: '/operations', label: 'Operaciones', icon: Activity },
-  { path: '/admin/api-keys', label: 'API Keys', icon: Key },
-  { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
-  { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
+  { path: '/operations', label: 'Operaciones', icon: Activity, minRole: 'reviewer' },
+  { path: '/admin/api-keys', label: 'API Keys', icon: Key, minRole: 'admin' },
+  { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database, minRole: 'admin' },
+  { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList, minRole: 'reviewer' },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
   { path: '/admin/resolver-review', label: 'Resolver Review (UNSURE)', icon: GitMerge },
   { path: '/admin/validation-review', label: 'Validation Review', icon: Shield },
@@ -63,6 +73,11 @@ export function Navigation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
+  const { atLeast } = usePermissions();
+  // Filter once per role change instead of inside the render path.
+  const visibleAdminNavItems = adminNavItems.filter(
+    (item) => !item.minRole || atLeast(item.minRole),
+  );
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
@@ -173,7 +188,7 @@ export function Navigation() {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-white/10" align="end">
-                {adminNavItems.map((item) => (
+                {visibleAdminNavItems.map((item) => (
                   <DropdownMenuItem
                     key={item.path}
                     className="text-gray-300 focus:text-white focus:bg-white/10 cursor-pointer"
@@ -295,7 +310,7 @@ export function Navigation() {
                 Administración
               </p>
             </div>
-            {adminNavItems.map((item) => {
+            {visibleAdminNavItems.map((item) => {
               const isActive = location.pathname === item.path ||
                 (item.path !== '/' && location.pathname.startsWith(item.path));
               return (
