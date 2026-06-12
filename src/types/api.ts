@@ -41,10 +41,45 @@ export interface ScreeningRequest {
 
 export interface SanctionDetail {
   authority: string;
-  program: string;
+  program?: string;
   reason?: string;
+  summary?: string;
   start_date?: string;
   end_date?: string;
+  listing_date?: string;
+  source?: string;       // ej. 'US_FINCEN_ENFORCEMENT'
+  source_url?: string;   // link al PDF/website oficial
+  provisions?: string;
+  entity?: string[];
+}
+
+/**
+ * Documento adicional (pasaporte, cédula, ID nacional) extraído de FtM
+ * Identification records vía properties.holder = Person.os_id.
+ * Vive dentro de identifiers.additional_documents.
+ */
+export interface AdditionalDocument {
+  number: string;
+  type?: string;        // 'id-card', 'passport', 'tax-id', etc.
+  country?: string;     // ISO alpha-2 lowercase
+  issuing_date?: string;
+  expires?: string;
+  source?: string;      // ej. 'CH_SECO_SANCTIONS'
+}
+
+/**
+ * Address shape ENRIQUECIDA desde FtM Address records.
+ * El campo addresses en ScreeningMatch puede contener cualquiera de estos shapes.
+ */
+export interface FtMAddress {
+  full?: string;
+  street?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;     // ISO alpha-2 lowercase
+  postOfficeBox?: string;
+  source?: string;
 }
 
 export interface ScreeningMatch {
@@ -66,17 +101,25 @@ export interface ScreeningMatch {
   birth_date?: string; // Alternative field from API
   gender?: string;
   topics?: string[];
-  identifiers?: Record<string, string>;
+  identifiers?: Record<string, unknown> & {
+    os_id?: string;
+    wikidataId?: string;
+    additional_documents?: AdditionalDocument[];
+  };
   sanctions_details?: SanctionDetail[];
-  addresses?: (string | { address: string; country?: string })[];
+  addresses?: (string | { address: string; country?: string } | FtMAddress)[];
   entity_subtype?: string;
   matched_fields?: string[];
   explanation?: string;
   matched_name?: string;
   highlight?: string;
   is_current_pep?: boolean;
+  is_rca?: boolean;
+  sanction_linked?: boolean;
   pep_category?: string;
   pep_positions?: unknown[];
+  network_risk?: number | null;
+  match_explanation?: string[];
   opensearch_score?: number;
   // Adverse Media (Tier 1)
   has_adverse_media?: boolean;

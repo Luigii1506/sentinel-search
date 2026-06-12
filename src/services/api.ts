@@ -47,10 +47,31 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    const originalRequest = error.config as InternalAxiosRequestConfig & {
+      _retry?: boolean;
+      _retry503?: boolean;
+    };
 
     if (!originalRequest) {
       return Promise.reject(error);
+    }
+
+    // Handle 503 Service Unavailable — backend reports OS degraded.
+    // Auto-retry ONCE after Retry-After header (default 10s) before surfacing
+    // the error to the caller. Avoids flashing "Error" on a transient blip.
+    if (error.response?.status === 503 && !originalRequest._retry503) {
+      originalRequest._retry503 = true;
+      const retryAfterHeader = error.response.headers['retry-after'];
+      const retryAfterSec = Math.min(
+        Math.max(parseInt(retryAfterHeader || '10', 10) || 10, 1),
+        30,
+      );
+      const detail =
+        (error.response.data as { detail?: string })?.detail ||
+        'Servicio recuperándose';
+      toast.warning(`${detail}. Reintentando en ${retryAfterSec}s…`);
+      await new Promise((r) => setTimeout(r, retryAfterSec * 1000));
+      return api(originalRequest);
     }
 
     // Handle 401 Unauthorized - Try to refresh token
@@ -110,6 +131,10 @@ api.interceptors.response.use(
           break;
         case 500:
           toast.error('Error del servidor. Intenta más tarde.');
+          break;
+        case 503:
+          // Reached only after the auto-retry above also failed.
+          toast.error('Servicio sigue degradado. Por favor reintenta en un minuto.');
           break;
         default:
           // Show backend error message if available
