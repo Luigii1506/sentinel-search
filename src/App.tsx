@@ -21,6 +21,7 @@ import { AdverseMediaPage } from '@/pages/AdverseMediaPage';
 import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
 import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
+import ApiKeysPage from '@/pages/ApiKeysPage';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -113,6 +114,14 @@ function App() {
                 }
               />
               {/* Admin Routes - Public for now */}
+              <Route
+                path="/admin/api-keys"
+                element={
+                  <AuthenticatedLayout>
+                    <ApiKeysPage />
+                  </AuthenticatedLayout>
+                }
+              />
               <Route
                 path="/admin/sources"
                 element={

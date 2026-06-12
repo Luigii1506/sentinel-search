@@ -20,6 +20,7 @@ import {
   GitMerge,
   Newspaper,
   Globe,
+  Key,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -47,6 +48,7 @@ const mainNavLinks = [
 const adminNavItems = [
   // Operations es el hub principal: status, ahora, próximos, recientes, alertas
   { path: '/operations', label: 'Operaciones', icon: Activity },
+  { path: '/admin/api-keys', label: 'API Keys', icon: Key },
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database },
   { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
