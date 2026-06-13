@@ -34,6 +34,7 @@ import {
 import { cn, getInitials } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { HealthIndicator } from '@/components/HealthIndicator';
+import { UsageIndicator } from '@/components/UsageIndicator';
 import { usePermissions, type Role } from '@/hooks/usePermissions';
 
 // All navigation links - PUBLIC ACCESS
@@ -204,6 +205,7 @@ export function Navigation() {
 
           {/* Right Section */}
           <div className="flex items-center gap-2 sm:gap-3">
+            {isAuthenticated && <UsageIndicator />}
             {isAuthenticated && <HealthIndicator />}
             {isAuthenticated ? (
               /* User Menu */

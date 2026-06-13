@@ -129,6 +129,37 @@ api.interceptors.response.use(
         case 429:
           toast.error('Demasiadas solicitudes. Por favor espera un momento.');
           break;
+        case 402: {
+          // Quota exhausted on the free tier. Surface the upgrade CTA
+          // and refresh the navbar counter so the user sees 0/N
+          // immediately. Headers from backend carry the metadata.
+          const headers = error.response.headers;
+          const limit = headers['x-quota-limit'];
+          const reset = headers['x-quota-reset'];
+          const detail =
+            (error.response.data as { detail?: string })?.detail ||
+            'Has alcanzado el límite diario.';
+          toast.error(detail, {
+            description: limit
+              ? `Plan actual: ${limit} búsquedas/día. Resetea: ${reset || 'pronto'}.`
+              : undefined,
+            action: {
+              label: 'Upgrade',
+              onClick: () => {
+                window.location.href = '/pricing';
+              },
+            },
+            duration: 10_000,
+          });
+          // Invalidate the cached usage snapshot so the navbar updates.
+          try {
+            const evt = new CustomEvent('quota:exhausted');
+            window.dispatchEvent(evt);
+          } catch {
+            /* noop */
+          }
+          break;
+        }
         case 500:
           toast.error('Error del servidor. Intenta más tarde.');
           break;
