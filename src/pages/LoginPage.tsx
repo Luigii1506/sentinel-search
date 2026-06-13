@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -132,9 +132,18 @@ export function LoginPage() {
               </Button>
             </form>
 
-            <div className="mt-6 pt-6 border-t border-white/10">
+            <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
+              <p className="text-sm text-gray-400 text-center">
+                ¿No tienes cuenta?{' '}
+                <Link
+                  to="/signup"
+                  className="text-blue-400 hover:text-blue-300 font-medium"
+                >
+                  Regístrate gratis
+                </Link>
+              </p>
               <p className="text-xs text-gray-500 text-center">
-                Sistema protegido. Acceso restringido a usuarios autorizados.
+                10 búsquedas/día gratis. Sin tarjeta requerida.
               </p>
             </div>
           </CardContent>

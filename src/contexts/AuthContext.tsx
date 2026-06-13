@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { authService } from '@/services/auth';
+import { authService, type SignupCredentials } from '@/services/auth';
 import { tokenManager } from '@/services/api';
 import type { User, LoginCredentials } from '@/types/api';
 import { toast } from 'sonner';
@@ -9,6 +9,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
+  signup: (credentials: SignupCredentials) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -65,6 +66,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  const signup = useCallback(async (credentials: SignupCredentials) => {
+    try {
+      setIsLoading(true);
+      await authService.signup(credentials);
+      // Backend returned tokens — fetch the freshly created user so the
+      // rest of the app sees the right role + permissions immediately.
+      const userData = await authService.getCurrentUser();
+      setUser(userData);
+      toast.success('Cuenta creada. ¡Bienvenido!');
+    } catch (error: unknown) {
+      const detail =
+        (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      toast.error(detail || 'No se pudo crear la cuenta');
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
   const refreshUser = useCallback(async () => {
     try {
       const userData = await authService.getCurrentUser();
@@ -79,6 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isAuthenticated: !!user,
     isLoading,
     login,
+    signup,
     logout,
     refreshUser,
   };

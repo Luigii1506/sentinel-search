@@ -5,6 +5,7 @@ import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { Navigation } from '@/components/Navigation';
 import { LoginPage } from '@/pages/LoginPage';
+import { SignUpPage } from '@/pages/SignUpPage';
 import { HomePage } from '@/pages/HomePage';
 import { SearchPage } from '@/pages/SearchPage';
 import { EntityProfilePage } from '@/pages/EntityProfilePage';
@@ -56,6 +57,7 @@ function App() {
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
               
               {/* Public Routes */}
               <Route

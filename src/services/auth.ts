@@ -1,7 +1,27 @@
 import api, { tokenManager } from './api';
 import type { LoginCredentials, LoginResponse, User } from '@/types/api';
 
+export interface SignupCredentials {
+  username: string;
+  email: string;
+  password: string;
+  first_name?: string;
+  last_name?: string;
+}
+
 export const authService = {
+  /**
+   * Self-service signup. Creates a free-tier account and returns tokens
+   * so the caller can land authenticated.
+   */
+  async signup(credentials: SignupCredentials): Promise<LoginResponse> {
+    const response = await api.post('/api/v1/auth/signup', credentials);
+    const { access_token, refresh_token } = response.data;
+    tokenManager.setToken(access_token);
+    tokenManager.setRefreshToken(refresh_token);
+    return response.data;
+  },
+
   /**
    * Login with email and password
    */
