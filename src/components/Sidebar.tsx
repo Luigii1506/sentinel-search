@@ -21,6 +21,8 @@ import {
   Activity,
   ClipboardList,
   GitMerge,
+  GitBranchPlus,
+  ShieldCheck,
   Newspaper,
   Globe,
   Key,
@@ -34,6 +36,8 @@ import {
   LogOut,
   User as UserIcon,
   Command as CommandIcon,
+  Server,
+  FileSearch,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -65,6 +69,29 @@ import { HealthIndicator } from '@/components/HealthIndicator';
 import { UsageIndicator } from '@/components/UsageIndicator';
 
 // ────────────────────────────── Nav config ──────────────────────────────
+//
+// CANONICAL NAVIGATION STRUCTURE
+//
+// Goal: every page in the app reachable from the sidebar, grouped by
+// domain, and the visibility filtered by role so the same component
+// renders a viewer's compact nav AND an admin's complete nav without
+// duplicating markup.
+//
+// Role tiers (mirrors backend RBAC, hierarchical via usePermissions):
+//   readonly  → least privileged; can search but nothing else
+//   viewer    → readonly + dashboards
+//   analyst   → viewer + Compliance (cases / watchlist / adverse media)
+//   reviewer  → analyst + Insights + Data Review (audit, merges)
+//   admin     → reviewer + Data Management + System (keys, webhooks, sources)
+//
+// To add a page:
+//   1. Add the route in App.tsx wrapped in <RoleGate minimumRole="…" />
+//   2. Add an entry below to the matching group with the same minRole
+//   3. Mirror it in CommandPalette.tsx's allActions array
+//
+// To add a NEW group: append a NavGroup at the bottom and pick the
+// smallest minRole — the group disappears for users who can't see any
+// of its items.
 
 interface NavItem {
   path: string;
@@ -75,25 +102,76 @@ interface NavItem {
   shortcut?: string;
 }
 
-const MAIN_NAV: NavItem[] = [
-  { path: '/',                 label: 'Home',              icon: LayoutDashboard, shortcut: 'G H' },
-  { path: '/search',           label: 'Búsqueda',          icon: Search,          shortcut: 'G S' },
-  { path: '/screening/bulk',   label: 'Bulk Screening',    icon: Upload,          shortcut: 'G B' },
-  { path: '/compliance',       label: 'Compliance',        icon: Shield,          shortcut: 'G C' },
-  { path: '/adverse-media',    label: 'Adverse Media',     icon: Newspaper },
-  { path: '/federated-search', label: 'Federated Search',  icon: Globe },
-];
+interface NavGroup {
+  title: string;
+  /** When set, the whole group hides for users below this rank. Each
+   *  item's own minRole still applies on top — pick the loosest role
+   *  here and tighten per-item if needed. */
+  minRole?: Role;
+  items: NavItem[];
+}
 
-const ADMIN_NAV: NavItem[] = [
-  { path: '/operations',           label: 'Operaciones',     icon: Activity,       minRole: 'reviewer' },
-  { path: '/admin/api-keys',       label: 'API Keys',        icon: Key,            minRole: 'admin' },
-  { path: '/admin/webhooks',       label: 'Webhooks',        icon: Webhook,        minRole: 'admin' },
-  { path: '/admin/activity-log',   label: 'Activity Log',    icon: ClipboardList,  minRole: 'reviewer' },
-  { path: '/admin/sources',        label: 'Fuentes',         icon: Database,       minRole: 'admin' },
-  { path: '/admin/audit',          label: 'Sources Audit',   icon: ClipboardList,  minRole: 'reviewer' },
-  { path: '/admin/merges',         label: 'Merge Review',    icon: GitMerge,       minRole: 'admin' },
-  { path: '/reports',              label: 'Reportes',        icon: BarChart3,      minRole: 'reviewer' },
-  { path: '/settings',             label: 'Configuración',   icon: Settings,       minRole: 'admin' },
+const NAV: NavGroup[] = [
+  {
+    // Everyone with an account sees these.
+    title: 'Workspace',
+    items: [
+      { path: '/',               label: 'Home',           icon: LayoutDashboard, shortcut: 'G H' },
+      { path: '/search',         label: 'Búsqueda',       icon: Search,          shortcut: 'G S' },
+      { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload,          shortcut: 'G B' },
+      { path: '/federated',      label: 'Federated Search', icon: Globe,         shortcut: 'G F' },
+    ],
+  },
+  {
+    // KYC analysts working day-to-day cases.
+    title: 'Compliance',
+    minRole: 'analyst',
+    items: [
+      { path: '/compliance',    label: 'Cases & Watchlist', icon: Shield,    shortcut: 'G C' },
+      { path: '/adverse-media', label: 'Adverse Media',     icon: Newspaper },
+    ],
+  },
+  {
+    // Compliance reviewers / team leads — read-mostly oversight.
+    title: 'Insights',
+    minRole: 'reviewer',
+    items: [
+      { path: '/operations',          label: 'Operaciones',  icon: Activity },
+      { path: '/admin/activity-log',  label: 'Activity Log', icon: ClipboardList },
+      { path: '/monitoring',          label: 'Monitoring',   icon: Activity },
+      { path: '/reports',             label: 'Reportes',     icon: BarChart3 },
+    ],
+  },
+  {
+    // Entity-resolution queues — manual review of edge cases.
+    title: 'Data Review',
+    minRole: 'reviewer',
+    items: [
+      { path: '/admin/merges',             label: 'Merge Review',      icon: GitMerge },
+      { path: '/admin/resolver-review',    label: 'Resolver Review',   icon: GitBranchPlus },
+      { path: '/admin/validation-review',  label: 'Validation Review', icon: ShieldCheck },
+    ],
+  },
+  {
+    // Data-ops surfaces — sources, health, catalog.
+    title: 'Data Management',
+    minRole: 'admin',
+    items: [
+      { path: '/admin/sources',     label: 'Sources Dashboard', icon: Database },
+      { path: '/admin/audit',       label: 'Sources Audit',     icon: FileSearch },
+      { path: '/data/yente-catalog', label: 'Yente Catalog',    icon: Server },
+    ],
+  },
+  {
+    // Account / billing / integrations.
+    title: 'System',
+    minRole: 'admin',
+    items: [
+      { path: '/admin/api-keys', label: 'API Keys', icon: Key,      shortcut: 'G K' },
+      { path: '/admin/webhooks', label: 'Webhooks', icon: Webhook },
+      { path: '/settings',       label: 'Settings', icon: Settings },
+    ],
+  },
 ];
 
 // ──────────────────────────── Collapse state ────────────────────────────
@@ -188,7 +266,17 @@ function SidebarBody({
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { atLeast } = usePermissions();
-  const visibleAdmin = ADMIN_NAV.filter((it) => !it.minRole || atLeast(it.minRole));
+
+  // Filter once per role change: drop groups the user can't see, then
+  // drop items within visible groups that the user can't see (per-item
+  // override of the group's minRole). Empty groups disappear entirely.
+  const visibleGroups = NAV
+    .filter((g) => !g.minRole || atLeast(g.minRole))
+    .map((g) => ({
+      ...g,
+      items: g.items.filter((it) => !it.minRole || atLeast(it.minRole)),
+    }))
+    .filter((g) => g.items.length > 0);
 
   return (
     <TooltipProvider>
@@ -234,21 +322,27 @@ function SidebarBody({
           </button>
         </div>
 
-        {/* Main nav */}
-        <div className={cn('flex-1 overflow-y-auto py-2 px-2 space-y-0.5', collapsed && 'px-2')}>
-          {MAIN_NAV.map((item) => (
-            <NavLink key={item.path} item={item} collapsed={collapsed} onNavigate={onNavigate} />
-          ))}
-
-          {visibleAdmin.length > 0 && (
-            <>
-              <SectionLabel collapsed={collapsed}>Admin</SectionLabel>
-              {visibleAdmin.map((item) => (
-                <NavLink key={item.path} item={item} collapsed={collapsed} onNavigate={onNavigate} />
+        {/* Main nav — grouped by domain, filtered by role */}
+        <nav
+          aria-label="Sidebar navigation"
+          className={cn('flex-1 overflow-y-auto py-2 px-2 space-y-0.5', collapsed && 'px-2')}
+        >
+          {visibleGroups.map((group, idx) => (
+            <div key={group.title}>
+              {/* First group renders without a label so the brand + ⌘K
+                  flow naturally into the first nav item. */}
+              {idx > 0 && <SectionLabel collapsed={collapsed}>{group.title}</SectionLabel>}
+              {group.items.map((item) => (
+                <NavLink
+                  key={item.path}
+                  item={item}
+                  collapsed={collapsed}
+                  onNavigate={onNavigate}
+                />
               ))}
-            </>
-          )}
-        </div>
+            </div>
+          ))}
+        </nav>
 
         {/* Bottom rail: usage + health + user */}
         <div className={cn('border-t border-navy-600 p-2 space-y-2', collapsed && 'px-2')}>

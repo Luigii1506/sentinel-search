@@ -19,6 +19,8 @@ import {
   Activity,
   ClipboardList,
   GitMerge,
+  GitBranchPlus,
+  ShieldCheck,
   Newspaper,
   Globe,
   Key,
@@ -29,6 +31,8 @@ import {
   LogOut,
   Plus,
   ArrowRight,
+  Server,
+  FileSearch,
 } from 'lucide-react';
 import {
   CommandDialog,
@@ -66,28 +70,44 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
 
   // ── Define all commands ──
+  // Keep in sync with the NAV groups in Sidebar.tsx. When you add a
+  // route there, mirror it here so users can reach it via ⌘K too.
   const allActions: PaletteAction[] = [
-    // Pages
+    // Workspace
     { id: 'p-home',        label: 'Home',              icon: LayoutDashboard, group: 'pages', to: '/' },
-    { id: 'p-search',      label: 'Búsqueda',          icon: Search,          group: 'pages', to: '/search', shortcut: 'G S' },
+    { id: 'p-search',      label: 'Búsqueda',          icon: Search,          group: 'pages', to: '/search',         shortcut: 'G S' },
     { id: 'p-bulk',        label: 'Bulk Screening',    icon: Upload,          group: 'pages', to: '/screening/bulk', shortcut: 'G B' },
-    { id: 'p-compliance',  label: 'Compliance',        icon: Shield,          group: 'pages', to: '/compliance', shortcut: 'G C' },
-    { id: 'p-adverse',     label: 'Adverse Media',     icon: Newspaper,       group: 'pages', to: '/adverse-media' },
-    { id: 'p-federated',   label: 'Federated Search',  icon: Globe,           group: 'pages', to: '/federated-search' },
-    { id: 'p-operations',  label: 'Operaciones',       icon: Activity,        group: 'pages', to: '/operations',        minRole: 'reviewer' },
-    { id: 'p-api-keys',    label: 'API Keys',          icon: Key,             group: 'pages', to: '/admin/api-keys',    minRole: 'admin' },
-    { id: 'p-webhooks',    label: 'Webhooks',          icon: Webhook,         group: 'pages', to: '/admin/webhooks',    minRole: 'admin' },
-    { id: 'p-activity',    label: 'Activity Log',      icon: ClipboardList,   group: 'pages', to: '/admin/activity-log',minRole: 'reviewer' },
-    { id: 'p-sources',     label: 'Fuentes de Datos',  icon: Database,        group: 'pages', to: '/admin/sources',     minRole: 'admin' },
-    { id: 'p-audit',       label: 'Sources Audit',     icon: ClipboardList,   group: 'pages', to: '/admin/audit',       minRole: 'reviewer' },
-    { id: 'p-merges',      label: 'Merge Review',      icon: GitMerge,        group: 'pages', to: '/admin/merges',      minRole: 'admin' },
-    { id: 'p-reports',     label: 'Reportes',          icon: BarChart3,       group: 'pages', to: '/reports',           minRole: 'reviewer' },
-    { id: 'p-settings',    label: 'Configuración',     icon: Settings,        group: 'pages', to: '/settings',          minRole: 'admin' },
+    { id: 'p-federated',   label: 'Federated Search',  icon: Globe,           group: 'pages', to: '/federated',      shortcut: 'G F' },
+
+    // Compliance (analyst+)
+    { id: 'p-compliance',  label: 'Cases & Watchlist', icon: Shield,    group: 'pages', to: '/compliance',      shortcut: 'G C', minRole: 'analyst' },
+    { id: 'p-adverse',     label: 'Adverse Media',     icon: Newspaper, group: 'pages', to: '/adverse-media',                    minRole: 'analyst' },
+
+    // Insights (reviewer+)
+    { id: 'p-operations',  label: 'Operaciones',  icon: Activity,       group: 'pages', to: '/operations',         minRole: 'reviewer' },
+    { id: 'p-activity',    label: 'Activity Log', icon: ClipboardList,  group: 'pages', to: '/admin/activity-log', minRole: 'reviewer' },
+    { id: 'p-monitoring',  label: 'Monitoring',   icon: Activity,       group: 'pages', to: '/monitoring',         minRole: 'reviewer' },
+    { id: 'p-reports',     label: 'Reportes',     icon: BarChart3,      group: 'pages', to: '/reports',            minRole: 'reviewer' },
+
+    // Data Review (reviewer+)
+    { id: 'p-merges',      label: 'Merge Review',      icon: GitMerge,       group: 'pages', to: '/admin/merges',             minRole: 'reviewer' },
+    { id: 'p-resolver',    label: 'Resolver Review',   icon: GitBranchPlus,  group: 'pages', to: '/admin/resolver-review',    minRole: 'reviewer' },
+    { id: 'p-validation',  label: 'Validation Review', icon: ShieldCheck,    group: 'pages', to: '/admin/validation-review',  minRole: 'reviewer' },
+
+    // Data Management (admin)
+    { id: 'p-sources',     label: 'Sources Dashboard', icon: Database,   group: 'pages', to: '/admin/sources',        minRole: 'admin' },
+    { id: 'p-audit',       label: 'Sources Audit',     icon: FileSearch, group: 'pages', to: '/admin/audit',          minRole: 'admin' },
+    { id: 'p-yente',       label: 'Yente Catalog',     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
+
+    // System (admin)
+    { id: 'p-api-keys',    label: 'API Keys',  icon: Key,      group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
+    { id: 'p-webhooks',    label: 'Webhooks',  icon: Webhook,  group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
+    { id: 'p-settings',    label: 'Settings',  icon: Settings, group: 'pages', to: '/settings',                        minRole: 'admin' },
 
     // Actions (role-gated)
-    { id: 'a-new-key',     label: 'Crear nueva API Key',  icon: Plus,    group: 'actions', to: '/admin/api-keys',     minRole: 'admin' },
-    { id: 'a-new-webhook', label: 'Crear nuevo Webhook',  icon: Plus,    group: 'actions', to: '/admin/webhooks',     minRole: 'admin' },
-    { id: 'a-logout',      label: 'Cerrar sesión',        icon: LogOut,  group: 'actions', run: () => logout() },
+    { id: 'a-new-key',     label: 'Crear nueva API Key', icon: Plus,   group: 'actions', to: '/admin/api-keys', minRole: 'admin' },
+    { id: 'a-new-webhook', label: 'Crear nuevo Webhook', icon: Plus,   group: 'actions', to: '/admin/webhooks', minRole: 'admin' },
+    { id: 'a-logout',      label: 'Cerrar sesión',       icon: LogOut, group: 'actions', run: () => logout() },
   ];
 
   const visible = allActions.filter((a) => !a.minRole || atLeast(a.minRole));

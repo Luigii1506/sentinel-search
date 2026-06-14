@@ -27,6 +27,7 @@ import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
 import ApiKeysPage from '@/pages/ApiKeysPage';
 import ActivityLogPage from '@/pages/ActivityLogPage';
 import WebhooksPage from '@/pages/WebhooksPage';
+import { YenteCatalogPage } from '@/pages/YenteCatalogPage';
 import { RoleGate } from '@/components/RoleGate';
 
 // Create Query Client
@@ -173,7 +174,19 @@ function App() {
                 path="/admin/sources"
                 element={
                   <AuthenticatedLayout>
-                    <SourcesDashboardPage />
+                    <RoleGate minimumRole="admin">
+                      <SourcesDashboardPage />
+                    </RoleGate>
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/data/yente-catalog"
+                element={
+                  <AuthenticatedLayout>
+                    <RoleGate minimumRole="admin">
+                      <YenteCatalogPage />
+                    </RoleGate>
                   </AuthenticatedLayout>
                 }
               />

@@ -180,7 +180,52 @@ unless they indicate live state).
 
 ---
 
-## 9. Adding a new page
+## 9. Navigation, routing & role tiers
+
+### Role hierarchy (mirrors backend RBAC)
+
+| Tier | Can access | Real-world fit |
+|---|---|---|
+| `readonly` | Search only | Free tier / unverified accounts |
+| `viewer` | + Dashboards | Auditor with read access |
+| `analyst` | + Compliance (cases, watchlist, adverse media) | KYC analyst working tickets |
+| `reviewer` | + Insights, Data Review (audit, merges) | Team lead / senior analyst |
+| `admin` | + Data Management, System (keys, sources, webhooks) | Compliance officer / system admin |
+
+`usePermissions().atLeast('reviewer')` is the canonical check. Hierarchy
+is encoded once in `src/hooks/usePermissions.ts`; everywhere else just
+asks. **Never** check `role === 'admin'` directly — use `atLeast('admin')`
+so future role additions don't break gates.
+
+### Sidebar grouping (`src/components/Sidebar.tsx`)
+
+Six groups in fixed order. The whole group hides if no item is visible
+to the current role:
+
+1. **Workspace** — all logged-in users
+2. **Compliance** — analyst+
+3. **Insights** — reviewer+
+4. **Data Review** — reviewer+
+5. **Data Management** — admin
+6. **System** — admin
+
+### Adding a route — three-step ritual
+
+1. **Route** in `src/App.tsx`, wrapped in `<RoleGate minimumRole="…">`
+2. **Sidebar entry** in `NAV` (Sidebar.tsx) with the same `minRole`
+3. **Command palette entry** in `allActions` (CommandPalette.tsx)
+
+If any of the three is missing, the page is unreachable for the role
+it should serve. CI lint catches step 1; reviewers must catch steps 2-3.
+
+### Visitor / public routes
+
+`/login` and `/signup` render WITHOUT `<AuthenticatedLayout>` — they
+get their own full-page hero. Don't render the sidebar on these.
+
+---
+
+## 10. Adding a new page
 
 **RULE OF ONE PAGE SHELL**: every authenticated route is wrapped in
 `<AppPage>`. Do not hand-roll the `min-h-screen` + `max-w-…` + `mx-auto`
