@@ -150,7 +150,7 @@ export function ProvenancePanel({ entityId }: Props) {
           <CardTitle className="text-sm">Resumen</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-sm">
             <div>
               <div className="text-muted-foreground">Schema</div>
               <div className="font-medium">{data.schema}</div>

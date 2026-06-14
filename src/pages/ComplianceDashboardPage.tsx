@@ -518,7 +518,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
         <DialogHeader>
           <DialogTitle>Crear Caso de Investigación</DialogTitle>
         </DialogHeader>
@@ -547,7 +547,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
               <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-white/10">
+              <SelectContent className="bg-brand-navy border-white/10">
                 <SelectItem value="critical" className="text-red-400">Critical</SelectItem>
                 <SelectItem value="high" className="text-orange-400">High</SelectItem>
                 <SelectItem value="medium" className="text-yellow-400">Medium</SelectItem>
@@ -620,7 +620,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
         <DialogHeader>
           <DialogTitle>Agregar a Monitoreo Continuo</DialogTitle>
         </DialogHeader>
@@ -640,7 +640,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
               <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
                 <SelectValue placeholder="Seleccionar..." />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-white/10">
+              <SelectContent className="bg-brand-navy border-white/10">
                 <SelectItem value="person" className="text-gray-300">Persona</SelectItem>
                 <SelectItem value="company" className="text-gray-300">Empresa</SelectItem>
                 <SelectItem value="vessel" className="text-gray-300">Embarcación</SelectItem>
@@ -654,7 +654,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
               <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a1a1a] border-white/10">
+              <SelectContent className="bg-brand-navy border-white/10">
                 <SelectItem value="realtime" className="text-gray-300">Tiempo real</SelectItem>
                 <SelectItem value="daily" className="text-gray-300">Diario</SelectItem>
                 <SelectItem value="weekly" className="text-gray-300">Semanal</SelectItem>
@@ -728,7 +728,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
         <DialogHeader>
           <DialogTitle>Agregar al Whitelist</DialogTitle>
         </DialogHeader>
@@ -813,7 +813,7 @@ export function ComplianceDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div

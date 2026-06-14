@@ -214,7 +214,7 @@ export function BulkScreeningPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div
@@ -268,7 +268,7 @@ export function BulkScreeningPage() {
                     className={cn(
                       'border-2 border-dashed transition-colors',
                       isDragging ? 'border-blue-500 bg-blue-500/5' : 'border-white/10',
-                      file ? 'bg-green-500/5 border-green-500/30' : 'bg-[#1a1a1a]'
+                      file ? 'bg-green-500/5 border-green-500/30' : 'bg-brand-navy'
                     )}
                     onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                     onDragLeave={() => setIsDragging(false)}
@@ -324,7 +324,7 @@ export function BulkScreeningPage() {
               {/* Text Input */}
               {inputMethod === 'text' && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-[#1a1a1a] border-white/5">
+                  <Card className="bg-brand-navy border-white/5">
                     <CardHeader>
                       <CardTitle className="text-white">Nombres a buscar</CardTitle>
                     </CardHeader>
@@ -333,7 +333,7 @@ export function BulkScreeningPage() {
                         value={namesText}
                         onChange={(e) => setNamesText(e.target.value)}
                         placeholder="Pega los nombres aqui, uno por linea...&#10;Ejemplo:&#10;Juan Perez&#10;Maria Garcia&#10;Carlos Lopez"
-                        className="min-h-[200px] bg-[#0a0a0a] border-white/10 text-white placeholder:text-gray-600"
+                        className="min-h-[200px] bg-brand-carbon border-white/10 text-white placeholder:text-gray-600"
                       />
                       <p className="text-sm text-gray-500 mt-2">
                         {parseNamesFromText().length} nombres detectados
@@ -345,7 +345,7 @@ export function BulkScreeningPage() {
 
               {/* Min Score Slider */}
               <motion.div variants={itemVariants}>
-                <Card className="bg-[#1a1a1a] border-white/5">
+                <Card className="bg-brand-navy border-white/5">
                   <CardHeader>
                     <CardTitle className="text-white flex items-center justify-between">
                       <span>Score minimo de coincidencia</span>
@@ -396,7 +396,7 @@ export function BulkScreeningPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
             >
-              <Card className="bg-[#1a1a1a] border-white/5 p-8">
+              <Card className="bg-brand-navy border-white/5 p-8">
                 <div className="text-center">
                   <div className="relative w-24 h-24 mx-auto mb-6">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -469,7 +469,7 @@ export function BulkScreeningPage() {
             >
               {/* Summary */}
               <motion.div variants={itemVariants}>
-                <Card className="bg-[#1a1a1a] border-white/5">
+                <Card className="bg-brand-navy border-white/5">
                   <CardContent className="p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
@@ -508,7 +508,7 @@ export function BulkScreeningPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(index * 0.02, 0.3) }}
                       >
-                        <Card className="bg-[#1a1a1a] border-white/5">
+                        <Card className="bg-brand-navy border-white/5">
                           <CardContent className="p-4 space-y-3">
                             <div className="flex items-start justify-between gap-3">
                               <p className="text-sm text-white break-words">{result.query}</p>
@@ -555,7 +555,7 @@ export function BulkScreeningPage() {
                     ))}
                   </div>
 
-                  <Card className="hidden md:block bg-[#1a1a1a] border-white/5">
+                  <Card className="hidden md:block bg-brand-navy border-white/5">
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead className="bg-white/5 border-b border-white/5">

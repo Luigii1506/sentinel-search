@@ -875,7 +875,7 @@ export function OperationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto space-y-4">
           <Skeleton className="h-12 bg-white/5" />
           <Skeleton className="h-12 bg-white/5" />
@@ -890,7 +890,7 @@ export function OperationsPage() {
   const refreshRate = runningCount > 0 ? '2.5s' : recentTriggerWindow ? '1.5s' : '30s';
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto space-y-4">
 
         {/* ── Header ───────────────────────────────────────────── */}
@@ -1054,7 +1054,7 @@ export function OperationsPage() {
           className="space-y-1.5"
         >
           {sources.length === 0 ? (
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-8 text-center">
                 <CheckCircle2 className="w-10 h-10 text-gray-600 mx-auto mb-2" />
                 <p className="text-sm text-gray-400">

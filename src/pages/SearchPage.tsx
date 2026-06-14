@@ -1158,7 +1158,7 @@ function SearchResultCard({
                       </span>
                     )}
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
                     {entity.explainability.structural_analysis && (
                       <>
                         <span className="text-gray-600">Tokens:</span>
@@ -1586,7 +1586,7 @@ export function SearchPage() {
     localFilters.sources.length;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 pb-12">
+    <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Search Header */}
         <motion.div

@@ -113,7 +113,7 @@ export function MonitoringPage() {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
@@ -131,7 +131,7 @@ export function MonitoringPage() {
 
   if (jobsError) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar monitoreo</h2>
@@ -190,7 +190,7 @@ export function MonitoringPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -249,9 +249,9 @@ export function MonitoringPage() {
               <Server className="w-5 h-5 text-gray-400" />
               Servicios
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {/* API */}
-              <Card className="bg-[#1a1a1a] border-white/5">
+              <Card className="bg-brand-navy border-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <ServiceStatusDot status={services.api?.status} />
                   <div className="min-w-0">
@@ -261,7 +261,7 @@ export function MonitoringPage() {
                 </CardContent>
               </Card>
               {/* Database */}
-              <Card className="bg-[#1a1a1a] border-white/5">
+              <Card className="bg-brand-navy border-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <ServiceStatusDot status={services.database?.status} />
                   <div className="min-w-0">
@@ -274,7 +274,7 @@ export function MonitoringPage() {
                 </CardContent>
               </Card>
               {/* Redis */}
-              <Card className="bg-[#1a1a1a] border-white/5">
+              <Card className="bg-brand-navy border-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <ServiceStatusDot status={services.redis?.status} />
                   <div className="min-w-0">
@@ -287,7 +287,7 @@ export function MonitoringPage() {
                 </CardContent>
               </Card>
               {/* OpenSearch */}
-              <Card className="bg-[#1a1a1a] border-white/5">
+              <Card className="bg-brand-navy border-white/5">
                 <CardContent className="p-4 flex items-center gap-3">
                   <ServiceStatusDot status={services.opensearch?.status} />
                   <div className="min-w-0">
@@ -308,13 +308,13 @@ export function MonitoringPage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-8"
         >
           {/* Entity counts */}
           {counts && (
             <>
               <motion.div variants={itemVariants}>
-                <Card className="bg-[#1a1a1a] border-white/5">
+                <Card className="bg-brand-navy border-white/5">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Layers className="w-4 h-4 text-amber-400" />
@@ -325,7 +325,7 @@ export function MonitoringPage() {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Card className="bg-[#1a1a1a] border-white/5">
+                <Card className="bg-brand-navy border-white/5">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Layers className="w-4 h-4 text-gray-300" />
@@ -336,7 +336,7 @@ export function MonitoringPage() {
                 </Card>
               </motion.div>
               <motion.div variants={itemVariants}>
-                <Card className="bg-[#1a1a1a] border-white/5">
+                <Card className="bg-brand-navy border-white/5">
                   <CardContent className="p-4">
                     <div className="flex items-center gap-2 mb-1">
                       <Layers className="w-4 h-4 text-yellow-400" />
@@ -351,7 +351,7 @@ export function MonitoringPage() {
 
           {/* Job stats */}
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Play className="w-4 h-4 text-blue-400" />
@@ -362,7 +362,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <CheckCircle2 className="w-4 h-4 text-green-400" />
@@ -373,7 +373,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <XCircle className="w-4 h-4 text-red-400" />
@@ -384,7 +384,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-purple-400" />
@@ -400,10 +400,10 @@ export function MonitoringPage() {
           variants={containerVariants}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-8"
         >
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-orange-400" />
@@ -414,7 +414,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="w-4 h-4 text-gray-400" />
@@ -425,7 +425,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Database className="w-4 h-4 text-green-400" />
@@ -436,7 +436,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Layers className="w-4 h-4 text-yellow-400" />
@@ -447,7 +447,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <XCircle className="w-4 h-4 text-red-400" />
@@ -458,7 +458,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-fuchsia-400" />
@@ -469,7 +469,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Server className="w-4 h-4 text-cyan-400" />
@@ -480,7 +480,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-red-400" />
@@ -491,7 +491,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <RefreshCw className="w-4 h-4 text-amber-400" />
@@ -502,7 +502,7 @@ export function MonitoringPage() {
             </Card>
           </motion.div>
           <motion.div variants={itemVariants}>
-            <Card className={`bg-[#1a1a1a] ${snapshotsCritical > 0 ? 'border-red-500/30' : snapshotsStale > 0 ? 'border-amber-500/30' : 'border-white/5'}`}>
+            <Card className={`bg-brand-navy ${snapshotsCritical > 0 ? 'border-red-500/30' : snapshotsStale > 0 ? 'border-amber-500/30' : 'border-white/5'}`}>
               <CardContent className="p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <HardDrive className={`w-4 h-4 ${snapshotsCritical > 0 ? 'text-red-400' : snapshotsStale > 0 ? 'text-amber-400' : 'text-green-400'}`} />
@@ -524,7 +524,7 @@ export function MonitoringPage() {
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader>
               <CardTitle className="text-white text-lg">Freshness y Riesgo Operativo</CardTitle>
             </CardHeader>
@@ -566,7 +566,7 @@ export function MonitoringPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader>
               <CardTitle className="text-white text-lg">DLQ y Calidad</CardTitle>
             </CardHeader>
@@ -633,7 +633,7 @@ export function MonitoringPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="bg-[#1a1a1a] border-blue-500/20">
+                  <Card className="bg-brand-navy border-blue-500/20">
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div>
@@ -682,7 +682,7 @@ export function MonitoringPage() {
               ))}
             </div>
           ) : (
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-8 text-center">
                 <Clock className="w-12 h-12 text-gray-600 mx-auto mb-4" />
                 <p className="text-gray-400">No hay jobs en ejecucion</p>
@@ -707,7 +707,7 @@ export function MonitoringPage() {
             )}
           </h2>
 
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-white/5 border-b border-white/5">

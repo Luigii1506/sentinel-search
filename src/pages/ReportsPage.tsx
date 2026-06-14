@@ -87,7 +87,7 @@ export default function ReportsPage() {
     return (
       <div className="pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <Skeleton className="h-8 w-64 mb-6" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}
         </div>
         <div className="grid grid-cols-2 gap-6">
@@ -132,7 +132,7 @@ export default function ReportsPage() {
       {report && (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <StatCard
               icon={AlertTriangle}
               label="Alertas Generadas"

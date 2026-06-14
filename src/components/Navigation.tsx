@@ -122,7 +122,7 @@ export function Navigation() {
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled
-          ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5'
+          ? 'bg-brand-carbon/95 backdrop-blur-xl border-b border-white/5'
           : 'bg-transparent'
       )}
     >
@@ -157,7 +157,7 @@ export function Navigation() {
                     'relative px-4 py-2 text-sm font-medium transition-colors rounded-lg',
                     isActive
                       ? 'text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-navy-100 hover:text-white hover:bg-white/5'
                   )}
                 >
                   {isActive && (
@@ -183,7 +183,7 @@ export function Navigation() {
                     'relative px-4 py-2 text-sm font-medium transition-colors rounded-lg flex items-center gap-2',
                     location.pathname.startsWith('/admin') || location.pathname === '/operations' || location.pathname === '/monitoring' || location.pathname === '/reports' || location.pathname === '/settings'
                       ? 'text-white bg-white/10'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-navy-100 hover:text-white hover:bg-white/5'
                   )}
                 >
                   <Settings className="w-4 h-4" />
@@ -191,7 +191,7 @@ export function Navigation() {
                   <ChevronDown className="w-3 h-3" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-white/10" align="end">
+              <DropdownMenuContent className="w-56 bg-brand-navy border-white/10" align="end">
                 {visibleAdminNavItems.map((item) => (
                   <DropdownMenuItem
                     key={item.path}
@@ -222,7 +222,7 @@ export function Navigation() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-[#1a1a1a] border-white/10" align="end" forceMount>
+                <DropdownMenuContent className="w-56 bg-brand-navy border-white/10" align="end" forceMount>
                   <div className="flex items-center gap-2 p-2">
                     <div className="flex flex-col space-y-0.5">
                       <p className="text-sm font-medium text-white">
@@ -285,7 +285,7 @@ export function Navigation() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
-          className="lg:hidden max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5"
+          className="lg:hidden max-h-[calc(100vh-3.5rem)] overflow-y-auto bg-brand-carbon/95 backdrop-blur-xl border-b border-white/5"
         >
           <nav className="px-3 py-3 space-y-1 pb-6">
             {mainNavLinks.map((link) => {
@@ -300,7 +300,7 @@ export function Navigation() {
                     'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
                     isActive
                       ? 'bg-white/10 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-navy-100 hover:text-white hover:bg-white/5'
                   )}
                 >
                   <link.icon className="w-5 h-5" />
@@ -327,7 +327,7 @@ export function Navigation() {
                     'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors',
                     isActive
                       ? 'bg-white/10 text-white'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-navy-100 hover:text-white hover:bg-white/5'
                   )}
                 >
                   <item.icon className="w-5 h-5" />

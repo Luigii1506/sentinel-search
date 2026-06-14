@@ -140,7 +140,7 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#1a1a1a] border-white/10">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-brand-navy border-white/10">
         <DialogHeader>
           <DialogTitle className="text-xl text-white flex items-center gap-2">
             <Database className="w-5 h-5 text-blue-400" />
@@ -156,7 +156,7 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
         ) : detail ? (
           <div className="space-y-6">
             {/* Header Info */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-3 rounded-lg bg-white/5">
                 <p className="text-xs text-gray-500">Estado</p>
                 <Badge className={`${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.bg} ${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.color} mt-1`}>
@@ -309,7 +309,7 @@ export function SourcesDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-[1600px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
             {[...Array(5)].map((_, i) => (
@@ -324,7 +324,7 @@ export function SourcesDashboardPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar fuentes</h2>
@@ -340,7 +340,7 @@ export function SourcesDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-[1600px] mx-auto">
         {/* Header */}
         <motion.div
@@ -367,7 +367,7 @@ export function SourcesDashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium text-gray-400 flex items-center gap-1.5">
                 <Server className="w-3.5 h-3.5" />
@@ -378,7 +378,7 @@ export function SourcesDashboardPage() {
               <div className="text-2xl font-bold text-white">{data?.total_registered}</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium text-[#CD853F] flex items-center gap-1.5">
                 <Database className="w-3.5 h-3.5" />
@@ -389,7 +389,7 @@ export function SourcesDashboardPage() {
               <div className="text-2xl font-bold text-white">{formatNumber(data?.total_bronze || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium text-gray-300 flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5" />
@@ -400,7 +400,7 @@ export function SourcesDashboardPage() {
               <div className="text-2xl font-bold text-white">{formatNumber(data?.total_silver || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium text-yellow-400 flex items-center gap-1.5">
                 <Shield className="w-3.5 h-3.5" />
@@ -411,7 +411,7 @@ export function SourcesDashboardPage() {
               <div className="text-2xl font-bold text-white">{formatNumber(data?.total_gold || 0)}</div>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardHeader className="pb-2">
               <CardTitle className="text-xs font-medium text-gray-400 flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5" />
@@ -465,16 +465,16 @@ export function SourcesDashboardPage() {
               placeholder="Buscar por nombre, source_id, dataset, pais..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-[#1a1a1a] border-white/10 text-white"
+              className="pl-10 bg-brand-navy border-white/10 text-white"
             />
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white">
+            <SelectTrigger className="bg-brand-navy border-white/10 text-white">
               <Activity className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-white/10">
+            <SelectContent className="bg-brand-navy border-white/10">
               <SelectItem value="all">Todos los status</SelectItem>
               <SelectItem value="active">Activo ({data?.by_status?.active || 0})</SelectItem>
               <SelectItem value="pending">Pendiente ({data?.by_status?.pending || 0})</SelectItem>
@@ -485,11 +485,11 @@ export function SourcesDashboardPage() {
           </Select>
 
           <Select value={hasDataFilter} onValueChange={setHasDataFilter}>
-            <SelectTrigger className="bg-[#1a1a1a] border-white/10 text-white">
+            <SelectTrigger className="bg-brand-navy border-white/10 text-white">
               <Database className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Datos" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-white/10">
+            <SelectContent className="bg-brand-navy border-white/10">
               <SelectItem value="all">Todas</SelectItem>
               <SelectItem value="has_data">Con datos</SelectItem>
               <SelectItem value="no_data">Sin datos</SelectItem>
@@ -503,7 +503,7 @@ export function SourcesDashboardPage() {
             const StatusIcon = statusCfg.icon;
 
             return (
-              <Card key={source.source_id} className="bg-[#1a1a1a] border-white/5">
+              <Card key={source.source_id} className="bg-brand-navy border-white/5">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -562,7 +562,7 @@ export function SourcesDashboardPage() {
         </div>
 
         {/* Sources Table */}
-        <div className="hidden md:block bg-[#1a1a1a] rounded-xl border border-white/5 overflow-hidden">
+        <div className="hidden md:block bg-brand-navy rounded-xl border border-white/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-white/5 border-b border-white/5">
@@ -704,7 +704,7 @@ export function SourcesDashboardPage() {
                           className="bg-white/[0.02]"
                         >
                           <td colSpan={12} className="px-6 py-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-sm">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
                               {/* Importer */}
                               <div>
                                 <p className="text-gray-500 mb-1 text-xs uppercase">Importer</p>

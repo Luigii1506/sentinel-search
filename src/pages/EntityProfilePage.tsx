@@ -768,7 +768,7 @@ function NetworkRiskTab({ entityId }: { entityId: string }) {
           <Network className="w-5 h-5 text-blue-400" />
           Riesgo Propagado por Red
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-xs text-gray-500">Riesgo Directo</p>
             <p className="text-2xl font-bold text-white">{nr.direct_risk_score ?? '-'}</p>
@@ -953,7 +953,7 @@ function UBOTab({ entityId }: { entityId: string }) {
           <Landmark className="w-5 h-5 text-blue-400" />
           {isIndividual ? 'Análisis de Control y Exposición' : 'Beneficiario Final (UBO)'}
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {owners.length > 0 && (
             <>
               <div>
@@ -1153,7 +1153,7 @@ function UBOTab({ entityId }: { entityId: string }) {
 // Loading Skeleton
 function EntityProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <Skeleton className="h-8 w-32" />
         <div className="glass rounded-2xl p-8">
@@ -1186,7 +1186,7 @@ function EntityNotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-brand-carbon flex items-center justify-center px-4">
       <div className="text-center">
         <AlertTriangle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-white mb-2">Entidad No Encontrada</h1>
@@ -1431,7 +1431,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
       {/* Enriched details grid */}
       {details && Object.keys(details).length > 0 && (
         <div className="mt-3 pt-3 border-t border-white/5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {details.rfc && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">RFC</p>
@@ -1662,7 +1662,7 @@ export function EntityProfilePage() {
   const riskColor = getRiskColor(entity.risk_level);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-20 pb-12">
+    <div className="min-h-screen bg-brand-carbon pt-20 pb-12">
       {/* Back Button & Actions */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

@@ -208,9 +208,9 @@ export function AuditPage() {
 
   if (sourcesLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-24 bg-white/5" />
             ))}
@@ -234,7 +234,7 @@ export function AuditPage() {
   const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -301,7 +301,7 @@ export function AuditPage() {
             className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"
           >
             {/* Cobertura 24h */}
-            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase tracking-wide">Cobertura últimas 24h</span>
@@ -331,7 +331,7 @@ export function AuditPage() {
             </Card>
 
             {/* Health buckets */}
-            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
               <CardContent className="p-4">
                 <span className="text-xs text-gray-400 uppercase tracking-wide">Estado de salud</span>
                 <div className="grid grid-cols-4 gap-2 mt-2">
@@ -356,7 +356,7 @@ export function AuditPage() {
             </Card>
 
             {/* Próximos syncs */}
-            <Card className="bg-[#1a1a1a] border-white/5 lg:col-span-1">
+            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
               <CardContent className="p-4">
                 <span className="text-xs text-gray-400 uppercase tracking-wide">Próximos syncs</span>
                 <div className="mt-2 space-y-1.5 max-h-[120px] overflow-y-auto">
@@ -385,7 +385,7 @@ export function AuditPage() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8"
         >
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Database className="w-4 h-4 text-blue-400" />
@@ -395,7 +395,7 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">{sourcesData?.total_with_data || 0} con datos</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <ShieldCheck className="w-4 h-4 text-cyan-400" />
@@ -405,7 +405,7 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">Con runtime health</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <CheckCircle2 className="w-4 h-4 text-green-400" />
@@ -415,7 +415,7 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">Score ≥ 80</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <AlertTriangle className="w-4 h-4 text-amber-400" />
@@ -425,7 +425,7 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">Stale o fallo reciente</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <XCircle className="w-4 h-4 text-red-400" />
@@ -435,7 +435,7 @@ export function AuditPage() {
               <p className="text-xs text-gray-500">Fallos consecutivos</p>
             </CardContent>
           </Card>
-          <Card className="bg-[#1a1a1a] border-white/5">
+          <Card className="bg-brand-navy border-white/5">
             <CardContent className="p-4">
               <div className="flex items-center gap-2 mb-1">
                 <Clock className="w-4 h-4 text-gray-400" />
@@ -461,7 +461,7 @@ export function AuditPage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {recentFailed.slice(0, 6).map((job) => (
-                <Card key={job.id} className="bg-[#1a1a1a] border-red-500/10">
+                <Card key={job.id} className="bg-brand-navy border-red-500/10">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-white">{job.source}</span>
@@ -492,16 +492,16 @@ export function AuditPage() {
               placeholder="Buscar por fuente, nombre o pais..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-[#1a1a1a] border-white/10 text-white"
+              className="pl-10 bg-brand-navy border-white/10 text-white"
             />
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[200px] bg-[#1a1a1a] border-white/10 text-white">
+            <SelectTrigger className="w-full md:w-[200px] bg-brand-navy border-white/10 text-white">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
-            <SelectContent className="bg-[#1a1a1a] border-white/10">
+            <SelectContent className="bg-brand-navy border-white/10">
               <SelectItem value="all">Todos los estados</SelectItem>
               <SelectItem value="critical">Crítico</SelectItem>
               <SelectItem value="warning">Atención</SelectItem>
@@ -517,7 +517,7 @@ export function AuditPage() {
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8"
           >
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <h2 className="text-base font-semibold text-white mb-3">Fuentes Desaparecidas</h2>
                 <div className="space-y-2">
@@ -541,7 +541,7 @@ export function AuditPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-[#1a1a1a] border-white/5">
+            <Card className="bg-brand-navy border-white/5">
               <CardContent className="p-4">
                 <h2 className="text-base font-semibold text-white mb-3">Eventos de Lifecycle</h2>
                 <div className="space-y-2">
@@ -594,7 +594,7 @@ export function AuditPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(index * 0.02, 0.3) }}
                 >
-                  <Card className="bg-[#1a1a1a] border-white/5">
+                  <Card className="bg-brand-navy border-white/5">
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
@@ -642,7 +642,7 @@ export function AuditPage() {
             })}
           </div>
 
-          <Card className="hidden md:block bg-[#1a1a1a] border-white/5">
+          <Card className="hidden md:block bg-brand-navy border-white/5">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-white/5 border-b border-white/5">

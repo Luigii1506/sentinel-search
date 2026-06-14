@@ -66,7 +66,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
       animate={{ scale: 1, opacity: 1 }}
       className={cn(
         'relative p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer',
-        'bg-[#1a1a1a] backdrop-blur-sm',
+        'bg-brand-navy backdrop-blur-sm',
         selected
           ? 'border-blue-500 shadow-lg shadow-blue-500/20'
           : isCenter
@@ -341,7 +341,7 @@ export function RelationshipGraph({
 
   if (isLoading) {
     return (
-      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-[#0a0a0a]', className)} style={{ height }}>
+      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-brand-carbon', className)} style={{ height }}>
         <div className="h-full flex items-center justify-center">
           <Skeleton className="w-full h-full bg-white/5" />
         </div>
@@ -351,7 +351,7 @@ export function RelationshipGraph({
 
   if (!center) {
     return (
-      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-[#0a0a0a]', className)} style={{ height }}>
+      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-brand-carbon', className)} style={{ height }}>
         <div className="h-full flex flex-col items-center justify-center text-gray-500">
           <Users className="w-12 h-12 mb-4" />
           <p>No hay datos de relaciones disponibles</p>
@@ -372,7 +372,7 @@ export function RelationshipGraph({
       {isFullscreen && (
         <button
           onClick={() => setIsFullscreen(false)}
-          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-[#1a1a1a]/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-brand-navy/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -391,7 +391,7 @@ export function RelationshipGraph({
         minZoom={0.2}
         maxZoom={2}
         attributionPosition="bottom-left"
-        className="bg-[#0a0a0a]"
+        className="bg-brand-carbon"
       >
         <Background
           color="#2a2a2a"
@@ -399,12 +399,12 @@ export function RelationshipGraph({
           size={1}
           style={{ backgroundColor: '#0a0a0a' }}
         />
-        <Controls className="bg-[#1a1a1a] border-white/10" />
+        <Controls className="bg-brand-navy border-white/10" />
         <MiniMap
           nodeStrokeWidth={3}
           zoomable
           pannable
-          className="bg-[#1a1a1a] border border-white/10 rounded-lg"
+          className="bg-brand-navy border border-white/10 rounded-lg"
           maskColor="rgba(10, 10, 10, 0.8)"
           nodeColor={(node) => {
             const data = node.data as unknown as EntityNodeData;
@@ -418,7 +418,7 @@ export function RelationshipGraph({
             <Button
               variant="outline"
               size="sm"
-              className="bg-[#1a1a1a]/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
               onClick={() => setIsFullscreen(!isFullscreen)}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -426,14 +426,14 @@ export function RelationshipGraph({
             <Button
               variant="outline"
               size="sm"
-              className="bg-[#1a1a1a]/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
             >
               <Share2 className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="bg-[#1a1a1a]/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
             >
               <Download className="w-4 h-4" />
             </Button>

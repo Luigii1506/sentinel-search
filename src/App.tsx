@@ -55,7 +55,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-[#0a0a0a] text-white">
+          <div className="min-h-screen bg-brand-carbon text-white">
             <Routes>
               {/* Public Routes */}
               <Route path="/login" element={<LoginPage />} />

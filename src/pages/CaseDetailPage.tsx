@@ -200,7 +200,7 @@ export function CaseDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
+      <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-40 rounded-xl" />
@@ -213,7 +213,7 @@ export function CaseDetailPage() {
   // Not found
   if (!caseData) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
+      <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl text-white mb-2">Caso no encontrado</h2>
@@ -243,7 +243,7 @@ export function CaseDetailPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-12">
+    <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back navigation */}
         <Button
@@ -619,7 +619,7 @@ export function CaseDetailPage() {
                       <div key={i} className="relative pl-10 py-2.5">
                         <div className={cn(
                           'absolute left-1 w-[22px] h-[22px] rounded-full flex items-center justify-center z-10',
-                          'bg-[#0a0a0a] border border-white/10',
+                          'bg-brand-carbon border border-white/10',
                         )}>
                           <EventIcon className="w-3 h-3 text-gray-500" />
                         </div>
@@ -726,7 +726,7 @@ export function CaseDetailPage() {
           DECISION DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={!!decisionDialog} onOpenChange={(open) => !open && setDecisionDialog(null)}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-lg">Tomar Decision</DialogTitle>
           </DialogHeader>
@@ -910,7 +910,7 @@ export function CaseDetailPage() {
           SAR REPORT DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={showSarReport} onOpenChange={setShowSarReport}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <DialogTitle className="text-lg flex items-center gap-2">
@@ -1262,7 +1262,7 @@ export function CaseDetailPage() {
           FILE SAR DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={showFileSarDialog} onOpenChange={setShowFileSarDialog}>
-        <DialogContent className="bg-[#1a1a1a] border-white/10 text-white max-w-md">
+        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <FileWarning className="w-5 h-5 text-amber-400" />

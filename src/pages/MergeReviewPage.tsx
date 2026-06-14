@@ -132,7 +132,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
       className="px-6 py-4 bg-white/[0.02] border-t border-white/5"
     >
       {/* Gold entity summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div>
           <p className="text-xs text-gray-500 mb-1">Tipo</p>
           <p className="text-sm text-white">{data.entity_type || 'N/A'}</p>
@@ -381,7 +381,7 @@ export function MergeReviewPage() {
   const endItem = Math.min((page + 1) * pageSize, data?.total || 0);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 px-4 sm:px-6 lg:px-8 pb-12">
+    <div className="min-h-screen bg-brand-carbon pt-24 px-4 sm:px-6 lg:px-8 pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -407,7 +407,7 @@ export function MergeReviewPage() {
                       )}
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-[#1a1a1a] border-white/10">
+                  <TooltipContent className="bg-brand-navy border-white/10">
                     Tiempo de respuesta del servidor
                   </TooltipContent>
                 </Tooltip>
@@ -427,7 +427,7 @@ export function MergeReviewPage() {
 
         {/* Stats cards */}
         {page === 0 && Object.keys(stats).length > 0 && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <StatCard
               title="Total Merges"
               value={stats.total_merged_entities || 0}
@@ -480,7 +480,7 @@ export function MergeReviewPage() {
                 <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 text-gray-300">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-white/10">
+                <SelectContent className="bg-brand-navy border-white/10">
                   {ENTITY_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <div className="flex items-center gap-2">
@@ -496,7 +496,7 @@ export function MergeReviewPage() {
                 <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10 text-gray-300">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1a] border-white/10">
+                <SelectContent className="bg-brand-navy border-white/10">
                   <SelectItem value="confidence_asc">Confianza (menor)</SelectItem>
                   <SelectItem value="confidence_desc">Confianza (mayor)</SelectItem>
                   <SelectItem value="sources_desc">Mas fuentes</SelectItem>
@@ -547,7 +547,7 @@ export function MergeReviewPage() {
                       <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10 text-gray-300">
                         <SelectValue placeholder="Metodo" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-white/10">
+                      <SelectContent className="bg-brand-navy border-white/10">
                         <SelectItem value="all">Todos los metodos</SelectItem>
                         <SelectItem value="cross_source_merge">Cross-Source</SelectItem>
                         <SelectItem value="gold_dedup_merge">Gold Dedup</SelectItem>
@@ -560,7 +560,7 @@ export function MergeReviewPage() {
                       <SelectTrigger className="w-full sm:w-[140px] bg-white/5 border-white/10 text-gray-300">
                         <SelectValue placeholder="Min fuentes" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#1a1a1a] border-white/10">
+                      <SelectContent className="bg-brand-navy border-white/10">
                         <SelectItem value="2">2+ fuentes</SelectItem>
                         <SelectItem value="3">3+ fuentes</SelectItem>
                         <SelectItem value="5">5+ fuentes</SelectItem>
@@ -746,7 +746,7 @@ export function MergeReviewPage() {
                                     <TooltipTrigger>
                                       <Shield className="w-3.5 h-3.5 text-yellow-400" />
                                     </TooltipTrigger>
-                                    <TooltipContent className="bg-[#1a1a1a] border-white/10">
+                                    <TooltipContent className="bg-brand-navy border-white/10">
                                       PEP: {entity.pep_category}
                                     </TooltipContent>
                                   </Tooltip>
@@ -860,7 +860,7 @@ export function MergeReviewPage() {
                   <SelectTrigger className="w-full sm:w-[120px] bg-white/5 border-white/10 text-gray-300 text-xs">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1a] border-white/10">
+                  <SelectContent className="bg-brand-navy border-white/10">
                     {PAGE_SIZE_OPTIONS.map(size => (
                       <SelectItem key={size} value={String(size)}>
                         {size} / página

@@ -179,7 +179,7 @@ export function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-brand-carbon">
       {/* Hero Section */}
       <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
@@ -274,7 +274,7 @@ export function HomePage() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.6 }}
-            className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-16"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-16"
           >
             {isLoading ? (
               <>
@@ -532,7 +532,7 @@ export function HomePage() {
       {/* Footer */}
       <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
               <h4 className="text-white font-semibold mb-4">Producto</h4>
               <ul className="space-y-2">

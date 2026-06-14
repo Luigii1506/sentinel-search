@@ -912,7 +912,7 @@ function ArticleDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-[#111] border-white/10 text-white">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-brand-navy border-white/10 text-white">
         {isLoading ? (
           <div className="space-y-4 p-4">
             <Skeleton className="h-6 w-3/4" />
