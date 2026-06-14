@@ -60,8 +60,9 @@ const adminNavItems: AdminNavItem[] = [
   // Operations es el hub principal: status, ahora, próximos, recientes, alertas
   { path: '/operations', label: 'Operaciones', icon: Activity, minRole: 'reviewer' },
   { path: '/admin/api-keys', label: 'API Keys', icon: Key, minRole: 'admin' },
+  { path: '/admin/activity-log', label: 'Activity Log', icon: ClipboardList, minRole: 'reviewer' },
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database, minRole: 'admin' },
-  { path: '/admin/audit', label: 'Audit Trail', icon: ClipboardList, minRole: 'reviewer' },
+  { path: '/admin/audit', label: 'Sources Audit', icon: ClipboardList, minRole: 'reviewer' },
   { path: '/admin/merges', label: 'Merge Review', icon: GitMerge },
   { path: '/admin/resolver-review', label: 'Resolver Review (UNSURE)', icon: GitMerge },
   { path: '/admin/validation-review', label: 'Validation Review', icon: Shield },

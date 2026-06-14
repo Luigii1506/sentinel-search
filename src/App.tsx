@@ -23,6 +23,7 @@ import { FederatedSearchPage } from '@/pages/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
 import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
 import ApiKeysPage from '@/pages/ApiKeysPage';
+import ActivityLogPage from '@/pages/ActivityLogPage';
 import { RoleGate } from '@/components/RoleGate';
 
 // Create Query Client
@@ -123,6 +124,16 @@ function App() {
                   <AuthenticatedLayout>
                     <RoleGate minimumRole="admin">
                       <ApiKeysPage />
+                    </RoleGate>
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/admin/activity-log"
+                element={
+                  <AuthenticatedLayout>
+                    <RoleGate minimumRole="reviewer">
+                      <ActivityLogPage />
                     </RoleGate>
                   </AuthenticatedLayout>
                 }
