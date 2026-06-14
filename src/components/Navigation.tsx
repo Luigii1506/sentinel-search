@@ -21,6 +21,7 @@ import {
   Newspaper,
   Globe,
   Key,
+  Webhook,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -60,6 +61,7 @@ const adminNavItems: AdminNavItem[] = [
   // Operations es el hub principal: status, ahora, próximos, recientes, alertas
   { path: '/operations', label: 'Operaciones', icon: Activity, minRole: 'reviewer' },
   { path: '/admin/api-keys', label: 'API Keys', icon: Key, minRole: 'admin' },
+  { path: '/admin/webhooks', label: 'Webhooks', icon: Webhook, minRole: 'admin' },
   { path: '/admin/activity-log', label: 'Activity Log', icon: ClipboardList, minRole: 'reviewer' },
   { path: '/admin/sources', label: 'Fuentes de Datos', icon: Database, minRole: 'admin' },
   { path: '/admin/audit', label: 'Sources Audit', icon: ClipboardList, minRole: 'reviewer' },

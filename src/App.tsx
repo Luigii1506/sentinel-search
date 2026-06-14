@@ -24,6 +24,7 @@ import { ResolverReviewPage } from '@/pages/ResolverReviewPage';
 import { ValidationReviewPage } from '@/pages/ValidationReviewPage';
 import ApiKeysPage from '@/pages/ApiKeysPage';
 import ActivityLogPage from '@/pages/ActivityLogPage';
+import WebhooksPage from '@/pages/WebhooksPage';
 import { RoleGate } from '@/components/RoleGate';
 
 // Create Query Client
@@ -134,6 +135,16 @@ function App() {
                   <AuthenticatedLayout>
                     <RoleGate minimumRole="reviewer">
                       <ActivityLogPage />
+                    </RoleGate>
+                  </AuthenticatedLayout>
+                }
+              />
+              <Route
+                path="/admin/webhooks"
+                element={
+                  <AuthenticatedLayout>
+                    <RoleGate minimumRole="admin">
+                      <WebhooksPage />
                     </RoleGate>
                   </AuthenticatedLayout>
                 }
