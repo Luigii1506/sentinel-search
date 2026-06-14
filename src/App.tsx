@@ -30,6 +30,7 @@ import ActivityLogPage from '@/pages/insights/ActivityLogPage';
 import WebhooksPage from '@/pages/admin/WebhooksPage';
 import { YenteCatalogPage } from '@/pages/data/YenteCatalogPage';
 import { RoleGate } from '@/components/RoleGate';
+import { PublicOnlyRoute } from '@/components/PublicOnlyRoute';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -79,9 +80,23 @@ function App() {
         <Router>
           <div className="min-h-screen bg-brand-carbon text-white">
             <Routes>
-              {/* Public Routes */}
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignUpPage />} />
+              {/* Guest-only routes: redirect to / if already authenticated */}
+              <Route
+                path="/login"
+                element={
+                  <PublicOnlyRoute>
+                    <LoginPage />
+                  </PublicOnlyRoute>
+                }
+              />
+              <Route
+                path="/signup"
+                element={
+                  <PublicOnlyRoute>
+                    <SignUpPage />
+                  </PublicOnlyRoute>
+                }
+              />
               
               {/* Public Routes */}
               <Route
