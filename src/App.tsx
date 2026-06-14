@@ -3,7 +3,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { Navigation } from '@/components/Navigation';
+import { Sidebar, TopbarMobile, useSidebarCollapse } from '@/components/Sidebar';
+import { CommandPalette, useCommandPalette } from '@/components/CommandPalette';
+import { cn } from '@/lib/utils';
 import { LoginPage } from '@/pages/LoginPage';
 import { SignUpPage } from '@/pages/SignUpPage';
 import { HomePage } from '@/pages/HomePage';
@@ -38,12 +40,30 @@ const queryClient = new QueryClient({
   },
 });
 
-// Layout component for authenticated pages
+// Layout component for authenticated pages.
+//
+// Shell: persistent sidebar (240/60px) on lg+, off-canvas drawer + slim
+// topbar on < lg. CommandPalette is mounted at the layout level so
+// ⌘K / Ctrl+K works on any route (the hook also binds the global
+// keydown listener once).
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
+  const { open, setOpen } = useCommandPalette();
+  const { collapsed, toggle } = useSidebarCollapse();
   return (
     <>
-      <Navigation />
-      <main className="pt-14 sm:pt-16">
+      <Sidebar
+        onToggleCommand={() => setOpen(true)}
+        collapsed={collapsed}
+        onToggleCollapse={toggle}
+      />
+      <TopbarMobile onToggleCommand={() => setOpen(true)} />
+      <CommandPalette open={open} onOpenChange={setOpen} />
+      <main
+        className={cn(
+          'min-h-screen transition-[padding] duration-200',
+          collapsed ? 'lg:pl-[60px]' : 'lg:pl-[240px]',
+        )}
+      >
         {children}
       </main>
     </>
