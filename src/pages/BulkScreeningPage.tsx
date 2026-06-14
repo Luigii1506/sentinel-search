@@ -153,7 +153,7 @@ export function BulkScreeningPage() {
     
     pollingRef.current = setInterval(async () => {
       try {
-        const response = await api.get(`/api/v2/screen/batch/${jobId}`);
+        const response = await api.get(`/api/v2/screen/gold/batch/${jobId}`);
         const data = response.data;
         
         setJob(prev => ({
@@ -183,7 +183,7 @@ export function BulkScreeningPage() {
     if (!job?.job_id) return;
     
     try {
-      const response = await api.get(`/api/v2/screen/batch/${job.job_id}/download?format=${format}`, {
+      const response = await api.get(`/api/v2/screen/gold/batch/${job.job_id}/download?format=${format}`, {
         responseType: 'blob',
       });
       
