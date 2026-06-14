@@ -19,6 +19,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { api } from '@/services/api';
+import { AppPage, PageHeader } from '@/components/foundation';
 
 interface BatchJob {
   job_id: string;
@@ -214,22 +215,16 @@ export function BulkScreeningPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-start gap-3 mb-2">
-            <FileSpreadsheet className="w-8 h-8 text-blue-400" />
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Bulk Screening</h1>
-          </div>
-          <p className="text-gray-400">
-            Screening masivo de nombres contra la base de datos
-          </p>
-        </motion.div>
+    <AppPage width="narrow">
+        <PageHeader
+          title="Bulk Screening"
+          description="Screening masivo de nombres contra la base de datos."
+          icon={
+            <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
+              <FileSpreadsheet className="w-6 h-6 text-electric-400" aria-hidden="true" />
+            </div>
+          }
+        />
 
         <AnimatePresence mode="wait">
           {step === 'upload' && (
@@ -641,8 +636,7 @@ export function BulkScreeningPage() {
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

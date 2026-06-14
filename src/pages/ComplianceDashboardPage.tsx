@@ -14,6 +14,7 @@ import {
   BarChart3,
   ChevronRight,
 } from 'lucide-react';
+import { AppPage, PageHeader } from '@/components/foundation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -813,33 +814,26 @@ export function ComplianceDashboardPage() {
   });
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8"
-        >
-          <div>
-            <h1 className="text-2xl font-bold text-white mb-2">
-              Compliance Dashboard
-            </h1>
-            <p className="text-gray-400">
-              Gestión de casos, alertas, whitelist y monitoreo continuo
-            </p>
-          </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+    <AppPage>
+        <PageHeader
+          title="Compliance Dashboard"
+          description="Gestión de casos, alertas, whitelist y monitoreo continuo."
+          icon={
+            <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
+              <Shield className="w-6 h-6 text-electric-400" aria-hidden="true" />
+            </div>
+          }
+          actions={
             <Button
               size="sm"
               onClick={() => setShowCreateCase(true)}
-              className="bg-blue-600 hover:bg-blue-700 gap-1 w-full sm:w-auto"
+              className="gap-1"
             >
               <Plus className="w-4 h-4" />
               Nuevo Caso
             </Button>
-          </div>
-        </motion.div>
+          }
+        />
 
         {/* Stats Cards */}
         <motion.div
@@ -997,13 +991,12 @@ export function ComplianceDashboardPage() {
             <WatchlistTab />
           </TabsContent>
         </Tabs>
-      </div>
 
       {/* Dialogs */}
       <CreateCaseDialog open={showCreateCase} onClose={() => setShowCreateCase(false)} />
       <AddWatchlistDialog open={showAddWatchlist} onClose={() => setShowAddWatchlist(false)} />
       <AddWhitelistDialog open={showAddWhitelist} onClose={() => setShowAddWhitelist(false)} />
-    </div>
+    </AppPage>
   );
 }
 

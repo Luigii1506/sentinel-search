@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { AppPage, PageHeader } from '@/components/foundation';
 import {
   Newspaper,
   AlertTriangle,
@@ -1140,35 +1141,29 @@ export function AdverseMediaPage() {
   const keywordArticles = stats?.by_method?.keyword || 0;
 
   return (
-    <div className="min-h-screen p-6 md:p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Newspaper className="w-8 h-8 text-orange-400" />
-              Adverse Media
-            </h1>
-            <p className="text-gray-400 mt-1">
-              Monitoreo continuo de noticias AML/CFT
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => reclassifyMutation.mutate()}
-            disabled={reclassifyMutation.isPending}
-            className="border-white/10"
-          >
-            <RefreshCw className={cn('w-4 h-4 mr-2', reclassifyMutation.isPending && 'animate-spin')} />
-            Reclasificar
-          </Button>
-        </div>
-      </motion.div>
+    <AppPage>
+        <PageHeader
+          title="Adverse Media"
+          description="Monitoreo continuo de noticias AML/CFT."
+          icon={
+            <div className="p-2.5 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30">
+              <Newspaper className="w-6 h-6 text-orange-400" aria-hidden="true" />
+            </div>
+          }
+          actions={
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => reclassifyMutation.mutate()}
+              disabled={reclassifyMutation.isPending}
+              className="gap-2"
+              aria-label="Reclasificar noticias"
+            >
+              <RefreshCw className={cn('w-4 h-4', reclassifyMutation.isPending && 'animate-spin')} />
+              Reclasificar
+            </Button>
+          }
+        />
 
       {/* Stats Row */}
       <motion.div
@@ -1250,6 +1245,6 @@ export function AdverseMediaPage() {
           <AnalyticsTab stats={stats} />
         </TabsContent>
       </Tabs>
-    </div>
+    </AppPage>
   );
 }

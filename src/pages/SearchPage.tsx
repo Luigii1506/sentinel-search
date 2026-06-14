@@ -24,7 +24,9 @@ import {
   Siren,
   Newspaper,
   Clock,
+  Search as SearchIcon,
 } from "lucide-react";
+import { AppPage, PageHeader } from "@/components/foundation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -1586,23 +1588,23 @@ export function SearchPage() {
     localFilters.sources.length;
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Search Header */}
+    <AppPage>
+        <PageHeader
+          title="Búsqueda de Entidades"
+          description="Screening contra listas de sanciones, PEPs, debarments y adverse media."
+          icon={
+            <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
+              <SearchIcon className="w-6 h-6 text-electric-400" aria-hidden="true" />
+            </div>
+          }
+          actions={<SemanticSearchToggle mode={searchMode} onChange={handleModeChange} />}
+        />
+
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="space-y-4"
         >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-            <h1 className="text-2xl font-bold text-white">
-              Búsqueda de Entidades
-            </h1>
-            <SemanticSearchToggle
-              mode={searchMode}
-              onChange={handleModeChange}
-            />
-          </div>
           <IntelligentSearch
             onSearch={handleSearch}
             onSelectResult={handleSelectResult}
@@ -1902,8 +1904,7 @@ export function SearchPage() {
             </div>
           </motion.div>
         )}
-      </div>
-    </div>
+    </AppPage>
   );
 }
 
