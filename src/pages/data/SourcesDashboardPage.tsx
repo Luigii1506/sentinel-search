@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { MetricCard } from '@/components/foundation';
 import {
   Select,
   SelectContent,
@@ -367,67 +368,32 @@ export function SourcesDashboardPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <Card className="bg-brand-navy border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-gray-400 flex items-center gap-1.5">
-                <Server className="w-3.5 h-3.5" />
-                Registradas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{data?.total_registered}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-[#CD853F] flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5" />
-                Bronze
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{formatNumber(data?.total_bronze || 0)}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-gray-300 flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5" />
-                Silver
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{formatNumber(data?.total_silver || 0)}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-yellow-400 flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" />
-                Gold
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{formatNumber(data?.total_gold || 0)}</div>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xs font-medium text-gray-400 flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5" />
-                Progreso
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{progress}%</div>
-              <div className="w-full bg-white/10 rounded-full h-1.5 mt-1">
-                <div
-                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <MetricCard
+            label="Registradas"
+            icon={Server}
+            value={data?.total_registered ?? 0}
+          />
+          <MetricCard
+            label="Bronze"
+            icon={Database}
+            value={formatNumber(data?.total_bronze || 0)}
+          />
+          <MetricCard
+            label="Silver"
+            icon={Layers}
+            value={formatNumber(data?.total_silver || 0)}
+          />
+          <MetricCard
+            label="Gold"
+            icon={Shield}
+            value={formatNumber(data?.total_gold || 0)}
+            accent="success"
+          />
+          <MetricCard
+            label="Progreso"
+            icon={Activity}
+            value={`${progress}%`}
+          />
         </div>
 
         {/* Category Tabs */}

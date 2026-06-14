@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Key,
@@ -9,7 +8,6 @@ import {
   Copy,
   CheckCircle2,
   AlertTriangle,
-  Clock,
   Shield,
   Eye,
   EyeOff,
@@ -40,22 +38,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   apiKeysService,
   type ApiKeyCreated,
   type ApiKeyRole,
   type ApiKeySummary,
 } from '@/services/apiKeys';
-import { AppPage } from '@/components/foundation';
+import { AppPage, PageHeader, ConfirmAction, StatusPill } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 
 function formatDateOr(value: string | null | undefined, fallback = '—'): string {
@@ -113,24 +101,16 @@ export default function ApiKeysPage() {
 
   return (
     <AppPage>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-              <Key className="w-6 h-6 text-blue-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-white">API Keys</h1>
-              <p className="text-sm text-gray-400">
-                Administra las llaves de acceso al API para cada cliente y rol.
-              </p>
-            </div>
+      <PageHeader
+        title="API Keys"
+        description="Administra las llaves de acceso al API para cada cliente y rol."
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Key className="w-6 h-6 text-blue-400" />
           </div>
-          <div className="flex items-center gap-3">
+        }
+        actions={
+          <>
             <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
               <Switch checked={includeRevoked} onCheckedChange={setIncludeRevoked} />
               Mostrar revocadas
@@ -139,8 +119,9 @@ export default function ApiKeysPage() {
               <Plus className="w-4 h-4" />
               Nueva key
             </Button>
-          </div>
-        </motion.div>
+          </>
+        }
+      />
 
         {/* Warning banner */}
         <Card className="border-amber-500/30 bg-amber-500/5">
@@ -219,17 +200,11 @@ export default function ApiKeysPage() {
                           {formatDateOr(k.expires_at, 'Sin caducidad')}
                         </td>
                         <td className="px-4 py-3">
-                          {k.is_active ? (
-                            <span className="inline-flex items-center gap-1.5 text-xs text-green-400">
-                              <CheckCircle2 className="w-3.5 h-3.5" />
-                              Activa
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-xs text-gray-500">
-                              <Clock className="w-3.5 h-3.5" />
-                              Revocada
-                            </span>
-                          )}
+                          <StatusPill
+                            kind={k.is_active ? 'success' : 'neutral'}
+                            label={k.is_active ? 'Activa' : 'Revocada'}
+                            size="sm"
+                          />
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-1">
@@ -282,26 +257,20 @@ export default function ApiKeysPage() {
         onClose={() => setNewKeyDisplay(null)}
       />
 
-      <AlertDialog open={!!revokeTarget} onOpenChange={(o) => !o && setRevokeTarget(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Revocar esta API key?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <strong className="text-white">{revokeTarget?.client_name}</strong> dejará
-              de poder hacer requests inmediatamente. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-500 hover:bg-red-600 text-white"
-              onClick={() => revokeTarget && revokeMutation.mutate(revokeTarget.id)}
-            >
-              Revocar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmAction
+        open={!!revokeTarget}
+        onOpenChange={(o) => !o && setRevokeTarget(null)}
+        variant="destructive"
+        title="¿Revocar esta API key?"
+        description={
+          <>
+            <strong className="text-white">{revokeTarget?.client_name}</strong> dejará
+            de poder hacer requests inmediatamente. Esta acción no se puede deshacer.
+          </>
+        }
+        confirmLabel="Revocar"
+        onConfirm={() => revokeTarget && revokeMutation.mutateAsync(revokeTarget.id)}
+      />
     </AppPage>
   );
 }

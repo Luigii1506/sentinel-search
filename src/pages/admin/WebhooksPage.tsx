@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Webhook as WebhookIcon,
@@ -33,24 +32,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import {
   webhooksService,
   ALL_EVENTS,
   type Webhook,
   type WebhookCreated,
   type WebhookEvent,
 } from '@/services/webhooks';
-import { AppPage } from '@/components/foundation';
-import { cn } from '@/lib/utils';
+import { AppPage, PageHeader, ConfirmAction, StatusPill } from '@/components/foundation';
 
 export default function WebhooksPage() {
   const queryClient = useQueryClient();
@@ -88,28 +76,21 @@ export default function WebhooksPage() {
 
   return (
     <AppPage>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
-              <WebhookIcon className="w-6 h-6 text-purple-400" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-white">Webhooks</h1>
-              <p className="text-sm text-gray-400">
-                Notificaciones HTTP a sistemas internos cuando ocurren eventos críticos.
-              </p>
-            </div>
+      <PageHeader
+        title="Webhooks"
+        description="Notificaciones HTTP a sistemas internos cuando ocurren eventos críticos."
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+            <WebhookIcon className="w-6 h-6 text-purple-400" />
           </div>
+        }
+        actions={
           <Button onClick={() => setCreateOpen(true)} className="gap-2">
             <Plus className="w-4 h-4" />
             Nuevo webhook
           </Button>
-        </motion.div>
+        }
+      />
 
         {/* How it works */}
         <Card className="border-blue-500/30 bg-blue-500/5">
@@ -159,25 +140,17 @@ export default function WebhooksPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-white font-medium">{w.name}</span>
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            'text-[10px]',
-                            w.is_active
-                              ? 'bg-green-500/10 text-green-300 border-green-500/30'
-                              : 'bg-gray-500/10 text-gray-300 border-gray-500/30',
-                          )}
-                        >
-                          {w.is_active ? 'Activo' : 'Inactivo'}
-                        </Badge>
+                        <StatusPill
+                          kind={w.is_active ? 'success' : 'neutral'}
+                          label={w.is_active ? 'Activo' : 'Inactivo'}
+                          size="sm"
+                        />
                         {w.failure_count > 0 && (
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] bg-amber-500/10 text-amber-300 border-amber-500/30 gap-1"
-                          >
-                            <AlertTriangle className="w-3 h-3" />
-                            {w.failure_count} fallos
-                          </Badge>
+                          <StatusPill
+                            kind="warning"
+                            label={`${w.failure_count} fallos`}
+                            size="sm"
+                          />
                         )}
                       </div>
                       <div className="text-xs text-gray-400 font-mono truncate">{w.url}</div>
@@ -249,29 +222,20 @@ export default function WebhooksPage() {
 
       <SecretDialog data={secretDisplay} onClose={() => setSecretDisplay(null)} />
 
-      <AlertDialog
+      <ConfirmAction
         open={!!deleteTarget}
         onOpenChange={(o) => !o && setDeleteTarget(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar este webhook?</AlertDialogTitle>
-            <AlertDialogDescription>
-              <strong className="text-white">{deleteTarget?.name}</strong> dejará de
-              recibir eventos inmediatamente. Esta acción no se puede deshacer.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-red-500 hover:bg-red-600 text-white"
-              onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
-            >
-              Eliminar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        variant="destructive"
+        title="¿Eliminar este webhook?"
+        description={
+          <>
+            <strong className="text-white">{deleteTarget?.name}</strong> dejará de
+            recibir eventos inmediatamente. Esta acción no se puede deshacer.
+          </>
+        }
+        confirmLabel="Eliminar"
+        onConfirm={() => deleteTarget && deleteMutation.mutateAsync(deleteTarget.id)}
+      />
     </AppPage>
   );
 }

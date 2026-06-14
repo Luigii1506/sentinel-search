@@ -29,6 +29,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SyncSourceButton } from '@/components/SyncSourceButton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
+import { StatusPill } from '@/components/foundation';
 import type {
   JobsResponse,
   SourceInfo,
@@ -81,14 +82,17 @@ function HealthScoreBadge({ score, status }: { score?: number; status?: string }
 // Combina freshness + failures + assertions con contexto real (no marca "error"
 // por un fallo aislado si después se recuperó).
 function StatusBadge({ status }: { status: string }) {
-  const config: Record<string, { label: string; class: string }> = {
-    healthy: { label: 'Saludable', class: 'bg-green-500/10 text-green-400 border-green-500/20' },
-    warning: { label: 'Atención', class: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
-    critical: { label: 'Crítico', class: 'bg-red-500/10 text-red-400 border-red-500/20' },
-    inactive: { label: 'Inactiva', class: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20' },
+  // health_status is its own enum (healthy/warning/critical/inactive),
+  // not a generic backend status — so we map it explicitly to a StatusPill
+  // kind here instead of using statusKindFromString.
+  const map: Record<string, { kind: Parameters<typeof StatusPill>[0]['kind']; label: string }> = {
+    healthy:  { kind: 'success', label: 'Saludable' },
+    warning:  { kind: 'warning', label: 'Atención' },
+    critical: { kind: 'error',   label: 'Crítico' },
+    inactive: { kind: 'neutral', label: 'Inactiva' },
   };
-  const c = config[status] || config.inactive;
-  return <Badge variant="outline" className={`text-xs ${c.class}`}>{c.label}</Badge>;
+  const c = map[status] || map.inactive;
+  return <StatusPill kind={c.kind} label={c.label} size="sm" />;
 }
 
 type AuditSourceRow = SourceInfo & {

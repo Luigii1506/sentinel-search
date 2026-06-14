@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
+import { StatusPill, statusKindFromString } from '@/components/foundation';
 import type {
   MonitoringOverviewResponse,
 } from '@/types/api';
@@ -751,27 +752,17 @@ export function MonitoringPage() {
                         <JobTypeBadge type={job.job_type} />
                       </td>
                       <td className="px-4 py-4 text-center">
-                        {job.status === 'success' || job.status === 'completed' ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-500/10">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
-                            <span className="text-xs text-green-400">Exito</span>
-                          </div>
-                        ) : job.status === 'failed' ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/10" title={job.error_message || ''}>
-                            <XCircle className="w-3.5 h-3.5 text-red-400" />
-                            <span className="text-xs text-red-400">Fallido</span>
-                          </div>
-                        ) : job.status === 'pending' ? (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10">
-                            <Clock className="w-3.5 h-3.5 text-yellow-400" />
-                            <span className="text-xs text-yellow-400">Pendiente</span>
-                          </div>
-                        ) : (
-                          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-500/10">
-                            <Clock className="w-3.5 h-3.5 text-gray-400" />
-                            <span className="text-xs text-gray-400">{job.status}</span>
-                          </div>
-                        )}
+                        <StatusPill
+                          kind={statusKindFromString(job.status)}
+                          label={
+                            job.status === 'success' || job.status === 'completed' ? 'Éxito'
+                            : job.status === 'failed' ? 'Fallido'
+                            : job.status === 'pending' ? 'Pendiente'
+                            : job.status
+                          }
+                          title={job.status === 'failed' ? job.error_message ?? undefined : undefined}
+                          size="sm"
+                        />
                       </td>
                       <td className="px-6 py-4 text-right">
                         <span className="text-sm text-gray-300">
