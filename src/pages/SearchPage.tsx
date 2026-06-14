@@ -1586,7 +1586,7 @@ export function SearchPage() {
     localFilters.sources.length;
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 pb-12">
+    <div className="min-h-screen bg-brand-carbon pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Search Header */}
         <motion.div

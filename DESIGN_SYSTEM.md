@@ -182,20 +182,47 @@ unless they indicate live state).
 
 ## 9. Adding a new page
 
+**RULE OF ONE PAGE SHELL**: every authenticated route is wrapped in
+`<AppPage>`. Do not hand-roll the `min-h-screen` + `max-w-…` + `mx-auto`
++ `px-…` combo again. There is exactly ONE canonical shell.
+
 1. Start from this skeleton:
    ```tsx
-   <div className="min-h-screen bg-background p-4 sm:p-8">
-     <div className="max-w-7xl mx-auto space-y-6">
-       <PageHeader title="…" description="…" icon={…} actions={…} />
-       {/* sections */}
-     </div>
-   </div>
+   import { AppPage, Section, PageHeader } from '@/components/foundation';
+
+   export function MyPage() {
+     return (
+       <AppPage>
+         <PageHeader title="…" description="…" icon={…} actions={…} />
+
+         <Section title="KPIs">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+             {/* MetricCards */}
+           </div>
+         </Section>
+
+         <Section title="Resultados" actions={<Button>…</Button>}>
+           <DataTable … />
+         </Section>
+       </AppPage>
+     );
+   }
    ```
-2. Tabular data → `<DataTable>` + `<SkeletonTable>` + `<EmptyState>`.
-3. KPI row → `<MetricCard>` × N.
-4. Risk anywhere → `<RiskBadge>`.
-5. Route in `App.tsx` under the matching `RoleGate`.
-6. Nav entry in `Navigation.tsx` with the correct `minRole`.
+2. `<AppPage width>`: `default` (max-w-7xl) | `narrow` (4xl) | `wide` (full).
+3. Tabular data → `<DataTable>` + `<SkeletonTable>` + `<EmptyState>`.
+4. KPI row → `<MetricCard>` × N inside a `<Section>`.
+5. Risk anywhere → `<RiskBadge>` / `<RiskScoreGauge>`.
+6. Right-rail evidence (master-detail) → `<EvidencePanel>`.
+7. Route in `App.tsx` under the matching `<RoleGate>`.
+8. Nav entry in `Sidebar.tsx` with the correct `minRole`.
+
+**NEVER**:
+- `pt-20`, `pt-24` anywhere on pages (legacy topbar offset; sidebar
+  replaced it — these now add wasted whitespace at the top of every
+  route).
+- Hand-roll `<div className="min-h-screen …">` outside `<AppPage>`.
+- Mix `max-w-5xl` and `max-w-7xl` in the same area. Pick one via
+  `<AppPage width>` and stick with it.
 
 If something feels manual, check whether a foundation component already
 covers it before writing CSS.

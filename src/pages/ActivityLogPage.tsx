@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import {
+  AppPage,
   PageHeader,
   EmptyState,
   DataTable,
@@ -164,8 +165,7 @@ export function ActivityLogPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AppPage>
         <PageHeader
           title="Activity Log"
           description="Auditoría de acciones de usuarios y llamadas al API."
@@ -275,8 +275,7 @@ export function ActivityLogPage() {
             />
           </CardContent>
         </Card>
-      </div>
-    </div>
+      </AppPage>
   );
 }
 

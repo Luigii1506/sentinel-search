@@ -381,7 +381,7 @@ export function MergeReviewPage() {
   const endItem = Math.min((page + 1) * pageSize, data?.total || 0);
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-24 px-4 sm:px-6 lg:px-8 pb-12">
+    <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8 pb-12">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">

@@ -113,7 +113,7 @@ export function MonitoringPage() {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
@@ -131,7 +131,7 @@ export function MonitoringPage() {
 
   if (jobsError) {
     return (
-      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar monitoreo</h2>
@@ -190,7 +190,7 @@ export function MonitoringPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div

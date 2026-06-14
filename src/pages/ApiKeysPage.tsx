@@ -55,6 +55,7 @@ import {
   type ApiKeyRole,
   type ApiKeySummary,
 } from '@/services/apiKeys';
+import { AppPage } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 
 function formatDateOr(value: string | null | undefined, fallback = '—'): string {
@@ -111,8 +112,7 @@ export default function ApiKeysPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AppPage>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -266,7 +266,6 @@ export default function ApiKeysPage() {
             )}
           </CardContent>
         </Card>
-      </div>
 
       <CreateKeyDialog
         open={createOpen}
@@ -303,7 +302,7 @@ export default function ApiKeysPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AppPage>
   );
 }
 

@@ -187,7 +187,7 @@ export function HomePage() {
       >
         <NeuralNetworkBackground />
 
-        <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             {/* Badge */}
             <motion.div

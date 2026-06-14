@@ -49,6 +49,7 @@ import {
   type WebhookCreated,
   type WebhookEvent,
 } from '@/services/webhooks';
+import { AppPage } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 
 export default function WebhooksPage() {
@@ -86,8 +87,7 @@ export default function WebhooksPage() {
   });
 
   return (
-    <div className="min-h-screen bg-background p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <AppPage>
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -236,7 +236,6 @@ export default function WebhooksPage() {
             )}
           </CardContent>
         </Card>
-      </div>
 
       <CreateWebhookDialog
         open={createOpen}
@@ -273,7 +272,7 @@ export default function WebhooksPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </AppPage>
   );
 }
 

@@ -208,7 +208,7 @@ export function AuditPage() {
 
   if (sourcesLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon pt-20 sm:pt-24 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[...Array(4)].map((_, i) => (
@@ -234,7 +234,7 @@ export function AuditPage() {
   const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div

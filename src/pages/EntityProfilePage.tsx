@@ -1153,7 +1153,7 @@ function UBOTab({ entityId }: { entityId: string }) {
 // Loading Skeleton
 function EntityProfileSkeleton() {
   return (
-    <div className="min-h-screen bg-brand-carbon pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <Skeleton className="h-8 w-32" />
         <div className="glass rounded-2xl p-8">
@@ -1662,7 +1662,7 @@ export function EntityProfilePage() {
   const riskColor = getRiskColor(entity.risk_level);
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-20 pb-12">
+    <div className="min-h-screen bg-brand-carbon pb-12">
       {/* Back Button & Actions */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

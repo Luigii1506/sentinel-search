@@ -200,7 +200,7 @@ export function CaseDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
+      <div className="min-h-screen bg-brand-carbon pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-40 rounded-xl" />
@@ -213,7 +213,7 @@ export function CaseDetailPage() {
   // Not found
   if (!caseData) {
     return (
-      <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
+      <div className="min-h-screen bg-brand-carbon pb-12">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl text-white mb-2">Caso no encontrado</h2>
@@ -243,7 +243,7 @@ export function CaseDetailPage() {
     : null;
 
   return (
-    <div className="min-h-screen bg-brand-carbon pt-24 pb-12">
+    <div className="min-h-screen bg-brand-carbon pb-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back navigation */}
         <Button
