@@ -38,6 +38,7 @@ import {
   Command as CommandIcon,
   Server,
   FileSearch,
+  Users as UsersIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -167,7 +168,8 @@ const NAV: NavGroup[] = [
     title: 'System',
     minRole: 'admin',
     items: [
-      { path: '/admin/api-keys', label: 'API Keys', icon: Key,      shortcut: 'G K' },
+      { path: '/admin/users',    label: 'Users',    icon: UsersIcon, shortcut: 'G U' },
+      { path: '/admin/api-keys', label: 'API Keys', icon: Key,       shortcut: 'G K' },
       { path: '/admin/webhooks', label: 'Webhooks', icon: Webhook },
       { path: '/settings',       label: 'Settings', icon: Settings },
     ],

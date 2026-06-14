@@ -25,6 +25,7 @@ import { FederatedSearchPage } from '@/pages/workspace/FederatedSearchPage';
 import { ResolverReviewPage } from '@/pages/review/ResolverReviewPage';
 import { ValidationReviewPage } from '@/pages/review/ValidationReviewPage';
 import ApiKeysPage from '@/pages/admin/ApiKeysPage';
+import UsersPage from '@/pages/admin/UsersPage';
 import ActivityLogPage from '@/pages/insights/ActivityLogPage';
 import WebhooksPage from '@/pages/admin/WebhooksPage';
 import { YenteCatalogPage } from '@/pages/data/YenteCatalogPage';
@@ -140,6 +141,16 @@ function App() {
                 }
               />
               {/* Admin Routes - Public for now */}
+              <Route
+                path="/admin/users"
+                element={
+                  <AuthenticatedLayout>
+                    <RoleGate minimumRole="admin">
+                      <UsersPage />
+                    </RoleGate>
+                  </AuthenticatedLayout>
+                }
+              />
               <Route
                 path="/admin/api-keys"
                 element={

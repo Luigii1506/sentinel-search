@@ -33,6 +33,7 @@ import {
   ArrowRight,
   Server,
   FileSearch,
+  Users as UsersIcon,
 } from 'lucide-react';
 import {
   CommandDialog,
@@ -100,11 +101,13 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     { id: 'p-yente',       label: 'Yente Catalog',     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
 
     // System (admin)
-    { id: 'p-api-keys',    label: 'API Keys',  icon: Key,      group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
-    { id: 'p-webhooks',    label: 'Webhooks',  icon: Webhook,  group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
-    { id: 'p-settings',    label: 'Settings',  icon: Settings, group: 'pages', to: '/settings',                        minRole: 'admin' },
+    { id: 'p-users',       label: 'Users',     icon: UsersIcon, group: 'pages', to: '/admin/users',    shortcut: 'G U', minRole: 'admin' },
+    { id: 'p-api-keys',    label: 'API Keys',  icon: Key,       group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
+    { id: 'p-webhooks',    label: 'Webhooks',  icon: Webhook,   group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
+    { id: 'p-settings',    label: 'Settings',  icon: Settings,  group: 'pages', to: '/settings',                        minRole: 'admin' },
 
     // Actions (role-gated)
+    { id: 'a-new-user',    label: 'Crear nuevo usuario', icon: Plus,   group: 'actions', to: '/admin/users',    minRole: 'admin' },
     { id: 'a-new-key',     label: 'Crear nueva API Key', icon: Plus,   group: 'actions', to: '/admin/api-keys', minRole: 'admin' },
     { id: 'a-new-webhook', label: 'Crear nuevo Webhook', icon: Plus,   group: 'actions', to: '/admin/webhooks', minRole: 'admin' },
     { id: 'a-logout',      label: 'Cerrar sesión',       icon: LogOut, group: 'actions', run: () => logout() },
