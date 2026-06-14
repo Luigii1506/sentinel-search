@@ -23,26 +23,20 @@ export const authService = {
   },
 
   /**
-   * Login with email and password
+   * Login with username OR email + password. The field is labeled
+   * "email" in LoginCredentials for legacy reasons, but the backend
+   * accepts either — useful since usernames don't always look like
+   * emails (e.g., the bootstrap admin `testuser_1781314742`).
    */
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
-    // Use form data as expected by OAuth2PasswordRequestForm
-    const formData = new URLSearchParams();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
-
-    const response = await api.post('/api/v1/auth/login', formData, {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
+    const response = await api.post('/api/v1/auth/login', {
+      username: credentials.email,
+      password: credentials.password,
     });
 
     const { access_token, refresh_token } = response.data;
-    
-    // Store tokens
     tokenManager.setToken(access_token);
     tokenManager.setRefreshToken(refresh_token);
-
     return response.data;
   },
 
