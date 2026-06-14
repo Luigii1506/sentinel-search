@@ -87,7 +87,7 @@ function FeatureCard({
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
       className="glass rounded-xl p-6 card-hover group"
     >
-      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
         <Icon className="w-6 h-6 text-blue-400" />
       </div>
       <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
@@ -585,7 +585,7 @@ export function HomePage() {
 
           <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-electric flex items-center justify-center">
                 <Shield className="w-4 h-4 text-white" />
               </div>
               <span className="text-white font-semibold">Sentinel PLD</span>

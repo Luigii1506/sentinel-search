@@ -132,7 +132,7 @@ export function Navigation() {
           <Link to="/" className="flex items-center gap-3 group">
             <motion.div
               whileHover={{ scale: 1.05 }}
-              className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"
+              className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-blue to-brand-electric flex items-center justify-center"
             >
               <Shield className="w-5 h-5 text-white" />
             </motion.div>
@@ -216,7 +216,7 @@ export function Navigation() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                     <Avatar className="h-9 w-9">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-sm">
+                      <AvatarFallback className="bg-gradient-to-br from-brand-blue to-brand-electric text-white text-sm">
                         {getInitials(user?.first_name + ' ' + user?.last_name || 'Usuario')}
                       </AvatarFallback>
                     </Avatar>

@@ -40,7 +40,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen bg-brand-carbon flex items-center justify-center relative overflow-hidden">
       <NeuralNetworkBackground />
       
       <motion.div
@@ -54,7 +54,7 @@ export function LoginPage() {
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: 'spring' }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 mb-4"
+            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-brand-blue to-brand-electric mb-4"
           >
             <Shield className="w-8 h-8 text-white" />
           </motion.div>
@@ -62,7 +62,7 @@ export function LoginPage() {
           <p className="text-gray-400 mt-2">Sistema de Cumplimiento PLD/FT</p>
         </div>
 
-        <Card className="bg-[#141414] border-white/10 backdrop-blur-xl">
+        <Card className="bg-navy-700 border-white/10 backdrop-blur-xl">
           <CardHeader>
             <CardTitle className="text-white">Iniciar Sesión</CardTitle>
             <CardDescription className="text-gray-400">

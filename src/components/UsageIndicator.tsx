@@ -104,7 +104,7 @@ export function UsageIndicator() {
             to="/pricing"
             className={cn(
               'flex items-center justify-between gap-2 px-3 py-2 rounded-lg',
-              'bg-gradient-to-r from-blue-500/20 to-purple-500/20',
+              'bg-gradient-to-r from-brand-blue/20 to-brand-electric/20',
               'border border-blue-500/30 text-sm text-blue-100',
               'hover:from-blue-500/30 hover:to-purple-500/30 transition-colors',
             )}

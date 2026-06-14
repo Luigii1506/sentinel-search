@@ -68,7 +68,7 @@ export function RiskSummaryHeader({
           <div className="flex-1">
             {/* Header Row */}
             <div className="flex flex-wrap items-start gap-4 mb-4">
-              <Avatar className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
+              <Avatar className="w-16 h-16 rounded-xl bg-gradient-to-br from-brand-blue to-brand-electric">
                 <AvatarFallback className="text-xl font-bold text-white bg-transparent">
                   {getInitials(entity.primaryName)}
                 </AvatarFallback>

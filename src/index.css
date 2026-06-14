@@ -4,31 +4,45 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom CSS Variables */
+/* Custom CSS Variables — Sentinel brand palette
+ *
+ * Source of truth lives in src/lib/design-tokens.ts. These vars are the
+ * hand-styled mirror so existing CSS classes (.glass, hero gradients,
+ * scrollbars) pick up the new palette without rewriting every selector.
+ * shadcn/ui has its own HSL-formatted vars further down in @layer base.
+ */
 :root {
-  /* Colors */
-  --background: #0a0a0a;
-  --background-secondary: #141414;
-  --card: #1a1a1a;
-  --card-hover: #222222;
-  --border: #2a2a2a;
-  --border-hover: #3a3a3a;
-  
-  /* Text Colors */
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --text-muted: #6a6a6a;
-  
-  /* Risk Colors */
-  --risk-critical: #ef4444;
-  --risk-high: #f97316;
-  --risk-medium: #eab308;
-  --risk-low: #22c55e;
-  
-  /* UI Accents */
-  --accent-blue: #3b82f6;
-  --accent-purple: #8b5cf6;
-  --accent-cyan: #06b6d4;
+  /* Brand */
+  --brand-electric: #00D4FF;
+  --brand-blue:     #1F6FEB;
+  --brand-navy:     #0A2540;
+  --brand-blanco:   #FFFFFF;
+  --brand-carbon:   #0B1220;
+
+  /* Surfaces (carbon → navy ramp, all in the same hue family) */
+  --background: #0B1220;            /* carbon — app background */
+  --background-secondary: #0F1C32;  /* raised */
+  --card: #0A2540;                  /* navy — primary surface */
+  --card-hover: #142849;
+  --border: #1B3760;
+  --border-hover: #274A7A;
+
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B7C9DD;
+  --text-muted: #7794B8;
+
+  /* Risk (semantic — kept independent of brand palette) */
+  --risk-critical: #EF4444;
+  --risk-high: #F97316;
+  --risk-medium: #EAB308;
+  --risk-low: #22C55E;
+
+  /* UI Accents — all derived from brand */
+  --accent-blue: #1F6FEB;           /* legacy alias → brand blue */
+  --accent-electric: #00D4FF;       /* brand accent */
+  --accent-purple: #8B5CF6;         /* kept for risk-network heatmaps */
+  --accent-cyan: #00D4FF;           /* alias → brand electric */
   
   /* Animation Easings */
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -137,10 +151,12 @@ h5 {
 
 /* Glassmorphism */
 .glass {
-  background: rgba(26, 26, 26, 0.8);
+  /* Navy-tinted glass — sits on top of #0B1220 carbon background
+   * and reads as a slightly raised surface in the brand hue family. */
+  background: rgba(10, 37, 64, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(31, 111, 235, 0.15);
 }
 
 .glass-light {
@@ -321,7 +337,7 @@ h5 {
 
 /* Utility Classes */
 .text-gradient {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-electric));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -426,7 +442,7 @@ h5 {
 
 /* Button Styles */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+  background: linear-gradient(135deg, var(--brand-blue), var(--brand-electric));
   color: white;
   padding: 10px 20px;
   border-radius: 8px;
@@ -497,29 +513,61 @@ h5 {
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Layer utilities for Tailwind */
+/* shadcn/ui design tokens — HSL form so Tailwind utilities can apply
+ * opacity via the `<color>/<alpha>` syntax.
+ *
+ *   hex          → hsl()                  → meaning
+ *   #0B1220      = 220 49% 9%            = carbon  (background)
+ *   #0A2540      = 213 73% 15%           = navy    (cards, popovers, secondary)
+ *   #1F6FEB      = 217 84% 52%           = blue    (primary action)
+ *   #00D4FF      = 190 100% 50%          = electric(accent + ring)
+ *   #FFFFFF      = 0 0% 100%             = blanco
+ *
+ * IMPORTANT: when accent is electric-blue (very light/saturated), the
+ * foreground on top of it must be dark (navy), not white, or it goes
+ * invisible. That's why --accent-foreground != --primary-foreground.
+ */
 @layer base {
   :root {
-    --background: 0 0% 4%;
+    --background: 220 49% 9%;
     --foreground: 0 0% 100%;
-    --card: 0 0% 10%;
+
+    --card: 213 73% 15%;
     --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10%;
+
+    --popover: 213 73% 15%;
     --popover-foreground: 0 0% 100%;
-    --primary: 217 91% 60%;
+
+    --primary: 217 84% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 10%;
+
+    --secondary: 215 50% 18%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 8%;
-    --muted-foreground: 0 0% 63%;
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 100%;
+
+    --muted: 215 50% 14%;
+    --muted-foreground: 213 30% 67%;
+
+    --accent: 190 100% 50%;
+    --accent-foreground: 213 73% 15%;     /* navy on electric — readable */
+
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 217 91% 60%;
+
+    --border: 215 49% 24%;
+    --input: 215 49% 24%;
+    --ring: 190 100% 50%;                  /* focus ring = electric */
+
     --radius: 0.625rem;
+
+    /* Sidebar (used by shadcn `sidebar-*` utilities) */
+    --sidebar-background: 220 49% 9%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 217 84% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 190 100% 50%;
+    --sidebar-accent-foreground: 213 73% 15%;
+    --sidebar-border: 215 49% 24%;
+    --sidebar-ring: 190 100% 50%;
   }
 }
 
