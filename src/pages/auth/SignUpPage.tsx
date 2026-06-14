@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 function PasswordStrengthMeter({ password }: { password: string }) {
   // Lightweight heuristic — actual policy enforcement is on the backend.
@@ -238,6 +239,10 @@ export function SignUpPage() {
                 )}
               </Button>
             </form>
+
+            <div className="mt-5">
+              <GoogleSignInButton label="Registrarse con Google" />
+            </div>
 
             <div className="mt-5 pt-4 border-t border-white/10 space-y-3">
               <div className="text-xs text-gray-400 space-y-1.5">

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
+import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -131,6 +132,10 @@ export function LoginPage() {
                 )}
               </Button>
             </form>
+
+            <div className="mt-6">
+              <GoogleSignInButton label="Iniciar sesión con Google" />
+            </div>
 
             <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
               <p className="text-sm text-gray-400 text-center">

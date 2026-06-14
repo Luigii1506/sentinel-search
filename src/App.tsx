@@ -8,6 +8,7 @@ import { CommandPalette, useCommandPalette } from '@/components/CommandPalette';
 import { cn } from '@/lib/utils';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { SignUpPage } from '@/pages/auth/SignUpPage';
+import { OAuthCallbackPage } from '@/pages/auth/OAuthCallbackPage';
 import { HomePage } from '@/pages/workspace/HomePage';
 import { SearchPage } from '@/pages/workspace/SearchPage';
 import { EntityProfilePage } from '@/pages/entity/EntityProfilePage';
@@ -97,6 +98,11 @@ function App() {
                   </PublicOnlyRoute>
                 }
               />
+              {/* OAuth callback: deliberately NOT wrapped in PublicOnlyRoute —
+                  its whole job is to flip the user FROM anonymous TO
+                  authenticated, so the guard would race the token write
+                  and bounce us before we got to set the session. */}
+              <Route path="/auth/callback" element={<OAuthCallbackPage />} />
               
               {/* Public Routes */}
               <Route
