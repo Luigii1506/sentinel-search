@@ -102,7 +102,7 @@ Agregar la nueva página al router:
 
 ```tsx
 // src/App.tsx o router config
-import { OptimizedSearchPage } from '@/pages/OptimizedSearchPage';
+import { OptimizedSearchPage } from '@/pages/workspace/OptimizedSearchPage';
 
 <Route path="/search-optimized" element={<OptimizedSearchPage />} />
 ```
