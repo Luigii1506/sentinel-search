@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { complianceService } from '@/services/compliance';
 import type { ComplianceReport } from '@/services/compliance';
+import { AppPage, PageHeader } from '@/components/foundation';
 
 const severityColors: Record<string, string> = {
   critical: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -85,49 +86,48 @@ export default function ReportsPage() {
 
   if (isLoading) {
     return (
-      <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
-        <Skeleton className="h-8 w-64 mb-6" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <AppPage width="wide">
+        <Skeleton className="h-8 w-64" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}
         </div>
         <div className="grid grid-cols-2 gap-6">
           {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-64" />)}
         </div>
-      </div>
+      </AppPage>
     );
   }
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-7xl mx-auto pb-12">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-white flex items-center gap-3">
+    <AppPage width="wide">
+      <PageHeader
+        title="Reportes de Compliance"
+        description="KPIs y métricas del sistema PLD/AML"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <BarChart3 className="w-6 h-6 text-blue-400" />
-            Reportes de Compliance
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            KPIs y métricas del sistema PLD/AML
-          </p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-          <Select value={period} onValueChange={setPeriod}>
-            <SelectTrigger className="w-full sm:w-[160px] bg-gray-800 border-gray-700">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7">Últimos 7 días</SelectItem>
-              <SelectItem value="30">Últimos 30 días</SelectItem>
-              <SelectItem value="90">Últimos 90 días</SelectItem>
-              <SelectItem value="365">Último año</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm" onClick={handleExport} disabled={!report}>
-            <Download className="w-4 h-4 mr-2" />
-            Exportar
-          </Button>
-        </div>
-      </div>
+          </div>
+        }
+        actions={
+          <>
+            <Select value={period} onValueChange={setPeriod}>
+              <SelectTrigger className="w-full sm:w-[160px] bg-gray-800 border-gray-700">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="7">Últimos 7 días</SelectItem>
+                <SelectItem value="30">Últimos 30 días</SelectItem>
+                <SelectItem value="90">Últimos 90 días</SelectItem>
+                <SelectItem value="365">Último año</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button variant="outline" size="sm" onClick={handleExport} disabled={!report}>
+              <Download className="w-4 h-4 mr-2" />
+              Exportar
+            </Button>
+          </>
+        }
+      />
 
       {report && (
         <>
@@ -338,6 +338,6 @@ export default function ReportsPage() {
           </div>
         </>
       )}
-    </div>
+    </AppPage>
   );
 }

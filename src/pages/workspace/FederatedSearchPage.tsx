@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AppPage, PageHeader } from '@/components/foundation';
 
 const ORIGIN_META = {
   local: {
@@ -64,17 +65,16 @@ export function FederatedSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-white mb-2">
-            Federated Search
-          </h1>
-          <p className="text-gray-400">
-            Búsqueda única en 3 origins: tus sources locales, leaks investigativos
-            (ICIJ Panama/Paradise/Pandora) y catálogo externo (OpenSanctions).
-          </p>
-        </div>
+    <AppPage>
+      <PageHeader
+        title="Federated Search"
+        description="Búsqueda única en 3 origins: tus sources locales, leaks investigativos (ICIJ Panama/Paradise/Pandora) y catálogo externo (OpenSanctions)."
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Globe className="w-6 h-6 text-blue-400" />
+          </div>
+        }
+      />
 
         <Card className="bg-white/5 border-white/10 mb-6">
           <CardContent className="pt-6">
@@ -141,8 +141,7 @@ export function FederatedSearchPage() {
             </div>
           </>
         )}
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

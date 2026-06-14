@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
-import { StatusPill, statusKindFromString } from '@/components/foundation';
+import { AppPage, PageHeader, StatusPill, statusKindFromString } from '@/components/foundation';
 import type {
   MonitoringOverviewResponse,
 } from '@/types/api';
@@ -114,26 +114,24 @@ export function MonitoringPage() {
 
   if (jobsLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-32 bg-white/5" />
-            ))}
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Skeleton className="h-96 bg-white/5" />
-            <Skeleton className="h-96 bg-white/5" />
-          </div>
+      <AppPage>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-32 bg-white/5" />
+          ))}
         </div>
-      </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-96 bg-white/5" />
+          <Skeleton className="h-96 bg-white/5" />
+        </div>
+      </AppPage>
     );
   }
 
   if (jobsError) {
     return (
-      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <AppPage>
+        <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar monitoreo</h2>
           <p className="text-gray-400 mb-4">No se pudieron obtener los datos de los jobs</p>
@@ -142,7 +140,7 @@ export function MonitoringPage() {
             Reintentar
           </Button>
         </div>
-      </div>
+      </AppPage>
     );
   }
 
@@ -191,53 +189,45 @@ export function MonitoringPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <Activity className="w-8 h-8 text-blue-400" />
-              <div>
-                <h1 className="text-3xl font-bold text-white">Monitoreo del Sistema</h1>
-                <p className="text-gray-400 mt-1">
-                  Estado de servicios, pipelines y jobs de ingestion
-                </p>
-              </div>
-            </div>
-            <div className="flex flex-col sm:items-end gap-2 sm:flex-row sm:items-center">
-              {dataQualitySnapshot && (
-                <div
-                  className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
-                    dataQualitySnapshot.is_critical
-                      ? 'border-red-500/30 bg-red-500/10 text-red-300'
-                      : dataQualitySnapshot.is_stale
-                        ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-                        : 'border-white/10 bg-white/5 text-gray-400'
-                  }`}
-                  title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
-                >
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    dataQualitySnapshot.is_critical
-                      ? 'bg-red-400'
-                      : dataQualitySnapshot.is_stale
-                        ? 'bg-amber-400'
-                        : 'bg-green-400'
-                  }`} />
-                  <span>Datos: {formatRelativeAge(dataQualityAgeSeconds)}</span>
-                </div>
-              )}
-              <Button variant="outline" onClick={() => refetchJobs()} className="w-full sm:w-auto">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Actualizar
-              </Button>
-            </div>
+    <AppPage>
+      <PageHeader
+        title="Monitoreo del Sistema"
+        description="Estado de servicios, pipelines y jobs de ingestion"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Activity className="w-6 h-6 text-blue-400" />
           </div>
-        </motion.div>
+        }
+        actions={
+          <>
+            {dataQualitySnapshot && (
+              <div
+                className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
+                  dataQualitySnapshot.is_critical
+                    ? 'border-red-500/30 bg-red-500/10 text-red-300'
+                    : dataQualitySnapshot.is_stale
+                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
+                      : 'border-white/10 bg-white/5 text-gray-400'
+                }`}
+                title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
+              >
+                <div className={`w-1.5 h-1.5 rounded-full ${
+                  dataQualitySnapshot.is_critical
+                    ? 'bg-red-400'
+                    : dataQualitySnapshot.is_stale
+                      ? 'bg-amber-400'
+                      : 'bg-green-400'
+                }`} />
+                <span>Datos: {formatRelativeAge(dataQualityAgeSeconds)}</span>
+              </div>
+            )}
+            <Button variant="outline" onClick={() => refetchJobs()}>
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Actualizar
+            </Button>
+          </>
+        }
+      />
 
         {/* System Health */}
         {services && (
@@ -791,8 +781,7 @@ export function MonitoringPage() {
             )}
           </Card>
         </motion.div>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

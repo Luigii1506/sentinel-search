@@ -39,6 +39,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/admin';
 import { SyncSourceButton } from '@/components/SyncSourceButton';
+import { AppPage, PageHeader, StatusPill } from '@/components/foundation';
 import type {
   MonitoringOverviewResponse,
   SourceActivityResponse,
@@ -875,13 +876,11 @@ export function OperationsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto space-y-4">
-          <Skeleton className="h-12 bg-white/5" />
-          <Skeleton className="h-12 bg-white/5" />
-          {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-16 bg-white/5" />)}
-        </div>
-      </div>
+      <AppPage spacing="compact">
+        <Skeleton className="h-12 bg-white/5" />
+        <Skeleton className="h-12 bg-white/5" />
+        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-16 bg-white/5" />)}
+      </AppPage>
     );
   }
 
@@ -890,35 +889,26 @@ export function OperationsPage() {
   const refreshRate = runningCount > 0 ? '2.5s' : recentTriggerWindow ? '1.5s' : '30s';
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto space-y-4">
-
-        {/* ── Header ───────────────────────────────────────────── */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Activity className="w-7 h-7 text-blue-400" />
-            <div>
-              <h1 className="text-2xl font-bold text-white">Operaciones</h1>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {sources.length} fuentes · actualizado hace {dataAge}s ·
-                <span className={recentTriggerWindow || runningCount > 0 ? 'text-blue-400 ml-1' : 'ml-1'}>
-                  auto-refresh {refreshRate}
-                </span>
-              </p>
-            </div>
+    <AppPage spacing="compact">
+      <PageHeader
+        title="Operaciones"
+        description={`${sources.length} fuentes · actualizado hace ${dataAge}s · auto-refresh ${refreshRate}`}
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Activity className="w-6 h-6 text-blue-400" />
           </div>
-          <div className="flex items-center gap-2">
+        }
+        actions={
+          <>
             {runningCount > 0 && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs">
-                <Loader2 className="w-3 h-3 animate-spin" />
-                <span>{runningCount} corriendo</span>
-              </div>
+              <StatusPill kind="running" label={`${runningCount} corriendo`} size="sm" />
             )}
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="w-3.5 h-3.5" />
             </Button>
-          </div>
-        </div>
+          </>
+        }
+      />
 
         {/* ── Infra Summary Card ─────────────────────────────── */}
         {opsSummary && (
@@ -1138,8 +1128,7 @@ export function OperationsPage() {
             </>
           )}
         </div>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

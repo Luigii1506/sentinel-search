@@ -13,6 +13,7 @@ import { PerformanceMonitor } from '@/components/search/PerformanceMonitor';
 import { SearchModeToggle } from '@/components/search/SearchModeToggle';
 import { useOptimizedSearch } from '@/hooks/useOptimizedSearch';
 import type { OptimizedSearchResult } from '@/services/screening';
+import { AppPage, PageHeader } from '@/components/foundation';
 
 export function OptimizedSearchPage() {
   const {
@@ -34,28 +35,16 @@ export function OptimizedSearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
-              <Zap className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">
-                Búsqueda Optimizada
-              </h1>
-              <p className="text-gray-400">
-                Smart Search v3 con cache de embeddings y búsqueda paralela
-              </p>
-            </div>
+    <AppPage>
+      <PageHeader
+        title="Búsqueda Optimizada"
+        description="Smart Search v3 con cache de embeddings y búsqueda paralela"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Zap className="w-6 h-6 text-blue-400" />
           </div>
-        </motion.div>
+        }
+      />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Search Column */}
@@ -234,8 +223,7 @@ export function OptimizedSearchPage() {
             </Card>
           </div>
         </div>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

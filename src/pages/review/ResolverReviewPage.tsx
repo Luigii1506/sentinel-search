@@ -12,13 +12,14 @@
  */
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus } from 'lucide-react';
 import { resolverService, type UnsurePair, type ResolverStatus } from '@/services/resolver';
 import { entityService } from '@/services/entities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AppPage, PageHeader } from '@/components/foundation';
 import { toast } from 'sonner';
 
 interface EntitySummary {
@@ -87,15 +88,16 @@ export function ResolverReviewPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6">
-          <h1 className="text-3xl font-semibold text-white mb-2">Resolver Review</h1>
-          <p className="text-gray-400">
-            Pares UNSURE generados por nomenklatura xref. Decide si son la misma
-            entidad (merge) o entidades distintas.
-          </p>
-        </div>
+    <AppPage>
+      <PageHeader
+        title="Resolver Review"
+        description="Pares UNSURE generados por nomenklatura xref. Decide si son la misma entidad (merge) o entidades distintas."
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <GitBranchPlus className="w-6 h-6 text-blue-400" />
+          </div>
+        }
+      />
 
         {status && (
           <Card className="bg-white/5 border-white/10 mb-6">
@@ -191,8 +193,7 @@ export function ResolverReviewPage() {
             </div>
           </>
         )}
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

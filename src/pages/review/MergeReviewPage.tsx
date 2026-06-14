@@ -32,6 +32,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { AppPage, PageHeader } from '@/components/foundation';
 import { useMergeReview, useMergeDetail, usePrefetchMerge } from '@/hooks/useMergeReview';
 import type { MergedEntitySummary, MergeChildInfo, MergeReviewSortBy } from '@/types/api';
 import { useNavigate } from 'react-router-dom';
@@ -381,20 +382,17 @@ export function MergeReviewPage() {
   const endItem = Math.min((page + 1) * pageSize, data?.total || 0);
 
   return (
-    <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8 pb-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-              <GitMerge className="w-7 h-7 text-purple-400" />
-              Merge Review
-            </h1>
-            <p className="text-gray-400 mt-1">
-              Auditar entidades Gold con multiples fuentes fusionadas
-            </p>
+    <AppPage>
+      <PageHeader
+        title="Merge Review"
+        description="Auditar entidades Gold con múltiples fuentes fusionadas"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+            <GitMerge className="w-6 h-6 text-purple-400" />
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+        }
+        actions={
+          <>
             {meta?.elapsed_ms && (
               <TooltipProvider>
                 <Tooltip>
@@ -422,8 +420,9 @@ export function MergeReviewPage() {
               <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
               Actualizar
             </Button>
-          </div>
-        </div>
+          </>
+        }
+      />
 
         {/* Stats cards */}
         {page === 0 && Object.keys(stats).length > 0 && (
@@ -943,8 +942,7 @@ export function MergeReviewPage() {
             </div>
           </>
         )}
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

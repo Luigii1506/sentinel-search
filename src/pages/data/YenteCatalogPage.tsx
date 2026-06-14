@@ -10,6 +10,7 @@ import { yenteService, type YenteCatalog, type YenteDataset } from '@/services';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { AppPage, PageHeader } from '@/components/foundation';
 
 const TIER_COLORS = [
   { min: 100000, color: 'bg-red-500/10 text-red-300 border-red-500/30', label: 'XL' },
@@ -64,24 +65,22 @@ export function YenteCatalogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-6 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold text-white mb-2 flex items-center gap-2">
-              <Globe className="h-7 w-7 text-purple-400" />
-              Yente Catalog
-            </h1>
-            <p className="text-gray-400">
-              Catálogo de datasets en formato Yente/OpenSanctions. Consumible por Aleph/ICIJ/OCCRP via
-              <code className="text-purple-300 mx-1">GET /api/v2/yente/catalog</code>
-            </p>
+    <AppPage>
+      <PageHeader
+        title="Yente Catalog"
+        description="Catálogo de datasets en formato Yente/OpenSanctions. Consumible por Aleph/ICIJ/OCCRP."
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+            <Globe className="w-6 h-6 text-purple-400" />
           </div>
+        }
+        actions={
           <Button onClick={handleExport} disabled={!catalog} variant="outline">
             <Download className="h-4 w-4 mr-2" />
             Export JSON
           </Button>
-        </div>
+        }
+      />
 
         {catalog && (
           <div className="grid grid-cols-3 gap-4 mb-6">
@@ -144,8 +143,7 @@ export function YenteCatalogPage() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

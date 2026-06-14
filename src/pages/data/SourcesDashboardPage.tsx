@@ -24,7 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MetricCard } from '@/components/foundation';
+import { AppPage, PageHeader, MetricCard } from '@/components/foundation';
 import {
   Select,
   SelectContent,
@@ -310,23 +310,21 @@ export function SourcesDashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
-        <div className="max-w-[1600px] mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-            {[...Array(5)].map((_, i) => (
-              <Skeleton key={i} className="h-28 bg-white/5" />
-            ))}
-          </div>
-          <Skeleton className="h-96 bg-white/5" />
+      <AppPage width="wide">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-28 bg-white/5" />
+          ))}
         </div>
-      </div>
+        <Skeleton className="h-96 bg-white/5" />
+      </AppPage>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto text-center">
+      <AppPage width="default">
+        <div className="text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-white mb-2">Error al cargar fuentes</h2>
           <p className="text-gray-400 mb-2">No se pudieron obtener los datos</p>
@@ -336,35 +334,31 @@ export function SourcesDashboardPage() {
             Reintentar
           </Button>
         </div>
-      </div>
+      </AppPage>
     );
   }
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-[1600px] mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <Database className="w-8 h-8 text-blue-400" />
-              <div>
-                <h1 className="text-3xl font-bold text-white">Dashboard de Fuentes</h1>
-                <p className="text-gray-400">
-                  {data?.total_registered} fuentes registradas · {data?.total_with_data} con datos
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" onClick={() => refetch()} className="border-white/10 w-full sm:w-auto">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Actualizar
-            </Button>
+    <AppPage width="wide">
+      <PageHeader
+        title="Dashboard de Fuentes"
+        description={
+          data
+            ? `${data.total_registered} fuentes registradas · ${data.total_with_data} con datos`
+            : undefined
+        }
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <Database className="w-6 h-6 text-blue-400" />
           </div>
-        </motion.div>
+        }
+        actions={
+          <Button variant="outline" onClick={() => refetch()} className="border-white/10">
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Actualizar
+          </Button>
+        }
+      />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
@@ -775,8 +769,7 @@ export function SourcesDashboardPage() {
             </span>
           </div>
         </div>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 

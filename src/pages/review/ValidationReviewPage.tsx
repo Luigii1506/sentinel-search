@@ -8,7 +8,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle, CheckCircle, XCircle, RefreshCw, Loader2, ExternalLink,
-  Shield, Trash2,
+  Trash2, ShieldCheck,
 } from 'lucide-react';
 import {
   validationService,
@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AppPage, PageHeader } from '@/components/foundation';
 import { toast } from 'sonner';
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -95,20 +96,21 @@ export function ValidationReviewPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-w-7xl">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Shield className="w-6 h-6" /> Validation Review Queue
-          </h1>
-          <p className="text-muted-foreground">
-            Alertas del consensus engine que requieren revisión humana
-          </p>
-        </div>
-        <Button onClick={loadData} variant="outline" size="sm">
-          <RefreshCw className="w-4 h-4 mr-2" /> Refresh
-        </Button>
-      </div>
+    <AppPage>
+      <PageHeader
+        title="Validation Review Queue"
+        description="Alertas del consensus engine que requieren revisión humana"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <ShieldCheck className="w-6 h-6 text-blue-400" />
+          </div>
+        }
+        actions={
+          <Button onClick={loadData} variant="outline" size="sm">
+            <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+          </Button>
+        }
+      />
 
       {/* Stats panel */}
       {stats && (
@@ -302,7 +304,7 @@ export function ValidationReviewPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </AppPage>
   );
 }
 

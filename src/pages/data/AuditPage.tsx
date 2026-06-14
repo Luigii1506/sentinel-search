@@ -29,7 +29,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SyncSourceButton } from '@/components/SyncSourceButton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
-import { StatusPill } from '@/components/foundation';
+import { AppPage, PageHeader, StatusPill } from '@/components/foundation';
 import type {
   JobsResponse,
   SourceInfo,
@@ -212,16 +212,14 @@ export function AuditPage() {
 
   if (sourcesLoading) {
     return (
-      <div className="min-h-screen bg-brand-carbon px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-24 bg-white/5" />
-            ))}
-          </div>
-          <Skeleton className="h-96 bg-white/5" />
+      <AppPage>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-24 bg-white/5" />
+          ))}
         </div>
-      </div>
+        <Skeleton className="h-96 bg-white/5" />
+      </AppPage>
     );
   }
 
@@ -238,30 +236,22 @@ export function AuditPage() {
   const inactiveSources = sourcesData?.sources?.filter((source) => source.is_active === false).length || 0;
 
   return (
-    <div className="min-h-screen bg-brand-carbon pb-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
-        >
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-3">
-              <ClipboardList className="w-8 h-8 text-blue-400" />
-              <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-white">Auditoria de Datos</h1>
-                <p className="text-gray-400 mt-1">
-                  Frescura, estado y confiabilidad de las fuentes de datos
-                </p>
-              </div>
-            </div>
-            <Button variant="outline" onClick={() => refetch()} className="w-full sm:w-auto">
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Actualizar
-            </Button>
+    <AppPage>
+      <PageHeader
+        title="Auditoría de Datos"
+        description="Frescura, estado y confiabilidad de las fuentes de datos"
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <ClipboardList className="w-6 h-6 text-blue-400" />
           </div>
-        </motion.div>
+        }
+        actions={
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="w-4 h-4 mr-2" />
+            Actualizar
+          </Button>
+        }
+      />
 
         {/* Zombie jobs banner (solo si hay) */}
         {healthOverview?.zombie_jobs && healthOverview.zombie_jobs.length > 0 && (
@@ -760,8 +750,7 @@ export function AuditPage() {
             )}
           </Card>
         </motion.div>
-      </div>
-    </div>
+    </AppPage>
   );
 }
 
