@@ -42,12 +42,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = useCallback(async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
-      const response = await authService.login(credentials);
-      setUser(response.user);
-      toast.success(`Bienvenido, ${response.user.first_name}`);
-    } catch (error) {
+      // /api/v1/auth/login returns only the tokens + role — no nested
+      // user object. Fetch the full profile via /me right after so the
+      // app has user.id, email, role, etc. available immediately.
+      await authService.login(credentials);
+      const userData = await authService.getCurrentUser();
+      if (!userData) {
+        throw new Error('Failed to load user profile after login');
+      }
+      setUser(userData);
+      toast.success(
+        `Bienvenido${userData.first_name ? `, ${userData.first_name}` : ''}`,
+      );
+    } catch (error: unknown) {
       console.error('Login error:', error);
-      toast.error('Credenciales inválidas. Intenta nuevamente.');
+      const detail =
+        (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
+      // Only surface the backend's detail when it's a plain string —
+      // 422 validation errors come back as an array and we don't want
+      // to dump pydantic JSON in a toast.
+      const friendly =
+        typeof detail === 'string' ? detail : 'Credenciales inválidas. Intenta nuevamente.';
+      toast.error(friendly);
       throw error;
     } finally {
       setIsLoading(false);
