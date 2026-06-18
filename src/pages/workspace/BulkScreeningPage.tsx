@@ -215,9 +215,9 @@ export function BulkScreeningPage() {
   };
 
   return (
-    <AppPage width="narrow">
+    <AppPage width="default">
         <PageHeader
-          title="Bulk Screening"
+          title="Screening masivo"
           description="Screening masivo de nombres contra la base de datos."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">

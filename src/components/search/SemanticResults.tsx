@@ -3,6 +3,7 @@ import { Brain, ArrowRight, AlertTriangle, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { EmptyState } from '@/components/foundation';
 // import type { SemanticSearchResult } from '@/services/screening';
 import { getRiskBgColor, cn } from '@/lib/utils';
 
@@ -16,13 +17,11 @@ interface SemanticResultsProps {
 export function SemanticResults({ results, executionTime, onSelectEntity }: SemanticResultsProps) {
   if (results.length === 0) {
     return (
-      <Card className="p-8 text-center bg-white/5 border-white/10">
-        <Brain className="w-12 h-12 mx-auto text-gray-600 mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">Sin resultados semánticos</h3>
-        <p className="text-gray-400">
-          Intenta con otra consulta o reduce el umbral de similitud.
-        </p>
-      </Card>
+      <EmptyState
+        icon={Brain}
+        title="Sin resultados semánticos"
+        description="Intenta con otra consulta o reduce el umbral de similitud."
+      />
     );
   }
 

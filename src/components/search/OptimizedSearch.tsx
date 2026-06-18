@@ -25,6 +25,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@/components/ui/tooltip';
+import { EmptyState } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { screeningService, type OptimizedSearchResult } from '@/services/screening';
@@ -541,16 +542,13 @@ export function OptimizedSearch({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="mt-8 text-center py-12"
+            className="mt-8"
           >
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 
-                          flex items-center justify-center">
-              <AlertCircle className="w-8 h-8 text-gray-400" />
-            </div>
-            <p className="text-gray-400">No se encontraron resultados</p>
-            <p className="text-sm text-gray-500 mt-1">
-              Intenta con términos diferentes o revisa la ortografía
-            </p>
+            <EmptyState
+              icon={AlertCircle}
+              title="Sin resultados"
+              description="Intenta con términos diferentes o revisa la ortografía."
+            />
           </motion.div>
         )}
       </AnimatePresence>
