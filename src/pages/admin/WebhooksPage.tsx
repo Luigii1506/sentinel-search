@@ -21,7 +21,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -38,7 +37,7 @@ import {
   type WebhookCreated,
   type WebhookEvent,
 } from '@/services/webhooks';
-import { AppPage, PageHeader, ConfirmAction, StatusPill } from '@/components/foundation';
+import { AppPage, PageHeader, ConfirmAction, EmptyState, PanelSkeleton, StatusPill } from '@/components/foundation';
 
 export default function WebhooksPage() {
   const queryClient = useQueryClient();
@@ -122,17 +121,26 @@ export default function WebhooksPage() {
             {isLoading ? (
               <div className="p-6 space-y-3">
                 {[0, 1, 2].map((i) => (
-                  <Skeleton key={i} className="h-16 rounded-lg" />
+                  <PanelSkeleton
+                    key={i}
+                    className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                    lines={3}
+                    titleWidthClassName="w-40"
+                  />
                 ))}
               </div>
             ) : !webhooks || webhooks.length === 0 ? (
-              <div className="p-12 text-center">
-                <WebhookIcon className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400 mb-1">Aún no hay webhooks configurados.</p>
-                <p className="text-xs text-gray-500">
-                  Crea uno para recibir notificaciones cuando matches críticos ocurran.
-                </p>
-              </div>
+              <EmptyState
+                icon={WebhookIcon}
+                title="Sin webhooks"
+                description="Crea uno para recibir notificaciones cuando ocurran eventos críticos."
+                action={
+                  <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Nuevo webhook
+                  </Button>
+                }
+              />
             ) : (
               <div className="divide-y divide-white/5">
                 {webhooks.map((w) => (
@@ -234,7 +242,10 @@ export default function WebhooksPage() {
           </>
         }
         confirmLabel="Eliminar"
-        onConfirm={() => deleteTarget && deleteMutation.mutateAsync(deleteTarget.id)}
+        onConfirm={() => {
+          if (!deleteTarget) return;
+          return deleteMutation.mutateAsync(deleteTarget.id);
+        }}
       />
     </AppPage>
   );

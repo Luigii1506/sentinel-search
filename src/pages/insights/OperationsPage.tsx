@@ -13,12 +13,11 @@
  *
  * Sin tablas separadas — una sola "fuente de verdad" por source.
  */
-import { useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
   AlertTriangle,
-  CalendarClock,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
@@ -32,22 +31,23 @@ import {
   XCircle,
   Zap,
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { adminService } from '@/services/admin';
 import { SyncSourceButton } from '@/components/SyncSourceButton';
-import { AppPage, PageHeader, StatusPill } from '@/components/foundation';
+import { AppPage, PageHeader, ListPageSkeleton, StatusPill, EmptyState, HealthDot, MetricCard, PanelSkeleton } from '@/components/foundation';
 import type {
   MonitoringOverviewResponse,
+  OperationsSummaryResponse,
   SourceActivityResponse,
   SourceActivityEntry,
   SourceRunsResponse,
   PipelineProgressResponse,
   PipelineLayerProgress,
 } from '@/types/api';
+
+const SchedulerPreviewSection = lazy(() => import('@/components/operations/SchedulerPreviewSection'));
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -74,6 +74,14 @@ function formatUntil(minutes: number | null | undefined): string {
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return `en ${hours}h`;
   return `en ${Math.floor(hours / 24)}d`;
+}
+
+function formatAgoOrFuture(hours: number | null | undefined): string {
+  if (hours == null) return '—';
+  if (hours < 0) return `en ${Math.abs(hours).toFixed(1)}h`;
+  if (hours < 1) return `${Math.round(hours * 60)}m`;
+  if (hours < 24) return `${hours.toFixed(1)}h`;
+  return `${Math.floor(hours / 24)}d`;
 }
 
 function formatNumber(n: number | null | undefined): string {
@@ -554,256 +562,6 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
   );
 }
 
-// ── Scheduler Preview (collapsible diagnostic section) ────────────────
-
-const REASON_LABELS: Record<string, { label: string; color: string }> = {
-  eligible:             { label: 'Elegible AHORA',            color: 'text-emerald-400' },
-  wrong_hour:           { label: 'Fuera de ventana horaria',  color: 'text-gray-500' },
-  wrong_weekday:        { label: 'Día de semana incorrecto',  color: 'text-gray-500' },
-  wrong_dom:            { label: 'Día del mes incorrecto',    color: 'text-gray-500' },
-  wrong_quarter_day:    { label: 'Día trimestral incorrecto', color: 'text-gray-500' },
-  dispatched_recently:  { label: 'Despachado recientemente',  color: 'text-blue-400' },
-  skipped_backoff:      { label: 'Bloqueado por fallos',      color: 'text-red-400' },
-  manual:               { label: 'Sin schedule (manual)',     color: 'text-gray-500' },
-};
-
-function formatHoursCompact(h: number | null | undefined): string {
-  if (h == null) return '—';
-  if (h < 1) return `${Math.round(h * 60)}m`;
-  if (h < 24) return `${h.toFixed(1)}h`;
-  if (h < 168) return `${(h / 24).toFixed(0)}d`;
-  return `${(h / 168).toFixed(0)}sem`;
-}
-
-// Formato "hace X" con manejo defensivo de tiempos negativos (last_dispatched
-// en el futuro — pasa si alguien dispara con timestamp simulado en tests/dev).
-function formatAgoOrFuture(h: number | null | undefined): string {
-  if (h == null) return '—';
-  if (h < 0) {
-    const abs = Math.abs(h);
-    return `en ${formatHoursCompact(abs)}`;
-  }
-  return formatHoursCompact(h);
-}
-
-function reasonMeta(reason: string) {
-  return REASON_LABELS[reason] ?? { label: reason, color: 'text-gray-400' };
-}
-
-type SortKey = 'source_id' | 'tier' | 'frequency' | 'reason' | 'hours_since_last_dispatch' | 'last_sync_result' | 'min_gap_hours' | 'backoff' | 'next_eligible';
-type SortDir = 'asc' | 'desc';
-
-function SchedulerPreviewSection() {
-  const [expanded, setExpanded] = useState(false);
-  const [onlyInWindow, setOnlyInWindow] = useState(true);
-  const [sortKey, setSortKey] = useState<SortKey>('source_id');
-  const [sortDir, setSortDir] = useState<SortDir>('asc');
-
-  const toggleSort = (key: SortKey) => {
-    if (sortKey === key) {
-      setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortKey(key);
-      setSortDir('asc');
-    }
-  };
-
-  const sortIcon = (key: SortKey) => {
-    if (sortKey !== key) return <span className="text-gray-700 ml-1">↕</span>;
-    return <span className="text-blue-400 ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>;
-  };
-
-  const { data, isLoading, refetch, isFetching } = useQuery({
-    queryKey: ['scheduler-preview', { onlyInWindow }],
-    queryFn: () => adminService.getSchedulerPreview({ only_in_window: onlyInWindow }),
-    enabled: expanded,
-    staleTime: 30_000,
-    refetchInterval: expanded ? 30_000 : false,
-  });
-
-  return (
-    <div className="rounded border border-white/10 bg-white/[0.02]">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 py-3 px-3 hover:bg-white/5 transition-colors"
-      >
-        {expanded ? <ChevronDown className="w-3.5 h-3.5 text-gray-500" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-500" />}
-        <CalendarClock className="w-4 h-4 text-purple-400" />
-        <div className="flex-1 text-left">
-          <div className="text-sm font-medium text-white">Scheduler Preview</div>
-          <div className="text-[11px] text-gray-500">
-            Qué decidiría Beat AHORA si corriera el dispatcher · dry-run permanente
-          </div>
-        </div>
-        {data && (
-          <div className="flex items-center gap-2 text-[11px] font-mono">
-            <span className="text-emerald-400">{data.eligible_now} elegibles</span>
-            <span className="text-gray-600">/</span>
-            <span className="text-gray-400">{data.total_scheduled} en vista</span>
-          </div>
-        )}
-      </button>
-
-      {expanded && (
-        <div className="border-t border-white/5 p-3 space-y-3">
-          {/* Controls */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => setOnlyInWindow(!onlyInWindow)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
-                onlyInWindow
-                  ? 'bg-white/10 text-white border-white/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent'
-              }`}
-              title="Si está activo, solo muestra sources cuya hora coincide ahora"
-            >
-              {onlyInWindow ? '✓ ' : ''}Solo en ventana
-            </button>
-            <Button variant="ghost" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
-            </Button>
-            {data?.evaluated_at && (
-              <span className="text-[10px] text-gray-500 font-mono ml-auto">
-                evaluado {formatLocalTime(data.evaluated_at)}
-              </span>
-            )}
-          </div>
-
-          {/* Breakdown por razón */}
-          {data?.skipped_by_reason && Object.keys(data.skipped_by_reason).length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(data.skipped_by_reason).map(([reason, count]) => {
-                const meta = reasonMeta(reason);
-                return (
-                  <span
-                    key={reason}
-                    className={`text-[10px] font-mono px-2 py-0.5 rounded border border-white/10 ${meta.color}`}
-                    title={reason}
-                  >
-                    {meta.label}: {count}
-                  </span>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Tabla */}
-          {isLoading && !data ? (
-            <div className="space-y-1">
-              <Skeleton className="h-8 bg-white/5" />
-              <Skeleton className="h-8 bg-white/5" />
-              <Skeleton className="h-8 bg-white/5" />
-            </div>
-          ) : data?.sources.length === 0 ? (
-            <div className="text-center py-6 text-xs text-gray-500">
-              {onlyInWindow
-                ? 'Ninguna fuente está en su ventana horaria ahora mismo. Desactiva el filtro para ver todas.'
-                : 'No hay fuentes programadas.'}
-            </div>
-          ) : (
-            <div className="overflow-x-auto -mx-3 px-3">
-              <table className="min-w-full text-xs whitespace-nowrap">
-                <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5 select-none">
-                    <th className="py-1.5 pr-4 cursor-pointer hover:text-white" onClick={() => toggleSort('source_id')}>Source{sortIcon('source_id')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('tier')}>Tier{sortIcon('tier')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('frequency')}>Freq · hora UTC{sortIcon('frequency')}</th>
-                    <th className="py-1.5 pr-4 cursor-pointer hover:text-white" onClick={() => toggleSort('reason')}>Razón{sortIcon('reason')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('next_eligible')} title="Cuándo el scheduler podría correr esta source otra vez (considera ventana + gap + backoff)">Próximo{sortIcon('next_eligible')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('hours_since_last_dispatch')} title="Cuándo fue la última vez que el dispatcher eligió esta fuente">Último dispatch{sortIcon('hours_since_last_dispatch')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('last_sync_result')} title="Resultado del último sync: OK / sin cambios remotos / lock / falló">Resultado{sortIcon('last_sync_result')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('min_gap_hours')} title="Gap mínimo entre dispatches — el scheduler NO redespacha hasta que pase este tiempo">Gap mín{sortIcon('min_gap_hours')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('backoff')} title="Si tiene ≥3 fallos consecutivos, el scheduler la bloquea hasta esta hora (backoff exponencial 6h→12h→24h)">Backoff{sortIcon('backoff')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {(() => {
-                    if (!data?.sources) return null;
-                    // Sort por columna activa
-                    const sorted = [...data.sources].sort((a, b) => {
-                      let av: any, bv: any;
-                      switch (sortKey) {
-                        case 'source_id':                  av = a.source_id;                  bv = b.source_id;                  break;
-                        case 'tier':                       av = a.tier;                       bv = b.tier;                       break;
-                        case 'frequency':                  av = `${a.frequency}_${a.schedule_hour_utc}`; bv = `${b.frequency}_${b.schedule_hour_utc}`; break;
-                        case 'reason':                     av = a.reason;                     bv = b.reason;                     break;
-                        case 'hours_since_last_dispatch':  av = a.hours_since_last_dispatch ?? Infinity; bv = b.hours_since_last_dispatch ?? Infinity; break;
-                        case 'last_sync_result':           av = a.last_sync_result ?? '';     bv = b.last_sync_result ?? '';     break;
-                        case 'min_gap_hours':              av = a.min_gap_hours;              bv = b.min_gap_hours;              break;
-                        case 'backoff':                    av = a.backoff_until ? new Date(a.backoff_until).getTime() : 0; bv = b.backoff_until ? new Date(b.backoff_until).getTime() : 0; break;
-                        case 'next_eligible':              av = a.hours_until_eligible ?? Infinity; bv = b.hours_until_eligible ?? Infinity; break;
-                      }
-                      const cmp = av < bv ? -1 : av > bv ? 1 : 0;
-                      return sortDir === 'asc' ? cmp : -cmp;
-                    });
-                    return sorted.map((s) => {
-                    const meta = reasonMeta(s.reason);
-                    const ago = formatAgoOrFuture(s.hours_since_last_dispatch);
-                    return (
-                      <tr key={s.source_id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                        <td className="py-1.5 pr-4 font-mono text-white">{s.source_id}</td>
-                        <td className="py-1.5 pr-3">
-                          <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${tierBadge(s.tier)}`}>
-                            T{s.tier}
-                          </span>
-                        </td>
-                        <td className="py-1.5 pr-3 text-gray-400 font-mono">
-                          {s.frequency} · {String(s.schedule_hour_utc).padStart(2, '0')}:{String(s.schedule_minute_utc ?? 0).padStart(2, '0')}
-                        </td>
-                        <td className={`py-1.5 pr-4 ${meta.color}`}>{meta.label}</td>
-                        <td className="py-1.5 pr-3 font-mono" title={s.next_eligible_at ? new Date(s.next_eligible_at).toLocaleString() : ''}>
-                          {s.eligible_now ? (
-                            <span className="text-emerald-400">ahora</span>
-                          ) : s.hours_until_eligible != null ? (
-                            <span className="text-blue-300">en {formatHoursCompact(s.hours_until_eligible)}</span>
-                          ) : (
-                            <span className="text-gray-600">—</span>
-                          )}
-                        </td>
-                        <td className="py-1.5 pr-3 text-gray-400 font-mono">{ago}</td>
-                        <td className="py-1.5 pr-3 font-mono">
-                          {s.last_sync_result === 'success' && <span className="text-emerald-400">OK</span>}
-                          {s.last_sync_result === 'failed' && <span className="text-red-400">falló</span>}
-                          {s.last_sync_result === 'skipped_smart' && <span className="text-gray-400">sin cambios</span>}
-                          {s.last_sync_result === 'skipped_lock' && <span className="text-yellow-400">lock</span>}
-                          {!s.last_sync_result && <span className="text-gray-600">—</span>}
-                        </td>
-                        <td className="py-1.5 pr-3 text-gray-500 font-mono" title="Tiempo mínimo entre dispatches — evita re-dispatch en la misma ventana">
-                          {formatHoursCompact(s.min_gap_hours)}
-                        </td>
-                        <td className="py-1.5 pr-3 font-mono">
-                          {s.backoff_until ? (
-                            (() => {
-                              const until = new Date(s.backoff_until);
-                              const remainingH = (until.getTime() - Date.now()) / 3_600_000;
-                              return (
-                                <span
-                                  className="text-red-400"
-                                  title={`${s.consecutive_failures} fallos consecutivos · backoff de ${s.backoff_hours}h · hasta ${until.toLocaleString()}`}
-                                >
-                                  {remainingH > 0 ? `${formatHoursCompact(remainingH)}` : 'expirado'} ({s.consecutive_failures} fails)
-                                </span>
-                              );
-                            })()
-                          ) : (
-                            <span className="text-gray-600">—</span>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  });
-                  })()}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-
 // ── Component ──────────────────────────────────────────────────────────
 
 export function OperationsPage() {
@@ -821,6 +579,7 @@ export function OperationsPage() {
       tier: tierFilter ?? undefined,
       limit: 100,
     }),
+    placeholderData: keepPreviousData,
     refetchInterval: (q) => {
       const runningCount = (q.state.data?.counts?.running ?? 0);
       const recentTrigger = Date.now() - lastTriggerAt < 30_000;
@@ -842,18 +601,15 @@ export function OperationsPage() {
   });
 
   // Infra summary: skip rate, queue depths, workers
-  const { data: opsSummary } = useQuery<any>({
+  const { data: opsSummary } = useQuery<OperationsSummaryResponse>({
     queryKey: ['operations', 'summary'],
-    queryFn: async () => {
-      const { api } = await import('@/services/api');
-      const { data } = await api.get('/api/v2/admin/operations-summary');
-      return data;
-    },
+    queryFn: () => adminService.getOperationsSummary(),
     refetchInterval: 30000,
     staleTime: 15000,
     refetchOnWindowFocus: false,
   });
 
+  const isActivityPending = isLoading && !activity;
   const sources = activity?.sources || [];
   const counts = activity?.counts || {};
   const services = overview?.system_health?.services as any;
@@ -874,25 +630,39 @@ export function OperationsPage() {
     { key: 'all', label: 'Todas' },
   ], [runningCount, recentFailedCount]);
 
-  if (isLoading) {
-    return (
-      <AppPage spacing="compact">
-        <Skeleton className="h-12 bg-white/5" />
-        <Skeleton className="h-12 bg-white/5" />
-        {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-16 bg-white/5" />)}
-      </AppPage>
-    );
-  }
-
   const dataAge = dataUpdatedAt ? Math.floor((Date.now() - dataUpdatedAt) / 1000) : 0;
   const recentTriggerWindow = Date.now() - lastTriggerAt < 30_000;
   const refreshRate = runningCount > 0 ? '2.5s' : recentTriggerWindow ? '1.5s' : '30s';
+  const statusSummaryCards: Array<{
+    label: string;
+    value: string | number;
+    icon: typeof CheckCircle2;
+    accent?: 'success' | 'red' | 'amber';
+  }> = isActivityPending
+    ? [
+        { label: 'saludables', value: '—', icon: CheckCircle2 },
+        { label: 'corriendo', value: '—', icon: Loader2 },
+        { label: 'fallaron', value: '—', icon: XCircle },
+        { label: 'desactualizadas', value: '—', icon: AlertTriangle },
+        { label: 'sin sync', value: '—', icon: Clock },
+      ]
+    : [
+        { label: 'saludables', value: counts.healthy || 0, accent: 'success', icon: CheckCircle2 },
+        { label: 'corriendo', value: runningCount, icon: Loader2 },
+        { label: 'fallaron', value: recentFailedCount, accent: 'red', icon: XCircle },
+        { label: 'desactualizadas', value: staleCount, accent: 'amber', icon: AlertTriangle },
+        { label: 'sin sync', value: neverCount, icon: Clock },
+      ];
 
   return (
     <AppPage spacing="compact">
       <PageHeader
         title="Operaciones"
-        description={`${sources.length} fuentes · actualizado hace ${dataAge}s · auto-refresh ${refreshRate}`}
+        description={
+          isActivityPending
+            ? 'Cargando estado operativo de las fuentes…'
+            : `${sources.length} fuentes · actualizado hace ${dataAge}s · auto-refresh ${refreshRate}`
+        }
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <Activity className="w-6 h-6 text-blue-400" />
@@ -911,7 +681,7 @@ export function OperationsPage() {
       />
 
         {/* ── Infra Summary Card ─────────────────────────────── */}
-        {opsSummary && (
+        {opsSummary ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
             <div className="flex flex-col">
               <span className="text-[10px] uppercase tracking-wide text-gray-500">Skip rate 7d</span>
@@ -959,6 +729,8 @@ export function OperationsPage() {
               </span>
             </div>
           </div>
+        ) : (
+          <PanelSkeleton lines={3} className="rounded-lg" />
         )}
 
         {/* ── Filtros: state + tier (combinables) ─────────────── */}
@@ -1043,15 +815,15 @@ export function OperationsPage() {
           animate={{ opacity: 1, y: 0 }}
           className="space-y-1.5"
         >
-          {sources.length === 0 ? (
-            <Card className="bg-brand-navy border-white/5">
-              <CardContent className="p-8 text-center">
-                <CheckCircle2 className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-                <p className="text-sm text-gray-400">
-                  Sin fuentes que coincidan con el filtro "{filter}"
-                </p>
-              </CardContent>
-            </Card>
+          {isActivityPending ? (
+            <ListPageSkeleton spacing="compact" showMetrics={false} rowCount={8} rowHeightClassName="h-16" />
+          ) : sources.length === 0 ? (
+            <EmptyState
+              icon={CheckCircle2}
+              title="Sin fuentes para este filtro"
+              description={`No hay fuentes que coincidan con "${filter}".`}
+              tone="success"
+            />
           ) : (
             sources.map((s) => (
               <SourceRow
@@ -1064,23 +836,23 @@ export function OperationsPage() {
         </motion.div>
 
         {/* ── Resumen por estado ───────────────────────────────── */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-2">
-          {[
-            { label: 'saludables', value: counts.healthy || 0, color: 'text-green-400' },
-            { label: 'corriendo', value: runningCount, color: 'text-blue-400' },
-            { label: 'fallaron', value: recentFailedCount, color: 'text-red-400' },
-            { label: 'desactualizadas', value: staleCount, color: 'text-amber-400' },
-            { label: 'sin sync', value: neverCount, color: 'text-zinc-500' },
-          ].map((s) => (
-            <div key={s.label} className="text-center py-2 px-3 rounded bg-white/5">
-              <div className={`text-lg font-bold ${s.color}`}>{s.value}</div>
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">{s.label}</p>
-            </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 pt-2">
+          {statusSummaryCards.map((s) => (
+            <MetricCard
+              key={s.label}
+              label={s.label}
+              value={s.value}
+              icon={s.icon}
+              accent={s.accent}
+              className="bg-white/5 border-white/10"
+            />
           ))}
         </div>
 
         {/* ── Scheduler diagnostic (Fase A+B del plan scheduler) ─ */}
-        <SchedulerPreviewSection />
+        <Suspense fallback={<PanelSkeleton lines={6} className="min-h-[220px]" />}>
+          <SchedulerPreviewSection />
+        </Suspense>
 
         {/* ── Infra footer ──────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2 text-xs pt-2 border-t border-white/5">
@@ -1093,37 +865,31 @@ export function OperationsPage() {
           ].map((svc) => {
             const SvcIcon = svc.icon;
             return (
-              <div
+              <HealthDot
                 key={svc.name}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded border text-xs ${
-                  svc.ok ? 'border-green-500/20 bg-green-500/5 text-green-400' : 'border-red-500/30 bg-red-500/10 text-red-400'
-                }`}
-              >
-                <div className={`w-1.5 h-1.5 rounded-full ${svc.ok ? 'bg-green-400' : 'bg-red-400'}`} />
-                <SvcIcon className="w-3 h-3" />
-                <span>{svc.name}</span>
-              </div>
+                status={svc.ok ? 'ok' : 'error'}
+                label={svc.name}
+                icon={SvcIcon}
+                detail={svc.latency != null ? `${svc.latency}ms` : undefined}
+                className={`px-2 py-1 rounded border text-xs ${svc.ok ? 'border-green-500/20 bg-green-500/5' : 'border-red-500/30 bg-red-500/10'}`}
+              />
             );
           })}
           {snapshotsHealth?.snapshots && snapshotsHealth.snapshots.length > 0 && (
             <>
               <span className="text-gray-500 ml-2">Snapshots:</span>
               {snapshotsHealth.snapshots.map((snap) => (
-                <div
+                <HealthDot
                   key={snap.scope}
-                  className={`flex items-center gap-1.5 px-2 py-1 rounded border text-xs ${
-                    snap.status === 'ok' ? 'border-green-500/20 bg-green-500/5 text-green-400' :
-                    snap.status === 'stale' ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' :
-                    'border-red-500/30 bg-red-500/10 text-red-400'
-                  }`}
+                  status={snap.status === 'ok' ? 'ok' : snap.status === 'stale' ? 'warning' : 'error'}
+                  label={snap.scope}
                   title={snap.computed_at || ''}
-                >
-                  <div className={`w-1.5 h-1.5 rounded-full ${
-                    snap.status === 'ok' ? 'bg-green-400' :
-                    snap.status === 'stale' ? 'bg-amber-400' : 'bg-red-400'
-                  }`} />
-                  <span className="font-mono text-[10px]">{snap.scope}</span>
-                </div>
+                  className={`px-2 py-1 rounded border text-xs ${
+                    snap.status === 'ok' ? 'border-green-500/20 bg-green-500/5' :
+                    snap.status === 'stale' ? 'border-amber-500/30 bg-amber-500/10' :
+                    'border-red-500/30 bg-red-500/10'
+                  }`}
+                />
               ))}
             </>
           )}

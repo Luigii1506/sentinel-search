@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AppPage, PageHeader } from '@/components/foundation';
+import { AppPage, PageHeader, MetricCard, EmptyState, PanelSkeleton } from '@/components/foundation';
 import {
   Newspaper,
   AlertTriangle,
@@ -27,15 +27,6 @@ import {
   Tag,
   BarChart3,
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -153,39 +144,6 @@ function getMethodBadge(method: string | null | undefined) {
   );
 }
 
-// ── Stat Card ──
-
-function StatCard({
-  label,
-  value,
-  subValue,
-  icon: Icon,
-  color = 'text-blue-400',
-  bgColor = 'bg-blue-500/10',
-}: {
-  label: string;
-  value: string | number;
-  subValue?: string;
-  icon: typeof Newspaper;
-  color?: string;
-  bgColor?: string;
-}) {
-  return (
-    <motion.div variants={itemVariants} className="glass rounded-xl p-5">
-      <div className="flex items-center gap-4">
-        <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', bgColor)}>
-          <Icon className={cn('w-6 h-6', color)} />
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-white">{value}</p>
-          <p className="text-sm text-gray-400">{label}</p>
-          {subValue && <p className="text-xs text-gray-500">{subValue}</p>}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 // ── Articles Tab ──
 
 function ArticlesTab() {
@@ -211,7 +169,7 @@ function ArticlesTab() {
     return (
       <div className="space-y-4">
         {[...Array(5)].map((_, i) => (
-          <Skeleton key={i} className="h-32 rounded-xl" />
+          <PanelSkeleton key={i} className="rounded-xl" lines={3} />
         ))}
       </div>
     );
@@ -262,7 +220,7 @@ function ArticlesTab() {
           </Select>
           <div className="w-full sm:w-[180px]">
             <p className="text-[10px] text-gray-500 mb-1">
-              Severity min: <span className="text-white font-mono">{minSeverity}</span>
+              Severidad minima: <span className="text-white font-mono">{minSeverity}</span>
             </p>
             <Slider
               value={[minSeverity]}
@@ -274,7 +232,7 @@ function ArticlesTab() {
           </div>
           <Button variant="outline" size="sm" onClick={() => refetch()} className="w-full sm:w-auto border-white/10">
             <RefreshCw className="w-4 h-4 mr-1" />
-            Refresh
+            Refrescar
           </Button>
         </div>
       </div>
@@ -286,11 +244,12 @@ function ArticlesTab() {
 
       {/* Article list */}
       {articles.length === 0 ? (
-        <div className="glass rounded-xl p-8 text-center">
-          <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-white mb-2">Sin resultados</h3>
-          <p className="text-gray-400">No se encontraron articulos con los filtros aplicados.</p>
-        </div>
+        <EmptyState
+          icon={CheckCircle}
+          title="Sin resultados"
+          description="No se encontraron artículos con los filtros aplicados."
+          tone="success"
+        />
       ) : (
         <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-3">
           {articles.map((article) => (
@@ -435,7 +394,7 @@ function SourcesTab() {
     return (
       <div className="space-y-2">
         {[...Array(10)].map((_, i) => (
-          <Skeleton key={i} className="h-12 rounded-lg" />
+          <Skeleton key={i} className="h-12 rounded-lg bg-white/10" />
         ))}
       </div>
     );
@@ -711,58 +670,29 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
     date: d.date ? new Date(d.date).toLocaleDateString('es-MX', { day: 'numeric', month: 'short' }) : '',
     count: d.count,
   }));
+  const maxDailyCount = Math.max(...chartData.map((item) => item.count), 1);
+  const recentTrend = chartData.slice(-7);
 
   return (
     <div className="space-y-6">
-      {/* Time Series Chart */}
       {chartData.length > 0 && (
         <div className="glass rounded-xl p-5">
           <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-orange-400" />
-            Articulos Adverse por Dia (30d)
+            Actividad reciente de adverse media
           </h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorAdverse" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#f97316" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                <XAxis
-                  dataKey="date"
-                  stroke="rgba(255,255,255,0.3)"
-                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  stroke="rgba(255,255,255,0.3)"
-                  tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 11 }}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#1a1a2e',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '12px',
-                  }}
-                  labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#f97316"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorAdverse)"
-                  name="Articulos"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {recentTrend.map((item) => (
+              <div key={item.date} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm text-gray-300">{item.date}</span>
+                  <span className="text-sm font-mono text-white">{item.count}</span>
+                </div>
+                <div className="mt-3 h-2 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full rounded-full bg-orange-400" style={{ width: `${Math.max((item.count / maxDailyCount) * 100, item.count > 0 ? 8 : 0)}%` }} />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -916,10 +846,8 @@ function ArticleDetailModal({
       <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-brand-navy border-white/10 text-white">
         {isLoading ? (
           <div className="space-y-4 p-4">
-            <Skeleton className="h-6 w-3/4" />
-            <Skeleton className="h-4 w-1/2" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-20 w-full" />
+            <PanelSkeleton lines={3} className="rounded-xl" />
+            <PanelSkeleton lines={2} className="rounded-xl" />
           </div>
         ) : article ? (
           <>
@@ -1138,8 +1066,6 @@ export function AdverseMediaPage() {
 
   // Compute AI vs keyword ratio for stat card
   const aiArticles = (stats?.by_method?.moonshot_ai || 0) + (stats?.by_method?.claude_ai || 0);
-  const keywordArticles = stats?.by_method?.keyword || 0;
-
   return (
     <AppPage>
         <PageHeader
@@ -1176,43 +1102,37 @@ export function AdverseMediaPage() {
           [...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 rounded-xl" />)
         ) : (
           <>
-            <StatCard
+            <MetricCard
               label="Total Articulos"
               value={stats?.total_articles?.toLocaleString() ?? 0}
               icon={Newspaper}
-              color="text-blue-400"
-              bgColor="bg-blue-500/10"
+              className="glass rounded-xl"
             />
-            <StatCard
+            <MetricCard
               label="Adverse Media"
               value={stats?.adverse ?? 0}
-              subValue={`${stats?.adverse_rate_pct ?? 0}% tasa`}
               icon={AlertTriangle}
-              color="text-orange-400"
-              bgColor="bg-orange-500/10"
+              accent="amber"
+              className="glass rounded-xl"
             />
-            <StatCard
+            <MetricCard
               label="Fuentes Activas"
               value={stats?.active_sources ?? 0}
               icon={Globe}
-              color="text-green-400"
-              bgColor="bg-green-500/10"
+              accent="success"
+              className="glass rounded-xl"
             />
-            <StatCard
+            <MetricCard
               label="Entity Links"
               value={stats?.total_entity_links ?? 0}
-              subValue={`${stats?.entities_with_articles ?? 0} entidades`}
               icon={Activity}
-              color="text-purple-400"
-              bgColor="bg-purple-500/10"
+              className="glass rounded-xl"
             />
-            <StatCard
+            <MetricCard
               label="Clasificacion AI"
               value={aiArticles}
-              subValue={`${keywordArticles} por keywords`}
               icon={Brain}
-              color="text-violet-400"
-              bgColor="bg-violet-500/10"
+              className="glass rounded-xl"
             />
           </>
         )}

@@ -20,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { complianceService } from '@/services/compliance';
 import type { ComplianceReport } from '@/services/compliance';
-import { AppPage, PageHeader } from '@/components/foundation';
+import { AppPage, PageHeader, ListPageSkeleton, MetricCard, EmptyState, SectionCard } from '@/components/foundation';
+import { Card, CardContent } from '@/components/ui/card';
 
 const severityColors: Record<string, string> = {
   critical: 'bg-red-500/20 text-red-400 border-red-500/30',
@@ -42,27 +42,6 @@ const statusLabels: Record<string, string> = {
   closed_inconclusive: 'Inconclusos',
   sar_filed: 'SAR Reportado',
 };
-
-function StatCard({ icon: Icon, label, value, sub, color }: {
-  icon: typeof BarChart3;
-  label: string;
-  value: string | number;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-5">
-      <div className="flex items-center gap-3 mb-2">
-        <div className={cn('p-2 rounded-lg', color || 'bg-blue-500/20')}>
-          <Icon className="w-4 h-4 text-blue-400" />
-        </div>
-        <span className="text-sm text-gray-400">{label}</span>
-      </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      {sub && <div className="text-xs text-gray-500 mt-1">{sub}</div>}
-    </div>
-  );
-}
 
 export default function ReportsPage() {
   const [period, setPeriod] = useState('30');
@@ -85,21 +64,11 @@ export default function ReportsPage() {
   };
 
   if (isLoading) {
-    return (
-      <AppPage width="wide">
-        <Skeleton className="h-8 w-64" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28" />)}
-        </div>
-        <div className="grid grid-cols-2 gap-6">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-64" />)}
-        </div>
-      </AppPage>
-    );
+    return <ListPageSkeleton width="default" metricCards={4} rowCount={4} rowHeightClassName="h-64" showFilters={false} />;
   }
 
   return (
-    <AppPage width="wide">
+    <AppPage width="default">
       <PageHeader
         title="Reportes de Compliance"
         description="KPIs y métricas del sistema PLD/AML"
@@ -133,44 +102,38 @@ export default function ReportsPage() {
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <StatCard
+            <MetricCard
               icon={AlertTriangle}
               label="Alertas Generadas"
               value={report.alerts.total}
-              sub={`${period} días`}
-              color="bg-red-500/20"
+              className="bg-brand-navy border-white/5"
             />
-            <StatCard
+            <MetricCard
               icon={Shield}
               label="Casos Creados"
               value={report.cases.total}
-              sub={`${report.cases.closed} cerrados`}
-              color="bg-blue-500/20"
+              className="bg-brand-navy border-white/5"
             />
-            <StatCard
+            <MetricCard
               icon={CheckCircle}
               label="SLA Compliance"
               value={`${report.cases.sla_compliance_pct}%`}
-              sub={`${report.cases.sla_breached} incumplidos`}
-              color={report.cases.sla_compliance_pct >= 90 ? 'bg-green-500/20' : 'bg-red-500/20'}
+              accent={report.cases.sla_compliance_pct >= 90 ? 'success' : 'red'}
+              className="bg-brand-navy border-white/5"
             />
-            <StatCard
+            <MetricCard
               icon={XCircle}
               label="Tasa Falsos Positivos"
               value={`${report.decisions.fp_rate_pct}%`}
-              sub={`${report.decisions.total} decisiones`}
-              color={report.decisions.fp_rate_pct <= 30 ? 'bg-green-500/20' : 'bg-yellow-500/20'}
+              accent={report.decisions.fp_rate_pct <= 30 ? 'success' : 'amber'}
+              className="bg-brand-navy border-white/5"
             />
           </div>
 
           {/* Detail Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Alertas por Severidad */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4" />
-                Alertas por Severidad
-              </h3>
+            <SectionCard title="Alertas por Severidad" icon={AlertTriangle}>
               <div className="space-y-3">
                 {Object.entries(report.alerts.by_severity).map(([severity, count]) => (
                   <div key={severity} className="flex items-center justify-between">
@@ -194,17 +157,17 @@ export default function ReportsPage() {
                   </div>
                 ))}
                 {Object.keys(report.alerts.by_severity).length === 0 && (
-                  <p className="text-sm text-gray-500">Sin alertas en el período</p>
+                  <EmptyState
+                    icon={CheckCircle}
+                    title="Sin alertas en el período"
+                    tone="success"
+                  />
                 )}
               </div>
-            </div>
+            </SectionCard>
 
             {/* Casos por Estado */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-                <Shield className="w-4 h-4" />
-                Casos por Estado
-              </h3>
+            <SectionCard title="Casos por Estado" icon={Shield}>
               <div className="space-y-3">
                 {Object.entries(report.cases.by_status).map(([status, count]) => (
                   <div key={status} className="flex items-center justify-between">
@@ -221,17 +184,13 @@ export default function ReportsPage() {
                   </div>
                 ))}
                 {Object.keys(report.cases.by_status).length === 0 && (
-                  <p className="text-sm text-gray-500">Sin casos en el período</p>
+                  <EmptyState icon={Shield} title="Sin casos en el período" />
                 )}
               </div>
-            </div>
+            </SectionCard>
 
             {/* Decisiones */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-4 h-4" />
-                Decisiones de Analistas
-              </h3>
+            <SectionCard title="Decisiones de Analistas" icon={TrendingUp}>
               {report.decisions.total > 0 ? (
                 <div className="space-y-4">
                   <div className="flex gap-4">
@@ -256,16 +215,12 @@ export default function ReportsPage() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">Sin decisiones en el período</p>
+                <EmptyState icon={TrendingUp} title="Sin decisiones en el período" />
               )}
-            </div>
+            </SectionCard>
 
             {/* Métricas Operativas */}
-            <div className="bg-gray-800/50 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                Métricas Operativas
-              </h3>
+            <SectionCard title="Métricas Operativas" icon={Clock}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Tiempo promedio resolución</span>
@@ -288,16 +243,17 @@ export default function ReportsPage() {
                   <span className="text-sm font-mono text-white">{report.monitoring.whitelist_active}</span>
                 </div>
               </div>
-            </div>
+            </SectionCard>
           </div>
 
           {/* Top Entities */}
           {report.top_entities.length > 0 && (
-            <div className="mt-6 bg-gray-800/50 border border-gray-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
-                <Eye className="w-4 h-4" />
-                Top Entidades con Más Alertas
-              </h3>
+            <Card className="mt-6 bg-brand-navy border-white/5">
+              <CardContent className="p-6">
+                <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  Top Entidades con Más Alertas
+                </h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
@@ -329,7 +285,8 @@ export default function ReportsPage() {
                   </tbody>
                 </table>
               </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Generated timestamp */}

@@ -23,7 +23,6 @@ import {
   X,
   TrendingUp,
   Database,
-  type LucideIcon,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +31,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { AppPage, PageHeader } from '@/components/foundation';
+import { AppPage, PageHeader, EmptyState, MetricCard, PanelSkeleton } from '@/components/foundation';
 import { useMergeReview, useMergeDetail, usePrefetchMerge } from '@/hooks/useMergeReview';
 import type { MergedEntitySummary, MergeChildInfo, MergeReviewSortBy } from '@/types/api';
 import { useNavigate } from 'react-router-dom';
@@ -109,9 +108,12 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
 
   if (isLoading) {
     return (
-      <div className="px-6 py-4 space-y-3">
-        <Skeleton className="h-4 w-48 bg-white/5" />
-        <Skeleton className="h-20 w-full bg-white/5" />
+      <div className="px-6 py-4">
+        <PanelSkeleton
+          className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+          lines={2}
+          titleWidthClassName="w-48"
+        />
       </div>
     );
   }
@@ -283,38 +285,6 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
   );
 }
 
-// Stat card component
-function StatCard({ 
-  title, 
-  value, 
-  icon: Icon, 
-  color,
-  subtitle 
-}: { 
-  title: string; 
-  value: number; 
-  icon: LucideIcon;
-  color: string;
-  subtitle?: string;
-}) {
-  return (
-    <Card className={`bg-white/5 border-white/5 ${color}`}>
-      <CardContent className="p-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs text-gray-500 mb-1">{title}</p>
-            <p className="text-2xl font-bold text-white">{formatNumber(value)}</p>
-            {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
-          </div>
-          <div className={`p-2 rounded-lg bg-white/5`}>
-            <Icon className="w-5 h-5 text-gray-400" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
 export function MergeReviewPage() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -427,29 +397,30 @@ export function MergeReviewPage() {
         {/* Stats cards */}
         {page === 0 && Object.keys(stats).length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <StatCard
-              title="Total Merges"
+            <MetricCard
+              label="Total Merges"
               value={stats.total_merged_entities || 0}
               icon={Database}
-              color="border-white/10"
+              className="bg-white/[0.02] border-white/5"
             />
-            <StatCard
-              title="Cross-Source"
+            <MetricCard
+              label="Cross-Source"
               value={stats.cross_source_merges || 0}
               icon={GitMerge}
-              color="border-blue-500/20"
+              className="bg-white/[0.02] border-white/5"
             />
-            <StatCard
-              title="Entity Resolution"
+            <MetricCard
+              label="Entity Resolution"
               value={stats.er_v4_merges || 0}
               icon={TrendingUp}
-              color="border-green-500/20"
+              className="bg-white/[0.02] border-white/5"
             />
-            <StatCard
-              title="Deduplicación"
+            <MetricCard
+              label="Deduplicación"
               value={(stats.gold_dedup_merges || 0) + (stats.exact_dedup_merges || 0)}
               icon={CheckCircle2}
-              color="border-orange-500/20"
+              accent="amber"
+              className="bg-white/[0.02] border-white/5"
             />
           </div>
         )}
@@ -605,29 +576,33 @@ export function MergeReviewPage() {
           </div>
         ) : error ? (
           <Card className="bg-red-500/5 border-red-500/10">
-            <CardContent className="p-8 text-center">
-              <AlertTriangle className="w-8 h-8 text-red-400 mx-auto mb-3" />
-              <p className="text-red-400 font-medium">Error cargando datos</p>
-              <p className="text-red-400/60 text-sm mt-1">
-                {(error as Error)?.message || 'Error desconocido'}
-              </p>
-              <Button
-                variant="outline"
-                onClick={() => refetch()}
-                className="mt-4 border-red-500/20 text-red-400 hover:bg-red-500/10"
-              >
-                Reintentar
-              </Button>
+            <CardContent className="p-8">
+              <EmptyState
+                icon={AlertTriangle}
+                title="Error cargando datos"
+                description={(error as Error)?.message || 'Error desconocido'}
+                tone="warning"
+                action={
+                  <Button
+                    variant="outline"
+                    onClick={() => refetch()}
+                    className="mt-4 border-red-500/20 text-red-400 hover:bg-red-500/10"
+                  >
+                    Reintentar
+                  </Button>
+                }
+              />
             </CardContent>
           </Card>
         ) : !data?.entities?.length ? (
           <Card className="bg-white/5 border-white/5">
-            <CardContent className="p-8 text-center">
-              <CheckCircle2 className="w-8 h-8 text-green-400 mx-auto mb-3" />
-              <p className="text-gray-300 font-medium">No hay merges con estos filtros</p>
-              <p className="text-gray-500 text-sm mt-1">
-                Ajusta los filtros para ver mas resultados
-              </p>
+            <CardContent className="p-8">
+              <EmptyState
+                icon={CheckCircle2}
+                title="No hay merges con estos filtros"
+                description="Ajusta los filtros para ver más resultados."
+                tone="success"
+              />
             </CardContent>
           </Card>
         ) : (

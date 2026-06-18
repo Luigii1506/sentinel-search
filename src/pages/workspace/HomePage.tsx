@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -13,58 +13,17 @@ import {
   Users,
   Building2,
   Globe,
+  Database,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
 import { IntelligentSearch } from '@/components/search/IntelligentSearch';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
+import { MetricCard } from '@/components/foundation';
 import { useDashboard } from '@/hooks/useDashboard';
 import { cn, formatCompactNumber } from '@/lib/utils';
-
-// Animated Counter Component
-function AnimatedCounter({ value, suffix = '', duration = 2 }: { value: number; suffix?: string; duration?: number }) {
-  const [count, setCount] = useState(0);
-  const countRef = useRef<HTMLSpanElement>(null);
-  const hasAnimated = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !hasAnimated.current) {
-          hasAnimated.current = true;
-          const steps = 60;
-          const increment = value / steps;
-          let current = 0;
-
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= value) {
-              setCount(value);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, (duration * 1000) / steps);
-        }
-      },
-      { threshold: 0.5 }
-    );
-
-    if (countRef.current) {
-      observer.observe(countRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [value, duration]);
-
-  return (
-    <span ref={countRef}>
-      {formatCompactNumber(count)}{suffix}
-    </span>
-  );
-}
+import { fadeUp } from '@/lib/motion';
 
 // Feature Card Component
 function FeatureCard({
@@ -183,9 +142,12 @@ export function HomePage() {
       {/* Hero Section */}
       <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.14),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(16,185,129,0.10),transparent_24%),linear-gradient(180deg,#06111f_0%,#091827_45%,#0b1220_100%)]"
       >
-        <NeuralNetworkBackground />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
+        <div className="absolute -left-16 top-24 h-72 w-72 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
+        <div className="absolute -right-20 bottom-24 h-80 w-80 rounded-full border border-emerald-400/10 bg-emerald-500/5 blur-3xl" aria-hidden="true" />
+        <div className="absolute inset-0 opacity-[0.04]" aria-hidden="true" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -271,46 +233,48 @@ export function HomePage() {
 
           {/* Floating Stats */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
+            {...fadeUp}
             transition={{ delay: 1, duration: 0.6 }}
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-16"
           >
             {isLoading ? (
               <>
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="text-center p-4">
-                    <Skeleton className="h-8 w-24 mx-auto mb-2" />
-                    <Skeleton className="h-4 w-20 mx-auto" />
+                  <div key={i} className="glass rounded-xl p-4 space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-8 w-20" />
                   </div>
                 ))}
               </>
             ) : (
               <>
-                <div className="text-center p-4 glass rounded-xl">
-                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                    <AnimatedCounter value={stats?.total_entities || 33583} suffix="+" />
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider">Entidades</div>
-                </div>
-                <div className="text-center p-4 glass rounded-xl">
-                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                    <AnimatedCounter value={6} />
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider">Fuentes Datos</div>
-                </div>
-                <div className="text-center p-4 glass rounded-xl">
-                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                    99.9%
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider">Uptime SLA</div>
-                </div>
-                <div className="text-center p-4 glass rounded-xl">
-                  <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                    &lt;50ms
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wider">Respuesta</div>
-                </div>
+                <MetricCard
+                  label="Entidades"
+                  value={`${formatCompactNumber(stats?.total_entities || 33583)}+`}
+                  icon={Shield}
+                  className="glass"
+                />
+                <MetricCard
+                  label="Fuentes de datos"
+                  value={6}
+                  icon={Database}
+                  className="glass"
+                />
+                <MetricCard
+                  label="Uptime SLA"
+                  value="99.9"
+                  unit="%"
+                  icon={CheckCircle}
+                  accent="success"
+                  className="glass"
+                />
+                <MetricCard
+                  label="Respuesta"
+                  value="<50"
+                  unit="ms"
+                  icon={Search}
+                  className="glass"
+                />
               </>
             )}
           </motion.div>
@@ -341,7 +305,7 @@ export function HomePage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            {...fadeUp}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
@@ -403,7 +367,7 @@ export function HomePage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-[#0f0f0f]">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            {...fadeUp}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-16"
@@ -453,7 +417,7 @@ export function HomePage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#0f0f0f]">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            {...fadeUp}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             className="text-center mb-12"

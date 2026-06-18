@@ -25,11 +25,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Skeleton } from '@/components/ui/skeleton';
 import { SyncSourceButton } from '@/components/SyncSourceButton';
 import { useQuery } from '@tanstack/react-query';
 import { adminService } from '@/services/admin';
-import { AppPage, PageHeader, StatusPill } from '@/components/foundation';
+import {
+  AppPage,
+  CategoryBadge,
+  EmptyState,
+  ListPageSkeleton,
+  MetricCard,
+  PageHeader,
+  StatusPill,
+} from '@/components/foundation';
 import type {
   JobsResponse,
   SourceInfo,
@@ -211,16 +218,7 @@ export function AuditPage() {
   };
 
   if (sourcesLoading) {
-    return (
-      <AppPage>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-24 bg-white/5" />
-          ))}
-        </div>
-        <Skeleton className="h-96 bg-white/5" />
-      </AppPage>
-    );
+    return <ListPageSkeleton metricCards={4} rowCount={1} rowHeightClassName="h-96" />;
   }
 
   const byStatus = allSources.reduce<Record<string, number>>((acc, source) => {
@@ -365,7 +363,12 @@ export function AuditPage() {
                     </div>
                   ))}
                   {healthOverview.upcoming_syncs.length === 0 && (
-                    <p className="text-xs text-gray-500">Sin syncs próximos</p>
+                    <EmptyState
+                      icon={Clock}
+                      title="Sin syncs próximos"
+                      description="No hay ejecuciones programadas en el corto plazo."
+                      className="p-5 sm:p-5"
+                    />
                   )}
                 </div>
               </CardContent>
@@ -377,68 +380,47 @@ export function AuditPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8"
+          className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-8"
         >
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Database className="w-4 h-4 text-blue-400" />
-                <span className="text-xs text-gray-400">Catalogo</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{sourcesData?.total_registered || 0}</div>
-              <p className="text-xs text-gray-500">{sourcesData?.total_with_data || 0} con datos</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <ShieldCheck className="w-4 h-4 text-cyan-400" />
-                <span className="text-xs text-gray-400">Monitoreadas</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{monitoredSources}</div>
-              <p className="text-xs text-gray-500">Con runtime health</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle2 className="w-4 h-4 text-green-400" />
-                <span className="text-xs text-gray-400">Saludables</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.healthy || 0}</div>
-              <p className="text-xs text-gray-500">Score ≥ 80</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <AlertTriangle className="w-4 h-4 text-amber-400" />
-                <span className="text-xs text-gray-400">En atención</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.warning || 0}</div>
-              <p className="text-xs text-gray-500">Stale o fallo reciente</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <XCircle className="w-4 h-4 text-red-400" />
-                <span className="text-xs text-gray-400">Críticas</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.critical || 0}</div>
-              <p className="text-xs text-gray-500">Fallos consecutivos</p>
-            </CardContent>
-          </Card>
-          <Card className="bg-brand-navy border-white/5">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-xs text-gray-400">Inactivas</span>
-              </div>
-              <div className="text-2xl font-bold text-white">{byStatus.inactive || inactiveSources}</div>
-              <p className="text-xs text-gray-500">Fuera del scheduler</p>
-            </CardContent>
-          </Card>
+          <MetricCard
+            label="Catalogo"
+            value={sourcesData?.total_registered || 0}
+            icon={Database}
+            className="bg-brand-navy border-white/5"
+          />
+          <MetricCard
+            label="Monitoreadas"
+            value={monitoredSources}
+            icon={ShieldCheck}
+            className="bg-brand-navy border-white/5"
+          />
+          <MetricCard
+            label="Saludables"
+            value={byStatus.healthy || 0}
+            icon={CheckCircle2}
+            accent="success"
+            className="bg-brand-navy border-white/5"
+          />
+          <MetricCard
+            label="En atención"
+            value={byStatus.warning || 0}
+            icon={AlertTriangle}
+            accent="amber"
+            className="bg-brand-navy border-white/5"
+          />
+          <MetricCard
+            label="Críticas"
+            value={byStatus.critical || 0}
+            icon={XCircle}
+            accent="red"
+            className="bg-brand-navy border-white/5"
+          />
+          <MetricCard
+            label="Inactivas"
+            value={byStatus.inactive || inactiveSources}
+            icon={Clock}
+            className="bg-brand-navy border-white/5"
+          />
         </motion.div>
 
         {/* Recent Failed Jobs */}
@@ -529,7 +511,13 @@ export function AuditPage() {
                       )}
                     </div>
                   )) : (
-                    <p className="text-sm text-gray-500">No hay fuentes marcadas como desaparecidas.</p>
+                    <EmptyState
+                      icon={CheckCircle2}
+                      title="Sin fuentes desaparecidas"
+                      description="No hay fuentes marcadas como desaparecidas en este momento."
+                      tone="success"
+                      className="p-6 sm:p-6"
+                    />
                   )}
                 </div>
               </CardContent>
@@ -557,7 +545,12 @@ export function AuditPage() {
                       )}
                     </div>
                   )) : (
-                    <p className="text-sm text-gray-500">No hay eventos recientes de lifecycle.</p>
+                    <EmptyState
+                      icon={ClipboardList}
+                      title="Sin eventos recientes"
+                      description="No hubo cambios recientes en el lifecycle de fuentes."
+                      className="p-6 sm:p-6"
+                    />
                   )}
                 </div>
               </CardContent>
@@ -606,7 +599,7 @@ export function AuditPage() {
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Categoria</p>
-                          <p className="text-gray-300">{source.category || '-'}</p>
+                          <CategoryBadge category={source.category || 'OTHER'} />
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Records</p>
@@ -697,7 +690,7 @@ export function AuditPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-xs text-gray-400">{source.category}</span>
+                          <CategoryBadge category={source.category || 'OTHER'} />
                         </td>
                         <td className="px-4 py-3 text-center">
                           <StatusBadge status={source.audit_status} />
@@ -743,10 +736,12 @@ export function AuditPage() {
             </div>
 
             {sources.length === 0 && (
-              <div className="text-center py-12">
-                <ClipboardList className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                <p className="text-gray-400">No se encontraron fuentes con los filtros aplicados</p>
-              </div>
+              <EmptyState
+                icon={ClipboardList}
+                title="Sin resultados"
+                description="No se encontraron fuentes con los filtros aplicados."
+                className="rounded-none border-0 bg-transparent p-12 shadow-none"
+              />
             )}
           </Card>
         </motion.div>

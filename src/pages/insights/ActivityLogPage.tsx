@@ -167,7 +167,7 @@ export function ActivityLogPage() {
   return (
     <AppPage>
         <PageHeader
-          title="Activity Log"
+          title="Registro de actividad"
           description="Auditoría de acciones de usuarios y llamadas al API."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">

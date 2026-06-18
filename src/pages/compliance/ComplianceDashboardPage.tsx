@@ -14,7 +14,7 @@ import {
   BarChart3,
   ChevronRight,
 } from 'lucide-react';
-import { AppPage, PageHeader } from '@/components/foundation';
+import { AppPage, PageHeader, EmptyState, MetricCard } from '@/components/foundation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -82,34 +82,6 @@ const statusLabels: Record<string, string> = {
 
 // ── Stat Card ──
 
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-  color = 'text-blue-400',
-  bgColor = 'bg-blue-500/10',
-}: {
-  label: string;
-  value: string | number;
-  icon: typeof Shield;
-  color?: string;
-  bgColor?: string;
-}) {
-  return (
-    <motion.div variants={itemVariants} className="glass rounded-xl p-5">
-      <div className="flex items-center gap-4">
-        <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center', bgColor)}>
-          <Icon className={cn('w-6 h-6', color)} />
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-white">{value}</p>
-          <p className="text-sm text-gray-400">{label}</p>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 // ── Cases Tab ──
 
 function CasesTab() {
@@ -133,11 +105,11 @@ function CasesTab() {
 
   if (cases.length === 0) {
     return (
-      <div className="glass rounded-xl p-12 text-center">
-        <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin Casos</h3>
-        <p className="text-gray-400">No hay casos de investigación registrados.</p>
-      </div>
+      <EmptyState
+        icon={FileText}
+        title="Sin Casos"
+        description="No hay casos de investigación registrados."
+      />
     );
   }
 
@@ -231,11 +203,12 @@ function AlertsTab() {
 
   if (alerts.length === 0) {
     return (
-      <div className="glass rounded-xl p-12 text-center">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin Alertas</h3>
-        <p className="text-gray-400">No hay alertas pendientes de revisión.</p>
-      </div>
+      <EmptyState
+        icon={CheckCircle}
+        title="Sin Alertas"
+        description="No hay alertas pendientes de revisión."
+        tone="success"
+      />
     );
   }
 
@@ -328,13 +301,11 @@ function WhitelistTab() {
 
   if (entries.length === 0) {
     return (
-      <div className="glass rounded-xl p-12 text-center">
-        <Shield className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Whitelist Vacío</h3>
-        <p className="text-gray-400">
-          No hay entradas de supresión. Los falsos positivos marcados aparecerán aquí.
-        </p>
-      </div>
+      <EmptyState
+        icon={Shield}
+        title="Whitelist Vacío"
+        description="No hay entradas de supresión. Los falsos positivos marcados aparecerán aquí."
+      />
     );
   }
 
@@ -417,13 +388,11 @@ function WatchlistTab() {
 
   if (entries.length === 0) {
     return (
-      <div className="glass rounded-xl p-12 text-center">
-        <Eye className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin Monitoreo</h3>
-        <p className="text-gray-400">
-          No hay entidades bajo monitoreo continuo.
-        </p>
-      </div>
+      <EmptyState
+        icon={Eye}
+        title="Sin Monitoreo"
+        description="No hay entidades bajo monitoreo continuo."
+      />
     );
   }
 
@@ -850,33 +819,31 @@ export function ComplianceDashboardPage() {
             </>
           ) : (
             <>
-              <StatCard
+              <MetricCard
                 label="Casos Abiertos"
                 value={dashboard?.cases?.open_cases ?? 0}
                 icon={FileText}
-                color="text-blue-400"
-                bgColor="bg-blue-500/10"
+                className="glass rounded-xl"
               />
-              <StatCard
+              <MetricCard
                 label="Alertas Pendientes"
                 value={dashboard?.cases?.by_status?.open ?? 0}
                 icon={AlertTriangle}
-                color="text-orange-400"
-                bgColor="bg-orange-500/10"
+                accent="amber"
+                className="glass rounded-xl"
               />
-              <StatCard
+              <MetricCard
                 label="Tasa FP"
                 value={`${dashboard?.false_positives?.fp_rate ?? 0}%`}
                 icon={XCircle}
-                color="text-red-400"
-                bgColor="bg-red-500/10"
+                accent="red"
+                className="glass rounded-xl"
               />
-              <StatCard
+              <MetricCard
                 label="Entidades Monitoreadas"
                 value={dashboard?.monitoring?.total_watched ?? 0}
                 icon={Eye}
-                color="text-purple-400"
-                bgColor="bg-purple-500/10"
+                className="glass rounded-xl"
               />
             </>
           )}

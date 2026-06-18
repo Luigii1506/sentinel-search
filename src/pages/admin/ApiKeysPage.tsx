@@ -20,7 +20,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Switch } from '@/components/ui/switch';
 import {
   Dialog,
@@ -43,7 +42,7 @@ import {
   type ApiKeyRole,
   type ApiKeySummary,
 } from '@/services/apiKeys';
-import { AppPage, PageHeader, ConfirmAction, StatusPill } from '@/components/foundation';
+import { AppPage, PageHeader, ConfirmAction, EmptyState, PanelSkeleton, StatusPill } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 
 function formatDateOr(value: string | null | undefined, fallback = '—'): string {
@@ -146,14 +145,26 @@ export default function ApiKeysPage() {
             {isLoading ? (
               <div className="p-6 space-y-3">
                 {[0, 1, 2].map((i) => (
-                  <Skeleton key={i} className="h-14 rounded-lg" />
+                  <PanelSkeleton
+                    key={i}
+                    className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                    lines={2}
+                    titleWidthClassName="w-32"
+                  />
                 ))}
               </div>
             ) : !keys || keys.length === 0 ? (
-              <div className="p-12 text-center">
-                <Key className="w-12 h-12 text-gray-600 mx-auto mb-3" />
-                <p className="text-gray-400">Aún no hay API keys.</p>
-              </div>
+              <EmptyState
+                icon={Key}
+                title="Sin API keys"
+                description="Aún no hay API keys creadas para clientes o integraciones."
+                action={
+                  <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                    <Plus className="w-4 h-4" />
+                    Nueva key
+                  </Button>
+                }
+              />
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -269,7 +280,10 @@ export default function ApiKeysPage() {
           </>
         }
         confirmLabel="Revocar"
-        onConfirm={() => revokeTarget && revokeMutation.mutateAsync(revokeTarget.id)}
+        onConfirm={() => {
+          if (!revokeTarget) return;
+          return revokeMutation.mutateAsync(revokeTarget.id);
+        }}
       />
     </AppPage>
   );

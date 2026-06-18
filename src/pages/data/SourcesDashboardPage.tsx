@@ -19,12 +19,12 @@ import {
   Shield,
   Globe,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { AppPage, PageHeader, MetricCard } from '@/components/foundation';
+import { AppPage, PageHeader, ListPageSkeleton, MetricCard, CategoryBadge, categoryLabel } from '@/components/foundation';
 import {
   Select,
   SelectContent,
@@ -44,56 +44,6 @@ import { useSourceDetail } from '@/hooks/useSourceDetail';
 import type { SourceInfo } from '@/types/api';
 
 // ── Constantes ──
-
-const CATEGORY_LABELS: Record<string, string> = {
-  SANCTIONS: 'Sanciones',
-  PEP: 'PEP',
-  DEBARMENT: 'Inhabilitados',
-  REGULATORY: 'Regulatorio',
-  LAW_ENFORCEMENT: 'Fuerza Publica',
-  TAX: 'Fiscal',
-  OTHER: 'Otros',
-  TERRORISM: 'Terrorismo',
-  FINANCIAL_DISCLOSURE: 'Divulgacion',
-  CORPORATE: 'Corporativo',
-  UBO: 'UBO',
-  LEGAL: 'Legal',
-  MEDIA: 'Media',
-  // lowercase fallback
-  sanctions: 'Sanciones',
-  pep: 'PEP',
-  debarment: 'Inhabilitados',
-  regulatory: 'Regulatorio',
-  law_enforcement: 'Fuerza Publica',
-  tax: 'Fiscal',
-  other: 'Otros',
-  terrorism: 'Terrorismo',
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  SANCTIONS: 'bg-red-500/10 text-red-400 border-red-500/20',
-  PEP: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  DEBARMENT: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  REGULATORY: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  LAW_ENFORCEMENT: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-  TAX: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  OTHER: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-  TERRORISM: 'bg-red-600/10 text-red-500 border-red-600/20',
-  FINANCIAL_DISCLOSURE: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
-  CORPORATE: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-  UBO: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-  LEGAL: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  MEDIA: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
-  // lowercase fallback
-  sanctions: 'bg-red-500/10 text-red-400 border-red-500/20',
-  pep: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  debarment: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  law_enforcement: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
-  tax: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  other: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
-  terrorism: 'bg-red-600/10 text-red-500 border-red-600/20',
-};
 
 const STATUS_CONFIG = {
   active: { label: 'Activo', icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
@@ -166,7 +116,7 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
               </div>
               <div className="p-3 rounded-lg bg-white/5">
                 <p className="text-xs text-gray-500">Categoria</p>
-                <p className="text-sm text-white capitalize">{CATEGORY_LABELS[detail.category] || detail.category}</p>
+                <p className="text-sm text-white capitalize">{categoryLabel(detail.category)}</p>
               </div>
               <div className="p-3 rounded-lg bg-white/5">
                 <p className="text-xs text-gray-500">Pais</p>
@@ -272,7 +222,7 @@ export function SourcesDashboardPage() {
       .sort((a, b) => b[1] - a[1])
       .map(([key, count]) => ({
         key,
-        label: CATEGORY_LABELS[key] || key,
+        label: categoryLabel(key),
         count,
       }));
   }, [data]);
@@ -309,16 +259,7 @@ export function SourcesDashboardPage() {
   };
 
   if (isLoading) {
-    return (
-      <AppPage width="wide">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-28 bg-white/5" />
-          ))}
-        </div>
-        <Skeleton className="h-96 bg-white/5" />
-      </AppPage>
-    );
+    return <ListPageSkeleton width="default" metricCards={5} rowCount={1} rowHeightClassName="h-96" />;
   }
 
   if (error) {
@@ -339,7 +280,7 @@ export function SourcesDashboardPage() {
   }
 
   return (
-    <AppPage width="wide">
+    <AppPage width="default">
       <PageHeader
         title="Dashboard de Fuentes"
         description={
@@ -477,12 +418,7 @@ export function SourcesDashboardPage() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Badge
-                      variant="outline"
-                      className={`text-[10px] ${CATEGORY_COLORS[source.category] || CATEGORY_COLORS.other || CATEGORY_COLORS.OTHER}`}
-                    >
-                      {CATEGORY_LABELS[source.category] || source.category}
-                    </Badge>
+                    <CategoryBadge category={source.category} />
                     {source.country ? (
                       <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-300 border-white/10">
                         {source.country}
@@ -591,12 +527,7 @@ export function SourcesDashboardPage() {
                           </div>
                         </td>
                         <td className="px-3 py-2.5">
-                          <Badge
-                            variant="outline"
-                            className={`text-[10px] ${CATEGORY_COLORS[source.category] || CATEGORY_COLORS.other || CATEGORY_COLORS.OTHER}`}
-                          >
-                            {CATEGORY_LABELS[source.category] || source.category}
-                          </Badge>
+                          <CategoryBadge category={source.category} />
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <span className="text-xs text-gray-400 font-mono">{source.country || '-'}</span>
