@@ -11,18 +11,23 @@ export interface LoginResponse {
   refresh_token: string;
   token_type: string;
   expires_in: number;
-  user: User;
+  role: UserRole;
 }
 
+export type UserRole = 'admin' | 'reviewer' | 'analyst' | 'viewer' | 'readonly';
+
 export interface User {
-  id: string;
-  email: string;
-  first_name: string;
-  last_name: string;
-  role: 'admin' | 'analyst' | 'reviewer' | 'viewer';
+  id: string | null;
+  username: string;
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  role: UserRole;
   permissions: string[];
   is_active: boolean;
+  created_at?: string | null;
   last_login?: string;
+  auth_method?: 'jwt' | 'api_key';
 }
 
 // Screening Types (matching backend)
@@ -252,6 +257,12 @@ export interface APIEntity {
 
   // PEP
   is_current_pep?: boolean;
+  pep_in_office?: boolean;
+  pep_monitoring_active?: boolean;
+  pep_status?: 'current_pep' | 'former_pep_in_monitoring' | 'ex_pep' | 'non_pep';
+  pep_monitoring_until?: string | null;
+  pep_last_office_end_date?: string | null;
+  pep_policy_years?: number;
   pep_category?: string;
 
   // Metadata
@@ -638,6 +649,24 @@ export interface SourceActivityResponse {
   total: number;
   counts: Record<string, number>;
   sources: SourceActivityEntry[];
+}
+
+export interface OperationsSummaryResponse {
+  execution_stats_7d?: {
+    total_runs?: number;
+    running?: number;
+    success?: number;
+    failed?: number;
+    skipped?: number;
+    skip_rate_pct?: number;
+    success_rate_pct?: number;
+    failure_rate_pct?: number;
+  };
+  workers?: {
+    count?: number;
+    names?: string[];
+  };
+  queues?: Record<string, number | null | undefined>;
 }
 
 export interface SourceRunDetail {

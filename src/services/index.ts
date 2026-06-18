@@ -1,4 +1,4 @@
-export { api, tokenManager, checkHealth } from './api';
+export { api, checkHealth } from './api';
 export { authService } from './auth';
 export { screeningService } from './screening';
 export { entityService } from './entities';

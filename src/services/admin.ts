@@ -8,6 +8,7 @@ import type {
   SourcesHealthOverviewResponse,
   SourceTimelineResponse,
   MonitoringOverviewResponse,
+  OperationsSummaryResponse,
   JobsResponse,
   SourceDetail,
   SystemHealth,
@@ -87,7 +88,7 @@ export const adminService = {
    * Update user
    */
   async updateUser(userId: string, updates: Partial<User>): Promise<User> {
-    const response = await api.put(`/api/v1/admin/users/${userId}`, updates);
+    const response = await api.patch(`/api/v1/admin/users/${userId}`, updates);
     return response.data;
   },
 
@@ -133,7 +134,7 @@ export const adminService = {
    * Clear cache
    */
   async clearCache(): Promise<{ message: string }> {
-    const response = await api.post('/api/v1/admin/cache/clear');
+    const response = await api.delete('/api/v1/admin/cache');
     return response.data;
   },
 
@@ -234,6 +235,13 @@ export const adminService = {
     const response = await api.get('/api/v2/admin/monitoring/overview', {
       params: { jobs_limit: 50 },
       timeout: 60000,
+    });
+    return response.data;
+  },
+
+  async getOperationsSummary(): Promise<OperationsSummaryResponse> {
+    const response = await api.get('/api/v2/admin/operations-summary', {
+      timeout: 20000,
     });
     return response.data;
   },

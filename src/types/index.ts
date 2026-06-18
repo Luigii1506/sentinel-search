@@ -343,7 +343,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'admin' | 'analyst' | 'reviewer' | 'viewer';
+  role: 'admin' | 'reviewer' | 'analyst' | 'viewer' | 'readonly';
   permissions: string[];
   lastLogin?: string;
   isActive: boolean;

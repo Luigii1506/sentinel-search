@@ -1,37 +1,15 @@
+import { Suspense, lazy, type ComponentType } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { Sidebar, TopbarMobile, useSidebarCollapse } from '@/components/Sidebar';
-import { CommandPalette, useCommandPalette } from '@/components/CommandPalette';
+import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
+import { useCommandPalette } from '@/hooks/useCommandPalette';
+import { ListPageSkeleton } from '@/components/foundation';
 import { cn } from '@/lib/utils';
-import { LoginPage } from '@/pages/auth/LoginPage';
-import { SignUpPage } from '@/pages/auth/SignUpPage';
-import { OAuthCallbackPage } from '@/pages/auth/OAuthCallbackPage';
-import { HomePage } from '@/pages/workspace/HomePage';
-import { SearchPage } from '@/pages/workspace/SearchPage';
-import { EntityProfilePage } from '@/pages/entity/EntityProfilePage';
-import { SourcesDashboardPage } from '@/pages/data/SourcesDashboardPage';
-import { MonitoringPage } from '@/pages/insights/MonitoringPage';
-import { OperationsPage } from '@/pages/insights/OperationsPage';
-import { BulkScreeningPage } from '@/pages/workspace/BulkScreeningPage';
-import { AuditPage } from '@/pages/data/AuditPage';
-import { MergeReviewPage } from '@/pages/review/MergeReviewPage';
-import { ComplianceDashboardPage } from '@/pages/compliance/ComplianceDashboardPage';
-import { CaseDetailPage } from '@/pages/compliance/CaseDetailPage';
-import ReportsPage from '@/pages/insights/ReportsPage';
-import { AdverseMediaPage } from '@/pages/compliance/AdverseMediaPage';
-import { FederatedSearchPage } from '@/pages/workspace/FederatedSearchPage';
-import { ResolverReviewPage } from '@/pages/review/ResolverReviewPage';
-import { ValidationReviewPage } from '@/pages/review/ValidationReviewPage';
-import ApiKeysPage from '@/pages/admin/ApiKeysPage';
-import UsersPage from '@/pages/admin/UsersPage';
-import ActivityLogPage from '@/pages/insights/ActivityLogPage';
-import WebhooksPage from '@/pages/admin/WebhooksPage';
-import { YenteCatalogPage } from '@/pages/data/YenteCatalogPage';
 import { RoleGate } from '@/components/RoleGate';
 import { PublicOnlyRoute } from '@/components/PublicOnlyRoute';
+import type { Role } from '@/hooks/usePermissions';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -44,6 +22,63 @@ const queryClient = new QueryClient({
   },
 });
 
+function lazyNamedPage<TModule extends Record<string, unknown>>(
+  loader: () => Promise<TModule>,
+  exportName: keyof TModule,
+) {
+  return lazy(async () => {
+    const module = await loader();
+    return { default: module[exportName] as ComponentType<any> };
+  });
+}
+
+const Sidebar = lazyNamedPage(() => import('@/components/Sidebar'), 'Sidebar');
+const TopbarMobile = lazyNamedPage(() => import('@/components/Sidebar'), 'TopbarMobile');
+const CommandPalette = lazyNamedPage(() => import('@/components/CommandPalette'), 'CommandPalette');
+const LoginPage = lazyNamedPage(() => import('@/pages/auth/LoginPage'), 'LoginPage');
+const SignUpPage = lazyNamedPage(() => import('@/pages/auth/SignUpPage'), 'SignUpPage');
+const OAuthCallbackPage = lazyNamedPage(() => import('@/pages/auth/OAuthCallbackPage'), 'OAuthCallbackPage');
+
+const HomePage = lazyNamedPage(() => import('@/pages/workspace/HomePage'), 'HomePage');
+const SearchPage = lazyNamedPage(() => import('@/pages/workspace/SearchPage'), 'SearchPage');
+const EntityProfilePage = lazyNamedPage(() => import('@/pages/entity/EntityProfilePage'), 'EntityProfilePage');
+const SourcesDashboardPage = lazyNamedPage(() => import('@/pages/data/SourcesDashboardPage'), 'SourcesDashboardPage');
+const MonitoringPage = lazyNamedPage(() => import('@/pages/insights/MonitoringPage'), 'MonitoringPage');
+const OperationsPage = lazyNamedPage(() => import('@/pages/insights/OperationsPage'), 'OperationsPage');
+const BulkScreeningPage = lazyNamedPage(() => import('@/pages/workspace/BulkScreeningPage'), 'BulkScreeningPage');
+const AuditPage = lazyNamedPage(() => import('@/pages/data/AuditPage'), 'AuditPage');
+const MergeReviewPage = lazyNamedPage(() => import('@/pages/review/MergeReviewPage'), 'MergeReviewPage');
+const ComplianceDashboardPage = lazyNamedPage(() => import('@/pages/compliance/ComplianceDashboardPage'), 'ComplianceDashboardPage');
+const CaseDetailPage = lazyNamedPage(() => import('@/pages/compliance/CaseDetailPage'), 'CaseDetailPage');
+const ReportsPage = lazy(() => import('@/pages/insights/ReportsPage'));
+const AdverseMediaPage = lazyNamedPage(() => import('@/pages/compliance/AdverseMediaPage'), 'AdverseMediaPage');
+const FederatedSearchPage = lazyNamedPage(() => import('@/pages/workspace/FederatedSearchPage'), 'FederatedSearchPage');
+const ResolverReviewPage = lazyNamedPage(() => import('@/pages/review/ResolverReviewPage'), 'ResolverReviewPage');
+const ValidationReviewPage = lazyNamedPage(() => import('@/pages/review/ValidationReviewPage'), 'ValidationReviewPage');
+const ApiKeysPage = lazy(() => import('@/pages/admin/ApiKeysPage'));
+const UsersPage = lazy(() => import('@/pages/admin/UsersPage'));
+const ActivityLogPage = lazy(() => import('@/pages/insights/ActivityLogPage'));
+const WebhooksPage = lazy(() => import('@/pages/admin/WebhooksPage'));
+const YenteCatalogPage = lazyNamedPage(() => import('@/pages/data/YenteCatalogPage'), 'YenteCatalogPage');
+
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(async () => {
+      const module = await import('@tanstack/react-query-devtools');
+      return { default: module.ReactQueryDevtools };
+    })
+  : null;
+
+function RouteLoadingFallback() {
+  return (
+    <ListPageSkeleton
+      showMetrics={false}
+      showFilters={false}
+      rowCount={4}
+      rowHeightClassName="h-24"
+    />
+  );
+}
+
 // Layout component for authenticated pages.
 //
 // Shell: persistent sidebar (240/60px) on lg+, off-canvas drawer + slim
@@ -53,15 +88,22 @@ const queryClient = new QueryClient({
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const { open, setOpen } = useCommandPalette();
   const { collapsed, toggle } = useSidebarCollapse();
+
   return (
     <>
-      <Sidebar
-        onToggleCommand={() => setOpen(true)}
-        collapsed={collapsed}
-        onToggleCollapse={toggle}
-      />
-      <TopbarMobile onToggleCommand={() => setOpen(true)} />
-      <CommandPalette open={open} onOpenChange={setOpen} />
+      <Suspense fallback={null}>
+        <Sidebar
+          onToggleCommand={() => setOpen(true)}
+          collapsed={collapsed}
+          onToggleCollapse={toggle}
+        />
+        <TopbarMobile onToggleCommand={() => setOpen(true)} />
+      </Suspense>
+      {open ? (
+        <Suspense fallback={null}>
+          <CommandPalette open={open} onOpenChange={setOpen} />
+        </Suspense>
+      ) : null}
       <main
         className={cn(
           'min-h-screen transition-[padding] duration-200',
@@ -71,6 +113,24 @@ function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
     </>
+  );
+}
+
+function GuardedPage({
+  children,
+  minimumRole = 'readonly',
+}: {
+  children: React.ReactNode;
+  minimumRole?: Role;
+}) {
+  return (
+    <AuthenticatedLayout>
+      <RoleGate minimumRole={minimumRole} redirectOnDenied>
+        <Suspense fallback={<RouteLoadingFallback />}>
+          {children}
+        </Suspense>
+      </RoleGate>
+    </AuthenticatedLayout>
   );
 }
 
@@ -86,7 +146,9 @@ function App() {
                 path="/login"
                 element={
                   <PublicOnlyRoute>
-                    <LoginPage />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <LoginPage />
+                    </Suspense>
                   </PublicOnlyRoute>
                 }
               />
@@ -94,7 +156,9 @@ function App() {
                 path="/signup"
                 element={
                   <PublicOnlyRoute>
-                    <SignUpPage />
+                    <Suspense fallback={<RouteLoadingFallback />}>
+                      <SignUpPage />
+                    </Suspense>
                   </PublicOnlyRoute>
                 }
               />
@@ -102,140 +166,134 @@ function App() {
                   its whole job is to flip the user FROM anonymous TO
                   authenticated, so the guard would race the token write
                   and bounce us before we got to set the session. */}
-              <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+              <Route
+                path="/auth/callback"
+                element={
+                  <Suspense fallback={<RouteLoadingFallback />}>
+                    <OAuthCallbackPage />
+                  </Suspense>
+                }
+              />
               
               {/* Public Routes */}
               <Route
                 path="/"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage>
                     <HomePage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/search"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage>
                     <SearchPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/entity/:id"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage>
                     <EntityProfilePage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/screening/bulk"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="analyst">
                     <BulkScreeningPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/federated"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage>
                     <FederatedSearchPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/resolver-review"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <ResolverReviewPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/validation-review"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <ValidationReviewPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
-              {/* Admin Routes - Public for now */}
               <Route
                 path="/admin/users"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="admin">
-                      <UsersPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <UsersPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/api-keys"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="admin">
-                      <ApiKeysPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <ApiKeysPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/activity-log"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="reviewer">
-                      <ActivityLogPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <ActivityLogPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/webhooks"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="admin">
-                      <WebhooksPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <WebhooksPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/sources"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="admin">
-                      <SourcesDashboardPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <SourcesDashboardPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/data/yente-catalog"
                 element={
-                  <AuthenticatedLayout>
-                    <RoleGate minimumRole="admin">
-                      <YenteCatalogPage />
-                    </RoleGate>
-                  </AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
+                    <YenteCatalogPage />
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/audit"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="admin">
                     <AuditPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/admin/merges"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <MergeReviewPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               
@@ -243,9 +301,9 @@ function App() {
               <Route
                 path="/adverse-media"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="analyst">
                     <AdverseMediaPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
 
@@ -253,57 +311,44 @@ function App() {
               <Route
                 path="/compliance"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="analyst">
                     <ComplianceDashboardPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/compliance/cases/:caseId"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="analyst">
                     <CaseDetailPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
 
-              {/* All Routes Public for now */}
               <Route
                 path="/operations"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <OperationsPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/monitoring"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <MonitoringPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
               />
               <Route
                 path="/reports"
                 element={
-                  <AuthenticatedLayout>
+                  <GuardedPage minimumRole="reviewer">
                     <ReportsPage />
-                  </AuthenticatedLayout>
+                  </GuardedPage>
                 }
-              />
-              <Route
-                path="/settings"
-                element={
-                  <AuthenticatedLayout>
-                    <div className="pt-24 px-8">
-                      <h1 className="text-2xl font-bold mb-4">Configuración</h1>
-                      <p className="text-gray-400">Configuración del sistema (Próximamente)</p>
-                    </div>
-                  </AuthenticatedLayout>
-                }
-              />
-              
+              />              
               {/* Catch all */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -321,7 +366,11 @@ function App() {
           </div>
         </Router>
       </AuthProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      {ReactQueryDevtools && (
+        <Suspense fallback={null}>
+          <ReactQueryDevtools initialIsOpen={false} />
+        </Suspense>
+      )}
     </QueryClientProvider>
   );
 }
