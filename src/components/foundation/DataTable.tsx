@@ -99,7 +99,7 @@ export function DataTable<T>({
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-sm">
           <thead className={cn(stickyHeader && 'sticky top-0 bg-card z-10')}>
-            <tr className="border-b border-navy-500 text-left text-xs uppercase tracking-wide text-navy-200">
+            <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
               {columns.map((col) => (
                 <th
                   key={col.id}
@@ -117,8 +117,8 @@ export function DataTable<T>({
                 key={getRowId(row)}
                 onClick={onRowClick ? () => onRowClick(row) : undefined}
                 className={cn(
-                  'border-b border-navy-600/40 transition-colors',
-                  onRowClick && 'hover:bg-navy-700/60 cursor-pointer',
+                  'border-b border-border/40 transition-colors',
+                  onRowClick && 'hover:bg-muted/60 cursor-pointer',
                 )}
               >
                 {columns.map((col) => (
@@ -136,18 +136,18 @@ export function DataTable<T>({
       </div>
 
       {/* ───────── Mobile < md (stacked cards) ───────── */}
-      <div className="md:hidden divide-y divide-navy-600/40">
+      <div className="md:hidden divide-y divide-border/40">
         {data.map((row, i) => (
           <div
             key={getRowId(row)}
             onClick={onRowClick ? () => onRowClick(row) : undefined}
             className={cn(
               'p-4 space-y-2',
-              onRowClick && 'hover:bg-navy-700/60 cursor-pointer active:bg-navy-700',
+              onRowClick && 'hover:bg-muted/60 cursor-pointer active:bg-muted',
             )}
           >
             {/* Primary column = card heading */}
-            <div className="text-sm font-medium text-white">
+            <div className="text-sm font-medium text-foreground">
               {primaryCol.cell(row, i)}
             </div>
             {/* Remaining columns as label/value list */}
@@ -155,10 +155,10 @@ export function DataTable<T>({
               <dl className="grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
                 {mobileCols.map((col) => (
                   <div key={col.id} className="contents">
-                    <dt className="text-navy-200 truncate">
+                    <dt className="text-muted-foreground truncate">
                       {col.mobileLabel ?? col.header}
                     </dt>
-                    <dd className="text-navy-50 text-right truncate">
+                    <dd className="text-muted-foreground text-right truncate">
                       {col.cell(row, i)}
                     </dd>
                   </div>

@@ -195,8 +195,8 @@ export function OptimizedSearch({
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="w-full pl-12 pr-24 py-6 text-lg bg-white/5 border-white/10 
-                     text-white placeholder:text-gray-500 rounded-xl
+          className="w-full pl-12 pr-24 py-6 text-lg bg-foreground/5 border-foreground/10
+                     text-foreground placeholder:text-gray-500 rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
                      transition-all duration-200"
         />
@@ -205,7 +205,7 @@ export function OptimizedSearch({
           {query && (
             <button
               onClick={clearSearch}
-              className="p-1 hover:bg-white/10 rounded-full transition-colors"
+              className="p-1 hover:bg-foreground/10 rounded-full transition-colors"
             >
               <XCircle className="w-5 h-5 text-gray-400" />
             </button>
@@ -252,7 +252,7 @@ export function OptimizedSearch({
                     "px-3 py-1 rounded-full text-xs font-medium border transition-all duration-200",
                     sourceLevel === level
                       ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                      : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20 hover:text-gray-300"
+                      : "bg-foreground/5 text-gray-400 border-foreground/10 hover:border-foreground/20 hover:text-gray-300"
                   )}
                 >
                   {label}
@@ -400,14 +400,14 @@ export function OptimizedSearch({
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
                 onClick={() => onResultSelect?.(result)}
-                className="p-4 rounded-lg bg-white/5 hover:bg-white/10 
-                           border border-white/10 hover:border-white/20
+                className="p-4 rounded-lg bg-foreground/5 hover:bg-foreground/10 
+                           border border-foreground/10 hover:border-foreground/20
                            cursor-pointer transition-all duration-200
                            flex items-center justify-between group"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-white font-medium group-hover:text-blue-400 
+                    <span className="text-foreground font-medium group-hover:text-blue-400
                                    transition-colors">
                       {result.name}
                     </span>
@@ -456,13 +456,13 @@ export function OptimizedSearch({
                         <Badge 
                           key={source}
                           variant="secondary" 
-                          className="text-xs bg-white/5"
+                          className="text-xs bg-foreground/5"
                         >
                           {source}
                         </Badge>
                       ))}
                       {result.sources.length > 3 && (
-                        <Badge variant="secondary" className="text-xs bg-white/5">
+                        <Badge variant="secondary" className="text-xs bg-foreground/5">
                           +{result.sources.length - 3}
                         </Badge>
                       )}

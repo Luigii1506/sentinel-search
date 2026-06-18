@@ -37,7 +37,7 @@ export function SourceLevelSelector({ value, onChange, className, size = 'md' }:
                   size === 'sm' ? 'px-2.5 py-1 rounded-full text-[10px]' : 'px-3 py-1.5 rounded-full text-xs',
                   value === level
                     ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                    : "bg-white/5 text-gray-400 border-white/10 hover:border-white/20 hover:text-gray-300"
+                    : "bg-foreground/5 text-gray-400 border-foreground/10 hover:border-foreground/20 hover:text-gray-300"
                 )}
               >
                 {label}

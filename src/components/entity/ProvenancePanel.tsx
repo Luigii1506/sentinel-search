@@ -45,7 +45,7 @@ export function ProvenancePanel({ entityId }: Props) {
   };
 
   if (isLoading) {
-    return <PanelSkeleton className="rounded-xl border border-white/5 bg-white/[0.02] p-6" lines={8} />;
+    return <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={8} />;
   }
 
   if (error) {

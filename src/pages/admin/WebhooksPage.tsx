@@ -113,7 +113,7 @@ export default function WebhooksPage() {
         {/* Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">
+            <CardTitle className="text-lg text-foreground">
               Webhooks registrados {webhooks ? `(${webhooks.length})` : ''}
             </CardTitle>
           </CardHeader>
@@ -123,7 +123,7 @@ export default function WebhooksPage() {
                 {[0, 1, 2].map((i) => (
                   <PanelSkeleton
                     key={i}
-                    className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                    className="rounded-lg border border-foreground/5 bg-foreground/[0.02] p-4"
                     lines={3}
                     titleWidthClassName="w-40"
                   />
@@ -142,12 +142,12 @@ export default function WebhooksPage() {
                 }
               />
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-foreground/5">
                 {webhooks.map((w) => (
-                  <div key={w.id} className="p-4 hover:bg-white/5 flex items-start gap-4">
+                  <div key={w.id} className="p-4 hover:bg-foreground/5 flex items-start gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-white font-medium">{w.name}</span>
+                        <span className="text-foreground font-medium">{w.name}</span>
                         <StatusPill
                           kind={w.is_active ? 'success' : 'neutral'}
                           label={w.is_active ? 'Activo' : 'Inactivo'}
@@ -237,7 +237,7 @@ export default function WebhooksPage() {
         title="¿Eliminar este webhook?"
         description={
           <>
-            <strong className="text-white">{deleteTarget?.name}</strong> dejará de
+            <strong className="text-foreground">{deleteTarget?.name}</strong> dejará de
             recibir eventos inmediatamente. Esta acción no se puede deshacer.
           </>
         }
@@ -335,7 +335,7 @@ function CreateWebhookDialog({
               {ALL_EVENTS.map((ev) => (
                 <label
                   key={ev.id}
-                  className="flex items-start gap-2 p-2 rounded-lg hover:bg-white/5 cursor-pointer"
+                  className="flex items-start gap-2 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer"
                 >
                   <Checkbox
                     checked={selectedEvents.includes(ev.id)}
@@ -343,7 +343,7 @@ function CreateWebhookDialog({
                     className="mt-0.5"
                   />
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm text-white font-medium font-mono">{ev.id}</div>
+                    <div className="text-sm text-foreground font-medium font-mono">{ev.id}</div>
                     <div className="text-xs text-gray-500">{ev.description}</div>
                   </div>
                 </label>
@@ -412,13 +412,13 @@ function SecretDialog({
           <div className="space-y-4 py-2">
             <div className="space-y-1">
               <Label>Webhook</Label>
-              <div className="text-sm text-white">{data.name}</div>
+              <div className="text-sm text-foreground">{data.name}</div>
             </div>
 
             <div className="space-y-1.5">
               <Label>Signing secret</Label>
               <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/10 font-mono text-sm text-purple-300 break-all">
+                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-foreground/10 font-mono text-sm text-purple-300 break-all">
                   {visible ? data.secret : '•'.repeat(40)}
                 </div>
                 <Button

@@ -57,14 +57,14 @@ export function UsageIndicator() {
           aria-label={`Búsquedas: ${used_today}/${daily_limit}`}
           className={cn(
             'hidden sm:flex items-center gap-2 px-2.5 h-9 rounded-lg',
-            'hover:bg-white/5 transition-colors group',
+            'hover:bg-foreground/5 transition-colors group',
           )}
         >
           <Zap className={cn('w-3.5 h-3.5', textColor)} />
           <span className={cn('text-xs font-medium tabular-nums', textColor)}>
             {used_today}/{daily_limit}
           </span>
-          <div className="hidden md:block w-16 h-1 rounded-full bg-white/10 overflow-hidden">
+          <div className="hidden md:block w-16 h-1 rounded-full bg-foreground/10 overflow-hidden">
             <div
               className={cn('h-full transition-all', barColor)}
               style={{ width: `${pct}%` }}
@@ -74,11 +74,11 @@ export function UsageIndicator() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-white">Plan {PLAN_LABEL[plan ?? 'free']}</span>
+          <span className="text-sm font-medium text-foreground">Plan {PLAN_LABEL[plan ?? 'free']}</span>
           <span className="text-xs text-gray-500">{used_today} / {daily_limit} hoy</span>
         </div>
 
-        <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden mb-3">
+        <div className="w-full h-1.5 rounded-full bg-foreground/10 overflow-hidden mb-3">
           <div
             className={cn('h-full transition-all', barColor)}
             style={{ width: `${pct}%` }}

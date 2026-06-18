@@ -78,7 +78,7 @@ export function HealthIndicator() {
           type="button"
           aria-label={`Estado del sistema: ${STATUS_LABEL[overall]}`}
           title={`Estado del sistema: ${STATUS_LABEL[overall]}`}
-          className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-white/5 transition-colors"
+          className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-foreground/5 transition-colors"
         >
           <Icon className="w-5 h-5 text-gray-400" />
           <span
@@ -93,7 +93,7 @@ export function HealthIndicator() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <span className={cn('w-2.5 h-2.5 rounded-full', STATUS_COLOR[overall])} />
-            <span className="text-sm font-medium text-white">
+            <span className="text-sm font-medium text-foreground">
               {STATUS_LABEL[overall]}
             </span>
           </div>
@@ -104,7 +104,7 @@ export function HealthIndicator() {
           )}
         </div>
 
-        <div className="border-t border-white/10 pt-2 space-y-0.5">
+        <div className="border-t border-foreground/10 pt-2 space-y-0.5">
           {health
             ? Object.entries(health.services).map(([name, svc]) => (
                 <ServiceRow key={name} name={name} svc={svc} />
@@ -117,7 +117,7 @@ export function HealthIndicator() {
         </div>
 
         {health?.warnings && health.warnings.length > 0 && (
-          <div className="border-t border-white/10 mt-3 pt-2">
+          <div className="border-t border-foreground/10 mt-3 pt-2">
             <p className="text-[10px] uppercase text-gray-500 mb-1.5">Avisos</p>
             <ul className="space-y-1">
               {health.warnings.map((w, i) => (

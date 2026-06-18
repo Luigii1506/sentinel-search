@@ -53,7 +53,7 @@ function ForbiddenPanel({ reason }: { reason?: 'login_required' }) {
     <div className="min-h-[60vh] flex items-center justify-center p-8">
       <div className="glass rounded-xl p-8 max-w-md text-center">
         <Shield className="w-12 h-12 text-amber-400 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-white mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           {reason === 'login_required' ? 'Inicia sesión' : 'Acceso restringido'}
         </h2>
         <p className="text-sm text-gray-400 mb-2">

@@ -262,8 +262,8 @@ export function BulkScreeningPage() {
                   <Card
                     className={cn(
                       'border-2 border-dashed transition-colors',
-                      isDragging ? 'border-blue-500 bg-blue-500/5' : 'border-white/10',
-                      file ? 'bg-green-500/5 border-green-500/30' : 'bg-brand-navy'
+                      isDragging ? 'border-blue-500 bg-blue-500/5' : 'border-foreground/10',
+                      file ? 'bg-green-500/5 border-green-500/30' : 'bg-card'
                     )}
                     onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
                     onDragLeave={() => setIsDragging(false)}
@@ -283,7 +283,7 @@ export function BulkScreeningPage() {
                           <div className="flex items-center gap-2 min-w-0">
                             <FileText className="w-8 h-8 text-green-400" />
                             <div className="text-left min-w-0">
-                              <p className="text-white font-medium break-all">{file.name}</p>
+                              <p className="text-foreground font-medium break-all">{file.name}</p>
                               <p className="text-sm text-gray-400">
                                 {(file.size / 1024).toFixed(1)} KB
                               </p>
@@ -303,7 +303,7 @@ export function BulkScreeningPage() {
                           className="cursor-pointer"
                         >
                           <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                          <p className="text-white font-medium mb-2">
+                          <p className="text-foreground font-medium mb-2">
                             Arrastra un archivo CSV o haz click para seleccionar
                           </p>
                           <p className="text-sm text-gray-500">
@@ -319,16 +319,16 @@ export function BulkScreeningPage() {
               {/* Text Input */}
               {inputMethod === 'text' && (
                 <motion.div variants={itemVariants}>
-                  <Card className="bg-brand-navy border-white/5">
+                  <Card className="bg-card border-foreground/5">
                     <CardHeader>
-                      <CardTitle className="text-white">Nombres a buscar</CardTitle>
+                      <CardTitle className="text-foreground">Nombres a buscar</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Textarea
                         value={namesText}
                         onChange={(e) => setNamesText(e.target.value)}
                         placeholder="Pega los nombres aqui, uno por linea...&#10;Ejemplo:&#10;Juan Perez&#10;Maria Garcia&#10;Carlos Lopez"
-                        className="min-h-[200px] bg-brand-carbon border-white/10 text-white placeholder:text-gray-600"
+                        className="min-h-[200px] bg-background border-foreground/10 text-foreground placeholder:text-gray-600"
                       />
                       <p className="text-sm text-gray-500 mt-2">
                         {parseNamesFromText().length} nombres detectados
@@ -340,9 +340,9 @@ export function BulkScreeningPage() {
 
               {/* Min Score Slider */}
               <motion.div variants={itemVariants}>
-                <Card className="bg-brand-navy border-white/5">
+                <Card className="bg-card border-foreground/5">
                   <CardHeader>
-                    <CardTitle className="text-white flex items-center justify-between">
+                    <CardTitle className="text-foreground flex items-center justify-between">
                       <span>Score minimo de coincidencia</span>
                       <Badge variant="outline" className="text-lg">
                         {Math.round(minScore * 100)}%
@@ -391,7 +391,7 @@ export function BulkScreeningPage() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
             >
-              <Card className="bg-brand-navy border-white/5 p-8">
+              <Card className="bg-card border-foreground/5 p-8">
                 <div className="text-center">
                   <div className="relative w-24 h-24 mx-auto mb-6">
                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
@@ -426,12 +426,12 @@ export function BulkScreeningPage() {
                     </div>
                   </div>
                   
-                  <h2 className="text-2xl font-bold text-white mb-2">Procesando...</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Procesando...</h2>
                   <p className="text-gray-400 mb-6">
                     {job?.processed} de {job?.total} nombres procesados
                   </p>
                   
-                  <div className="w-full max-w-md mx-auto bg-white/10 rounded-full h-2 mb-4">
+                  <div className="w-full max-w-md mx-auto bg-foreground/10 rounded-full h-2 mb-4">
                     <div
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${((job?.processed || 0) / (job?.total || 1)) * 100}%` }}
@@ -464,11 +464,11 @@ export function BulkScreeningPage() {
             >
               {/* Summary */}
               <motion.div variants={itemVariants}>
-                <Card className="bg-brand-navy border-white/5">
+                <Card className="bg-card border-foreground/5">
                   <CardContent className="p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
-                        <h2 className="text-2xl font-bold text-white mb-1">Resultados</h2>
+                        <h2 className="text-2xl font-bold text-foreground mb-1">Resultados</h2>
                         <p className="text-gray-400">
                           {job?.completed_count} procesados · {job?.failed_count} fallidos
                         </p>
@@ -503,10 +503,10 @@ export function BulkScreeningPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: Math.min(index * 0.02, 0.3) }}
                       >
-                        <Card className="bg-brand-navy border-white/5">
+                        <Card className="bg-card border-foreground/5">
                           <CardContent className="p-4 space-y-3">
                             <div className="flex items-start justify-between gap-3">
-                              <p className="text-sm text-white break-words">{result.query}</p>
+                              <p className="text-sm text-foreground break-words">{result.query}</p>
                               {result.status === 'found' ? (
                                 <Badge className="bg-green-500/10 text-green-400 border-green-500/20">Encontrado</Badge>
                               ) : result.status === 'not_found' ? (
@@ -550,10 +550,10 @@ export function BulkScreeningPage() {
                     ))}
                   </div>
 
-                  <Card className="hidden md:block bg-brand-navy border-white/5">
+                  <Card className="hidden md:block bg-card border-foreground/5">
                     <div className="overflow-x-auto">
                       <table className="w-full">
-                        <thead className="bg-white/5 border-b border-white/5">
+                        <thead className="bg-foreground/5 border-b border-foreground/5">
                           <tr>
                             <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
                               Nombre Buscado
@@ -572,17 +572,17 @@ export function BulkScreeningPage() {
                             </th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-foreground/5">
                           {job.results.map((result, index) => (
                             <motion.tr
                               key={index}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               transition={{ delay: index * 0.02 }}
-                              className="hover:bg-white/5 transition-colors"
+                              className="hover:bg-foreground/5 transition-colors"
                             >
                               <td className="px-6 py-4">
-                                <span className="text-sm text-white">{result.query}</span>
+                                <span className="text-sm text-foreground">{result.query}</span>
                               </td>
                               <td className="px-6 py-4 text-center">
                                 {result.status === 'found' ? (

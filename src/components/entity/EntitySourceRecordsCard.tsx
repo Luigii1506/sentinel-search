@@ -48,14 +48,14 @@ export function EntitySourceRecordsCard({
         </h3>
         <div className="space-y-2">
           {sourceRecords.map((rec, i) => (
-            <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.03]">
+            <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-foreground/[0.03]">
               {rec.category && (
-                <Badge variant="outline" className={cn('text-[10px] shrink-0', catColors[rec.category] || 'bg-white/5 text-gray-400')}>
+                <Badge variant="outline" className={cn('text-[10px] shrink-0', catColors[rec.category] || 'bg-foreground/5 text-gray-400')}>
                   {catLabels[rec.category] || rec.category}
                 </Badge>
               )}
               <div className="flex-1 min-w-0">
-                <span className="text-sm text-white">{rec.source_display || formatSourceName(rec.source) || rec.source}</span>
+                <span className="text-sm text-foreground">{rec.source_display || formatSourceName(rec.source) || rec.source}</span>
                 {rec.country && (
                   <span className="text-[10px] text-gray-500 ml-2">{countryNames[rec.country] || rec.country}</span>
                 )}

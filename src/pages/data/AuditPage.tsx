@@ -293,7 +293,7 @@ export function AuditPage() {
             className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"
           >
             {/* Cobertura 24h */}
-            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
+            <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-gray-400 uppercase tracking-wide">Cobertura últimas 24h</span>
@@ -304,10 +304,10 @@ export function AuditPage() {
                     {healthOverview.coverage_24h.coverage_pct}%
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-white mb-2">
+                <div className="text-2xl font-bold text-foreground mb-2">
                   {healthOverview.coverage_24h.synced_in_24h} <span className="text-base text-gray-500 font-normal">/ {healthOverview.coverage_24h.total_active_sources}</span>
                 </div>
-                <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+                <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden">
                   <div
                     className={`h-full ${
                       healthOverview.coverage_24h.coverage_pct >= 80 ? 'bg-green-400' :
@@ -323,7 +323,7 @@ export function AuditPage() {
             </Card>
 
             {/* Health buckets */}
-            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
+            <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
                 <span className="text-xs text-gray-400 uppercase tracking-wide">Estado de salud</span>
                 <div className="grid grid-cols-4 gap-2 mt-2">
@@ -348,7 +348,7 @@ export function AuditPage() {
             </Card>
 
             {/* Próximos syncs */}
-            <Card className="bg-brand-navy border-white/5 lg:col-span-1">
+            <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
                 <span className="text-xs text-gray-400 uppercase tracking-wide">Próximos syncs</span>
                 <div className="mt-2 space-y-1.5 max-h-[120px] overflow-y-auto">
@@ -386,40 +386,40 @@ export function AuditPage() {
             label="Catalogo"
             value={sourcesData?.total_registered || 0}
             icon={Database}
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
           <MetricCard
             label="Monitoreadas"
             value={monitoredSources}
             icon={ShieldCheck}
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
           <MetricCard
             label="Saludables"
             value={byStatus.healthy || 0}
             icon={CheckCircle2}
             accent="success"
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
           <MetricCard
             label="En atención"
             value={byStatus.warning || 0}
             icon={AlertTriangle}
             accent="amber"
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
           <MetricCard
             label="Críticas"
             value={byStatus.critical || 0}
             icon={XCircle}
             accent="red"
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
           <MetricCard
             label="Inactivas"
             value={byStatus.inactive || inactiveSources}
             icon={Clock}
-            className="bg-brand-navy border-white/5"
+            className="bg-card border-foreground/5"
           />
         </motion.div>
 
@@ -430,17 +430,17 @@ export function AuditPage() {
             animate={{ opacity: 1, y: 0 }}
             className="mb-8"
           >
-            <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-400" />
               Jobs Fallidos Recientes
               <Badge className="bg-red-500/10 text-red-400 border-red-500/20">{recentFailed.length}</Badge>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {recentFailed.slice(0, 6).map((job) => (
-                <Card key={job.id} className="bg-brand-navy border-red-500/10">
+                <Card key={job.id} className="bg-card border-red-500/10">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-white">{job.source}</span>
+                      <span className="text-sm font-medium text-foreground">{job.source}</span>
                       <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/20">
                         Fallido
                       </Badge>
@@ -468,16 +468,16 @@ export function AuditPage() {
               placeholder="Buscar por fuente, nombre o pais..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-brand-navy border-white/10 text-white"
+              className="pl-10 bg-card border-foreground/10 text-foreground"
             />
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-[200px] bg-brand-navy border-white/10 text-white">
+            <SelectTrigger className="w-full md:w-[200px] bg-card border-foreground/10 text-foreground">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Filtrar por estado" />
             </SelectTrigger>
-            <SelectContent className="bg-brand-navy border-white/10">
+            <SelectContent className="bg-card border-foreground/10">
               <SelectItem value="all">Todos los estados</SelectItem>
               <SelectItem value="critical">Crítico</SelectItem>
               <SelectItem value="warning">Atención</SelectItem>
@@ -493,15 +493,15 @@ export function AuditPage() {
             animate={{ opacity: 1, y: 0 }}
             className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8"
           >
-            <Card className="bg-brand-navy border-white/5">
+            <Card className="bg-card border-foreground/5">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold text-white mb-3">Fuentes Desaparecidas</h2>
+                <h2 className="text-base font-semibold text-foreground mb-3">Fuentes Desaparecidas</h2>
                 <div className="space-y-2">
                   {disappearedMarked.length > 0 ? disappearedMarked.slice(0, 6).map((item: any) => (
-                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3">
+                    <div key={item.source_id} className="rounded-lg bg-foreground/5 p-3">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-sm text-white font-medium">{item.source_id}</p>
+                          <p className="text-sm text-foreground font-medium">{item.source_id}</p>
                           <p className="text-xs text-gray-500">{formatDate(item.updated_at)}</p>
                         </div>
                         <StatusBadge status={item.status} />
@@ -523,20 +523,20 @@ export function AuditPage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-brand-navy border-white/5">
+            <Card className="bg-card border-foreground/5">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold text-white mb-3">Eventos de Lifecycle</h2>
+                <h2 className="text-base font-semibold text-foreground mb-3">Eventos de Lifecycle</h2>
                 <div className="space-y-2">
                   {lifecycleEvents.length > 0 ? lifecycleEvents.slice(0, 6).map((event: any) => (
-                    <div key={event.id} className="rounded-lg bg-white/5 p-3">
+                    <div key={event.id} className="rounded-lg bg-foreground/5 p-3">
                       <div className="flex items-center justify-between gap-3">
                         <div>
-                          <p className="text-sm text-white font-medium">{event.source_id}</p>
+                          <p className="text-sm text-foreground font-medium">{event.source_id}</p>
                           <p className="text-xs text-gray-500">
                             {event.event_type} · {event.triggered_by} · {formatDate(event.created_at)}
                           </p>
                         </div>
-                        <Badge variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+                        <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
                           {event.entity_source_id || 'source'}
                         </Badge>
                       </div>
@@ -564,7 +564,7 @@ export function AuditPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-gray-400" />
               Fuentes de Datos
               <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/20">{sources.length}</Badge>
@@ -581,11 +581,11 @@ export function AuditPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: Math.min(index * 0.02, 0.3) }}
                 >
-                  <Card className="bg-brand-navy border-white/5">
+                  <Card className="bg-card border-foreground/5">
                     <CardContent className="p-4 space-y-3">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="text-sm font-medium text-white break-words">{source.source_id}</p>
+                          <p className="text-sm font-medium text-foreground break-words">{source.source_id}</p>
                           <p className="text-xs text-gray-500 break-words">{source.display_name}</p>
                         </div>
                         <StatusBadge status={source.audit_status} />
@@ -615,7 +615,7 @@ export function AuditPage() {
                         </div>
                       </div>
                       {source.is_active !== false && source.is_historical !== true && (
-                        <div className="pt-2 border-t border-white/5">
+                        <div className="pt-2 border-t border-foreground/5">
                           <SyncSourceButton
                             sourceId={source.source_id}
                             invalidateKeys={[['admin', 'sources'], ['admin', 'jobs'], ['operations']]}
@@ -629,13 +629,13 @@ export function AuditPage() {
             })}
           </div>
 
-          <Card className="hidden md:block bg-brand-navy border-white/5">
+          <Card className="hidden md:block bg-card border-foreground/5">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-white/5 border-b border-white/5">
+                <thead className="bg-foreground/5 border-b border-foreground/5">
                   <tr>
                     <th
-                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4 cursor-pointer hover:text-white"
+                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('source_id')}
                     >
                       Fuente <SortIcon field="source_id" />
@@ -644,7 +644,7 @@ export function AuditPage() {
                       Categoria
                     </th>
                     <th
-                      className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-white"
+                      className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('status')}
                     >
                       Estado <SortIcon field="status" />
@@ -653,13 +653,13 @@ export function AuditPage() {
                       Salud
                     </th>
                     <th
-                      className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-white"
+                      className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('bronze_count')}
                     >
                       Records <SortIcon field="bronze_count" />
                     </th>
                     <th
-                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-white"
+                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('last_sync')}
                     >
                       Ultimo Sync <SortIcon field="last_sync" />
@@ -672,7 +672,7 @@ export function AuditPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-foreground/5">
                   {sources.map((source, index) => {
                     const freshness = freshnessLabel(source.audit_last_sync);
                     return (
@@ -681,11 +681,11 @@ export function AuditPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: Math.min(index * 0.01, 0.5) }}
-                        className="hover:bg-white/5 transition-colors"
+                        className="hover:bg-foreground/5 transition-colors"
                       >
                         <td className="px-6 py-3">
                           <div>
-                            <p className="text-sm font-medium text-white">{source.source_id}</p>
+                            <p className="text-sm font-medium text-foreground">{source.source_id}</p>
                             <p className="text-xs text-gray-500">{source.display_name}</p>
                           </div>
                         </td>

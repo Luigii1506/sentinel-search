@@ -37,13 +37,13 @@ export function ListPageSkeleton({
         {showFilters && (
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="h-11 rounded-lg bg-white/10" />
+              <Skeleton key={i} className="h-11 rounded-lg bg-foreground/10" />
             ))}
           </div>
         )}
         <div className="space-y-3">
           {Array.from({ length: rowCount }).map((_, i) => (
-            <Skeleton key={i} className={cn('rounded-xl bg-white/10', rowHeightClassName)} />
+            <Skeleton key={i} className={cn('rounded-xl bg-foreground/10', rowHeightClassName)} />
           ))}
         </div>
       </div>

@@ -36,7 +36,7 @@ export function PublicTrajectoryCard({
   return (
     <div className="glass rounded-xl p-6">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-lg font-medium text-white flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
           <Landmark className="w-5 h-5 text-purple-400" />
           Trayectoria pública
         </h3>
@@ -46,17 +46,17 @@ export function PublicTrajectoryCard({
               {pepBadgeLabel}
             </Badge>
           )}
-          <Badge variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+          <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
             {unifiedCareerEntries.length} cargo{unifiedCareerEntries.length !== 1 ? 's' : ''}
           </Badge>
         </div>
       </div>
       <div className="space-y-3">
         {unifiedCareerEntries.slice(0, 6).map((entry, i) => (
-          <div key={entry.id || i} className={cn('p-3 rounded-lg border-l-2', entry.is_pep ? 'bg-purple-500/5 border-purple-500/50' : 'bg-white/[0.02] border-sky-500/20')}>
+          <div key={entry.id || i} className={cn('p-3 rounded-lg border-l-2', entry.is_pep ? 'bg-purple-500/5 border-purple-500/50' : 'bg-foreground/[0.02] border-sky-500/20')}>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-white font-medium break-words">{entry.title}</p>
+                <p className="text-sm text-foreground font-medium break-words">{entry.title}</p>
                 {(entry.context || entry.source) && (
                   <p className="text-xs text-gray-400 break-words">{entry.context || formatSourceName(entry.source || '')}</p>
                 )}

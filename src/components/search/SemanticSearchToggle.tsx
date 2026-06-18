@@ -19,7 +19,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
     <TooltipProvider>
       <div className={cn('flex flex-col sm:flex-row sm:items-center gap-2', className)}>
         {/* Toggle Switch */}
-        <div className="flex w-full sm:w-auto items-center bg-white/5 rounded-xl p-1 border border-white/10 overflow-x-auto">
+        <div className="flex w-full sm:w-auto items-center bg-foreground/5 rounded-xl p-1 border border-foreground/10 overflow-x-auto">
           {/* Traditional Button */}
           <button
             onClick={() => onChange('traditional')}
@@ -27,7 +27,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
               'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'traditional'
                 ? 'bg-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5'
             )}
           >
             <Search className="w-4 h-4" />
@@ -41,19 +41,19 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
               'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'semantic'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5'
             )}
           >
             <Brain className="w-4 h-4" />
             <span className="hidden sm:inline">Smart Search</span>
-            <span className="ml-1 text-[10px] bg-white/20 px-1.5 py-0.5 rounded-full">v5.0</span>
+            <span className="ml-1 text-[10px] bg-foreground/20 px-1.5 py-0.5 rounded-full">v5.0</span>
           </button>
         </div>
 
         {/* Info Tooltip */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="hidden sm:inline-flex p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400">
+            <button className="hidden sm:inline-flex p-2 rounded-lg hover:bg-foreground/10 transition-colors text-gray-400">
               <Info className="w-4 h-4" />
             </button>
           </TooltipTrigger>

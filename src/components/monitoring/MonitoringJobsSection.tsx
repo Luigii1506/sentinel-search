@@ -71,7 +71,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
           <Play className="w-5 h-5 text-blue-400" />
           Jobs en Ejecucion
           {jobs?.running && jobs.running.length > 0 && (
@@ -90,11 +90,11 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card className="bg-brand-navy border-blue-500/20">
+                <Card className="bg-card border-blue-500/20">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-medium text-white">{job.source}</p>
+                        <p className="font-medium text-foreground">{job.source}</p>
                         <p className="text-xs text-gray-500">ID: {job.id.slice(0, 8)}...</p>
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-500/10">
@@ -110,7 +110,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Procesados:</span>
-                        <span className="text-white">
+                        <span className="text-foreground">
                           {job.records_processed > 0
                             ? job.records_processed.toLocaleString()
                             : job.records_inserted > 0
@@ -120,16 +120,16 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Tiempo:</span>
-                        <span className="text-white">{formatElapsed(job.elapsed_seconds)}</span>
+                        <span className="text-foreground">{formatElapsed(job.elapsed_seconds)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Inicio:</span>
-                        <span className="text-white">{formatDate(job.started_at)}</span>
+                        <span className="text-foreground">{formatDate(job.started_at)}</span>
                       </div>
                     </div>
 
                     <div className="mt-3">
-                      <div className="w-full bg-white/10 rounded-full h-1.5">
+                      <div className="w-full bg-foreground/10 rounded-full h-1.5">
                         <div className="bg-blue-500 h-1.5 rounded-full animate-pulse w-full" />
                       </div>
                     </div>
@@ -139,7 +139,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
             ))}
           </div>
         ) : (
-          <Card className="bg-brand-navy border-white/5">
+          <Card className="bg-card border-foreground/5">
             <CardContent className="p-8">
               <EmptyState
                 icon={Clock}
@@ -156,7 +156,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
           <Database className="w-5 h-5 text-gray-400" />
           Jobs Recientes
           {jobs?.recent && jobs.recent.length > 0 && (
@@ -166,10 +166,10 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
           )}
         </h2>
 
-        <Card className="bg-brand-navy border-white/5">
+        <Card className="bg-card border-foreground/5">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/5">
+              <thead className="bg-foreground/5 border-b border-foreground/5">
                 <tr>
                   <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
                     Fuente
@@ -191,18 +191,18 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-foreground/5">
                 {jobs?.recent?.map((job, index) => (
                   <motion.tr
                     key={job.id}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.02 }}
-                    className="hover:bg-white/5 transition-colors"
+                    className="hover:bg-foreground/5 transition-colors"
                   >
                     <td className="px-6 py-4">
                       <div>
-                        <p className="text-sm font-medium text-white">{job.source}</p>
+                        <p className="text-sm font-medium text-foreground">{job.source}</p>
                         <p className="text-xs text-gray-500">ID: {job.id.slice(0, 8)}...</p>
                       </div>
                     </td>

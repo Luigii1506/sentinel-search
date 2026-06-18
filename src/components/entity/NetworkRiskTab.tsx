@@ -49,14 +49,14 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
   return (
     <div className="space-y-6">
       <motion.div {...fadeUp} className="glass rounded-xl p-6">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <Network className="w-5 h-5 text-blue-400" />
           Riesgo Propagado por Red
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
             <p className="text-xs text-gray-500">Riesgo Directo</p>
-            <p className="text-2xl font-bold text-white">{networkRisk.direct_risk_score ?? '-'}</p>
+            <p className="text-2xl font-bold text-foreground">{networkRisk.direct_risk_score ?? '-'}</p>
           </div>
           <div>
             <p className="text-xs text-gray-500">Riesgo Propagado</p>
@@ -76,14 +76,14 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
           </div>
           <div>
             <p className="text-xs text-gray-500">Conexiones Riesgosas</p>
-            <p className="text-2xl font-bold text-white">{networkRisk.risky_connections ?? 0}</p>
+            <p className="text-2xl font-bold text-foreground">{networkRisk.risky_connections ?? 0}</p>
           </div>
         </div>
       </motion.div>
 
       {networkRisk.risk_neighbors && networkRisk.risk_neighbors.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="glass rounded-xl p-6">
-          <h3 className="text-lg font-medium text-white mb-4">
+          <h3 className="text-lg font-medium text-foreground mb-4">
             Vecinos de Riesgo ({networkRisk.risk_neighbors.length})
           </h3>
           <div className="space-y-2">
@@ -106,7 +106,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
               };
 
               return (
-                <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-white/5">
+                <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 rounded-lg bg-foreground/5">
                   <div className="flex items-center gap-3 min-w-0">
                     <div
                       className={cn(
@@ -121,7 +121,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
                       )}
                     />
                     <div className="min-w-0">
-                      <p className="text-white font-medium text-sm truncate">{neighbor.entity_name}</p>
+                      <p className="text-foreground font-medium text-sm truncate">{neighbor.entity_name}</p>
                       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                         <span className="text-xs text-gray-500">
                           {relationshipLabels[neighbor.relationship_type] || neighbor.relationship_type}

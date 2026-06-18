@@ -124,7 +124,7 @@ function FilterPanel({
   return (
     <div className="glass rounded-xl p-4 sm:p-5 space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-sm font-medium text-white flex items-center gap-2">
+        <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
           <Filter className="w-4 h-4" />
           Filtros
         </h3>
@@ -133,7 +133,7 @@ function FilterPanel({
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="text-xs text-gray-400 hover:text-white"
+            className="text-xs text-gray-400 hover:text-foreground"
           >
             Limpiar
           </Button>
@@ -152,13 +152,13 @@ function FilterPanel({
               <motion.label
                 key={type}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
+                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors border border-foreground/5 sm:border-transparent"
               >
                 <input
                   type="checkbox"
                   checked={filters.entityTypes.includes(type)}
                   onChange={() => toggleEntityType(type)}
-                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
+                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
                 />
                 <EIcon className="w-4 h-4 text-gray-500" />
                 <span className="text-xs sm:text-sm text-gray-300 capitalize">
@@ -188,13 +188,13 @@ function FilterPanel({
               <motion.label
                 key={level}
                 whileHover={{ x: 2 }}
-                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
+                className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors border border-foreground/5 sm:border-transparent"
               >
                 <input
                   type="checkbox"
                   checked={filters.riskLevels.includes(level)}
                   onChange={() => toggleRiskLevel(level)}
-                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
+                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
                 />
                 <span className={cn("text-xs sm:text-sm capitalize", colors[level])}>
                   {level === "critical"
@@ -221,13 +221,13 @@ function FilterPanel({
             <motion.label
               key={source}
               whileHover={{ x: 2 }}
-              className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors border border-white/5 sm:border-transparent"
+              className="flex items-center gap-2 sm:gap-3 p-2 rounded-lg hover:bg-foreground/5 cursor-pointer transition-colors border border-foreground/5 sm:border-transparent"
             >
               <input
                 type="checkbox"
                 checked={filters.sources.includes(source)}
                 onChange={() => toggleSource(source)}
-                className="w-4 h-4 rounded border-white/20 bg-white/5 text-blue-500 focus:ring-blue-500/20"
+                className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
               />
               <span className="text-xs sm:text-sm text-gray-300">{source}</span>
             </motion.label>
@@ -416,7 +416,7 @@ export function SearchPage() {
                 "px-3 py-1 rounded-full border transition",
                 engine === "v1"
                   ? "bg-blue-500/20 border-blue-400 text-blue-200"
-                  : "border-white/10 text-gray-400 hover:bg-white/5",
+                  : "border-foreground/10 text-gray-400 hover:bg-foreground/5",
               )}
               title="Búsqueda clásica: BM25 fuzzy sobre nombres + fonética"
             >
@@ -435,7 +435,7 @@ export function SearchPage() {
                 "px-3 py-1 rounded-full border transition flex items-center gap-1",
                 engine === "v2"
                   ? "bg-purple-500/20 border-purple-400 text-purple-200"
-                  : "border-white/10 text-gray-400 hover:bg-white/5",
+                  : "border-foreground/10 text-gray-400 hover:bg-foreground/5",
               )}
               title="Inteligente (default): scoring ML híbrido + multi-script (Latín↔Cirílico↔Chino↔Árabe) + provenance per-propiedad"
             >
@@ -467,7 +467,7 @@ export function SearchPage() {
                   <Button
                     variant="outline"
                     onClick={() => setShowFilters(!showFilters)}
-                    className="w-full gap-2 border-white/10"
+                    className="w-full gap-2 border-foreground/10"
                   >
                     <Filter className="w-4 h-4" />
                     Filtros
@@ -499,7 +499,7 @@ export function SearchPage() {
                 {/* Results Header */}
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div>
-                    <h2 className="text-lg font-medium text-white">
+                    <h2 className="text-lg font-medium text-foreground">
                       {isLoading
                         ? "Buscando..."
                         : searchMode === "semantic"
@@ -521,7 +521,7 @@ export function SearchPage() {
                       variant="ghost"
                       size="sm"
                       onClick={clearSearch}
-                      className="text-gray-400 hover:text-white"
+                      className="text-gray-400 hover:text-foreground"
                     >
                       <X className="w-4 h-4 mr-1" />
                       Limpiar
@@ -597,7 +597,7 @@ export function SearchPage() {
                           <Button
                             onClick={clearSearch}
                             variant="outline"
-                            className="border-white/10"
+                            className="border-foreground/10"
                           >
                             Nueva búsqueda
                           </Button>
@@ -617,7 +617,7 @@ export function SearchPage() {
             animate={{ opacity: 1 }}
             className="mt-12"
           >
-            <h2 className="text-lg font-medium text-white mb-6">
+            <h2 className="text-lg font-medium text-foreground mb-6">
               Búsquedas Sugeridas
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -659,13 +659,13 @@ export function SearchPage() {
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ scale: 1.02, y: -2 }}
                   onClick={() => handleSearch(item.query)}
-                  className="glass rounded-xl p-4 text-left hover:bg-white/[0.03] transition-all group"
+                  className="glass rounded-xl p-4 text-left hover:bg-foreground/[0.03] transition-all group"
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
                       <item.icon className="w-5 h-5 text-blue-400" />
                     </div>
-                    <span className="font-medium text-white">{item.query}</span>
+                    <span className="font-medium text-foreground">{item.query}</span>
                   </div>
                   <p className="text-sm text-gray-400">{item.description}</p>
                 </motion.button>

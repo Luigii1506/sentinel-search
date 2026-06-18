@@ -65,7 +65,7 @@ export function PerformanceMonitor() {
 
   
   return (
-    <Card className="bg-white/5 border-white/10">
+    <Card className="bg-foreground/5 border-foreground/10">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
           <Activity className="w-4 h-4 text-blue-400" />
@@ -76,7 +76,7 @@ export function PerformanceMonitor() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           {/* Average Time */}
-          <div className="p-3 rounded-lg bg-white/5">
+          <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
               <Clock className="w-3 h-3" />
               Tiempo Medio
@@ -87,7 +87,7 @@ export function PerformanceMonitor() {
           </div>
 
           {/* Cache Hit Rate */}
-          <div className="p-3 rounded-lg bg-white/5">
+          <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
               <Database className="w-3 h-3" />
               Cache Hit Rate
@@ -97,12 +97,12 @@ export function PerformanceMonitor() {
             </div>
             <Progress 
               value={stats.cacheHitRate} 
-              className="h-1 mt-2 bg-white/10"
+              className="h-1 mt-2 bg-foreground/10"
             />
           </div>
 
           {/* Cache Size */}
-          <div className="p-3 rounded-lg bg-white/5">
+          <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
               <Zap className="w-3 h-3" />
               Cache Size
@@ -116,7 +116,7 @@ export function PerformanceMonitor() {
           </div>
 
           {/* Total Queries */}
-          <div className="p-3 rounded-lg bg-white/5">
+          <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
               <TrendingUp className="w-3 h-3" />
               Queries
@@ -140,7 +140,7 @@ export function PerformanceMonitor() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   className="flex items-center justify-between p-2 rounded 
-                           bg-white/5 text-sm"
+                           bg-foreground/5 text-sm"
                 >
                   <span className="truncate text-gray-300 max-w-[150px]">
                     {query.query}
@@ -164,7 +164,7 @@ export function PerformanceMonitor() {
 
         {/* Performance Legend */}
         <div className="flex items-center gap-4 text-xs text-gray-500 pt-2 
-                      border-t border-white/10">
+                      border-t border-foreground/10">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-green-500" />
             <span>&lt;100ms</span>

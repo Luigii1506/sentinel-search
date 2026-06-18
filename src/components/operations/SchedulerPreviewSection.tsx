@@ -96,15 +96,15 @@ export function SchedulerPreviewSection() {
   });
 
   return (
-    <div className="rounded border border-white/10 bg-white/[0.02]">
+    <div className="rounded border border-foreground/10 bg-foreground/[0.02]">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 py-3 px-3 hover:bg-white/5 transition-colors"
+        className="w-full flex items-center gap-3 py-3 px-3 hover:bg-foreground/5 transition-colors"
       >
         {expanded ? <ChevronDown className="w-3.5 h-3.5 text-gray-500" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-500" />}
         <CalendarClock className="w-4 h-4 text-purple-400" />
         <div className="flex-1 text-left">
-          <div className="text-sm font-medium text-white">Scheduler Preview</div>
+          <div className="text-sm font-medium text-foreground">Scheduler Preview</div>
           <div className="text-[11px] text-gray-500">
             Qué decidiría Beat AHORA si corriera el dispatcher · dry-run permanente
           </div>
@@ -119,14 +119,14 @@ export function SchedulerPreviewSection() {
       </button>
 
       {expanded && (
-        <div className="border-t border-white/5 p-3 space-y-3">
+        <div className="border-t border-foreground/5 p-3 space-y-3">
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setOnlyInWindow(!onlyInWindow)}
               className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
                 onlyInWindow
-                  ? 'bg-white/10 text-white border-white/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent'
+                  ? 'bg-foreground/10 text-foreground border-foreground/20'
+                  : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border-transparent'
               }`}
               title="Si está activo, solo muestra sources cuya hora coincide ahora"
             >
@@ -149,7 +149,7 @@ export function SchedulerPreviewSection() {
                 return (
                   <span
                     key={reason}
-                    className={`text-[10px] font-mono px-2 py-0.5 rounded border border-white/10 ${meta.color}`}
+                    className={`text-[10px] font-mono px-2 py-0.5 rounded border border-foreground/10 ${meta.color}`}
                     title={reason}
                   >
                     {meta.label}: {count}
@@ -161,9 +161,9 @@ export function SchedulerPreviewSection() {
 
           {isLoading && !data ? (
             <div className="space-y-1">
-              <Skeleton className="h-8 bg-white/5" />
-              <Skeleton className="h-8 bg-white/5" />
-              <Skeleton className="h-8 bg-white/5" />
+              <Skeleton className="h-8 bg-foreground/5" />
+              <Skeleton className="h-8 bg-foreground/5" />
+              <Skeleton className="h-8 bg-foreground/5" />
             </div>
           ) : data?.sources.length === 0 ? (
             <EmptyState
@@ -180,16 +180,16 @@ export function SchedulerPreviewSection() {
             <div className="overflow-x-auto -mx-3 px-3">
               <table className="min-w-full text-xs whitespace-nowrap">
                 <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wider text-gray-500 border-b border-white/5 select-none">
-                    <th className="py-1.5 pr-4 cursor-pointer hover:text-white" onClick={() => toggleSort('source_id')}>Source{sortIcon('source_id')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('tier')}>Tier{sortIcon('tier')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('frequency')}>Freq · hora UTC{sortIcon('frequency')}</th>
-                    <th className="py-1.5 pr-4 cursor-pointer hover:text-white" onClick={() => toggleSort('reason')}>Razón{sortIcon('reason')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('next_eligible')} title="Cuándo el scheduler podría correr esta source otra vez (considera ventana + gap + backoff)">Próximo{sortIcon('next_eligible')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('hours_since_last_dispatch')} title="Cuándo fue la última vez que el dispatcher eligió esta fuente">Último dispatch{sortIcon('hours_since_last_dispatch')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('last_sync_result')} title="Resultado del último sync: OK / sin cambios remotos / lock / falló">Resultado{sortIcon('last_sync_result')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('min_gap_hours')} title="Gap mínimo entre dispatches — el scheduler NO redespacha hasta que pase este tiempo">Gap mín{sortIcon('min_gap_hours')}</th>
-                    <th className="py-1.5 pr-3 cursor-pointer hover:text-white" onClick={() => toggleSort('backoff')} title="Si tiene ≥3 fallos consecutivos, el scheduler la bloquea hasta esta hora (backoff exponencial 6h→12h→24h)">Backoff{sortIcon('backoff')}</th>
+                  <tr className="text-left text-[10px] uppercase tracking-wider text-gray-500 border-b border-foreground/5 select-none">
+                    <th className="py-1.5 pr-4 cursor-pointer hover:text-foreground" onClick={() => toggleSort('source_id')}>Source{sortIcon('source_id')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('tier')}>Tier{sortIcon('tier')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('frequency')}>Freq · hora UTC{sortIcon('frequency')}</th>
+                    <th className="py-1.5 pr-4 cursor-pointer hover:text-foreground" onClick={() => toggleSort('reason')}>Razón{sortIcon('reason')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('next_eligible')} title="Cuándo el scheduler podría correr esta source otra vez (considera ventana + gap + backoff)">Próximo{sortIcon('next_eligible')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('hours_since_last_dispatch')} title="Cuándo fue la última vez que el dispatcher eligió esta fuente">Último dispatch{sortIcon('hours_since_last_dispatch')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('last_sync_result')} title="Resultado del último sync: OK / sin cambios remotos / lock / falló">Resultado{sortIcon('last_sync_result')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('min_gap_hours')} title="Gap mínimo entre dispatches — el scheduler NO redespacha hasta que pase este tiempo">Gap mín{sortIcon('min_gap_hours')}</th>
+                    <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('backoff')} title="Si tiene ≥3 fallos consecutivos, el scheduler la bloquea hasta esta hora (backoff exponencial 6h→12h→24h)">Backoff{sortIcon('backoff')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -217,8 +217,8 @@ export function SchedulerPreviewSection() {
                       const meta = reasonMeta(s.reason);
                       const ago = formatAgoOrFuture(s.hours_since_last_dispatch);
                       return (
-                        <tr key={s.source_id} className="border-b border-white/[0.03] hover:bg-white/[0.02]">
-                          <td className="py-1.5 pr-4 font-mono text-white">{s.source_id}</td>
+                        <tr key={s.source_id} className="border-b border-foreground/[0.03] hover:bg-foreground/[0.02]">
+                          <td className="py-1.5 pr-4 font-mono text-foreground">{s.source_id}</td>
                           <td className="py-1.5 pr-3">
                             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${tierBadge(s.tier)}`}>
                               T{s.tier}

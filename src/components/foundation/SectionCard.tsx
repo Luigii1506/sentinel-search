@@ -20,7 +20,7 @@ export function SectionCard({
   titleClassName,
 }: SectionCardProps) {
   return (
-    <Card className={cn('bg-brand-navy border-white/5', className)}>
+    <Card className={cn('bg-card border-foreground/5', className)}>
       <CardContent className={cn('p-6', contentClassName)}>
         <h3 className={cn('text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2', titleClassName)}>
           {Icon && <Icon className="w-4 h-4" />}

@@ -82,8 +82,8 @@ export function RelationshipContextSummaryCard({
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {overviewFamilyRelationships.length > 0
               ? overviewFamilyRelationships.slice(0, 6).map((rel, index) => (
-                  <div key={`${rel.related_entity_id || rel.related_entity_name}-${index}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
-                    <p className="text-sm text-white font-medium break-words">{humanizeEntityName(rel.related_entity_name)}</p>
+                  <div key={`${rel.related_entity_id || rel.related_entity_name}-${index}`} className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
+                    <p className="text-sm text-foreground font-medium break-words">{humanizeEntityName(rel.related_entity_name)}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {rel.subtype && (
                         <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
@@ -104,8 +104,8 @@ export function RelationshipContextSummaryCard({
                   </div>
                 ))
               : overviewStructuredFamily.slice(0, 6).map((rel, index) => (
-                  <div key={`${rel.entity_id || rel.qid || rel.name}-${index}`} className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
-                    <p className="text-sm text-white font-medium break-words">{humanizeEntityName(rel.name)}</p>
+                  <div key={`${rel.entity_id || rel.qid || rel.name}-${index}`} className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
+                    <p className="text-sm text-foreground font-medium break-words">{humanizeEntityName(rel.name)}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
                         {rel.relationship_label}
@@ -131,15 +131,15 @@ export function RelationshipContextSummaryCard({
           ) : null}
         </div>
       ) : referenceLike ? (
-        <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
-          <p className="text-sm text-white">Se identificaron {totalDetectedRelationships} relaciones para esta entidad contextual.</p>
+        <div className="mb-4 rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
+          <p className="text-sm text-foreground">Se identificaron {totalDetectedRelationships} relaciones para esta entidad contextual.</p>
           <p className="text-xs text-gray-500 mt-1">
             Para acelerar la apertura de referencias, el resumen general no carga el detalle completo de relaciones. Usa la pestaña de relaciones para ver personas y organizaciones vinculadas.
           </p>
         </div>
       ) : (
-        <div className="mb-4 rounded-lg bg-white/[0.03] border border-white/5 p-3">
-          <p className="text-sm text-white">
+        <div className="mb-4 rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
+          <p className="text-sm text-foreground">
             Se identificaron {amlVisibleRelationships} relaciones AML visibles de {totalDetectedRelationships} relaciones detectadas.
           </p>
           <p className="text-xs text-gray-500 mt-1">
@@ -158,7 +158,7 @@ export function RelationshipContextSummaryCard({
           .map(([type, count]) => (
             <div key={type} className="flex items-center gap-1.5">
               <span className="text-xs text-gray-500">{relationshipTypeLabels[type] || type}</span>
-              <Badge className="bg-white/10 text-gray-300 text-[10px]">{count}</Badge>
+              <Badge className="bg-foreground/10 text-gray-300 text-[10px]">{count}</Badge>
             </div>
           ))}
       </div>

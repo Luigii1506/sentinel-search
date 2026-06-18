@@ -106,27 +106,27 @@ export default function ReportsPage() {
               icon={AlertTriangle}
               label="Alertas Generadas"
               value={report.alerts.total}
-              className="bg-brand-navy border-white/5"
+              className="bg-card border-foreground/5"
             />
             <MetricCard
               icon={Shield}
               label="Casos Creados"
               value={report.cases.total}
-              className="bg-brand-navy border-white/5"
+              className="bg-card border-foreground/5"
             />
             <MetricCard
               icon={CheckCircle}
               label="SLA Compliance"
               value={`${report.cases.sla_compliance_pct}%`}
               accent={report.cases.sla_compliance_pct >= 90 ? 'success' : 'red'}
-              className="bg-brand-navy border-white/5"
+              className="bg-card border-foreground/5"
             />
             <MetricCard
               icon={XCircle}
               label="Tasa Falsos Positivos"
               value={`${report.decisions.fp_rate_pct}%`}
               accent={report.decisions.fp_rate_pct <= 30 ? 'success' : 'amber'}
-              className="bg-brand-navy border-white/5"
+              className="bg-card border-foreground/5"
             />
           </div>
 
@@ -153,7 +153,7 @@ export default function ReportsPage() {
                         />
                       </div>
                     </div>
-                    <span className="text-sm font-mono text-white w-12 text-right">{count}</span>
+                    <span className="text-sm font-mono text-foreground w-12 text-right">{count}</span>
                   </div>
                 ))}
                 {Object.keys(report.alerts.by_severity).length === 0 && (
@@ -180,7 +180,7 @@ export default function ReportsPage() {
                         />
                       </div>
                     </div>
-                    <span className="text-sm font-mono text-white w-12 text-right">{count}</span>
+                    <span className="text-sm font-mono text-foreground w-12 text-right">{count}</span>
                   </div>
                 ))}
                 {Object.keys(report.cases.by_status).length === 0 && (
@@ -224,7 +224,7 @@ export default function ReportsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Tiempo promedio resolución</span>
-                  <span className="text-sm font-mono text-white">
+                  <span className="text-sm font-mono text-foreground">
                     {report.cases.avg_resolution_hours
                       ? `${report.cases.avg_resolution_hours}h`
                       : 'N/A'}
@@ -232,15 +232,15 @@ export default function ReportsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">SARs presentados</span>
-                  <span className="text-sm font-mono text-white">{report.cases.sar_filed}</span>
+                  <span className="text-sm font-mono text-foreground">{report.cases.sar_filed}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Entidades monitoreadas</span>
-                  <span className="text-sm font-mono text-white">{report.monitoring.watchlist_active}</span>
+                  <span className="text-sm font-mono text-foreground">{report.monitoring.watchlist_active}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-400">Whitelist activas</span>
-                  <span className="text-sm font-mono text-white">{report.monitoring.whitelist_active}</span>
+                  <span className="text-sm font-mono text-foreground">{report.monitoring.whitelist_active}</span>
                 </div>
               </div>
             </SectionCard>
@@ -248,7 +248,7 @@ export default function ReportsPage() {
 
           {/* Top Entities */}
           {report.top_entities.length > 0 && (
-            <Card className="mt-6 bg-brand-navy border-white/5">
+            <Card className="mt-6 bg-card border-foreground/5">
               <CardContent className="p-6">
                 <h3 className="text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2">
                   <Eye className="w-4 h-4" />
@@ -268,7 +268,7 @@ export default function ReportsPage() {
                     {report.top_entities.map((entity, i) => (
                       <tr key={i} className="border-b border-gray-700/50 hover:bg-gray-700/20">
                         <td className="py-2 px-3 text-gray-500">{i + 1}</td>
-                        <td className="py-2 px-3 text-white font-medium">{entity.name}</td>
+                        <td className="py-2 px-3 text-foreground font-medium">{entity.name}</td>
                         <td className="py-2 px-3 text-right font-mono">{entity.alert_count}</td>
                         <td className="py-2 px-3 text-right">
                           <Badge variant="outline" className={cn('text-xs', {

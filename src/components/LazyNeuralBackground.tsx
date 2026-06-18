@@ -8,7 +8,7 @@ const NeuralNetworkBackground = lazy(() =>
 
 export function LazyNeuralBackground() {
   return (
-    <Suspense fallback={<div className="absolute inset-0 bg-brand-carbon" aria-hidden="true" />}>
+    <Suspense fallback={<div className="absolute inset-0 bg-background" aria-hidden="true" />}>
       <NeuralNetworkBackground />
     </Suspense>
   );

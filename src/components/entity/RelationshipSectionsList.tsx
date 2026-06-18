@@ -82,7 +82,7 @@ export function RelationshipSectionsList({
                   [section.key]: !prev[section.key],
                 }))
               }
-              className="w-full flex items-center justify-between gap-3 pb-2 border-b border-white/10 text-left"
+              className="w-full flex items-center justify-between gap-3 pb-2 border-b border-foreground/10 text-left"
             >
               <div className="flex items-center gap-2">
                 {collapsedRelationshipSections[section.key] ? (
@@ -104,7 +104,7 @@ export function RelationshipSectionsList({
                         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
                           {subgroupLabel}
                         </span>
-                        <div className="h-px flex-1 bg-white/10" />
+                        <div className="h-px flex-1 bg-foreground/10" />
                       </div>
                     )}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -144,19 +144,19 @@ export function RelationshipSectionsList({
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: i * 0.03 }}
-                            className="glass rounded-lg p-4 hover:bg-white/[0.04] transition-colors"
+                            className="glass rounded-lg p-4 hover:bg-foreground/[0.04] transition-colors"
                           >
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between mb-1">
                               <div className="flex-1 min-w-0">
                                 {rel.related_entity_id ? (
                                   <button
                                     onClick={() => onNavigateEntity(rel.related_entity_id)}
-                                    className="text-white font-medium hover:text-blue-400 transition-colors text-left cursor-pointer break-words block max-w-full"
+                                    className="text-foreground font-medium hover:text-blue-400 transition-colors text-left cursor-pointer break-words block max-w-full"
                                   >
                                     {humanizeEntityName(rel.related_entity_name)}
                                   </button>
                                 ) : (
-                                  <p className="text-white font-medium break-words">
+                                  <p className="text-foreground font-medium break-words">
                                     {humanizeEntityName(rel.related_entity_name)}
                                   </p>
                                 )}
@@ -261,7 +261,7 @@ export function RelationshipSectionsList({
 
                             <div className="flex flex-wrap items-center gap-1.5">
                               {(rel.start_date || rel.end_date) && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
                                   <Calendar className="w-3 h-3" />
                                   {rel.start_date && rel.end_date
                                     ? `${formatDate(rel.start_date)} — ${formatDate(rel.end_date)}`
@@ -272,7 +272,7 @@ export function RelationshipSectionsList({
                               )}
 
                               {sourceName && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
                                   <Database className="w-3 h-3" />
                                   {referenceLike && sourceName?.toLowerCase() === 'wikidata' ? 'Wikidata' : sourceName}
                                 </span>
@@ -304,7 +304,7 @@ export function RelationshipSectionsList({
                               )}
 
                               {rel.related_entity_sources && rel.related_entity_sources.length > 1 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
                                   <FileText className="w-3 h-3" />
                                   {rel.related_entity_sources.length} fuentes
                                 </span>

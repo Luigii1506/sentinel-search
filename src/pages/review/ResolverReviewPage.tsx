@@ -97,10 +97,10 @@ export function ResolverReviewPage() {
     if (!status) return null;
     return (
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <MetricCard label="UNSURE pendientes" value={status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-white/5 border-white/10" />
-        <MetricCard label="Positive pendientes" value={status.judgements.positive} icon={CheckCircle} accent="success" className="bg-white/5 border-white/10" />
-        <MetricCard label="Negative" value={status.judgements.negative} icon={XCircle} accent="red" className="bg-white/5 border-white/10" />
-        <MetricCard label="Canonical groups" value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-white/5 border-white/10" />
+        <MetricCard label="UNSURE pendientes" value={status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label="Positive pendientes" value={status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label="Negative" value={status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label="Canonical groups" value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
       </div>
     );
   }, [status]);
@@ -127,7 +127,7 @@ export function ResolverReviewPage() {
       )}
 
       {isLoading ? (
-        <PanelSkeleton className="rounded-xl border border-white/5 bg-white/[0.02] p-6" lines={6} />
+        <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={6} />
       ) : !pair ? (
         <EmptyState
           icon={CheckCircle}
@@ -143,7 +143,7 @@ export function ResolverReviewPage() {
         />
       ) : (
         <>
-          <Card className="bg-white/5 border-white/10 mb-4">
+          <Card className="bg-foreground/5 border-foreground/10 mb-4">
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-base">
                 <span>¿Son la misma entidad?</span>
@@ -152,7 +152,7 @@ export function ResolverReviewPage() {
             </CardHeader>
             <CardContent>
               {entityLoading ? (
-                <PanelSkeleton className="rounded-xl border border-white/5 bg-white/[0.02] p-6" lines={4} />
+                <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={4} />
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <EntityCard entity={leftEnt} id={pair.source} side="A" navigate={navigate} />
@@ -190,14 +190,14 @@ function EntityCard({ entity, id, side, navigate }: { entity: EntitySummary | nu
   const isSanctioned = (data?.overview?.sanctions || data?.sanctions || []).length > 0;
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+    <div className="rounded-xl border border-foreground/10 bg-foreground/5 p-4">
       <div className="flex items-start justify-between mb-2">
         <Badge variant="outline" className="text-xs">{side}</Badge>
         <button onClick={() => navigate(`/entity/${id}`)} className="text-xs text-blue-400 hover:underline inline-flex items-center gap-1">
           Ver perfil <ExternalLink className="h-3 w-3" />
         </button>
       </div>
-      <div className="text-white font-medium mb-2">{name}</div>
+      <div className="text-foreground font-medium mb-2">{name}</div>
       <div className="text-xs text-gray-500 mb-2 font-mono">{id.slice(0, 16)}...</div>
       <div className="flex flex-wrap gap-1 mb-2">
         {isPep && <Badge className="text-xs bg-amber-500/20 text-amber-300">PEP</Badge>}

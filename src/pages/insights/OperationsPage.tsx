@@ -108,7 +108,7 @@ const STATE_META: Record<string, { icon: any; color: string; bg: string; label: 
   stale: { icon: AlertTriangle, color: 'text-amber-400', bg: 'border-amber-500/15 bg-amber-500/5', label: 'desactualizada' },
   healthy: { icon: CheckCircle2, color: 'text-green-400', bg: 'border-green-500/15 bg-green-500/5', label: 'saludable' },
   never: { icon: AlertTriangle, color: 'text-zinc-500', bg: 'border-zinc-500/20 bg-zinc-500/5', label: 'sin sync' },
-  idle: { icon: Clock, color: 'text-gray-400', bg: 'border-white/5 bg-transparent', label: 'idle' },
+  idle: { icon: Clock, color: 'text-gray-400', bg: 'border-foreground/5 bg-transparent', label: 'idle' },
 };
 
 function tierBadge(tier: number) {
@@ -175,7 +175,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
               'sin actividad');
 
           return (
-            <div key={r.id} className="grid grid-cols-12 gap-2 text-[11px] py-1.5 px-2 rounded hover:bg-white/5">
+            <div key={r.id} className="grid grid-cols-12 gap-2 text-[11px] py-1.5 px-2 rounded hover:bg-foreground/5">
               {/* Status */}
               <div className={`col-span-1 ${statusColor} text-center font-mono`}>{statusIcon}</div>
 
@@ -245,7 +245,7 @@ function LayerDot({ layer, data }: { layer: typeof PIPELINE_LAYERS[number]; data
   const baseColor =
     data.status === 'running'  ? 'bg-blue-500 border-blue-400 animate-pulse'
     : data.status === 'complete' ? 'bg-emerald-500/80 border-emerald-400'
-    : 'bg-white/5 border-white/10';
+    : 'bg-foreground/5 border-foreground/10';
 
   const labelColor =
     data.status === 'running'  ? 'text-blue-300'
@@ -318,7 +318,7 @@ function PipelineProgressBar({ sourceId, isRunning }: { sourceId: string; isRunn
                 className={`h-px w-4 ${
                   data[PIPELINE_LAYERS[idx + 1].key].status !== 'pending'
                     ? 'bg-emerald-500/40'
-                    : 'bg-white/10'
+                    : 'bg-foreground/10'
                 }`}
               />
             )}
@@ -341,7 +341,7 @@ function PipelineProgressBar({ sourceId, isRunning }: { sourceId: string; isRunn
               {activeProgress.expected != null && ` / ${activeProgress.expected.toLocaleString()} records`}
             </span>
           </div>
-          <div className="h-1.5 w-full rounded-full bg-white/5 overflow-hidden">
+          <div className="h-1.5 w-full rounded-full bg-foreground/5 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all"
               style={{ width: `${activeProgress.percent}%` }}
@@ -488,12 +488,12 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
   }
 
   return (
-    <div className={`rounded border ${meta.bg} hover:border-white/15 transition-colors overflow-hidden`}>
+    <div className={`rounded border ${meta.bg} hover:border-foreground/15 transition-colors overflow-hidden`}>
       <div className="flex items-center gap-3 py-3 px-3">
         {/* Caret expand/collapse */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex-shrink-0 text-gray-500 hover:text-white transition-colors"
+          className="flex-shrink-0 text-gray-500 hover:text-foreground transition-colors"
           title={expanded ? 'Colapsar' : 'Expandir historial'}
         >
           {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -510,7 +510,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
         {/* Source name + sub-info */}
         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(!expanded)}>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-mono text-white">{source.source_id}</span>
+            <span className="text-sm font-mono text-foreground">{source.source_id}</span>
             <span className="text-[10px] text-gray-500">{source.schedule_frequency || ''}</span>
             {nextInfo}
             {dispatchInfo}
@@ -535,7 +535,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 text-xs text-gray-400 hover:text-white"
+            className="h-7 text-xs text-gray-400 hover:text-foreground"
             onClick={() => navigate(`/admin/sources?focus=${source.source_id}`)}
             title="Ver en /admin/sources"
           >
@@ -552,7 +552,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="border-t border-white/5"
+            className="border-t border-foreground/5"
           >
             <SourceRunsHistory sourceId={source.source_id} />
           </motion.div>
@@ -682,7 +682,7 @@ export function OperationsPage() {
 
         {/* ── Infra Summary Card ─────────────────────────────── */}
         {opsSummary ? (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-white/[0.02] border border-white/5">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/5">
             <div className="flex flex-col">
               <span className="text-[10px] uppercase tracking-wide text-gray-500">Skip rate 7d</span>
               <span className="text-lg font-mono text-emerald-400">
@@ -744,8 +744,8 @@ export function OperationsPage() {
                 onClick={() => setFilter(opt.key)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   active
-                    ? 'bg-white/10 text-white border border-white/20'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    ? 'bg-foreground/10 text-foreground border border-foreground/20'
+                    : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border border-transparent'
                 }`}
               >
                 {opt.label}
@@ -763,7 +763,7 @@ export function OperationsPage() {
           })}
 
           {/* Separador */}
-          <div className="h-5 w-px bg-white/10 mx-1" />
+          <div className="h-5 w-px bg-foreground/10 mx-1" />
 
           {/* Filtro por tier */}
           <span className="text-[10px] uppercase tracking-wider text-gray-500 mr-1">Tier:</span>
@@ -771,8 +771,8 @@ export function OperationsPage() {
             onClick={() => setTierFilter(null)}
             className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
               tierFilter === null
-                ? 'bg-white/10 text-white border border-white/20'
-                : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                ? 'bg-foreground/10 text-foreground border border-foreground/20'
+                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border border-transparent'
             }`}
           >
             Todos
@@ -793,7 +793,7 @@ export function OperationsPage() {
                       tColor === 'blue' ? 'bg-blue-500/15 text-blue-300 border-blue-500/40' :
                       'bg-gray-500/15 text-gray-300 border-gray-500/40'
                     )
-                    : 'text-gray-400 hover:text-white hover:bg-white/5 border-transparent'
+                    : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border-transparent'
                 }`}
                 title={
                   t === 1 ? 'Sanciones críticas / Fugitivos' :
@@ -844,7 +844,7 @@ export function OperationsPage() {
               value={s.value}
               icon={s.icon}
               accent={s.accent}
-              className="bg-white/5 border-white/10"
+              className="bg-foreground/5 border-foreground/10"
             />
           ))}
         </div>
@@ -855,7 +855,7 @@ export function OperationsPage() {
         </Suspense>
 
         {/* ── Infra footer ──────────────────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-2 text-xs pt-2 border-t border-white/5">
+        <div className="flex flex-wrap items-center gap-2 text-xs pt-2 border-t border-foreground/5">
           <span className="text-gray-500 mr-2">Infraestructura:</span>
           {services && [
             { name: 'API', icon: Zap, ok: services.api?.status === 'ok' },

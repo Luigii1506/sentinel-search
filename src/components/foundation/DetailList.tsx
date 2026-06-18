@@ -87,12 +87,12 @@ export function DetailRow({
   const isEmpty = value === null || value === undefined || value === '';
   return (
     <>
-      <dt className={cn('text-xs uppercase tracking-wider text-navy-200 self-start md:pt-0.5', className)}>
+      <dt className={cn('text-xs uppercase tracking-wider text-muted-foreground self-start md:pt-0.5', className)}>
         {label}
       </dt>
-      <dd className={cn('text-sm text-white flex items-center gap-2 min-w-0', wrap ? 'flex-wrap' : '')}>
+      <dd className={cn('text-sm text-foreground flex items-center gap-2 min-w-0', wrap ? 'flex-wrap' : '')}>
         {isEmpty ? (
-          <span className="italic text-navy-300">{emptyText}</span>
+          <span className="italic text-muted-foreground">{emptyText}</span>
         ) : (
           <span
             className={cn(
@@ -134,7 +134,7 @@ function CopyButton({ value }: { value: string }) {
       type="button"
       onClick={onClick}
       aria-label={copied ? 'Copiado' : 'Copiar al portapapeles'}
-      className="shrink-0 text-navy-200 hover:text-electric-300 transition-colors"
+      className="shrink-0 text-muted-foreground hover:text-electric-300 transition-colors"
     >
       {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
     </button>

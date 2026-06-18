@@ -296,7 +296,7 @@ function RiskScoreGauge({ score, level }: { score: number; level: RiskLevel }) {
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-white">{score}</span>
+        <span className="text-3xl font-bold text-foreground">{score}</span>
         <span className="text-xs text-gray-400 uppercase">Riesgo</span>
       </div>
     </div>
@@ -317,7 +317,7 @@ function InfoItem({ label, value, icon: Icon }: { label: string; value?: any; ic
       {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
       <div className="min-w-0">
         <p className="text-xs text-gray-500 uppercase">{label}</p>
-        <p className="text-sm text-white break-words">{displayValue}</p>
+        <p className="text-sm text-foreground break-words">{displayValue}</p>
       </div>
     </div>
   );
@@ -374,7 +374,7 @@ function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
       {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
       <div>
         <p className="text-xs text-gray-500 uppercase">{label}</p>
-        <ul className="text-sm text-white space-y-0.5 mt-0.5">
+        <ul className="text-sm text-foreground space-y-0.5 mt-0.5">
           {visible.map((item, i) => (
             <li key={i} className="flex items-start gap-1.5">
               <span className="text-gray-600 mt-1">•</span>
@@ -420,9 +420,9 @@ function ReferenceLinksList({
               key={`${item.qid || item.name}-${i}`}
               type="button"
               onClick={() => onOpenReference(item)}
-              className="w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:bg-white/[0.06] transition-colors"
+              className="w-full rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2 text-left hover:bg-foreground/[0.06] transition-colors"
             >
-              <span className="text-sm text-white leading-snug block">
+              <span className="text-sm text-foreground leading-snug block">
                 {humanizeEntityName(item.name)}
               </span>
             </button>
@@ -470,7 +470,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
     <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
         <div className="min-w-0">
-          <h4 className="text-white font-medium">{entry.source}</h4>
+          <h4 className="text-foreground font-medium">{entry.source}</h4>
           <p className="text-sm text-gray-400">{entry.program}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -491,55 +491,55 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
 
       {/* Enriched details grid */}
       {details && Object.keys(details).length > 0 && (
-        <div className="mt-3 pt-3 border-t border-white/5">
+        <div className="mt-3 pt-3 border-t border-foreground/5">
           <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {details.rfc && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">RFC</p>
-                <p className="text-sm text-white font-mono break-all">{details.rfc}</p>
+                <p className="text-sm text-foreground font-mono break-all">{details.rfc}</p>
               </div>
             )}
             {details.dataset_label && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Dataset</p>
-                <p className="text-sm text-white break-words">{details.dataset_label}</p>
+                <p className="text-sm text-foreground break-words">{details.dataset_label}</p>
               </div>
             )}
             {details.supuesto && (
               <div className="col-span-2 md:col-span-1">
                 <p className="text-[10px] text-gray-500 uppercase">Supuesto</p>
-                <p className="text-sm text-white break-words">{details.supuesto}</p>
+                <p className="text-sm text-foreground break-words">{details.supuesto}</p>
               </div>
             )}
             {details.monto && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Monto</p>
-                <p className="text-sm text-white break-words">{details.monto}</p>
+                <p className="text-sm text-foreground break-words">{details.monto}</p>
               </div>
             )}
             {details.entidad_federativa && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Entidad Federativa</p>
-                <p className="text-sm text-white break-words">{details.entidad_federativa}</p>
+                <p className="text-sm text-foreground break-words">{details.entidad_federativa}</p>
               </div>
             )}
             {details.tipo_persona && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Tipo Persona</p>
-                <p className="text-sm text-white break-words">{details.tipo_persona}</p>
+                <p className="text-sm text-foreground break-words">{details.tipo_persona}</p>
               </div>
             )}
             {details.fecha_publicacion && (
               <div>
                 <p className="text-[10px] text-gray-500 uppercase">Fecha Publicacion</p>
-                <p className="text-sm text-white break-words">{details.fecha_publicacion}</p>
+                <p className="text-sm text-foreground break-words">{details.fecha_publicacion}</p>
               </div>
             )}
           </div>
 
           {/* Nested datasets (aggregated format) */}
           {details.datasets && Array.isArray(details.datasets) && details.datasets.length > 1 && (
-            <div className="mt-3 pt-3 border-t border-white/5">
+            <div className="mt-3 pt-3 border-t border-foreground/5">
               <p className="text-xs text-gray-500 mb-2">
                 Aparece en {details.dataset_count || details.datasets.length} datasets:
               </p>
@@ -547,11 +547,11 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
                 {details.datasets.map((ds, idx) => {
                   const d = ds as Record<string, unknown>;
                   return (
-                    <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 p-2 rounded bg-white/5">
+                    <div key={idx} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 p-2 rounded bg-foreground/5">
                       <Badge variant="outline" className={cn('text-[10px]', getRiskBadgeClasses(String(d.riesgo || '')))}>
                         {String(d.riesgo || 'N/A')}
                       </Badge>
-                      <span className="text-xs text-white break-words">{String(d.dataset_label || d.dataset || '')}</span>
+                      <span className="text-xs text-foreground break-words">{String(d.dataset_label || d.dataset || '')}</span>
                       {d.supuesto ? <span className="text-xs text-gray-500 break-words">{String(d.supuesto)}</span> : null}
                     </div>
                   );
@@ -819,7 +819,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               onClick={() => navigate(-1)}
-              className="gap-2 text-gray-400 hover:text-white"
+              className="gap-2 text-gray-400 hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver
@@ -828,7 +828,7 @@ const hasSanctions =
               variant="ghost"
               size="sm"
               onClick={() => refetch()}
-              className="gap-2 text-gray-400 hover:text-white"
+              className="gap-2 text-gray-400 hover:text-foreground"
             >
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Actualizar</span>
@@ -836,7 +836,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 text-gray-400 hover:text-white"
+              className="gap-2 text-gray-400 hover:text-foreground"
             >
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">Compartir</span>
@@ -844,7 +844,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-foreground"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
@@ -1038,7 +1038,7 @@ const hasSanctions =
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white/5 border border-white/10 p-1">
+          <TabsList className="bg-foreground/5 border border-foreground/10 p-1">
             {availableTabs.map((tab) => {
               const TabIcon = tab.icon;
               const isRelationshipsLoading = tab.id === 'relationships' && isProfilePending;
@@ -1048,15 +1048,15 @@ const hasSanctions =
                 tab.count;
 
               return (
-                <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-white/10 whitespace-nowrap">
+                <TabsTrigger key={tab.id} value={tab.id} className="data-[state=active]:bg-foreground/10 whitespace-nowrap">
                   {TabIcon ? <TabIcon className="w-4 h-4 sm:mr-1" /> : null}
                   {tab.label}
                   {dynamicCount ? (
-                    <Badge className="ml-2 bg-white/10 text-gray-200 text-[10px]">
+                    <Badge className="ml-2 bg-foreground/10 text-gray-200 text-[10px]">
                       {dynamicCount}
                     </Badge>
                   ) : isRelationshipsLoading ? (
-                    <span className="ml-2 inline-flex h-5 min-w-8 animate-pulse rounded-full border border-white/10 bg-white/5" />
+                    <span className="ml-2 inline-flex h-5 min-w-8 animate-pulse rounded-full border border-foreground/10 bg-foreground/5" />
                   ) : null}
                 </TabsTrigger>
               );
@@ -1081,7 +1081,7 @@ const hasSanctions =
                 <motion.div {...fadeUp} transition={{ delay: 0.05 }}
                   className="glass rounded-xl p-6">
                   <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h3 className="text-lg font-medium text-white flex items-center gap-2">
+                    <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
                       <Shield className="w-5 h-5 text-red-400" />
                       Sanciones
                     </h3>
@@ -1090,11 +1090,11 @@ const hasSanctions =
                   <div className="space-y-3">
                     {entity.sanctions.slice(0, 5).map((s, i) => (
                       <div key={i} className={cn('p-3 rounded-lg border-l-2',
-                        s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-white/[0.02] border-gray-600/30'
+                        s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-foreground/[0.02] border-gray-600/30'
                       )}>
                         <div className="mb-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="text-sm text-white font-medium break-words">{s.source}</span>
+                            <span className="text-sm text-foreground font-medium break-words">{s.source}</span>
                             {s.authority && s.authority !== s.source && (
                               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
                                 {s.authority}
@@ -1190,7 +1190,7 @@ const hasSanctions =
             {entity.sanctions.length === 0 ? (
               <div className="glass rounded-xl p-12 text-center">
                 <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-white mb-2">Sin Sanciones</h3>
+                <h3 className="text-xl font-medium text-foreground mb-2">Sin Sanciones</h3>
                 <p className="text-gray-400">Esta entidad no aparece en listas de sanciones.</p>
               </div>
             ) : (

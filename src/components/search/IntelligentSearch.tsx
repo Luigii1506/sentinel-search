@@ -154,7 +154,7 @@ export function IntelligentSearch({
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           {/* Search Icon */}
-          <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-white/5">
+          <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-foreground/5">
             {isLoading ? (
               <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
             ) : (
@@ -162,8 +162,8 @@ export function IntelligentSearch({
             )}
           </div>
 
-          <div className="flex w-full items-center gap-2 rounded-xl bg-white/[0.03] px-3 py-2 sm:flex-1 sm:bg-transparent sm:px-0 sm:py-0">
-            <div className="flex sm:hidden items-center justify-center w-9 h-9 rounded-xl bg-white/5 shrink-0">
+          <div className="flex w-full items-center gap-2 rounded-xl bg-foreground/[0.03] px-3 py-2 sm:flex-1 sm:bg-transparent sm:px-0 sm:py-0">
+            <div className="flex sm:hidden items-center justify-center w-9 h-9 rounded-xl bg-foreground/5 shrink-0">
               {isLoading ? (
                 <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
               ) : (
@@ -181,7 +181,7 @@ export function IntelligentSearch({
               placeholder={placeholder}
               autoFocus={autoFocus}
               className={cn(
-                'min-w-0 flex-1 bg-transparent border-0 px-0 text-white placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0',
+                'min-w-0 flex-1 bg-transparent border-0 px-0 text-foreground placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0',
                 size === 'large' ? 'text-base sm:text-lg h-11 sm:h-12' : 'text-base h-10'
               )}
             />
@@ -195,7 +195,7 @@ export function IntelligentSearch({
                   clearSearch();
                   inputRef.current?.focus();
                 }}
-                className="p-2 rounded-lg hover:bg-white/10 transition-colors shrink-0"
+                className="p-2 rounded-lg hover:bg-foreground/10 transition-colors shrink-0"
               >
                 <X className="w-4 h-4 text-gray-400" />
               </motion.button>
@@ -208,8 +208,8 @@ export function IntelligentSearch({
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                'w-full gap-2 rounded-xl hover:bg-white/10',
-                showFilters && 'bg-white/10'
+                'w-full gap-2 rounded-xl hover:bg-foreground/10',
+                showFilters && 'bg-foreground/10'
               )}
             >
               <Filter className="w-4 h-4" />
@@ -244,7 +244,7 @@ export function IntelligentSearch({
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="pt-4 pb-2 border-t border-white/10 mt-3 space-y-4">
+              <div className="pt-4 pb-2 border-t border-foreground/10 mt-3 space-y-4">
                 {/* Entity Types */}
                 <div>
                   <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
@@ -259,7 +259,7 @@ export function IntelligentSearch({
                           'w-full sm:w-auto px-3 py-2 rounded-lg text-sm transition-all duration-200 border text-center',
                           filters.entityTypes.includes(value)
                             ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
-                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-foreground/5 border-foreground/10 text-gray-400 hover:bg-foreground/10'
                         )}
                       >
                         {label}
@@ -282,7 +282,7 @@ export function IntelligentSearch({
                           'w-full sm:w-auto px-3 py-2 rounded-lg text-sm transition-all duration-200 border text-center',
                           filters.riskLevels.includes(value)
                             ? getRiskBgColor(value)
-                            : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10'
+                            : 'bg-foreground/5 border-foreground/10 text-gray-400 hover:bg-foreground/10'
                         )}
                       >
                         {label}
@@ -321,8 +321,8 @@ export function IntelligentSearch({
                   className={cn(
                     'w-full text-left p-3 rounded-lg transition-all duration-200 flex items-start gap-3',
                     selectedIndex === index
-                      ? 'bg-white/10'
-                      : 'hover:bg-white/5'
+                      ? 'bg-foreground/10'
+                      : 'hover:bg-foreground/5'
                   )}
                 >
                   {/* Risk Indicator */}
@@ -334,7 +334,7 @@ export function IntelligentSearch({
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-white truncate">
+                      <span className="font-medium text-foreground truncate">
                         {suggestion.name}
                       </span>
                       <Badge
@@ -380,11 +380,11 @@ export function IntelligentSearch({
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-2 bg-white/5 border-t border-white/10 text-xs text-gray-500 flex items-center justify-between">
+            <div className="px-4 py-2 bg-foreground/5 border-t border-foreground/10 text-xs text-gray-500 flex items-center justify-between">
               <span>Presiona Enter para buscar</span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-gray-400">↑</kbd>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-gray-400">↓</kbd>
+                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400">↑</kbd>
+                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400">↓</kbd>
                 para navegar
               </span>
             </div>

@@ -189,12 +189,12 @@ function ArticlesTab() {
                 placeholder="Buscar en titulos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-white/5 border-white/10"
+                className="pl-9 bg-foreground/5 border-foreground/10"
               />
             </div>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10">
+            <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10">
               <Filter className="w-4 h-4 mr-2 text-gray-400" />
               <SelectValue placeholder="Categoria" />
             </SelectTrigger>
@@ -206,7 +206,7 @@ function ArticlesTab() {
             </SelectContent>
           </Select>
           <Select value={selectedDays} onValueChange={setSelectedDays}>
-            <SelectTrigger className="w-full sm:w-[140px] bg-white/5 border-white/10">
+            <SelectTrigger className="w-full sm:w-[140px] bg-foreground/5 border-foreground/10">
               <Clock className="w-4 h-4 mr-2 text-gray-400" />
               <SelectValue />
             </SelectTrigger>
@@ -220,7 +220,7 @@ function ArticlesTab() {
           </Select>
           <div className="w-full sm:w-[180px]">
             <p className="text-[10px] text-gray-500 mb-1">
-              Severidad minima: <span className="text-white font-mono">{minSeverity}</span>
+              Severidad minima: <span className="text-foreground font-mono">{minSeverity}</span>
             </p>
             <Slider
               value={[minSeverity]}
@@ -230,7 +230,7 @@ function ArticlesTab() {
               className="w-full"
             />
           </div>
-          <Button variant="outline" size="sm" onClick={() => refetch()} className="w-full sm:w-auto border-white/10">
+          <Button variant="outline" size="sm" onClick={() => refetch()} className="w-full sm:w-auto border-foreground/10">
             <RefreshCw className="w-4 h-4 mr-1" />
             Refrescar
           </Button>
@@ -284,7 +284,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
   return (
     <motion.div
       variants={itemVariants}
-      className="glass rounded-xl p-5 hover:bg-white/[0.04] transition-colors cursor-pointer group"
+      className="glass rounded-xl p-5 hover:bg-foreground/[0.04] transition-colors cursor-pointer group"
       onClick={onClick}
     >
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
@@ -307,7 +307,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
             {getMethodBadge(article.classification_method)}
           </div>
 
-          <h4 className="text-sm font-medium text-white mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
+          <h4 className="text-sm font-medium text-foreground mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
             {article.title}
           </h4>
 
@@ -347,7 +347,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
             )}>
               {article.severity}
             </span>
-            <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+            <div className="w-full h-1.5 bg-foreground/5 rounded-full overflow-hidden">
               <div
                 className={cn('h-full rounded-full transition-all', getSeverityBarColor(article.severity))}
                 style={{ width: `${article.severity}%` }}
@@ -394,7 +394,7 @@ function SourcesTab() {
     return (
       <div className="space-y-2">
         {[...Array(10)].map((_, i) => (
-          <Skeleton key={i} className="h-12 rounded-lg bg-white/10" />
+          <Skeleton key={i} className="h-12 rounded-lg bg-foreground/10" />
         ))}
       </div>
     );
@@ -424,7 +424,7 @@ function SourcesTab() {
           <p className="text-xs text-gray-400">Inactivas</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-white">{totalArticles.toLocaleString()}</p>
+          <p className="text-xl font-bold text-foreground">{totalArticles.toLocaleString()}</p>
           <p className="text-xs text-gray-400">Total Articulos</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
@@ -442,8 +442,8 @@ function SourcesTab() {
             variant="outline"
             size="sm"
             className={cn(
-              'text-xs border-white/10',
-              filterType === type && 'bg-white/10 text-white'
+              'text-xs border-foreground/10',
+              filterType === type && 'bg-foreground/10 text-foreground'
             )}
             onClick={() => setFilterType(type)}
           >
@@ -466,7 +466,7 @@ function SourcesTab() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       <div className={cn('w-2 h-2 rounded-full', source.error_count > 5 ? 'bg-red-500' : 'bg-green-500')} />
-                      <span className="text-white font-medium break-words">{source.display_name}</span>
+                      <span className="text-foreground font-medium break-words">{source.display_name}</span>
                     </div>
                     <p className="text-[11px] text-gray-500 mt-1 break-all">{source.source_key}</p>
                   </div>
@@ -477,7 +477,7 @@ function SourcesTab() {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Articulos</p>
-                    <p className="text-white font-mono">{source.total_articles}</p>
+                    <p className="text-foreground font-mono">{source.total_articles}</p>
                   </div>
                   <div>
                     <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Calidad</p>
@@ -499,7 +499,7 @@ function SourcesTab() {
                   size="sm"
                   onClick={() => crawlMutation.mutate(source.source_key)}
                   disabled={crawlMutation.isPending}
-                  className="w-full border-white/10 text-gray-300"
+                  className="w-full border-foreground/10 text-gray-300"
                 >
                   <RefreshCw className={cn('w-3.5 h-3.5 mr-2', crawlMutation.isPending && 'animate-spin')} />
                   Ejecutar Crawl
@@ -510,7 +510,7 @@ function SourcesTab() {
         <div className="hidden md:block glass rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-white/5">
+              <tr className="border-b border-foreground/5">
                 <th className="text-left p-3 text-gray-400 font-medium">Fuente</th>
                 <th className="text-left p-3 text-gray-400 font-medium">Tipo</th>
                 <th className="text-right p-3 text-gray-400 font-medium">Articulos</th>
@@ -570,7 +570,7 @@ function SourcesTab() {
           <div className="hidden md:block glass rounded-xl overflow-hidden opacity-60">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/5">
+                <tr className="border-b border-foreground/5">
                   <th className="text-left p-3 text-gray-500 font-medium">Fuente</th>
                   <th className="text-left p-3 text-gray-500 font-medium">Tipo</th>
                   <th className="text-right p-3 text-gray-500 font-medium">Articulos</th>
@@ -579,7 +579,7 @@ function SourcesTab() {
               </thead>
               <tbody>
                 {inactiveSources.map((source) => (
-                  <tr key={source.id} className="border-b border-white/5 last:border-0">
+                  <tr key={source.id} className="border-b border-foreground/5 last:border-0">
                     <td className="p-3 text-gray-500">{source.display_name}</td>
                     <td className="p-3">
                       <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-gray-500">
@@ -609,11 +609,11 @@ function SourceRow({
   isCrawling: boolean;
 }) {
   return (
-    <tr className="border-b border-white/5 last:border-0 hover:bg-white/[0.02]">
+    <tr className="border-b border-foreground/5 last:border-0 hover:bg-foreground/[0.02]">
       <td className="p-3">
         <div className="flex items-center gap-2">
           <div className={cn('w-2 h-2 rounded-full', source.error_count > 5 ? 'bg-red-500' : 'bg-green-500')} />
-          <span className="text-white font-medium">{source.display_name}</span>
+          <span className="text-foreground font-medium">{source.display_name}</span>
           <span className="text-[10px] text-gray-500">{source.source_key}</span>
         </div>
       </td>
@@ -622,7 +622,7 @@ function SourceRow({
           {source.source_type.toUpperCase()}
         </Badge>
       </td>
-      <td className="p-3 text-right text-white font-mono">{source.total_articles}</td>
+      <td className="p-3 text-right text-foreground font-mono">{source.total_articles}</td>
       <td className="p-3 text-right">
         <span className="text-gray-400">{source.quality_score}</span>
       </td>
@@ -644,7 +644,7 @@ function SourceRow({
           size="sm"
           onClick={onCrawl}
           disabled={isCrawling}
-          className="text-xs text-gray-400 hover:text-white"
+          className="text-xs text-gray-400 hover:text-foreground"
         >
           <RefreshCw className={cn('w-3 h-3', isCrawling && 'animate-spin')} />
         </Button>
@@ -677,18 +677,18 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
     <div className="space-y-6">
       {chartData.length > 0 && (
         <div className="glass rounded-xl p-5">
-          <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-orange-400" />
             Actividad reciente de adverse media
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {recentTrend.map((item) => (
-              <div key={item.date} className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+              <div key={item.date} className="rounded-xl border border-foreground/10 bg-foreground/[0.03] p-4">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm text-gray-300">{item.date}</span>
-                  <span className="text-sm font-mono text-white">{item.count}</span>
+                  <span className="text-sm font-mono text-foreground">{item.count}</span>
                 </div>
-                <div className="mt-3 h-2 rounded-full bg-white/5 overflow-hidden">
+                <div className="mt-3 h-2 rounded-full bg-foreground/5 overflow-hidden">
                   <div className="h-full rounded-full bg-orange-400" style={{ width: `${Math.max((item.count / maxDailyCount) * 100, item.count > 0 ? 8 : 0)}%` }} />
                 </div>
               </div>
@@ -700,7 +700,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Distribution */}
         <div className="glass rounded-xl p-5">
-          <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+          <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-400" />
             Distribucion por Categoria
           </h3>
@@ -710,7 +710,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
                 <span className="text-sm text-gray-400 w-32 shrink-0 truncate">
                   {categoryLabels[category] || category}
                 </span>
-                <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+                <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(count / maxCount) * 100}%` }}
@@ -725,7 +725,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
                     ))}
                   />
                 </div>
-                <span className="text-sm font-mono text-white w-8 text-right">{count}</span>
+                <span className="text-sm font-mono text-foreground w-8 text-right">{count}</span>
               </div>
             ))}
             {categories.length === 0 && (
@@ -736,7 +736,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
 
         {/* Classification Method Distribution */}
         <div className="glass rounded-xl p-5">
-          <h3 className="text-base font-medium text-white mb-4 flex items-center gap-2">
+          <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
             <Brain className="w-5 h-5 text-violet-400" />
             Metodo de Clasificacion
           </h3>
@@ -751,7 +751,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
                     <Icon className="w-4 h-4 text-gray-400" />
                     <span className="text-sm text-gray-400 truncate">{meta.label}</span>
                   </div>
-                  <div className="flex-1 h-5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${pct}%` }}
@@ -764,7 +764,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
                     />
                   </div>
                   <div className="text-right w-20 shrink-0">
-                    <span className="text-sm font-mono text-white">{count}</span>
+                    <span className="text-sm font-mono text-foreground">{count}</span>
                     <span className="text-xs text-gray-500 ml-1">({pct}%)</span>
                   </div>
                 </div>
@@ -781,21 +781,21 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass rounded-xl p-5">
           <p className="text-sm text-gray-400 mb-1">Tasa Adverse Media</p>
-          <p className="text-3xl font-bold text-white">{stats.adverse_rate_pct}%</p>
+          <p className="text-3xl font-bold text-foreground">{stats.adverse_rate_pct}%</p>
           <p className="text-xs text-gray-500 mt-1">
             {stats.adverse} de {stats.total_articles} articulos
           </p>
         </div>
         <div className="glass rounded-xl p-5">
           <p className="text-sm text-gray-400 mb-1">Entity Links</p>
-          <p className="text-3xl font-bold text-white">{stats.total_entity_links}</p>
+          <p className="text-3xl font-bold text-foreground">{stats.total_entity_links}</p>
           <p className="text-xs text-gray-500 mt-1">
             {stats.entities_with_articles} entidades vinculadas
           </p>
         </div>
         <div className="glass rounded-xl p-5">
           <p className="text-sm text-gray-400 mb-1">Sin Clasificar</p>
-          <p className="text-3xl font-bold text-white">{stats.unclassified}</p>
+          <p className="text-3xl font-bold text-foreground">{stats.unclassified}</p>
           <p className="text-xs text-gray-500 mt-1">
             {stats.classified} clasificados
           </p>
@@ -843,7 +843,7 @@ function ArticleDetailModal({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-brand-navy border-white/10 text-white">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-card border-foreground/10 text-foreground">
         {isLoading ? (
           <div className="space-y-4 p-4">
             <PanelSkeleton lines={3} className="rounded-xl" />
@@ -854,7 +854,7 @@ function ArticleDetailModal({
             <DialogHeader>
               <div className="flex items-start gap-3">
                 <div className="flex-1">
-                  <DialogTitle className="text-lg text-white leading-snug">
+                  <DialogTitle className="text-lg text-foreground leading-snug">
                     {article.title}
                   </DialogTitle>
                   <DialogDescription className="sr-only">
@@ -882,7 +882,7 @@ function ArticleDetailModal({
             </DialogHeader>
 
             {/* Meta info */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 border-b border-white/5 pb-3">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 border-b border-foreground/5 pb-3">
               {article.source_display_name && (
                 <span className="flex items-center gap-1">
                   <Newspaper className="w-3 h-3" />
@@ -914,7 +914,7 @@ function ArticleDetailModal({
 
             {/* Content snippet */}
             {article.content_snippet && (
-              <div className="bg-white/5 rounded-lg p-4 text-sm text-gray-300 leading-relaxed">
+              <div className="bg-foreground/5 rounded-lg p-4 text-sm text-gray-300 leading-relaxed">
                 <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
                   <FileText className="w-3 h-3" />
                   Extracto
@@ -973,7 +973,7 @@ function ArticleDetailModal({
                   {article.entity_links.map((link) => (
                     <div
                       key={link.id}
-                      className="flex items-center justify-between bg-white/5 rounded-lg p-3"
+                      className="flex items-center justify-between bg-foreground/5 rounded-lg p-3"
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
@@ -981,7 +981,7 @@ function ArticleDetailModal({
                           link.verified ? 'bg-green-500' : 'bg-yellow-500'
                         )} />
                         <div>
-                          <p className="text-sm text-white font-medium">{link.mentioned_name}</p>
+                          <p className="text-sm text-foreground font-medium">{link.mentioned_name}</p>
                           <p className="text-xs text-gray-500">
                             Confianza: {Math.round(link.match_confidence * 100)}%
                             {link.match_method && ` · ${link.match_method}`}
@@ -1140,16 +1140,16 @@ export function AdverseMediaPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6 bg-white/5 border border-white/10">
-          <TabsTrigger value="articles" className="data-[state=active]:bg-white/10">
+        <TabsList className="mb-6 bg-foreground/5 border border-foreground/10">
+          <TabsTrigger value="articles" className="data-[state=active]:bg-foreground/10">
             <Newspaper className="w-4 h-4 mr-2" />
             Articulos
           </TabsTrigger>
-          <TabsTrigger value="sources" className="data-[state=active]:bg-white/10">
+          <TabsTrigger value="sources" className="data-[state=active]:bg-foreground/10">
             <Database className="w-4 h-4 mr-2" />
             Fuentes
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="data-[state=active]:bg-white/10">
+          <TabsTrigger value="analytics" className="data-[state=active]:bg-foreground/10">
             <TrendingUp className="w-4 h-4 mr-2" />
             Analisis
           </TabsTrigger>

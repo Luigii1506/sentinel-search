@@ -67,12 +67,12 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
       animate={{ scale: 1, opacity: 1 }}
       className={cn(
         'relative p-3 rounded-xl border-2 transition-all duration-200 cursor-pointer',
-        'bg-brand-navy backdrop-blur-sm',
+        'bg-card backdrop-blur-sm',
         selected
           ? 'border-blue-500 shadow-lg shadow-blue-500/20'
           : isCenter
           ? 'border-purple-500 shadow-lg shadow-purple-500/20'
-          : 'border-white/10 hover:border-white/20'
+          : 'border-foreground/10 hover:border-foreground/20'
       )}
       style={{
         boxShadow: selected ? `0 0 20px ${color}30` : isCenter ? `0 0 20px rgba(168, 85, 247, 0.3)` : undefined,
@@ -101,7 +101,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
 
         {/* Content */}
         <div className="min-w-0 flex-1">
-          <p className="font-medium text-white text-sm truncate">
+          <p className="font-medium text-foreground text-sm truncate">
             {entity.name}
           </p>
           <div className="flex items-center gap-2 mt-1">
@@ -123,7 +123,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
           {entity.topics && entity.topics.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {entity.topics.slice(0, 2).map(topic => (
-                <span key={topic} className="text-[9px] px-1.5 py-0.5 rounded bg-white/10 text-gray-400 capitalize">
+                <span key={topic} className="text-[9px] px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400 capitalize">
                   {topic}
                 </span>
               ))}
@@ -342,9 +342,9 @@ export function RelationshipGraph({
 
   if (isLoading) {
     return (
-      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-brand-carbon', className)} style={{ height }}>
+      <div className={cn('rounded-xl overflow-hidden border border-foreground/10 bg-background', className)} style={{ height }}>
         <div className="h-full flex items-center justify-center">
-          <Skeleton className="w-full h-full bg-white/5" />
+          <Skeleton className="w-full h-full bg-foreground/5" />
         </div>
       </div>
     );
@@ -352,7 +352,7 @@ export function RelationshipGraph({
 
   if (!center) {
     return (
-      <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-brand-carbon', className)} style={{ height }}>
+      <div className={cn('rounded-xl overflow-hidden border border-foreground/10 bg-background', className)} style={{ height }}>
         <div className="h-full p-6">
           <EmptyState
             icon={Users}
@@ -367,7 +367,7 @@ export function RelationshipGraph({
   const graphContent = (
     <div
       className={cn(
-        'relative rounded-xl overflow-hidden border border-white/10',
+        'relative rounded-xl overflow-hidden border border-foreground/10',
         isFullscreen ? 'fixed inset-0 z-50 border-0 rounded-none' : '',
         className
       )}
@@ -376,7 +376,7 @@ export function RelationshipGraph({
       {isFullscreen && (
         <button
           onClick={() => setIsFullscreen(false)}
-          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-brand-navy/80 backdrop-blur border border-white/10 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-card/80 backdrop-blur border border-foreground/10 hover:bg-foreground/10 text-gray-400 hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -395,7 +395,7 @@ export function RelationshipGraph({
         minZoom={0.2}
         maxZoom={2}
         attributionPosition="bottom-left"
-        className="bg-brand-carbon"
+        className="bg-background"
       >
         <Background
           color="#2a2a2a"
@@ -403,12 +403,12 @@ export function RelationshipGraph({
           size={1}
           style={{ backgroundColor: '#0a0a0a' }}
         />
-        <Controls className="bg-brand-navy border-white/10" />
+        <Controls className="bg-card border-foreground/10" />
         <MiniMap
           nodeStrokeWidth={3}
           zoomable
           pannable
-          className="bg-brand-navy border border-white/10 rounded-lg"
+          className="bg-card border border-foreground/10 rounded-lg"
           maskColor="rgba(10, 10, 10, 0.8)"
           nodeColor={(node) => {
             const data = node.data as unknown as EntityNodeData;
@@ -422,7 +422,7 @@ export function RelationshipGraph({
             <Button
               variant="outline"
               size="sm"
-              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-card/80 backdrop-blur border-foreground/10 hover:bg-foreground/10"
               onClick={() => setIsFullscreen(!isFullscreen)}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -430,14 +430,14 @@ export function RelationshipGraph({
             <Button
               variant="outline"
               size="sm"
-              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-card/80 backdrop-blur border-foreground/10 hover:bg-foreground/10"
             >
               <Share2 className="w-4 h-4" />
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="bg-brand-navy/80 backdrop-blur border-white/10 hover:bg-white/10"
+              className="bg-card/80 backdrop-blur border-foreground/10 hover:bg-foreground/10"
             >
               <Download className="w-4 h-4" />
             </Button>
@@ -463,7 +463,7 @@ export function RelationshipGraph({
                         'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                         depth === d
                           ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                          : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
                       )}
                     >
                       {d}
@@ -490,7 +490,7 @@ export function RelationshipGraph({
                 value={minStrength}
                 onChange={(e) => setMinStrength(Number(e.target.value))}
                 className="w-full h-1.5 rounded-full appearance-none cursor-pointer
-                  bg-white/10 accent-blue-500
+                  bg-foreground/10 accent-blue-500
                   [&::-webkit-slider-thumb]:appearance-none
                   [&::-webkit-slider-thumb]:w-3
                   [&::-webkit-slider-thumb]:h-3
@@ -536,7 +536,7 @@ export function RelationshipGraph({
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-3 pt-1 border-t border-white/5 text-xs text-gray-500">
+            <div className="flex items-center gap-3 pt-1 border-t border-foreground/5 text-xs text-gray-500">
               <span>{visibleNodeIds.size}{totalNodes && totalNodes !== visibleNodeIds.size ? `/${totalNodes}` : ''} nodos</span>
               <span className="text-gray-600">·</span>
               <span>{filteredEdges.length}{totalEdges && totalEdges !== filteredEdges.length ? `/${totalEdges}` : ''} relaciones</span>
@@ -558,7 +558,7 @@ export function RelationshipGraph({
             </div>
 
             {onNavigate && (
-              <div className="mt-3 pt-3 border-t border-white/10">
+              <div className="mt-3 pt-3 border-t border-foreground/10">
                 <p className="text-[10px] text-gray-500">
                   Doble clic en un nodo para navegar
                 </p>

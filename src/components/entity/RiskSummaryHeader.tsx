@@ -76,7 +76,7 @@ export function RiskSummaryHeader({
 
               <div className="flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h1 className="text-2xl lg:text-3xl font-semibold text-white truncate">
+                  <h1 className="text-2xl lg:text-3xl font-semibold text-foreground truncate">
                     {entity.primaryName}
                   </h1>
                   <Badge className={cn('capitalize', getRiskColorClass(entity.riskLevel))}>
@@ -138,13 +138,13 @@ export function RiskSummaryHeader({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="bg-white/5 border-white/10 text-gray-300"
+                      className="bg-foreground/5 border-foreground/10 text-gray-300"
                     >
                       {alias.name}
                     </Badge>
                   ))}
                   {entity.aliases.length > 5 && (
-                    <Badge variant="outline" className="bg-white/5 border-white/10 text-gray-500">
+                    <Badge variant="outline" className="bg-foreground/5 border-foreground/10 text-gray-500">
                       +{entity.aliases.length - 5} more
                     </Badge>
                   )}
@@ -245,7 +245,7 @@ export function RiskSummaryHeader({
               <Button
                 variant="outline"
                 onClick={onExportReport}
-                className="gap-2 border-white/10 hover:bg-white/10"
+                className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <Download className="w-4 h-4" />
                 Export Report
@@ -254,7 +254,7 @@ export function RiskSummaryHeader({
               <Button
                 variant="outline"
                 onClick={onAddToMonitoring}
-                className="gap-2 border-white/10 hover:bg-white/10"
+                className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <Bell className="w-4 h-4" />
                 Monitor
@@ -263,7 +263,7 @@ export function RiskSummaryHeader({
               <Button
                 variant="outline"
                 onClick={onAddNote}
-                className="gap-2 border-white/10 hover:bg-white/10"
+                className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <StickyNote className="w-4 h-4" />
                 Add Note

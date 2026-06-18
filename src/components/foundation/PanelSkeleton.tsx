@@ -19,13 +19,13 @@ export function PanelSkeleton({
 }: PanelSkeletonProps) {
   return (
     <div className={cn('glass rounded-xl p-4 space-y-3', className)} role="status" aria-label="Cargando panel">
-      <Skeleton className={cn('h-5 bg-white/10', titleWidthClassName)} />
+      <Skeleton className={cn('h-5 bg-foreground/10', titleWidthClassName)} />
       <div className="space-y-2">
         {Array.from({ length: lines }).map((_, i) => (
           <Skeleton
             key={i}
             className={cn(
-              'h-4 bg-white/10',
+              'h-4 bg-foreground/10',
               lineWidthClassNames?.[i] ?? (i === lines - 1 ? 'w-2/3' : 'w-full'),
             )}
           />

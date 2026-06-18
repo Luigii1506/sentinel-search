@@ -29,10 +29,10 @@ export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
           <ChevronRight className="h-3 w-3 mr-1" />Provenance
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 max-h-96 overflow-y-auto bg-[#0d0d0d] border-white/10 text-gray-100" onClick={(e) => e.stopPropagation()}>
-        <div className="mb-2 flex items-start justify-between gap-2 sticky top-0 bg-[#0d0d0d] pb-2 border-b border-white/5">
+      <PopoverContent className="w-96 max-h-96 overflow-y-auto bg-card border-foreground/10 text-gray-100" onClick={(e) => e.stopPropagation()}>
+        <div className="mb-2 flex items-start justify-between gap-2 sticky top-0 bg-card pb-2 border-b border-foreground/5">
           <div>
-            <div className="text-sm font-medium text-white">{canonicalName || `${entityId.slice(0, 12)}...`}</div>
+            <div className="text-sm font-medium text-foreground">{canonicalName || `${entityId.slice(0, 12)}...`}</div>
             <div className="text-xs text-gray-500">Provenance per-property</div>
           </div>
           <Link to={`/entity/${entityId}?tab=provenance`} className="text-xs text-purple-300 hover:underline inline-flex items-center gap-1">Completo <ExternalLink className="h-3 w-3" /></Link>
@@ -50,7 +50,7 @@ export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
             </div>
             <div className="text-xs space-y-1.5 max-h-60 overflow-y-auto">
               {Object.values(data.properties).sort((a, b) => (b.conflict ? 1 : 0) - (a.conflict ? 1 : 0)).slice(0, 6).map((prop) => (
-                <div key={prop.prop} className={`px-2 py-1 rounded border ${prop.conflict ? 'bg-red-500/10 border-red-500/30' : 'bg-white/5 border-white/10'}`}>
+                <div key={prop.prop} className={`px-2 py-1 rounded border ${prop.conflict ? 'bg-red-500/10 border-red-500/30' : 'bg-foreground/5 border-foreground/10'}`}>
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-purple-300">{prop.prop}</span>
                     <div className="flex items-center gap-1">
@@ -78,8 +78,8 @@ export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
 }
 
 function Stat({ label, value, accent = 'gray' }: { label: string; value: number | string; accent?: 'gray' | 'red'; }) {
-  const valueColor = accent === 'red' ? 'text-red-400' : 'text-white';
-  return <div className="bg-white/5 rounded px-2 py-1 text-center"><div className={`font-semibold ${valueColor}`}>{value}</div><div className="text-[9px] text-gray-500 uppercase">{label}</div></div>;
+  const valueColor = accent === 'red' ? 'text-red-400' : 'text-foreground';
+  return <div className="bg-foreground/5 rounded px-2 py-1 text-center"><div className={`font-semibold ${valueColor}`}>{value}</div><div className="text-[9px] text-gray-500 uppercase">{label}</div></div>;
 }
 
 export default ProvenanceTooltip;

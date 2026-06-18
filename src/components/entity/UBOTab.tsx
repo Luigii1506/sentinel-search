@@ -71,7 +71,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
   return (
     <div className="space-y-6">
       <motion.div {...fadeUp} className="glass rounded-xl p-6">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <Landmark className="w-5 h-5 text-blue-400" />
           {isIndividual ? 'Análisis de Control y Exposición' : 'Beneficiario Final (UBO)'}
         </h3>
@@ -80,11 +80,11 @@ export function UBOTab({ entityId }: UBOTabProps) {
             <>
               <div>
                 <p className="text-xs text-gray-500">UBOs Identificados</p>
-                <p className="text-2xl font-bold text-white">{owners.length}</p>
+                <p className="text-2xl font-bold text-foreground">{owners.length}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">UBOs &gt;25%</p>
-                <p className="text-2xl font-bold text-white">{ubo.ubos_above_25pct || 0}</p>
+                <p className="text-2xl font-bold text-foreground">{ubo.ubos_above_25pct || 0}</p>
               </div>
             </>
           )}
@@ -92,11 +92,11 @@ export function UBOTab({ entityId }: UBOTabProps) {
             <>
               <div>
                 <p className="text-xs text-gray-500">Entidades Controladas</p>
-                <p className="text-2xl font-bold text-white">{controlled.length}</p>
+                <p className="text-2xl font-bold text-foreground">{controlled.length}</p>
               </div>
               <div>
                 <p className="text-xs text-gray-500">Controladas Sancionadas</p>
-                <p className={cn('text-2xl font-bold', ubo.controlled_sanctioned > 0 ? 'text-red-400' : 'text-white')}>
+                <p className={cn('text-2xl font-bold', ubo.controlled_sanctioned > 0 ? 'text-red-400' : 'text-foreground')}>
                   {ubo.controlled_sanctioned || 0}
                 </p>
               </div>
@@ -105,7 +105,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
           {keyRelationships.length > 0 && (
             <div>
               <p className="text-xs text-gray-500">Vínculos de Riesgo</p>
-              <p className="text-2xl font-bold text-white">{keyRelationships.length}</p>
+              <p className="text-2xl font-bold text-foreground">{keyRelationships.length}</p>
             </div>
           )}
           {ubo.risk_flag && (
@@ -119,13 +119,13 @@ export function UBOTab({ entityId }: UBOTabProps) {
 
       {owners.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="glass rounded-xl p-6">
-          <h3 className="text-lg font-medium text-white mb-4">Beneficiarios Finales</h3>
+          <h3 className="text-lg font-medium text-foreground mb-4">Beneficiarios Finales</h3>
           <div className="space-y-3">
             {owners.map((owner: any, index: number) => (
-              <div key={index} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(owner.risk_level))}>
+              <div key={index} className={cn('p-4 rounded-lg bg-foreground/5 border-l-4', riskBorderColor(owner.risk_level))}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-white font-medium break-words">{owner.ubo_name || owner.name}</p>
+                    <p className="text-foreground font-medium break-words">{owner.ubo_name || owner.name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {owner.effective_ownership_pct != null && (
                         <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
@@ -164,14 +164,14 @@ export function UBOTab({ entityId }: UBOTabProps) {
 
       {controlled.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="glass rounded-xl p-6">
-          <h3 className="text-lg font-medium text-white mb-1">Entidades Controladas</h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">Entidades Controladas</h3>
           <p className="text-xs text-gray-500 mb-4">Empresas y entidades sobre las que tiene propiedad o dirección</p>
           <div className="space-y-3">
             {controlled.map((controlledEntity: any, index: number) => (
-              <div key={index} className={cn('p-4 rounded-lg bg-white/5 border-l-4', riskBorderColor(controlledEntity.risk_level))}>
+              <div key={index} className={cn('p-4 rounded-lg bg-foreground/5 border-l-4', riskBorderColor(controlledEntity.risk_level))}>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
-                    <p className="text-white font-medium break-words">{controlledEntity.entity_name}</p>
+                    <p className="text-foreground font-medium break-words">{controlledEntity.entity_name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
                         {controlledEntity.relationship_subtype || controlledEntity.relationship_type}
@@ -202,11 +202,11 @@ export function UBOTab({ entityId }: UBOTabProps) {
 
       {keyRelationships.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="glass rounded-xl p-6">
-          <h3 className="text-lg font-medium text-white mb-1">Vínculos de Riesgo</h3>
+          <h3 className="text-lg font-medium text-foreground mb-1">Vínculos de Riesgo</h3>
           <p className="text-xs text-gray-500 mb-4">Relaciones familiares, políticas y asociaciones con entidades de riesgo medio-alto</p>
           <div className="space-y-2">
             {keyRelationships.map((relationship: any, index: number) => (
-              <div key={index} className="p-3 rounded-lg bg-white/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div key={index} className="p-3 rounded-lg bg-foreground/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3 min-w-0">
                   <div
                     className={cn(
@@ -221,7 +221,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
                     )}
                   />
                   <div className="min-w-0">
-                    <p className="text-white text-sm font-medium break-words">{relationship.entity_name}</p>
+                    <p className="text-foreground text-sm font-medium break-words">{relationship.entity_name}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-500 break-words">
                         {relationshipTypeLabel[relationship.relationship_type] || relationship.relationship_type}

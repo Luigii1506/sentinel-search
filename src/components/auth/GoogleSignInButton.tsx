@@ -69,9 +69,9 @@ export function GoogleSignInButton({
     <div className="space-y-3">
       {!hideDivider && (
         <div className="flex items-center gap-3 text-xs text-gray-500 uppercase tracking-wider">
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-foreground/10" />
           <span>o</span>
-          <div className="flex-1 h-px bg-white/10" />
+          <div className="flex-1 h-px bg-foreground/10" />
         </div>
       )}
       <button
@@ -81,7 +81,7 @@ export function GoogleSignInButton({
           // to set an HttpOnly cookie before bouncing to Google.
           window.location.href = loginUrl;
         }}
-        className="w-full inline-flex items-center justify-center gap-3 rounded-md border border-white/15 bg-white hover:bg-gray-50 text-gray-800 font-medium px-4 py-2.5 transition-colors"
+        className="w-full inline-flex items-center justify-center gap-3 rounded-md border border-foreground/15 bg-white hover:bg-gray-50 text-gray-800 font-medium px-4 py-2.5 transition-colors"
       >
         <GoogleGlyph className="w-4 h-4" />
         <span>{label}</span>

@@ -48,7 +48,7 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
     return (
       <div className="glass rounded-xl p-12 text-center">
         <Landmark className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin exposición PEP registrada</h3>
+        <h3 className="text-xl font-medium text-foreground mb-2">Sin exposición PEP registrada</h3>
         <p className="text-gray-400">No hay cargos PEP consolidados para esta entidad en la vista actual.</p>
       </div>
     );
@@ -57,7 +57,7 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-medium text-white flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
           <Landmark className="w-5 h-5 text-purple-400" />
           Exposición política consolidada
         </h3>
@@ -75,30 +75,30 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
       ) : null}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
-        <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+        <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Cargos PEP</p>
-          <p className="text-2xl font-bold text-white mt-1">{canonicalPepEntries.length}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{canonicalPepEntries.length}</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+        <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Vigentes</p>
-          <p className="text-2xl font-bold text-white mt-1">{currentPepEntries.length}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{currentPepEntries.length}</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+        <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Históricos</p>
-          <p className="text-2xl font-bold text-white mt-1">{historicalPepEntries}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">{historicalPepEntries}</p>
         </div>
-        <div className="rounded-lg bg-white/[0.03] border border-white/5 p-3">
+        <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-[11px] text-gray-500 uppercase tracking-wide">Jurisdicciones</p>
-          <p className="text-sm font-semibold text-white mt-2 break-words">{pepJurisdictions.join(', ') || 'No especificadas'}</p>
+          <p className="text-sm font-semibold text-foreground mt-2 break-words">{pepJurisdictions.join(', ') || 'No especificadas'}</p>
         </div>
       </div>
 
       {pepSourceSummary.length > 0 && (
-        <div className="glass rounded-xl p-4 border border-white/5">
+        <div className="glass rounded-xl p-4 border border-foreground/5">
           <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Cobertura por fuente</p>
           <div className="flex flex-wrap gap-2">
             {pepSourceSummary.map((item) => (
-              <Badge key={item.label} variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+              <Badge key={item.label} variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
                 {item.label}: {item.value}
               </Badge>
             ))}
@@ -118,7 +118,7 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
             <div className={cn('glass rounded-lg p-5 border-l-4 transition-colors', pep.is_current ? 'border-purple-500 bg-purple-500/5' : 'border-gray-600 hover:border-gray-500')}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-white font-medium text-base leading-tight">{pep.role}</h4>
+                  <h4 className="text-foreground font-medium text-base leading-tight">{pep.role}</h4>
                   {(pep.institution || pep.department || pep.source) && (
                     <p className="text-gray-300 text-sm mt-1 flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />

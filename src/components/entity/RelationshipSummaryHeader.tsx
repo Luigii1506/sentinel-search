@@ -34,10 +34,10 @@ export function RelationshipSummaryHeader({
   contextualRelationshipCounts,
 }: RelationshipSummaryHeaderProps) {
   return (
-    <div className="glass rounded-xl border border-white/10 bg-white/[0.02] p-4">
+    <div className="glass rounded-xl border border-foreground/10 bg-foreground/[0.02] p-4">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <p className="text-sm font-medium text-white">Resumen de relaciones</p>
+          <p className="text-sm font-medium text-foreground">Resumen de relaciones</p>
           <p className="text-xs text-gray-400 mt-1">
             {amlVisibleRelationships} visibles AML de {totalDetectedRelationships} detectadas en total.
           </p>
@@ -62,12 +62,12 @@ export function RelationshipSummaryHeader({
           .sort(([, a], [, b]) => b - a)
           .slice(0, 4)
           .map(([type, count]) => (
-            <span key={type} className="rounded-full bg-white/[0.04] px-2.5 py-1">
+            <span key={type} className="rounded-full bg-foreground/[0.04] px-2.5 py-1">
               {(relationshipTypeLabels[type] || type)} {count}
             </span>
           ))}
         {!referenceLike && Object.keys(contextualRelationshipCounts).length > 0 ? (
-          <span className="rounded-full bg-white/[0.03] px-2.5 py-1 text-gray-500">
+          <span className="rounded-full bg-foreground/[0.03] px-2.5 py-1 text-gray-500">
             Contexto oculto: {Object.values(contextualRelationshipCounts).reduce((sum, value) => sum + value, 0)}
           </span>
         ) : null}

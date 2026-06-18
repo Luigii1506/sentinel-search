@@ -3,7 +3,7 @@
  * authenticated sidebar layout.
  *
  * Before this existed, every page hand-rolled its own
- *   `<div className="min-h-screen bg-brand-carbon pt-24 px-4 sm:px-6 lg:px-8 pb-12">`
+ *   `<div className="min-h-screen bg-background pt-24 px-4 sm:px-6 lg:px-8 pb-12">`
  * with a different combination of pt-20 vs pt-24, p-4 vs p-6,
  * max-w-5xl vs 6xl vs 7xl, and space-y-3/4/6. The result was a UI that
  * felt subtly off as you navigated — headers sat at different
@@ -125,12 +125,12 @@ export function Section({
         <header className="flex items-baseline justify-between gap-4">
           <div className="min-w-0">
             {title && (
-              <h2 className="text-base font-semibold text-white tracking-tight">
+              <h2 className="text-base font-semibold text-foreground tracking-tight">
                 {title}
               </h2>
             )}
             {description && (
-              <p className="text-xs text-navy-200 mt-0.5">{description}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
             )}
           </div>
           {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}

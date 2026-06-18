@@ -241,7 +241,7 @@ export function FederatedSearchPage() {
       />
 
       <Section unstyled>
-        <Card className="border-white/10 bg-white/5">
+        <Card className="border-foreground/10 bg-foreground/5">
           <CardContent className="space-y-4 p-6">
             <div className="flex flex-col gap-3 lg:flex-row">
               <div className="flex-1">
@@ -250,7 +250,7 @@ export function FederatedSearchPage() {
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => event.key === 'Enter' && runSearch()}
                   placeholder="Busca una persona, empresa o beneficiario final"
-                  className="border-white/10 bg-background/60 text-white"
+                  className="border-foreground/10 bg-background/60 text-foreground"
                 />
               </div>
               <div className="flex gap-2">
@@ -258,7 +258,7 @@ export function FederatedSearchPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setShowAdvanced((current) => !current)}
-                  className="border-white/10 bg-transparent"
+                  className="border-foreground/10 bg-transparent"
                 >
                   <SlidersHorizontal className="mr-2 h-4 w-4" />
                   Ajustes
@@ -284,21 +284,21 @@ export function FederatedSearchPage() {
                     'rounded-lg border px-3 py-2 text-left transition',
                     Math.abs(threshold - preset.value) < 0.001
                       ? 'border-cyan-500/40 bg-cyan-500/10 text-white'
-                      : 'border-white/10 bg-background/40 text-navy-100 hover:border-white/20 hover:text-white',
+                      : 'border-foreground/10 bg-background/40 text-muted-foreground hover:border-foreground/20 hover:text-foreground',
                   )}
                 >
                   <div className="text-sm font-medium">{preset.label}</div>
-                  <div className="text-xs text-navy-200">{preset.hint}</div>
+                  <div className="text-xs text-muted-foreground">{preset.hint}</div>
                 </button>
               ))}
             </div>
 
             {showAdvanced && (
-              <div className="grid gap-4 rounded-xl border border-white/10 bg-background/40 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="grid gap-4 rounded-xl border border-foreground/10 bg-background/40 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3 text-sm text-navy-100">
+                  <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
                     <span>Sensibilidad de coincidencia</span>
-                    <span className="font-mono text-white">{threshold.toFixed(2)}</span>
+                    <span className="font-mono text-foreground">{threshold.toFixed(2)}</span>
                   </div>
                   <input
                     type="range"
@@ -310,23 +310,23 @@ export function FederatedSearchPage() {
                     className="w-full"
                   />
                 </div>
-                <div className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-navy-100">
-                  Umbral actual: <span className="font-medium text-white">{threshold >= 0.7 ? 'estricto' : threshold <= 0.45 ? 'amplio' : 'balanceado'}</span>
+                <div className="rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-2 text-xs text-muted-foreground">
+                  Umbral actual: <span className="font-medium text-foreground">{threshold >= 0.7 ? 'estricto' : threshold <= 0.45 ? 'amplio' : 'balanceado'}</span>
                 </div>
               </div>
             )}
 
-            <div className="grid gap-3 text-sm text-navy-100 lg:grid-cols-3">
-              <div className="rounded-xl border border-white/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-white">Cuándo usar esta vista</div>
+            <div className="grid gap-3 text-sm text-muted-foreground lg:grid-cols-3">
+              <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
+                <div className="mb-1 font-medium text-foreground">Cuándo usar esta vista</div>
                 <p>Cuando necesitas confirmar cobertura ampliada y no solo una coincidencia local.</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-white">Qué devuelve</div>
+              <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
+                <div className="mb-1 font-medium text-foreground">Qué devuelve</div>
                 <p>Resultados agrupados por tipo de fuente, con score unificado y señales críticas visibles.</p>
               </div>
-              <div className="rounded-xl border border-white/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-white">Qué decisión habilita</div>
+              <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
+                <div className="mb-1 font-medium text-foreground">Qué decisión habilita</div>
                 <p>Priorizar revisión manual, abrir expediente o descartar con mayor confianza.</p>
               </div>
             </div>
@@ -385,20 +385,20 @@ export function FederatedSearchPage() {
                     <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-200">
                       {data ? buildCoverageLabel(data) : 'Sin datos'}
                     </Badge>
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-navy-100">
+                    <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-muted-foreground">
                       {data?.candidates_evaluated ?? 0} candidatos evaluados
                     </Badge>
-                    <Badge variant="outline" className="border-white/10 bg-white/5 text-navy-100">
+                    <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-muted-foreground">
                       Umbral {data?.threshold.toFixed(2) ?? submittedThreshold.toFixed(2)}
                     </Badge>
                   </div>
-                  <p className="text-sm leading-6 text-navy-100">{buildExecutiveSummary(allMatches)}</p>
+                  <p className="text-sm leading-6 text-muted-foreground">{buildExecutiveSummary(allMatches)}</p>
                   {bestMatch ? (
-                    <div className="rounded-xl border border-white/10 bg-background/40 p-4">
+                    <div className="rounded-xl border border-foreground/10 bg-background/40 p-4">
                       <div className="mb-3 flex items-start justify-between gap-3">
                         <div>
-                          <div className="text-xs uppercase tracking-wide text-navy-200">Hallazgo principal</div>
-                          <div className="mt-1 text-base font-semibold text-white">{bestMatch.caption}</div>
+                          <div className="text-xs uppercase tracking-wide text-muted-foreground">Hallazgo principal</div>
+                          <div className="mt-1 text-base font-semibold text-foreground">{bestMatch.caption}</div>
                         </div>
                         <Badge
                           variant="outline"
@@ -412,27 +412,27 @@ export function FederatedSearchPage() {
                       </div>
                       <div className="mb-3 flex flex-wrap gap-2">
                         <Badge variant="secondary">{bestMatch.schema}</Badge>
-                        <Badge variant="outline" className="border-white/10 bg-white/5 text-white">
+                        <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-foreground">
                           Score {formatScore(bestMatch.score)}
                         </Badge>
                         {bestMatch.is_sanctioned && <Badge className="bg-red-500/15 text-red-200">Sanción</Badge>}
                         {bestMatch.is_pep && <Badge className="bg-amber-500/15 text-amber-200">PEP</Badge>}
                       </div>
-                      <p className="text-sm text-navy-100">
-                        Dataset destacado: <span className="text-white">{formatDatasets(bestMatch.datasets)}</span>
+                      <p className="text-sm text-muted-foreground">
+                        Dataset destacado: <span className="text-foreground">{formatDatasets(bestMatch.datasets)}</span>
                       </p>
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Button type="button" onClick={() => navigate(`/entity/${bestMatch.id}`)}>
                           Abrir perfil
                           <ExternalLink className="ml-2 h-4 w-4" />
                         </Button>
-                        <Button type="button" variant="outline" onClick={() => navigate('/search')} className="border-white/10 bg-transparent">
+                        <Button type="button" variant="outline" onClick={() => navigate('/search')} className="border-foreground/10 bg-transparent">
                           Ir a búsqueda principal
                         </Button>
                       </div>
                     </div>
                   ) : (
-                    <div className="rounded-xl border border-dashed border-white/10 bg-background/30 p-4 text-sm text-navy-100">
+                    <div className="rounded-xl border border-dashed border-foreground/10 bg-background/30 p-4 text-sm text-muted-foreground">
                       No hubo un hallazgo principal porque ninguna fuente devolvió coincidencias por encima del umbral actual.
                     </div>
                   )}
@@ -440,7 +440,7 @@ export function FederatedSearchPage() {
               </SectionCard>
 
               <SectionCard title="Cómo leer esta consulta" icon={ShieldCheck}>
-                <div className="space-y-3 text-sm text-navy-100">
+                <div className="space-y-3 text-sm text-muted-foreground">
                   <p>La vista no sustituye la validación de identidad. Sirve para concentrar cobertura y señalar dónde revisar primero.</p>
                   <p>Prioriza coincidencias con sanción o score alto. Después revisa leaks y contexto externo para riesgo reputacional.</p>
                   <p>Si hay demasiados resultados, sube el umbral. Si falta cobertura, baja el umbral o complementa con la búsqueda principal.</p>
@@ -472,7 +472,7 @@ export function FederatedSearchPage() {
               description="La consulta se ejecutó correctamente, pero ninguna fuente devolvió resultados suficientes con la sensibilidad actual."
               tone="success"
               action={
-                <Button type="button" variant="outline" onClick={() => setThreshold(0.4)} className="border-white/10 bg-transparent">
+                <Button type="button" variant="outline" onClick={() => setThreshold(0.4)} className="border-foreground/10 bg-transparent">
                   Probar modo amplio
                 </Button>
               }
@@ -503,16 +503,16 @@ function OriginPanel({
           <Badge variant="outline" className={meta.badgeClassName}>
             {matches.length} coincidencias
           </Badge>
-          <span className="text-xs text-navy-200">{meta.shortLabel}</span>
+          <span className="text-xs text-muted-foreground">{meta.shortLabel}</span>
         </div>
 
         <div className="space-y-1">
-          <p className="text-sm text-navy-100">{meta.description}</p>
-          <p className="text-xs text-navy-200">{meta.summary}</p>
+          <p className="text-sm text-muted-foreground">{meta.description}</p>
+          <p className="text-xs text-muted-foreground">{meta.summary}</p>
         </div>
 
         {matches.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-white/10 bg-background/30 p-4 text-sm text-navy-100">
+          <div className="rounded-xl border border-dashed border-foreground/10 bg-background/30 p-4 text-sm text-muted-foreground">
             {meta.emptyMessage}
           </div>
         ) : (
@@ -522,19 +522,19 @@ function OriginPanel({
                 key={match.id}
                 type="button"
                 onClick={() => onOpenEntity(match.id)}
-                className="w-full rounded-xl border border-white/10 bg-background/35 p-4 text-left transition hover:border-white/20 hover:bg-background/55"
+                className="w-full rounded-xl border border-foreground/10 bg-background/35 p-4 text-left transition hover:border-foreground/20 hover:bg-background/55"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-medium text-white" title={match.caption}>
+                    <div className="truncate text-sm font-medium text-foreground" title={match.caption}>
                       {match.caption}
                     </div>
-                    <div className="mt-1 text-xs text-navy-200">{formatDatasets(match.datasets)}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{formatDatasets(match.datasets)}</div>
                   </div>
                   <Badge
                     variant="outline"
                     className={cn(
-                      'shrink-0 border-white/10 bg-white/5 text-xs',
+                      'shrink-0 border-foreground/10 bg-foreground/5 text-xs',
                       scoreTone(match.score) === 'red' && 'text-red-200',
                       scoreTone(match.score) === 'amber' && 'text-amber-200',
                       scoreTone(match.score) === 'success' && 'text-emerald-200',

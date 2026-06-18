@@ -271,12 +271,12 @@ const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
   regulatory: "border-blue-500/20 text-blue-400/80",
   law_enforcement: "border-indigo-500/20 text-indigo-400/80",
   tax: "border-orange-500/20 text-orange-400/80",
-  other: "border-white/10 text-gray-400",
+  other: "border-foreground/10 text-gray-400",
 };
 
 function getConfidenceTone(confidence?: number) {
   if (confidence == null) {
-    return { label: "Confianza no disponible", className: "bg-white/5 text-gray-400 border-white/10" };
+    return { label: "Confianza no disponible", className: "bg-foreground/5 text-gray-400 border-foreground/10" };
   }
   if (confidence >= 0.9) {
     return { label: `Confianza alta · ${Math.round(confidence * 100)}%`, className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
@@ -405,14 +405,14 @@ function SearchResultCard({
       <div className="absolute left-0 top-0 bottom-0 w-1" style={{ backgroundColor: riskColor }} />
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="px-4 sm:px-5 py-3.5 sm:pl-6 cursor-pointer hover:bg-white/[0.02] transition-colors select-none"
+        className="px-4 sm:px-5 py-3.5 sm:pl-6 cursor-pointer hover:bg-foreground/[0.02] transition-colors select-none"
       >
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-3">
           <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: `${riskColor}12` }}>
             <TypeIcon className="w-5 h-5" style={{ color: riskColor }} />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="text-[15px] font-semibold text-white leading-tight">
+            <h3 className="text-[15px] font-semibold text-foreground leading-tight">
               {humanizeEntityName(entity.display_name || entity.name)}
             </h3>
             {entity.description && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{entity.description}</p>}
@@ -422,7 +422,7 @@ function SearchResultCard({
                 {entity.aliases.length > 2 && ` +${entity.aliases.length - 2}`}
               </p>
             )}
-            <div className="mt-2 rounded-lg border border-white/8 bg-white/[0.02] px-3 py-2">
+            <div className="mt-2 rounded-lg border border-foreground/8 bg-foreground/[0.02] px-3 py-2">
               <p className="text-[12px] font-medium text-gray-200 leading-relaxed">{evidenceSummary}</p>
               <RiskBadges
                 isSanctioned={entity.is_sanctioned ?? (entity.sanctions?.length || 0) > 0}
@@ -461,7 +461,7 @@ function SearchResultCard({
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                 Coincidencia {matchSignalLabel} · {Math.round(entity.match_score || 0)}%
               </Badge>
-              <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">{coverageSummary}</Badge>
+              <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-gray-300 border-foreground/10">{coverageSummary}</Badge>
               {entity.has_adverse_media && (
                 <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-400 border-red-500/30">
                   <Newspaper className="w-3 h-3" />
@@ -547,14 +547,14 @@ function SearchResultCard({
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-4 sm:px-6 pb-5 pt-1 border-t border-white/5 space-y-4">
+            <div className="px-4 sm:px-6 pb-5 pt-1 border-t border-foreground/5 space-y-4">
               <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
                 {(entity.match_type as string) === "v2_ml" ? (
                   <Badge className="text-[10px] px-2 py-0.5 bg-purple-500/15 text-purple-200 border-purple-400/40" title="Scored by nomenklatura.DefaultAlgorithm — ML model entrenado por OpenSanctions">
                     ✨ v2 ML-scored
                   </Badge>
                 ) : (
-                  <Badge className="text-[10px] px-2 py-0.5 bg-white/5 text-gray-300 border-white/10">
+                  <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-gray-300 border-foreground/10">
                     Motor {entity.match_type || "opensearch"}
                   </Badge>
                 )}
@@ -565,26 +565,26 @@ function SearchResultCard({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/5 rounded-lg overflow-hidden border border-white/5">
-                <div className="bg-[#0d0d0d] px-3 py-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-foreground/5 rounded-lg overflow-hidden border border-foreground/5">
+                <div className="bg-card px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Tipo</p>
-                  <p className="text-sm text-white font-medium mt-0.5 capitalize">{getEntityTypeLabel(entity.entity_type)}</p>
+                  <p className="text-sm text-foreground font-medium mt-0.5 capitalize">{getEntityTypeLabel(entity.entity_type)}</p>
                 </div>
-                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                <div className="bg-card px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Género</p>
-                  <p className="text-sm text-white font-medium mt-0.5">{genderLabel || "—"}</p>
+                  <p className="text-sm text-foreground font-medium mt-0.5">{genderLabel || "—"}</p>
                 </div>
-                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                <div className="bg-card px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Fecha Nacimiento</p>
-                  <p className="text-sm text-white font-medium mt-0.5">{entity.birth_date || entity.date_of_birth || "—"}</p>
+                  <p className="text-sm text-foreground font-medium mt-0.5">{entity.birth_date || entity.date_of_birth || "—"}</p>
                 </div>
-                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                <div className="bg-card px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Lugar Nacimiento</p>
-                  <p className="text-sm text-white font-medium mt-0.5">{entity.place_of_birth || "—"}</p>
+                  <p className="text-sm text-foreground font-medium mt-0.5">{entity.place_of_birth || "—"}</p>
                 </div>
-                <div className="bg-[#0d0d0d] px-3 py-2.5">
+                <div className="bg-card px-3 py-2.5">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider">Nacionalidad</p>
-                  <p className="text-sm text-white font-medium mt-0.5">
+                  <p className="text-sm text-foreground font-medium mt-0.5">
                     {entity.nationalities_display && entity.nationalities_display.length > 0 ? (
                       <>{countryFlag} {entity.nationalities_display.join(", ")}</>
                     ) : country ? (
@@ -593,9 +593,9 @@ function SearchResultCard({
                   </p>
                 </div>
                 {entity.addresses && entity.addresses.length > 0 && (
-                  <div className="bg-[#0d0d0d] px-3 py-2.5 col-span-2">
+                  <div className="bg-card px-3 py-2.5 col-span-2">
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider">Ubicación</p>
-                    <p className="text-sm text-white font-medium mt-0.5 break-words">
+                    <p className="text-sm text-foreground font-medium mt-0.5 break-words">
                       {(() => {
                         const a = entity.addresses[0];
                         if (typeof a === "string") return a;
@@ -609,9 +609,9 @@ function SearchResultCard({
                 {entity.nationalities &&
                   entity.nationalities.length > 0 &&
                   !(entity.nationalities.length === 1 && entity.nationalities[0] === country) && (
-                    <div className="bg-[#0d0d0d] px-3 py-2.5 col-span-2">
+                    <div className="bg-card px-3 py-2.5 col-span-2">
                       <p className="text-[10px] text-gray-500 uppercase tracking-wider">Nacionalidades</p>
-                      <p className="text-sm text-white font-medium mt-0.5">
+                      <p className="text-sm text-foreground font-medium mt-0.5">
                         {entity.nationalities.map((n: string) => `${COUNTRY_FLAGS[n] || ""} ${COUNTRY_NAMES[n] || n}`).join("  ·  ")}
                       </p>
                     </div>
@@ -626,7 +626,7 @@ function SearchResultCard({
                       <div className="flex items-center gap-2">
                         <Flag className="w-4 h-4 text-purple-400 flex-shrink-0" />
                         <div>
-                          <p className="text-sm font-medium text-white">{pepPosition.cargo || entity.pep_category}</p>
+                          <p className="text-sm font-medium text-foreground">{pepPosition.cargo || entity.pep_category}</p>
                           {pepPosition.dependencia && <p className="text-xs text-gray-400 mt-0.5">{pepPosition.dependencia}</p>}
                         </div>
                       </div>
@@ -746,7 +746,7 @@ function SearchResultCard({
               )}
 
               {entity.explainability && (
-                <div className="pt-3 border-t border-white/5">
+                <div className="pt-3 border-t border-foreground/5">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-[10px] text-gray-500 mb-2">
                     <div className="flex items-center gap-1.5">
                       <Sparkles className="w-3 h-3 text-purple-400" />
@@ -803,12 +803,12 @@ function SearchResultCard({
                 </div>
               )}
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 pt-3 border-t border-white/5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 pt-3 border-t border-foreground/5">
                 <div className="flex-1">
                   <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Fuentes ({sources.length})</p>
                   <div className="flex flex-wrap gap-1">
                     {sources.map((source) => (
-                      <span key={source} className={`text-[10px] px-2 py-0.5 rounded-full bg-white/5 border ${SOURCE_COLOR_MAP[getSourceCategory(source)]}`}>
+                      <span key={source} className={`text-[10px] px-2 py-0.5 rounded-full bg-foreground/5 border ${SOURCE_COLOR_MAP[getSourceCategory(source)]}`}>
                         {formatSourceName(source)}
                       </span>
                     ))}

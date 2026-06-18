@@ -37,7 +37,7 @@ import { activityLogService, type AuditLogEntry } from '@/services/activityLog';
 import { cn } from '@/lib/utils';
 
 function statusBadgeClasses(code: number | null): string {
-  if (code === null) return 'bg-navy-600 text-navy-100 border-navy-500/40';
+  if (code === null) return 'bg-secondary text-muted-foreground border-border/40';
   if (code >= 500)   return 'bg-red-500/10 text-red-200 border-red-500/30';
   if (code === 402)  return 'bg-amber-500/10 text-amber-200 border-amber-500/30';
   if (code === 401 || code === 403) return 'bg-orange-500/10 text-orange-200 border-orange-500/30';
@@ -88,7 +88,7 @@ export function ActivityLogPage() {
       id: 'when',
       header: 'Cuando',
       cell: (row) => (
-        <span className="text-xs text-navy-100 whitespace-nowrap">
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
           {formatDistanceToNow(new Date(row.timestamp), { addSuffix: true, locale: es })}
         </span>
       ),
@@ -99,8 +99,8 @@ export function ActivityLogPage() {
       primary: true,
       cell: (row) => (
         <span className="text-xs">
-          <span className="text-white font-medium">
-            {row.username ?? <span className="text-navy-200">anónimo</span>}
+          <span className="text-foreground font-medium">
+            {row.username ?? <span className="text-muted-foreground">anónimo</span>}
           </span>
         </span>
       ),
@@ -109,7 +109,7 @@ export function ActivityLogPage() {
       id: 'auth',
       header: 'Auth',
       hideOnMobile: true,
-      cell: (row) => <span className="text-xs text-navy-200">{row.auth_method ?? '—'}</span>,
+      cell: (row) => <span className="text-xs text-muted-foreground">{row.auth_method ?? '—'}</span>,
     },
     {
       id: 'method',
@@ -117,7 +117,7 @@ export function ActivityLogPage() {
       cell: (row) => (
         <Badge
           variant="outline"
-          className={cn('text-[10px]', METHOD_COLOR[row.action] ?? 'bg-navy-600 text-navy-100 border-navy-500')}
+          className={cn('text-[10px]', METHOD_COLOR[row.action] ?? 'bg-secondary text-muted-foreground border-border')}
         >
           {row.action}
         </Badge>
@@ -149,7 +149,7 @@ export function ActivityLogPage() {
       header: 'Latencia',
       align: 'right',
       cell: (row) => (
-        <span className="text-xs text-navy-200 tabular-nums">
+        <span className="text-xs text-muted-foreground tabular-nums">
           {row.duration_ms !== null ? `${row.duration_ms}ms` : '—'}
         </span>
       ),
@@ -159,7 +159,7 @@ export function ActivityLogPage() {
       header: 'IP',
       hideOnMobile: true,
       cell: (row) => (
-        <span className="text-xs text-navy-200 font-mono">{row.ip_address ?? '—'}</span>
+        <span className="text-xs text-muted-foreground font-mono">{row.ip_address ?? '—'}</span>
       ),
     },
   ];
@@ -208,7 +208,7 @@ export function ActivityLogPage() {
         <Card>
           <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="relative">
-              <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-200" aria-hidden="true" />
+              <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" aria-hidden="true" />
               <Input
                 placeholder="Usuario (substring)"
                 value={usernameFilter}
@@ -218,7 +218,7 @@ export function ActivityLogPage() {
               />
             </div>
             <div className="relative">
-              <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-navy-200" aria-hidden="true" />
+              <Globe className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" aria-hidden="true" />
               <Input
                 placeholder="Endpoint (substring)"
                 value={endpointFilter}

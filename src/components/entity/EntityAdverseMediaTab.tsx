@@ -148,11 +148,11 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
             </div>
             <div className="flex-1 grid grid-cols-3 gap-4">
               <div>
-                <p className="text-lg font-bold text-white">{riskProfile.total_articles}</p>
+                <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
                 <p className="text-xs text-gray-400">Articulos</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-white">{riskProfile.recent_30d}</p>
+                <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
                 <p className="text-xs text-gray-400">Ultimos 30d</p>
               </div>
               <div>
@@ -165,7 +165,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
             {riskProfile.top_categories.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {riskProfile.top_categories.map((category) => (
-                  <Badge key={category} variant="outline" className={cn('text-[10px]', amCategoryColors[category] || 'bg-white/5')}>
+                  <Badge key={category} variant="outline" className={cn('text-[10px]', amCategoryColors[category] || 'bg-foreground/5')}>
                     {amCategoryLabels[category] || category}
                   </Badge>
                 ))}
@@ -183,10 +183,10 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
           </h4>
           <div className="space-y-2">
             {structured.categories.map((category, index) => (
-              <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-white/[0.02]">
-                <span className="text-sm text-white">{amCategoryLabels[category.category] || category.category}</span>
+              <div key={index} className="flex items-center justify-between p-2 rounded-lg bg-foreground/[0.02]">
+                <span className="text-sm text-foreground">{amCategoryLabels[category.category] || category.category}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                     <div className={cn('h-full rounded-full', sevBg(category.severity))} style={{ width: `${category.severity}%` }} />
                   </div>
                   <span className={cn('text-xs font-mono', sevColor(category.severity))}>{category.severity}</span>
@@ -234,10 +234,10 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                 )}
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
-                  <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
+                  <h5 className="text-sm font-medium text-foreground flex-1 line-clamp-2">{article.title}</h5>
                   {(article.severity ?? 0) > 0 && (
                     <div className="flex items-center gap-1 shrink-0">
-                      <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="w-12 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                         <div className={cn('h-full rounded-full', sevBg(article.severity))} style={{ width: `${article.severity}%` }} />
                       </div>
                       <span className={cn('text-xs font-mono font-bold', sevColor(article.severity))}>
@@ -251,7 +251,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {article.categories?.map((category) => (
-                    <Badge key={category} variant="outline" className={cn('text-[10px]', amCategoryColors[category] || 'bg-white/5')}>
+                    <Badge key={category} variant="outline" className={cn('text-[10px]', amCategoryColors[category] || 'bg-foreground/5')}>
                       {amCategoryLabels[category] || category}
                     </Badge>
                   ))}

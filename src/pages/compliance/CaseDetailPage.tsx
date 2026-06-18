@@ -252,7 +252,7 @@ export function CaseDetailPage() {
             <Button
               variant="ghost"
               onClick={() => navigate('/compliance')}
-              className="text-gray-400 hover:text-white"
+              className="text-gray-400 hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Casos
             </Button>
@@ -312,7 +312,7 @@ export function CaseDetailPage() {
 
                 {/* Action items for True Positive */}
                 {caseData.status === 'closed_tp' && !caseData.sar_filed && (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-white/5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-foreground/5">
                     <div className="flex items-start gap-3">
                       <FileWarning className="w-4 h-4 text-amber-400 flex-shrink-0" />
                       <span className="text-sm text-amber-400">
@@ -341,7 +341,7 @@ export function CaseDetailPage() {
                   </div>
                 )}
                 {caseData.sar_filed && (
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-white/5">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-foreground/5">
                     <div className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
                       <span className="text-sm text-blue-400">SAR/ROS presentado ante el regulador</span>
@@ -392,7 +392,7 @@ export function CaseDetailPage() {
             <p className="text-sm text-gray-500 mb-4">{caseData.description}</p>
           )}
 
-          <DetailList className="pt-4 border-t border-white/5">
+          <DetailList className="pt-4 border-t border-foreground/5">
             <DetailRow label="Riesgo" value={`${Math.round(caseData.risk_score || 0)}/100`} mono />
             <DetailRow label="Alertas" value={`${decidedAlerts.length}/${alerts.length} revisadas`} />
             <DetailRow label="Creado" value={formatDateTime(caseData.created_at)} />
@@ -417,7 +417,7 @@ export function CaseDetailPage() {
           transition={{ delay: 0.1 }}
           className="mb-6"
         >
-          <h2 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+          <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4 text-blue-400" />
             Coincidencias detectadas
             <span className="text-xs text-gray-500 font-normal">({alerts.length})</span>
@@ -440,7 +440,7 @@ export function CaseDetailPage() {
                   <div key={alert.id} className="glass rounded-xl overflow-hidden">
                     {/* Alert decision strip */}
                     {alertDecision && (
-                      <div className={cn('px-5 py-2.5 flex items-center gap-2 border-b border-white/5', alertDecision.bgColor)}>
+                      <div className={cn('px-5 py-2.5 flex items-center gap-2 border-b border-foreground/5', alertDecision.bgColor)}>
                         <AlertDecisionIcon className={cn('w-4 h-4', alertDecision.color)} />
                         <span className={cn('text-sm font-medium', alertDecision.color)}>
                           {alertDecision.label}
@@ -458,7 +458,7 @@ export function CaseDetailPage() {
                         <div className="flex-1 min-w-0">
                           {/* Entity matched */}
                           <div className="flex items-start gap-2 mb-2">
-                            <p className="text-white font-medium break-words">{alert.matched_entity_name}</p>
+                            <p className="text-foreground font-medium break-words">{alert.matched_entity_name}</p>
                             <Badge variant="outline" className={cn('text-[10px] flex-shrink-0',
                               alert.severity === 'critical' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
                               alert.severity === 'high' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
@@ -508,7 +508,7 @@ export function CaseDetailPage() {
 
                           {/* Decision reason inline */}
                           {alert.decision_reason && (
-                            <div className="mt-3 p-3 rounded-lg bg-white/[0.03] border border-white/5">
+                            <div className="mt-3 p-3 rounded-lg bg-foreground/[0.03] border border-foreground/5">
                               <p className="text-xs text-gray-500 mb-1">Razon:</p>
                               <p className="text-sm text-gray-300">{alert.decision_reason}</p>
                             </div>
@@ -568,13 +568,13 @@ export function CaseDetailPage() {
             transition={{ delay: 0.2 }}
             className="mb-6"
           >
-            <h2 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+            <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
               <Clock className="w-4 h-4 text-gray-400" />
               Historial
             </h2>
             <div className="glass rounded-xl p-5">
               <div className="relative">
-                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-white/10" />
+                <div className="absolute left-[15px] top-2 bottom-2 w-px bg-foreground/10" />
                 <div className="space-y-0">
                   {timeline.map((event, i) => {
                     const eventType = String(event.event_type || 'created');
@@ -597,7 +597,7 @@ export function CaseDetailPage() {
                       <div key={i} className="relative pl-10 py-2.5">
                         <div className={cn(
                           'absolute left-1 w-[22px] h-[22px] rounded-full flex items-center justify-center z-10',
-                          'bg-brand-carbon border border-white/10',
+                          'bg-background border border-foreground/10',
                         )}>
                           <EventIcon className="w-3 h-3 text-gray-500" />
                         </div>
@@ -614,11 +614,11 @@ export function CaseDetailPage() {
                         </div>
                         {event.old_value != null && event.new_value != null && (
                           <div className="flex items-center gap-2 mt-1 text-xs">
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
+                            <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-gray-500">
                               {statusConfig[String(event.old_value)]?.label || String(event.old_value)}
                             </span>
                             <ChevronRight className="w-3 h-3 text-gray-600" />
-                            <span className="px-1.5 py-0.5 rounded bg-white/5 text-white">
+                            <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-foreground">
                               {statusConfig[String(event.new_value)]?.label || String(event.new_value)}
                             </span>
                           </div>
@@ -640,7 +640,7 @@ export function CaseDetailPage() {
           transition={{ delay: 0.3 }}
           className="mb-6"
         >
-          <h2 className="text-base font-semibold text-white mb-3 flex items-center gap-2">
+          <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-gray-400" />
             Notas
             {notes.length > 0 && (
@@ -655,7 +655,7 @@ export function CaseDetailPage() {
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 placeholder="Agregar una nota al caso..."
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 mb-3 min-h-[80px]"
+                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600 mb-3 min-h-[80px]"
                 rows={2}
               />
               <div className="flex justify-end">
@@ -704,15 +704,15 @@ export function CaseDetailPage() {
           DECISION DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={!!decisionDialog} onOpenChange={(open) => !open && setDecisionDialog(null)}>
-        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
+        <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-lg">Tomar decision</DialogTitle>
           </DialogHeader>
           {decisionDialog && (
             <div className="space-y-5">
               {/* Context card */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/5">
-                <p className="text-white font-medium mb-1">{decisionDialog.matched_entity_name}</p>
+              <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/5">
+                <p className="text-foreground font-medium mb-1">{decisionDialog.matched_entity_name}</p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 text-sm text-gray-400">
                   <span>Busqueda: "{decisionDialog.query_name}"</span>
                   <span className="hidden sm:inline text-gray-600">|</span>
@@ -726,7 +726,7 @@ export function CaseDetailPage() {
                 {decisionDialog.matched_sources.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {decisionDialog.matched_sources.map((s) => (
-                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
+                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/5 text-gray-500">
                         {s.replace(/_/g, ' ')}
                       </span>
                     ))}
@@ -745,7 +745,7 @@ export function CaseDetailPage() {
                       'p-4 rounded-xl border-2 text-left transition-all',
                       decisionType === 'true_positive'
                         ? 'bg-red-500/15 border-red-500/60 text-white'
-                        : 'border-white/10 text-gray-300 hover:bg-red-500/5 hover:border-red-500/20'
+                        : 'border-foreground/10 text-gray-300 hover:bg-red-500/5 hover:border-red-500/20'
                     )}
                   >
                     <AlertTriangle className={cn('w-5 h-5 mb-2',
@@ -764,7 +764,7 @@ export function CaseDetailPage() {
                       'p-4 rounded-xl border-2 text-left transition-all',
                       decisionType === 'false_positive'
                         ? 'bg-green-500/15 border-green-500/60 text-white'
-                        : 'border-white/10 text-gray-300 hover:bg-green-500/5 hover:border-green-500/20'
+                        : 'border-foreground/10 text-gray-300 hover:bg-green-500/5 hover:border-green-500/20'
                     )}
                   >
                     <CheckCircle className={cn('w-5 h-5 mb-2',
@@ -785,7 +785,7 @@ export function CaseDetailPage() {
                       'p-3 rounded-xl border-2 text-left transition-all',
                       decisionType === 'escalate'
                         ? 'bg-orange-500/15 border-orange-500/60 text-white'
-                        : 'border-white/10 text-gray-300 hover:bg-orange-500/5 hover:border-orange-500/20'
+                        : 'border-foreground/10 text-gray-300 hover:bg-orange-500/5 hover:border-orange-500/20'
                     )}
                   >
                     <span className="text-sm font-medium">Escalar</span>
@@ -797,7 +797,7 @@ export function CaseDetailPage() {
                       'p-3 rounded-xl border-2 text-left transition-all',
                       decisionType === 'inconclusive'
                         ? 'bg-gray-500/15 border-gray-500/60 text-white'
-                        : 'border-white/10 text-gray-300 hover:bg-gray-500/5 hover:border-gray-500/20'
+                        : 'border-foreground/10 text-gray-300 hover:bg-gray-500/5 hover:border-gray-500/20'
                     )}
                   >
                     <span className="text-sm font-medium">Inconcluso</span>
@@ -815,7 +815,7 @@ export function CaseDetailPage() {
                   value={decisionReason}
                   onChange={(e) => setDecisionReason(e.target.value)}
                   placeholder="Describe la razon de esta decision..."
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600"
+                  className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600"
                   rows={3}
                 />
               </div>
@@ -847,7 +847,7 @@ export function CaseDetailPage() {
               )}
 
               {/* Actions */}
-              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2 border-t border-white/5">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-2 border-t border-foreground/5">
                 <Button
                   variant="ghost"
                   onClick={() => setDecisionDialog(null)}
@@ -888,7 +888,7 @@ export function CaseDetailPage() {
           SAR REPORT DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={showSarReport} onOpenChange={setShowSarReport}>
-        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="bg-card border-foreground/10 text-foreground max-w-3xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <DialogTitle className="text-lg flex items-center gap-2">
@@ -911,7 +911,7 @@ export function CaseDetailPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider">Reporte SAR/ROS</p>
-                    <p className="text-lg font-semibold text-white mt-1">
+                    <p className="text-lg font-semibold text-foreground mt-1">
                       {(sarReport as any).sar_report?.case?.case_number || caseData.case_number}
                     </p>
                   </div>
@@ -939,7 +939,7 @@ export function CaseDetailPage() {
                   Sujeto Investigado
                 </h3>
                 <div className="glass rounded-xl p-4">
-                  <p className="text-white font-medium text-lg mb-2">
+                  <p className="text-foreground font-medium text-lg mb-2">
                     {(sarReport as any).sar_report?.subject?.entity_name || caseData.entity_name}
                   </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -982,7 +982,7 @@ export function CaseDetailPage() {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="glass rounded-xl p-4 text-center">
-                    <p className="text-2xl font-bold text-white">
+                    <p className="text-2xl font-bold text-foreground">
                       {(sarReport as any).sar_report?.summary?.total_alerts || 0}
                     </p>
                     <p className="text-xs text-gray-500 mt-1">Alertas</p>
@@ -1035,7 +1035,7 @@ export function CaseDetailPage() {
                     {((sarReport as any).sar_report?.alerts || []).map((alert: any, i: number) => (
                       <div key={i} className="glass rounded-xl p-4">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-2">
-                          <span className="text-white font-medium break-words">{alert.matched_entity}</span>
+                          <span className="text-foreground font-medium break-words">{alert.matched_entity}</span>
                           {alert.decision && (
                             <Badge variant="outline" className={cn('text-[10px]',
                               decisionConfig[alert.decision]?.bgColor || ''
@@ -1048,12 +1048,12 @@ export function CaseDetailPage() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-400">
                           <div>Busqueda: "{alert.query_name}"</div>
-                          <div>Confianza: <span className="font-mono text-white">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
-                          <div>Riesgo: <span className="font-mono text-white">{alert.risk_score}</span></div>
+                          <div>Confianza: <span className="font-mono text-foreground">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
+                          <div>Riesgo: <span className="font-mono text-foreground">{alert.risk_score}</span></div>
                           <div>Tipo: {alert.alert_type}</div>
                         </div>
                         {alert.decision_reason && (
-                          <div className="mt-2 p-2 rounded bg-white/[0.03] text-sm text-gray-400">
+                          <div className="mt-2 p-2 rounded bg-foreground/[0.03] text-sm text-gray-400">
                             <span className="text-gray-500">Razon: </span>{alert.decision_reason}
                           </div>
                         )}
@@ -1099,7 +1099,7 @@ export function CaseDetailPage() {
                   <div className="glass rounded-xl p-4">
                     <div className="space-y-2">
                       {((sarReport as any).sar_report?.timeline || []).map((event: any, i: number) => (
-                        <div key={i} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm py-1 border-b border-white/5 last:border-0">
+                        <div key={i} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm py-1 border-b border-foreground/5 last:border-0">
                           <span className="text-gray-300 break-words">
                             {eventTypeConfig[event.event]?.label || event.event}
                           </span>
@@ -1168,7 +1168,7 @@ export function CaseDetailPage() {
               </div>
 
               {/* Actions */}
-              <div className="flex justify-between items-center pt-3 border-t border-white/5">
+              <div className="flex justify-between items-center pt-3 border-t border-foreground/5">
                 <div className="flex gap-2">                  <Button
                     variant="outline"
                     size="sm"
@@ -1183,7 +1183,7 @@ export function CaseDetailPage() {
                       URL.revokeObjectURL(url);
                       toast.success('Reporte descargado');
                     }}
-                    className="text-gray-400 border-white/10 hover:bg-white/5"
+                    className="text-gray-400 border-foreground/10 hover:bg-foreground/5"
                   >
                     <Download className="w-3.5 h-3.5 mr-1.5" />
                     JSON
@@ -1223,7 +1223,7 @@ export function CaseDetailPage() {
           FILE SAR DIALOG
           ═══════════════════════════════════════════ */}
       <Dialog open={showFileSarDialog} onOpenChange={setShowFileSarDialog}>
-        <DialogContent className="bg-brand-navy border-white/10 text-white max-w-md">
+        <DialogContent className="bg-card border-foreground/10 text-foreground max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <FileWarning className="w-5 h-5 text-amber-400" />
@@ -1244,7 +1244,7 @@ export function CaseDetailPage() {
                 value={sarReference}
                 onChange={(e) => setSarReference(e.target.value)}
                 placeholder="Ej: ROS-2026-00145 o SAR-20260314-001"
-                className="bg-white/5 border-white/10 text-white placeholder:text-gray-600"
+                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600"
               />
             </div>
 
@@ -1257,7 +1257,7 @@ export function CaseDetailPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+            <div className="flex justify-end gap-2 pt-2 border-t border-foreground/5">
               <Button
                 variant="ghost"
                 onClick={() => setShowFileSarDialog(false)}

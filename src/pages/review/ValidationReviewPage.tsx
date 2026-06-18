@@ -91,11 +91,11 @@ export function ValidationReviewPage() {
 
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <MetricCard label="Alertas abiertas" value={stats.alerts_by_status.open ?? 0} className="bg-white/5 border-white/10" />
-          <MetricCard label="Resueltas" value={stats.alerts_by_status.resolved ?? 0} className="bg-white/5 border-white/10" />
-          <MetricCard label="Entidades auditadas" value={stats.total_entities_audited.toLocaleString()} className="bg-white/5 border-white/10" />
-          <MetricCard label="Aceptadas alta conf." value={(stats.evidence_by_decision.accepted_high ?? 0).toLocaleString()} className="bg-white/5 border-white/10" />
-          <MetricCard label="Marcadas + rechazadas" value={((stats.evidence_by_decision.flagged_review ?? 0) + (stats.evidence_by_decision.rejected ?? 0)).toLocaleString()} accent="amber" className="bg-white/5 border-white/10" />
+          <MetricCard label="Alertas abiertas" value={stats.alerts_by_status.open ?? 0} className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label="Resueltas" value={stats.alerts_by_status.resolved ?? 0} className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label="Entidades auditadas" value={stats.total_entities_audited.toLocaleString()} className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label="Aceptadas alta conf." value={(stats.evidence_by_decision.accepted_high ?? 0).toLocaleString()} className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label="Marcadas + rechazadas" value={((stats.evidence_by_decision.flagged_review ?? 0) + (stats.evidence_by_decision.rejected ?? 0)).toLocaleString()} accent="amber" className="bg-foreground/5 border-foreground/10" />
         </div>
       )}
 
@@ -125,7 +125,7 @@ export function ValidationReviewPage() {
           </CardHeader>
           <CardContent>
             {isLoading ? (
-              <PanelSkeleton className="rounded-xl border border-white/5 bg-white/[0.02] p-6" lines={4} />
+              <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={4} />
             ) : alerts.length === 0 ? (
               <EmptyState icon={AlertTriangle} title="Sin alertas" description="No hay alertas que coincidan con los filtros actuales." />
             ) : (

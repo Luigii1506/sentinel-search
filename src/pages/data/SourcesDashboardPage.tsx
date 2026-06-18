@@ -91,9 +91,9 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-brand-navy border-white/10">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-foreground/10">
         <DialogHeader>
-          <DialogTitle className="text-xl text-white flex items-center gap-2">
+          <DialogTitle className="text-xl text-foreground flex items-center gap-2">
             <Database className="w-5 h-5 text-blue-400" />
             {isLoading ? 'Cargando...' : detail?.display_name}
           </DialogTitle>
@@ -101,69 +101,69 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
 
         {isLoading ? (
           <div className="space-y-4">
-            <Skeleton className="h-32 bg-white/5" />
-            <Skeleton className="h-48 bg-white/5" />
+            <Skeleton className="h-32 bg-foreground/5" />
+            <Skeleton className="h-48 bg-foreground/5" />
           </div>
         ) : detail ? (
           <div className="space-y-6">
             {/* Header Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-3 rounded-lg bg-white/5">
+              <div className="p-3 rounded-lg bg-foreground/5">
                 <p className="text-xs text-gray-500">Estado</p>
                 <Badge className={`${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.bg} ${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.color} mt-1`}>
                   {STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.label || detail.status}
                 </Badge>
               </div>
-              <div className="p-3 rounded-lg bg-white/5">
+              <div className="p-3 rounded-lg bg-foreground/5">
                 <p className="text-xs text-gray-500">Categoria</p>
-                <p className="text-sm text-white capitalize">{categoryLabel(detail.category)}</p>
+                <p className="text-sm text-foreground capitalize">{categoryLabel(detail.category)}</p>
               </div>
-              <div className="p-3 rounded-lg bg-white/5">
+              <div className="p-3 rounded-lg bg-foreground/5">
                 <p className="text-xs text-gray-500">Pais</p>
-                <p className="text-sm text-white">{detail.country || 'N/A'}</p>
+                <p className="text-sm text-foreground">{detail.country || 'N/A'}</p>
               </div>
-              <div className="p-3 rounded-lg bg-white/5">
+              <div className="p-3 rounded-lg bg-foreground/5">
                 <p className="text-xs text-gray-500">Entidades</p>
-                <p className="text-sm text-white font-mono">{formatNumber(detail.bronze_count)}</p>
+                <p className="text-sm text-foreground font-mono">{formatNumber(detail.bronze_count)}</p>
               </div>
             </div>
 
             {/* Conteos por Capa */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-white flex items-center gap-2">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Layers className="w-4 h-4 text-purple-400" />
                 Conteos por Capa
               </h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="p-4 rounded-lg bg-[#8B4513]/20 border border-[#8B4513]/30">
                   <p className="text-xs text-[#CD853F]">Bronze (Raw)</p>
-                  <p className="text-2xl font-bold text-white">{formatNumber(detail.bronze_count)}</p>
+                  <p className="text-2xl font-bold text-foreground">{formatNumber(detail.bronze_count)}</p>
                 </div>
                 <div className="p-4 rounded-lg bg-gray-500/10 border border-gray-500/30">
                   <p className="text-xs text-gray-400">Silver (Clean)</p>
-                  <p className="text-2xl font-bold text-white">{formatNumber(detail.silver_count)}</p>
+                  <p className="text-2xl font-bold text-foreground">{formatNumber(detail.silver_count)}</p>
                 </div>
                 <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
                   <p className="text-xs text-yellow-400">Gold (Unified)</p>
-                  <p className="text-2xl font-bold text-white">{formatNumber(detail.gold_count)}</p>
+                  <p className="text-2xl font-bold text-foreground">{formatNumber(detail.gold_count)}</p>
                 </div>
               </div>
             </div>
 
             {/* Metricas 7d */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-white flex items-center gap-2">
+              <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Activity className="w-4 h-4 text-green-400" />
                 Metricas (7 dias)
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 rounded-lg bg-green-500/10">
                   <p className="text-xs text-green-400">Jobs Exitosos</p>
-                  <p className="text-xl font-bold text-white">{detail.success_count_7d}</p>
+                  <p className="text-xl font-bold text-foreground">{detail.success_count_7d}</p>
                 </div>
                 <div className="p-3 rounded-lg bg-red-500/10">
                   <p className="text-xs text-red-400">Jobs Fallidos</p>
-                  <p className="text-xl font-bold text-white">{detail.error_count_7d}</p>
+                  <p className="text-xl font-bold text-foreground">{detail.error_count_7d}</p>
                 </div>
               </div>
             </div>
@@ -171,10 +171,10 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
             {/* Recent Jobs */}
             {detail.recent_jobs.length > 0 && (
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-white">Jobs Recientes</h3>
+                <h3 className="text-sm font-medium text-foreground">Jobs Recientes</h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {detail.recent_jobs.map((job) => (
-                    <div key={job.id} className="p-3 rounded-lg bg-white/5 text-sm">
+                    <div key={job.id} className="p-3 rounded-lg bg-foreground/5 text-sm">
                       <div className="flex items-center justify-between">
                         <Badge className={
                           job.status === 'success' ? 'bg-green-500/10 text-green-400' :
@@ -267,7 +267,7 @@ export function SourcesDashboardPage() {
       <AppPage width="default">
         <div className="text-center">
           <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Error al cargar fuentes</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Error al cargar fuentes</h2>
           <p className="text-gray-400 mb-2">No se pudieron obtener los datos</p>
           <p className="text-sm text-gray-500 mb-4">{(error as Error).message}</p>
           <Button onClick={() => refetch()} variant="outline">
@@ -294,7 +294,7 @@ export function SourcesDashboardPage() {
           </div>
         }
         actions={
-          <Button variant="outline" onClick={() => refetch()} className="border-white/10">
+          <Button variant="outline" onClick={() => refetch()} className="border-foreground/10">
             <RefreshCw className="w-4 h-4 mr-2" />
             Actualizar
           </Button>
@@ -338,7 +338,7 @@ export function SourcesDashboardPage() {
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'all'
                 ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                : 'bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10'
+                : 'bg-foreground/5 text-gray-400 border border-foreground/5 hover:bg-foreground/10'
             }`}
           >
             Todas ({data?.sources?.length || 0})
@@ -350,7 +350,7 @@ export function SourcesDashboardPage() {
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.key
                   ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                  : 'bg-white/5 text-gray-400 border border-white/5 hover:bg-white/10'
+                  : 'bg-foreground/5 text-gray-400 border border-foreground/5 hover:bg-foreground/10'
               }`}
             >
               {tab.label} ({tab.count})
@@ -366,16 +366,16 @@ export function SourcesDashboardPage() {
               placeholder="Buscar por nombre, source_id, dataset, pais..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-brand-navy border-white/10 text-white"
+              className="pl-10 bg-card border-foreground/10 text-foreground"
             />
           </div>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="bg-brand-navy border-white/10 text-white">
+            <SelectTrigger className="bg-card border-foreground/10 text-foreground">
               <Activity className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Status" />
             </SelectTrigger>
-            <SelectContent className="bg-brand-navy border-white/10">
+            <SelectContent className="bg-card border-foreground/10">
               <SelectItem value="all">Todos los status</SelectItem>
               <SelectItem value="active">Activo ({data?.by_status?.active || 0})</SelectItem>
               <SelectItem value="pending">Pendiente ({data?.by_status?.pending || 0})</SelectItem>
@@ -386,11 +386,11 @@ export function SourcesDashboardPage() {
           </Select>
 
           <Select value={hasDataFilter} onValueChange={setHasDataFilter}>
-            <SelectTrigger className="bg-brand-navy border-white/10 text-white">
+            <SelectTrigger className="bg-card border-foreground/10 text-foreground">
               <Database className="w-4 h-4 mr-2" />
               <SelectValue placeholder="Datos" />
             </SelectTrigger>
-            <SelectContent className="bg-brand-navy border-white/10">
+            <SelectContent className="bg-card border-foreground/10">
               <SelectItem value="all">Todas</SelectItem>
               <SelectItem value="has_data">Con datos</SelectItem>
               <SelectItem value="no_data">Sin datos</SelectItem>
@@ -404,11 +404,11 @@ export function SourcesDashboardPage() {
             const StatusIcon = statusCfg.icon;
 
             return (
-              <Card key={source.source_id} className="bg-brand-navy border-white/5">
+              <Card key={source.source_id} className="bg-card border-foreground/5">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white">{source.display_name}</p>
+                      <p className="text-sm font-medium text-foreground">{source.display_name}</p>
                       <p className="text-xs text-gray-500 font-mono break-all">{source.source_id}</p>
                     </div>
                     <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${statusCfg.bg} ${statusCfg.border} border`}>
@@ -420,33 +420,33 @@ export function SourcesDashboardPage() {
                   <div className="flex flex-wrap gap-2">
                     <CategoryBadge category={source.category} />
                     {source.country ? (
-                      <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-300 border-white/10">
+                      <Badge variant="outline" className="text-[10px] bg-foreground/5 text-gray-300 border-foreground/10">
                         {source.country}
                       </Badge>
                     ) : null}
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-lg bg-white/5 p-3">
+                    <div className="rounded-lg bg-foreground/5 p-3">
                       <p className="text-[11px] text-gray-500">Bronze</p>
-                      <p className="text-white font-mono">{source.bronze_count > 0 ? formatNumber(source.bronze_count) : '-'}</p>
+                      <p className="text-foreground font-mono">{source.bronze_count > 0 ? formatNumber(source.bronze_count) : '-'}</p>
                     </div>
-                    <div className="rounded-lg bg-white/5 p-3">
+                    <div className="rounded-lg bg-foreground/5 p-3">
                       <p className="text-[11px] text-gray-500">Silver</p>
-                      <p className="text-white font-mono">{source.silver_count > 0 ? formatNumber(source.silver_count) : '-'}</p>
+                      <p className="text-foreground font-mono">{source.silver_count > 0 ? formatNumber(source.silver_count) : '-'}</p>
                     </div>
-                    <div className="rounded-lg bg-white/5 p-3">
+                    <div className="rounded-lg bg-foreground/5 p-3">
                       <p className="text-[11px] text-gray-500">Gold</p>
-                      <p className="text-white font-mono">{source.gold_count > 0 ? formatNumber(source.gold_count) : '-'}</p>
+                      <p className="text-foreground font-mono">{source.gold_count > 0 ? formatNumber(source.gold_count) : '-'}</p>
                     </div>
-                    <div className="rounded-lg bg-white/5 p-3">
+                    <div className="rounded-lg bg-foreground/5 p-3">
                       <p className="text-[11px] text-gray-500">Último sync</p>
-                      <p className="text-white">{formatDate(source.last_sync)}</p>
+                      <p className="text-foreground">{formatDate(source.last_sync)}</p>
                     </div>
                   </div>
 
                   <SourceDetailDialog sourceId={source.source_id}>
-                    <Button variant="outline" className="w-full border-white/10">
+                    <Button variant="outline" className="w-full border-foreground/10">
                       <Eye className="w-4 h-4 mr-2" />
                       Ver detalle
                     </Button>
@@ -458,10 +458,10 @@ export function SourcesDashboardPage() {
         </div>
 
         {/* Sources Table */}
-        <div className="hidden md:block bg-brand-navy rounded-xl border border-white/5 overflow-hidden">
+        <div className="hidden md:block bg-card rounded-xl border border-foreground/5 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/5">
+              <thead className="bg-foreground/5 border-b border-foreground/5">
                 <tr>
                   <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3 w-8"></th>
                   <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
@@ -498,7 +498,7 @@ export function SourcesDashboardPage() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-foreground/5">
                 {filteredSources.map((source: SourceInfo, index: number) => {
                   const statusCfg = STATUS_CONFIG[effectiveStatus(source)] || STATUS_CONFIG.pending;
                   const StatusIcon = statusCfg.icon;
@@ -510,17 +510,17 @@ export function SourcesDashboardPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: Math.min(index * 0.005, 0.5) }}
-                        className="hover:bg-white/5 transition-colors cursor-pointer"
+                        className="hover:bg-foreground/5 transition-colors cursor-pointer"
                         onClick={() => toggleRow(source.source_id)}
                       >
                         <td className="px-3 py-2.5">
-                          <button className="text-gray-500 hover:text-white">
+                          <button className="text-gray-500 hover:text-foreground">
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                           </button>
                         </td>
                         <td className="px-3 py-2.5">
                           <div className="min-w-[200px]">
-                            <p className="text-sm font-medium text-white truncate">
+                            <p className="text-sm font-medium text-foreground truncate">
                               {source.display_name}
                             </p>
                             <p className="text-xs text-gray-500 font-mono">{source.source_id}</p>
@@ -592,7 +592,7 @@ export function SourcesDashboardPage() {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="bg-white/[0.02]"
+                          className="bg-foreground/[0.02]"
                         >
                           <td colSpan={12} className="px-6 py-4">
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
@@ -693,7 +693,7 @@ export function SourcesDashboardPage() {
             </div>
           )}
 
-          <div className="px-6 py-3 border-t border-white/5 text-sm text-gray-500 flex justify-between">
+          <div className="px-6 py-3 border-t border-foreground/5 text-sm text-gray-500 flex justify-between">
             <span>Mostrando {filteredSources.length} de {data?.sources?.length || 0} fuentes</span>
             <span>
               Bronze: {formatNumber(data?.total_bronze || 0)} · Silver: {formatNumber(data?.total_silver || 0)} · Gold: {formatNumber(data?.total_gold || 0)}

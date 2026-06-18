@@ -45,12 +45,12 @@ export function EntityOverviewDetailsGrid({
           </h3>
           <div className="space-y-2">
             {entity.identifications.map((ident, i) => (
-              <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between py-1.5 border-b border-white/5 last:border-0">
+              <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between py-1.5 border-b border-foreground/5 last:border-0">
                 <div className="flex items-center gap-2 min-w-0">
                   <Badge className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                     {ident.label || ident.type.toUpperCase()}
                   </Badge>
-                  <span className="text-white font-mono text-sm break-all">{ident.number}</span>
+                  <span className="text-foreground font-mono text-sm break-all">{ident.number}</span>
                 </div>
                 {ident.country && (
                   <span className="text-[10px] text-gray-500">{countryNames[ident.country] || ident.country}</span>
@@ -73,10 +73,10 @@ export function EntityOverviewDetailsGrid({
               {(showAllAliases ? entity.aliases : entity.aliases.slice(0, 12)).map((alias, i) => (
                 <div
                   key={`${alias.name}-${i}`}
-                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5"
+                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-1.5"
                 >
-                  <span className="text-sm text-white break-words max-w-full">{alias.name}</span>
-                  <Badge variant="outline" className="text-[10px] text-gray-400 shrink-0 border-white/10">
+                  <span className="text-sm text-foreground break-words max-w-full">{alias.name}</span>
+                  <Badge variant="outline" className="text-[10px] text-gray-400 shrink-0 border-foreground/10">
                     {getAliasTypeLabel(alias.type)}
                   </Badge>
                 </div>
@@ -104,8 +104,8 @@ export function EntityOverviewDetailsGrid({
           </h3>
           <div className="space-y-2">
             {validAddresses.slice(0, 5).map((addr, i) => (
-              <div key={i} className="p-2 rounded-lg bg-white/[0.03]">
-                <p className="text-sm text-white">{formatAddressValue(addr)}</p>
+              <div key={i} className="p-2 rounded-lg bg-foreground/[0.03]">
+                <p className="text-sm text-foreground">{formatAddressValue(addr)}</p>
                 {addr.is_current && (
                   <Badge className="text-[10px] bg-green-500/10 text-green-400 mt-1">Actual</Badge>
                 )}

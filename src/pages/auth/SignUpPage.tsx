@@ -41,7 +41,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
         {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded ${i < score ? color : 'bg-white/10'}`}
+            className={`h-1 flex-1 rounded ${i < score ? color : 'bg-foreground/10'}`}
           />
         ))}
       </div>
@@ -95,7 +95,7 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-brand-carbon flex items-center justify-center py-8 px-4">
+    <div className="relative min-h-screen overflow-hidden bg-background flex items-center justify-center py-8 px-4">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(14,165,233,0.10),transparent_24%),linear-gradient(180deg,#06111f_0%,#091827_48%,#0b1220_100%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
       <div className="absolute left-[10%] top-[12%] h-44 w-44 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
@@ -122,9 +122,9 @@ export function SignUpPage() {
           </p>
         </div>
 
-        <Card className="bg-navy-700 border-white/10 backdrop-blur-xl">
+        <Card className="bg-muted border-foreground/10 backdrop-blur-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-white text-lg">Regístrate</CardTitle>
+            <CardTitle className="text-foreground text-lg">Regístrate</CardTitle>
             <CardDescription className="text-gray-400">
               Empieza a buscar en segundos.
             </CardDescription>
@@ -146,7 +146,7 @@ export function SignUpPage() {
                     id="first_name"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-foreground/5 border-foreground/10 text-white"
                     disabled={isLoading}
                   />
                 </div>
@@ -158,7 +158,7 @@ export function SignUpPage() {
                     id="last_name"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className="bg-foreground/5 border-foreground/10 text-white"
                     disabled={isLoading}
                   />
                 </div>
@@ -173,7 +173,7 @@ export function SignUpPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase())}
                   placeholder="ej. juan_perez"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-foreground/10 text-white"
                   disabled={isLoading}
                   required
                 />
@@ -189,7 +189,7 @@ export function SignUpPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="tu@empresa.com"
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-foreground/5 border-foreground/10 text-white"
                   disabled={isLoading}
                   required
                 />
@@ -206,7 +206,7 @@ export function SignUpPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Mínimo 8 caracteres"
-                    className="bg-white/5 border-white/10 text-white pr-10"
+                    className="bg-foreground/5 border-foreground/10 text-white pr-10"
                     disabled={isLoading}
                     required
                     minLength={8}
@@ -246,7 +246,7 @@ export function SignUpPage() {
               <GoogleSignInButton label="Registrarse con Google" />
             </div>
 
-            <div className="mt-5 pt-4 border-t border-white/10 space-y-3">
+            <div className="mt-5 pt-4 border-t border-foreground/10 space-y-3">
               <div className="text-xs text-gray-400 space-y-1.5">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
@@ -262,7 +262,7 @@ export function SignUpPage() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500 text-center pt-2 border-t border-white/5">
+              <p className="text-xs text-gray-500 text-center pt-2 border-t border-foreground/5">
                 ¿Ya tienes cuenta?{' '}
                 <Link
                   to="/login"

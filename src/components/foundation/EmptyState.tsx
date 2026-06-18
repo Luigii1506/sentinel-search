@@ -20,8 +20,8 @@ interface EmptyStateProps {
 
 const TONE_STYLES = {
   neutral: {
-    iconColor: 'text-navy-200',
-    iconBg: 'bg-navy-700',
+    iconColor: 'text-muted-foreground',
+    iconBg: 'bg-muted',
   },
   success: {
     iconColor: 'text-green-400',
@@ -68,9 +68,9 @@ export function EmptyState({
       >
         <Icon className={cn('w-7 h-7', t.iconColor)} aria-hidden="true" />
       </div>
-      <h3 className="text-lg font-medium text-white mb-1.5">{title}</h3>
+      <h3 className="text-lg font-medium text-foreground mb-1.5">{title}</h3>
       {description && (
-        <p className="text-sm text-navy-100 max-w-md mb-5">{description}</p>
+        <p className="text-sm text-muted-foreground max-w-md mb-5">{description}</p>
       )}
       {action && <div className="mt-1">{action}</div>}
     </div>

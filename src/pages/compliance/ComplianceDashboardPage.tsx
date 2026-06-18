@@ -119,7 +119,7 @@ function CasesTab() {
         <motion.div
           key={c.id}
           variants={itemVariants}
-          className="glass rounded-xl p-5 border-l-4 cursor-pointer hover:bg-white/[0.02] transition-colors"
+          className="glass rounded-xl p-5 border-l-4 cursor-pointer hover:bg-foreground/[0.02] transition-colors"
           style={{
             borderColor:
               c.priority === 'critical' ? '#ef4444' :
@@ -144,7 +144,7 @@ function CasesTab() {
                   </Badge>
                 )}
               </div>
-              <h4 className="text-white font-medium">{c.title}</h4>
+              <h4 className="text-foreground font-medium">{c.title}</h4>
               {c.entity_name && (
                 <p className="text-sm text-gray-400 mt-1">Entidad: {c.entity_name}</p>
               )}
@@ -169,7 +169,7 @@ function CasesTab() {
           {c.tags && c.tags.length > 0 && (
             <div className="flex gap-1 mt-2">
               {c.tags.map((tag) => (
-                <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-gray-400">
+                <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-foreground/5 text-gray-400">
                   {tag}
                 </span>
               ))}
@@ -230,7 +230,7 @@ function AlertsTab() {
                 )}>
                   {alert.severity}
                 </Badge>
-                <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-400">
+                <Badge variant="outline" className="text-[10px] bg-foreground/5 text-gray-400">
                   {alert.alert_type}
                 </Badge>
                 {alert.decision && (
@@ -245,14 +245,14 @@ function AlertsTab() {
                   </Badge>
                 )}
               </div>
-              <p className="text-white font-medium">{alert.matched_entity_name}</p>
+              <p className="text-foreground font-medium">{alert.matched_entity_name}</p>
               <p className="text-sm text-gray-400">
                 Query: &quot;{alert.query_name}&quot; — Confianza: {Math.round(alert.match_confidence * 100)}%
               </p>
               {alert.matched_sources.length > 0 && (
                 <div className="flex gap-1 mt-1">
                   {alert.matched_sources.slice(0, 3).map((s) => (
-                    <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 text-gray-500">
+                    <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/5 text-gray-500">
                       {s}
                     </span>
                   ))}
@@ -322,7 +322,7 @@ function WhitelistTab() {
         >
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-white font-medium">{entry.suppressed_entity_name}</span>
+              <span className="text-foreground font-medium">{entry.suppressed_entity_name}</span>
               {entry.is_permanent && (
                 <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                   Permanente
@@ -413,7 +413,7 @@ function WatchlistTab() {
         >
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-white font-medium">{entry.entity_name}</span>
+              <span className="text-foreground font-medium">{entry.entity_name}</span>
               <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                 {freqLabels[entry.monitoring_frequency] || entry.monitoring_frequency}
               </Badge>
@@ -488,7 +488,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
           <DialogTitle>Crear Caso de Investigación</DialogTitle>
         </DialogHeader>
@@ -499,7 +499,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Ej: Investigación coincidencia OFAC — Juan Pérez"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
@@ -508,16 +508,16 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
               placeholder="Nombre de la entidad (opcional)"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
             <Label className="text-gray-400">Prioridad</Label>
             <Select value={priority} onValueChange={setPriority}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+              <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-brand-navy border-white/10">
+              <SelectContent className="bg-card border-foreground/10">
                 <SelectItem value="critical" className="text-red-400">Critical</SelectItem>
                 <SelectItem value="high" className="text-orange-400">High</SelectItem>
                 <SelectItem value="medium" className="text-yellow-400">Medium</SelectItem>
@@ -531,7 +531,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Descripción del caso..."
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
               rows={3}
             />
           </div>
@@ -541,7 +541,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="ej: pep, sanctions, high-risk"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -590,7 +590,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
           <DialogTitle>Agregar a Monitoreo Continuo</DialogTitle>
         </DialogHeader>
@@ -601,16 +601,16 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
               placeholder="Nombre a monitorear"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
             <Label className="text-gray-400">Tipo de entidad</Label>
             <Select value={entityType} onValueChange={setEntityType}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+              <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
                 <SelectValue placeholder="Seleccionar..." />
               </SelectTrigger>
-              <SelectContent className="bg-brand-navy border-white/10">
+              <SelectContent className="bg-card border-foreground/10">
                 <SelectItem value="person" className="text-gray-300">Persona</SelectItem>
                 <SelectItem value="company" className="text-gray-300">Empresa</SelectItem>
                 <SelectItem value="vessel" className="text-gray-300">Embarcación</SelectItem>
@@ -621,10 +621,10 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
           <div>
             <Label className="text-gray-400">Frecuencia de monitoreo</Label>
             <Select value={frequency} onValueChange={setFrequency}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white mt-1">
+              <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-brand-navy border-white/10">
+              <SelectContent className="bg-card border-foreground/10">
                 <SelectItem value="realtime" className="text-gray-300">Tiempo real</SelectItem>
                 <SelectItem value="daily" className="text-gray-300">Diario</SelectItem>
                 <SelectItem value="weekly" className="text-gray-300">Semanal</SelectItem>
@@ -641,7 +641,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
               max="1"
               value={minConfidence}
               onChange={(e) => setMinConfidence(e.target.value)}
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
@@ -650,7 +650,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               placeholder="Nombre del cliente"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
@@ -698,7 +698,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="bg-brand-navy border-white/10 text-white max-w-lg">
+      <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
           <DialogTitle>Agregar al Whitelist</DialogTitle>
         </DialogHeader>
@@ -709,7 +709,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={queryName}
               onChange={(e) => setQueryName(e.target.value)}
               placeholder="Ej: JUAN PEREZ GARCIA"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
@@ -718,7 +718,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
               placeholder="UUID de la entidad"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
@@ -727,7 +727,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
               placeholder="Nombre de la entidad a suprimir"
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
@@ -736,7 +736,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="Razón para suprimir este match..."
-              className="bg-white/5 border-white/10 text-white mt-1"
+              className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
               rows={2}
             />
           </div>
@@ -746,7 +746,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               id="is-permanent"
               checked={isPermanent}
               onChange={(e) => setIsPermanent(e.target.checked)}
-              className="rounded bg-white/5 border-white/20"
+              className="rounded bg-foreground/5 border-foreground/20"
             />
             <Label htmlFor="is-permanent" className="text-gray-400 cursor-pointer">
               Permanente (no expira)
@@ -862,7 +862,7 @@ export function ComplianceDashboardPage() {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
-                <p className="text-2xl font-bold text-white">{dashboard.false_positives.total_decisions}</p>
+                <p className="text-2xl font-bold text-foreground">{dashboard.false_positives.total_decisions}</p>
                 <p className="text-xs text-gray-500">Total</p>
               </div>
               <div>
@@ -883,11 +883,11 @@ export function ComplianceDashboardPage() {
               </div>
             </div>
             {dashboard.false_positives.top_fp_entities.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-white/5">
+              <div className="mt-4 pt-4 border-t border-foreground/5">
                 <p className="text-xs text-gray-500 mb-2">Top entidades con más FP:</p>
                 <div className="flex flex-wrap gap-2">
                   {dashboard.false_positives.top_fp_entities.slice(0, 5).map((e) => (
-                    <Badge key={e.entity_name} variant="outline" className="text-xs bg-white/5 text-gray-400">
+                    <Badge key={e.entity_name} variant="outline" className="text-xs bg-foreground/5 text-gray-400">
                       {e.entity_name} ({e.fp_count})
                     </Badge>
                   ))}
@@ -900,20 +900,20 @@ export function ComplianceDashboardPage() {
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <TabsList className="bg-white/5 border border-white/10 p-1">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-white/10">
+            <TabsList className="bg-foreground/5 border border-foreground/10 p-1">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-foreground/10">
                 <FileText className="w-4 h-4 mr-2" />
                 Casos
               </TabsTrigger>
-              <TabsTrigger value="alerts" className="data-[state=active]:bg-white/10">
+              <TabsTrigger value="alerts" className="data-[state=active]:bg-foreground/10">
                 <AlertTriangle className="w-4 h-4 mr-2" />
                 Alertas
               </TabsTrigger>
-              <TabsTrigger value="whitelist" className="data-[state=active]:bg-white/10">
+              <TabsTrigger value="whitelist" className="data-[state=active]:bg-foreground/10">
                 <Shield className="w-4 h-4 mr-2" />
                 Whitelist
               </TabsTrigger>
-              <TabsTrigger value="watchlist" className="data-[state=active]:bg-white/10">
+              <TabsTrigger value="watchlist" className="data-[state=active]:bg-foreground/10">
                 <Eye className="w-4 h-4 mr-2" />
                 Monitoreo
               </TabsTrigger>
@@ -925,7 +925,7 @@ export function ComplianceDashboardPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowAddWatchlist(true)}
-                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5 w-full sm:w-auto"
+                className="gap-1 text-gray-400 border-foreground/10 hover:bg-foreground/5 w-full sm:w-auto"
               >
                 <Plus className="w-3 h-3" /> Agregar
               </Button>
@@ -935,7 +935,7 @@ export function ComplianceDashboardPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setShowAddWhitelist(true)}
-                className="gap-1 text-gray-400 border-white/10 hover:bg-white/5 w-full sm:w-auto"
+                className="gap-1 text-gray-400 border-foreground/10 hover:bg-foreground/5 w-full sm:w-auto"
               >
                 <Plus className="w-3 h-3" /> Agregar
               </Button>

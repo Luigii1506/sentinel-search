@@ -58,7 +58,7 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
     <div className={cn("flex items-center gap-2", className)}>
       <span className="text-sm text-gray-400 mr-2">Modo:</span>
       
-      <div className="flex bg-white/5 rounded-lg p-1 gap-1">
+      <div className="flex bg-foreground/5 rounded-lg p-1 gap-1">
         {modes.map((option) => (
           <TooltipProvider key={option.value}>
             <Tooltip>
@@ -70,13 +70,13 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
                   className={cn(
                     "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200",
                     mode === option.value
-                      ? "bg-white/10 text-white"
-                      : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
+                      ? "bg-foreground/10 text-foreground"
+                      : "text-gray-400 hover:text-gray-200 hover:bg-foreground/5"
                   )}
                 >
                   <span className={cn(
                     "transition-colors",
-                    mode === option.value ? "text-white" : "text-gray-500"
+                    mode === option.value ? "text-foreground" : "text-gray-500"
                   )}>
                     {option.icon}
                   </span>
@@ -106,7 +106,7 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="p-1.5 hover:bg-white/10 rounded-full transition-colors">
+            <button className="p-1.5 hover:bg-foreground/10 rounded-full transition-colors">
               <Info className="w-4 h-4 text-gray-400" />
             </button>
           </TooltipTrigger>

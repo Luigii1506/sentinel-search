@@ -59,7 +59,7 @@ export function RelationshipFiltersPanel({
 }: RelationshipFiltersPanelProps) {
   return (
     <>
-      <div className="glass rounded-xl border border-white/10">
+      <div className="glass rounded-xl border border-foreground/10">
         <button
           type="button"
           onClick={() => setShowRelationshipFilters((prev) => !prev)}
@@ -67,7 +67,7 @@ export function RelationshipFiltersPanel({
         >
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-medium text-white">Filtros de relaciones</span>
+            <span className="text-sm font-medium text-foreground">Filtros de relaciones</span>
           </div>
           {showRelationshipFilters ? (
             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -77,11 +77,11 @@ export function RelationshipFiltersPanel({
         </button>
 
         {showRelationshipFilters && (
-          <div className="px-4 pb-4 space-y-4 border-t border-white/10">
+          <div className="px-4 pb-4 space-y-4 border-t border-foreground/10">
             {!referenceLike && (
               <div className="flex items-start justify-between gap-4 pt-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-white">Incluir relaciones contextuales</p>
+                  <p className="text-sm font-medium text-foreground">Incluir relaciones contextuales</p>
                   <p className="text-xs text-gray-400">
                     Muestra afiliaciones y vínculos biográficos que normalmente se ocultan en la vista AML priorizada.
                   </p>
@@ -103,7 +103,7 @@ export function RelationshipFiltersPanel({
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relLevelFilter === filter.key
                       ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -120,7 +120,7 @@ export function RelationshipFiltersPanel({
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relContextFilter === filter.key
                       ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -137,7 +137,7 @@ export function RelationshipFiltersPanel({
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relPriorityFilter === filter.key
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -160,7 +160,7 @@ export function RelationshipFiltersPanel({
             value={relSearch}
             onChange={(e) => setRelSearch(e.target.value)}
             placeholder="Buscar relaciones por nombre, tipo, país o fuente"
-            className="w-full bg-white/5 border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
+            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
           />
         </div>
 

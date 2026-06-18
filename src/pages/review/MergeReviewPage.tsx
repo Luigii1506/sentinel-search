@@ -110,7 +110,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
     return (
       <div className="px-6 py-4">
         <PanelSkeleton
-          className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+          className="rounded-lg border border-foreground/5 bg-foreground/[0.02] p-4"
           lines={2}
           titleWidthClassName="w-48"
         />
@@ -132,27 +132,27 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
       animate={{ opacity: 1, height: 'auto' }}
       exit={{ opacity: 0, height: 0 }}
       transition={{ duration: 0.2 }}
-      className="px-6 py-4 bg-white/[0.02] border-t border-white/5"
+      className="px-6 py-4 bg-foreground/[0.02] border-t border-foreground/5"
     >
       {/* Gold entity summary */}
       <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div>
           <p className="text-xs text-gray-500 mb-1">Tipo</p>
-          <p className="text-sm text-white">{data.entity_type || 'N/A'}</p>
+          <p className="text-sm text-foreground">{data.entity_type || 'N/A'}</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1">Paises</p>
-          <p className="text-sm text-white break-words">
+          <p className="text-sm text-foreground break-words">
             {data.countries?.join(', ') || 'N/A'}
           </p>
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1">Nacimiento</p>
-          <p className="text-sm text-white">{data.birth_date || 'N/A'}</p>
+          <p className="text-sm text-foreground">{data.birth_date || 'N/A'}</p>
         </div>
         <div>
           <p className="text-xs text-gray-500 mb-1">PEP</p>
-          <p className="text-sm text-white">
+          <p className="text-sm text-foreground">
             {data.is_current_pep ? (
               <Badge variant="outline" className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30">
                 {data.pep_category || 'PEP'}
@@ -170,7 +170,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
           <p className="text-xs text-gray-500 mb-1">Todos los nombres ({data.all_names.length})</p>
           <div className="flex flex-wrap gap-1.5">
             {data.all_names.map((name, i) => (
-              <Badge key={i} variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+              <Badge key={i} variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
                 {name}
               </Badge>
             ))}
@@ -185,10 +185,10 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
         </p>
         <div className="space-y-3 md:hidden">
           {data.children.map((child: MergeChildInfo, idx: number) => (
-            <div key={child.silver_id || idx} className="rounded-lg border border-white/5 bg-white/[0.02] p-4">
+            <div key={child.silver_id || idx} className="rounded-lg border border-foreground/5 bg-foreground/[0.02] p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+                  <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
                     {child.source}
                   </Badge>
                   <Badge
@@ -222,9 +222,9 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
             </div>
           ))}
         </div>
-        <div className="hidden rounded-lg border border-white/5 overflow-hidden md:block">
+        <div className="hidden rounded-lg border border-foreground/5 overflow-hidden md:block">
           <table className="w-full text-sm">
-            <thead className="bg-white/5">
+            <thead className="bg-foreground/5">
               <tr>
                 <th className="text-left text-xs font-medium text-gray-400 px-3 py-2">Fuente</th>
                 <th className="text-left text-xs font-medium text-gray-400 px-3 py-2">Nombre</th>
@@ -234,11 +234,11 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
                 <th className="text-right text-xs font-medium text-gray-400 px-3 py-2">Fecha</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-foreground/5">
               {data.children.map((child: MergeChildInfo, idx: number) => (
-                <tr key={child.silver_id || idx} className="hover:bg-white/5 transition-colors">
+                <tr key={child.silver_id || idx} className="hover:bg-foreground/5 transition-colors">
                   <td className="px-3 py-2">
-                    <Badge variant="outline" className="text-xs bg-white/5 text-gray-300 border-white/10">
+                    <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
                       {child.source}
                     </Badge>
                   </td>
@@ -274,7 +274,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
         <Button
           variant="outline"
           size="sm"
-          className="text-xs border-white/10 text-gray-400 hover:text-white"
+          className="text-xs border-foreground/10 text-gray-400 hover:text-foreground"
           onClick={() => navigate(`/entity/${data.entity_id}`)}
         >
           <ExternalLink className="w-3 h-3 mr-1" />
@@ -367,7 +367,7 @@ export function MergeReviewPage() {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-white/5 px-3 py-1.5 rounded-lg border border-white/10">
+                    <div className="flex items-center gap-1.5 text-xs text-gray-500 bg-foreground/5 px-3 py-1.5 rounded-lg border border-foreground/10">
                       <Clock className="w-3.5 h-3.5" />
                       {String(meta.elapsed_ms)}ms
                       {!!meta.cached_count && (
@@ -375,7 +375,7 @@ export function MergeReviewPage() {
                       )}
                     </div>
                   </TooltipTrigger>
-                  <TooltipContent className="bg-brand-navy border-white/10">
+                  <TooltipContent className="bg-card border-foreground/10">
                     Tiempo de respuesta del servidor
                   </TooltipContent>
                 </Tooltip>
@@ -385,7 +385,7 @@ export function MergeReviewPage() {
               variant="outline"
               onClick={() => refetch()}
               disabled={isFetching}
-              className="border-white/10 text-gray-400 hover:text-white"
+              className="border-foreground/10 text-gray-400 hover:text-foreground"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
               Actualizar
@@ -401,32 +401,32 @@ export function MergeReviewPage() {
               label="Total Merges"
               value={stats.total_merged_entities || 0}
               icon={Database}
-              className="bg-white/[0.02] border-white/5"
+              className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
               label="Cross-Source"
               value={stats.cross_source_merges || 0}
               icon={GitMerge}
-              className="bg-white/[0.02] border-white/5"
+              className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
               label="Entity Resolution"
               value={stats.er_v4_merges || 0}
               icon={TrendingUp}
-              className="bg-white/[0.02] border-white/5"
+              className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
               label="Deduplicación"
               value={(stats.gold_dedup_merges || 0) + (stats.exact_dedup_merges || 0)}
               icon={CheckCircle2}
               accent="amber"
-              className="bg-white/[0.02] border-white/5"
+              className="bg-foreground/[0.02] border-foreground/5"
             />
           </div>
         )}
 
         {/* Filters */}
-        <Card className="bg-white/5 border-white/5 mb-6">
+        <Card className="bg-foreground/5 border-foreground/5 mb-6">
           <CardContent className="p-4">
             {/* Primary filters */}
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
@@ -442,15 +442,15 @@ export function MergeReviewPage() {
                   placeholder="Buscar por nombre..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                  className="pl-9 w-full sm:w-[250px] bg-white/5 border-white/10 text-gray-300 placeholder:text-gray-600"
+                  className="pl-9 w-full sm:w-[250px] bg-foreground/5 border-foreground/10 text-gray-300 placeholder:text-gray-600"
                 />
               </div>
 
               <Select value={entityType} onValueChange={(v) => { setEntityType(v); setPage(0); }}>
-                <SelectTrigger className="w-full sm:w-[160px] bg-white/5 border-white/10 text-gray-300">
+                <SelectTrigger className="w-full sm:w-[160px] bg-foreground/5 border-foreground/10 text-gray-300">
                   <SelectValue placeholder="Tipo" />
                 </SelectTrigger>
-                <SelectContent className="bg-brand-navy border-white/10">
+                <SelectContent className="bg-card border-foreground/10">
                   {ENTITY_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <div className="flex items-center gap-2">
@@ -463,10 +463,10 @@ export function MergeReviewPage() {
               </Select>
 
               <Select value={sortBy} onValueChange={(v) => { setSortBy(v as MergeReviewSortBy); setPage(0); }}>
-                <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10 text-gray-300">
+                <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-gray-300">
                   <SelectValue placeholder="Ordenar por" />
                 </SelectTrigger>
-                <SelectContent className="bg-brand-navy border-white/10">
+                <SelectContent className="bg-card border-foreground/10">
                   <SelectItem value="confidence_asc">Confianza (menor)</SelectItem>
                   <SelectItem value="confidence_desc">Confianza (mayor)</SelectItem>
                   <SelectItem value="sources_desc">Mas fuentes</SelectItem>
@@ -510,14 +510,14 @@ export function MergeReviewPage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  className="mt-4 pt-4 border-t border-white/10 overflow-hidden"
+                  className="mt-4 pt-4 border-t border-foreground/10 overflow-hidden"
                 >
                   <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
                     <Select value={matchMethod} onValueChange={(v) => { setMatchMethod(v); setPage(0); }}>
-                      <SelectTrigger className="w-full sm:w-[180px] bg-white/5 border-white/10 text-gray-300">
+                      <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-gray-300">
                         <SelectValue placeholder="Metodo" />
                       </SelectTrigger>
-                      <SelectContent className="bg-brand-navy border-white/10">
+                      <SelectContent className="bg-card border-foreground/10">
                         <SelectItem value="all">Todos los metodos</SelectItem>
                         <SelectItem value="cross_source_merge">Cross-Source</SelectItem>
                         <SelectItem value="gold_dedup_merge">Gold Dedup</SelectItem>
@@ -527,10 +527,10 @@ export function MergeReviewPage() {
                     </Select>
 
                     <Select value={String(minSources)} onValueChange={(v) => { setMinSources(Number(v)); setPage(0); }}>
-                      <SelectTrigger className="w-full sm:w-[140px] bg-white/5 border-white/10 text-gray-300">
+                      <SelectTrigger className="w-full sm:w-[140px] bg-foreground/5 border-foreground/10 text-gray-300">
                         <SelectValue placeholder="Min fuentes" />
                       </SelectTrigger>
-                      <SelectContent className="bg-brand-navy border-white/10">
+                      <SelectContent className="bg-card border-foreground/10">
                         <SelectItem value="2">2+ fuentes</SelectItem>
                         <SelectItem value="3">3+ fuentes</SelectItem>
                         <SelectItem value="5">5+ fuentes</SelectItem>
@@ -544,7 +544,7 @@ export function MergeReviewPage() {
                         placeholder="Filtrar por fuente..."
                         value={sourceFilter}
                         onChange={(e) => { setSourceFilter(e.target.value); setPage(0); }}
-                        className="pl-9 w-full sm:w-[180px] bg-white/5 border-white/10 text-gray-300 placeholder:text-gray-600"
+                        className="pl-9 w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-gray-300 placeholder:text-gray-600"
                       />
                     </div>
 
@@ -557,7 +557,7 @@ export function MergeReviewPage() {
                         placeholder="Confianza min %"
                         value={minConfidence}
                         onChange={(e) => { setMinConfidence(e.target.value); setPage(0); }}
-                        className="pl-9 w-full sm:w-[150px] bg-white/5 border-white/10 text-gray-300 placeholder:text-gray-600"
+                        className="pl-9 w-full sm:w-[150px] bg-foreground/5 border-foreground/10 text-gray-300 placeholder:text-gray-600"
                       />
                     </div>
                   </div>
@@ -571,7 +571,7 @@ export function MergeReviewPage() {
         {isLoading ? (
           <div className="space-y-2">
             {Array.from({ length: 10 }).map((_, i) => (
-              <Skeleton key={i} className="h-14 w-full bg-white/5 rounded-lg" />
+              <Skeleton key={i} className="h-14 w-full bg-foreground/5 rounded-lg" />
             ))}
           </div>
         ) : error ? (
@@ -595,7 +595,7 @@ export function MergeReviewPage() {
             </CardContent>
           </Card>
         ) : !data?.entities?.length ? (
-          <Card className="bg-white/5 border-white/5">
+          <Card className="bg-foreground/5 border-foreground/5">
             <CardContent className="p-8">
               <EmptyState
                 icon={CheckCircle2}
@@ -612,7 +612,7 @@ export function MergeReviewPage() {
                 const isExpanded = expandedRows.has(entity.entity_id);
                 const EntityTypeIcon = ENTITY_TYPE_OPTIONS.find(t => t.value === entity.entity_type)?.icon || Users;
                 return (
-                  <div key={entity.entity_id} className="rounded-xl border border-white/5 overflow-hidden bg-white/[0.02]">
+                  <div key={entity.entity_id} className="rounded-xl border border-foreground/5 overflow-hidden bg-foreground/[0.02]">
                     <motion.button
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -623,7 +623,7 @@ export function MergeReviewPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm text-white font-medium break-words">{entity.canonical_name}</span>
+                            <span className="text-sm text-foreground font-medium break-words">{entity.canonical_name}</span>
                             {entity.is_current_pep && <Shield className="w-3.5 h-3.5 text-yellow-400 shrink-0" />}
                           </div>
                           {entity.all_names.length > 1 && (
@@ -649,7 +649,7 @@ export function MergeReviewPage() {
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Mappings</p>
-                          <p className="text-white font-mono">{entity.mapping_count}</p>
+                          <p className="text-foreground font-mono">{entity.mapping_count}</p>
                         </div>
                         <div>
                           <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Confianza avg</p>
@@ -658,10 +658,10 @@ export function MergeReviewPage() {
                       </div>
                       <div className="flex flex-wrap gap-1 mt-3">
                         {entity.all_sources.slice(0, 3).map((src) => (
-                          <Badge key={src} variant="outline" className="text-[10px] bg-white/5 text-gray-300 border-white/10">{src}</Badge>
+                          <Badge key={src} variant="outline" className="text-[10px] bg-foreground/5 text-gray-300 border-foreground/10">{src}</Badge>
                         ))}
                         {entity.all_sources.length > 3 && (
-                          <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-500 border-white/10">+{entity.all_sources.length - 3}</Badge>
+                          <Badge variant="outline" className="text-[10px] bg-foreground/5 text-gray-500 border-foreground/10">+{entity.all_sources.length - 3}</Badge>
                         )}
                       </div>
                     </motion.button>
@@ -671,9 +671,9 @@ export function MergeReviewPage() {
               })}
             </div>
 
-            <div className="hidden md:block rounded-xl border border-white/5 overflow-hidden bg-white/[0.02]">
+            <div className="hidden md:block rounded-xl border border-foreground/5 overflow-hidden bg-foreground/[0.02]">
               <table className="w-full">
-                <thead className="bg-white/5 border-b border-white/5">
+                <thead className="bg-foreground/5 border-b border-foreground/5">
                   <tr>
                     <th className="w-8 px-3 py-3" />
                     <th className="text-left text-xs font-medium text-gray-400 px-3 py-3">Nombre Canonico</th>
@@ -686,7 +686,7 @@ export function MergeReviewPage() {
                     <th className="text-right text-xs font-medium text-gray-400 px-3 py-3">Risk</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5">
+                <tbody className="divide-y divide-foreground/5">
                   {data.entities.map((entity: MergedEntitySummary, index: number) => {
                     const isExpanded = expandedRows.has(entity.entity_id);
                     const EntityTypeIcon = ENTITY_TYPE_OPTIONS.find(t => t.value === entity.entity_type)?.icon || Users;
@@ -698,7 +698,7 @@ export function MergeReviewPage() {
                           animate={{ opacity: 1 }}
                           transition={{ delay: Math.min(index * 0.01, 0.3) }}
                           className={`cursor-pointer transition-colors ${
-                            isExpanded ? 'bg-white/5' : 'hover:bg-white/[0.03]'
+                            isExpanded ? 'bg-foreground/5' : 'hover:bg-foreground/[0.03]'
                           }`}
                           onClick={() => toggleRow(entity.entity_id)}
                         >
@@ -711,7 +711,7 @@ export function MergeReviewPage() {
                           </td>
                           <td className="px-3 py-3">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm text-white font-medium break-words max-w-full">
+                              <span className="text-sm text-foreground font-medium break-words max-w-full">
                                 {entity.canonical_name}
                               </span>
                               {entity.is_current_pep && (
@@ -720,7 +720,7 @@ export function MergeReviewPage() {
                                     <TooltipTrigger>
                                       <Shield className="w-3.5 h-3.5 text-yellow-400" />
                                     </TooltipTrigger>
-                                    <TooltipContent className="bg-brand-navy border-white/10">
+                                    <TooltipContent className="bg-card border-foreground/10">
                                       PEP: {entity.pep_category}
                                     </TooltipContent>
                                   </Tooltip>
@@ -745,13 +745,13 @@ export function MergeReviewPage() {
                                 <Badge
                                   key={src}
                                   variant="outline"
-                                  className="text-[10px] bg-white/5 text-gray-300 border-white/10"
+                                  className="text-[10px] bg-foreground/5 text-gray-300 border-foreground/10"
                                 >
                                   {src}
                                 </Badge>
                               ))}
                               {entity.all_sources.length > 3 && (
-                                <Badge variant="outline" className="text-[10px] bg-white/5 text-gray-500 border-white/10">
+                                <Badge variant="outline" className="text-[10px] bg-foreground/5 text-gray-500 border-foreground/10">
                                   +{entity.all_sources.length - 3}
                                 </Badge>
                               )}
@@ -771,7 +771,7 @@ export function MergeReviewPage() {
                             </div>
                           </td>
                           <td className="px-3 py-3 text-center">
-                            <span className="text-sm text-white font-mono">
+                            <span className="text-sm text-foreground font-mono">
                               {entity.mapping_count}
                             </span>
                           </td>
@@ -831,10 +831,10 @@ export function MergeReviewPage() {
                   value={String(pageSize)} 
                   onValueChange={(v) => { setPageSize(Number(v)); setPage(0); }}
                 >
-                  <SelectTrigger className="w-full sm:w-[120px] bg-white/5 border-white/10 text-gray-300 text-xs">
+                  <SelectTrigger className="w-full sm:w-[120px] bg-foreground/5 border-foreground/10 text-gray-300 text-xs">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-brand-navy border-white/10">
+                  <SelectContent className="bg-card border-foreground/10">
                     {PAGE_SIZE_OPTIONS.map(size => (
                       <SelectItem key={size} value={String(size)}>
                         {size} / página
@@ -850,7 +850,7 @@ export function MergeReviewPage() {
                   size="sm"
                   onClick={() => setPage(0)}
                   disabled={page === 0}
-                  className="text-gray-400 hover:text-white disabled:opacity-30"
+                  className="text-gray-400 hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronsLeft className="w-4 h-4" />
                 </Button>
@@ -859,7 +859,7 @@ export function MergeReviewPage() {
                   size="sm"
                   onClick={() => setPage(page - 1)}
                   disabled={page === 0}
-                  className="text-gray-400 hover:text-white disabled:opacity-30"
+                  className="text-gray-400 hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
@@ -886,7 +886,7 @@ export function MergeReviewPage() {
                         className={`w-8 h-8 rounded text-sm font-medium transition-colors ${
                           page === pageNum
                             ? 'bg-primary-600 text-white'
-                            : 'text-gray-400 hover:bg-white/10'
+                            : 'text-gray-400 hover:bg-foreground/10'
                         } disabled:opacity-50`}
                       >
                         {pageNum + 1}
@@ -900,7 +900,7 @@ export function MergeReviewPage() {
                   size="sm"
                   onClick={() => setPage(page + 1)}
                   disabled={page >= totalPages - 1}
-                  className="text-gray-400 hover:text-white disabled:opacity-30"
+                  className="text-gray-400 hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </Button>
@@ -909,7 +909,7 @@ export function MergeReviewPage() {
                   size="sm"
                   onClick={() => setPage(totalPages - 1)}
                   disabled={page >= totalPages - 1}
-                  className="text-gray-400 hover:text-white disabled:opacity-30"
+                  className="text-gray-400 hover:text-foreground disabled:opacity-30"
                 >
                   <ChevronsRight className="w-4 h-4" />
                 </Button>

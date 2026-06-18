@@ -49,7 +49,7 @@ function FeatureCard({
       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
         <Icon className="w-6 h-6 text-blue-400" />
       </div>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
       <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
     </motion.div>
   );
@@ -89,7 +89,7 @@ function RiskLevelCard({
           {level}
         </span>
       </div>
-      <h3 className="text-xl font-semibold text-white mb-3">{title}</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-3">{title}</h3>
       <p className="text-gray-400 text-sm mb-4">{description}</p>
       <ul className="space-y-1">
         {examples.map((example) => (
@@ -112,7 +112,7 @@ function DataSourceBadge({ name, isMexican = false }: { name: string; isMexican?
         'px-4 py-2 rounded-lg border text-sm transition-all cursor-pointer',
         isMexican
           ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20'
-          : 'bg-white/5 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white'
+          : 'bg-foreground/5 border-foreground/10 text-gray-300 hover:bg-foreground/10 hover:text-foreground'
       )}
     >
       {name}
@@ -138,11 +138,11 @@ export function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
       <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.14),transparent_36%),radial-gradient(circle_at_82%_18%,rgba(16,185,129,0.10),transparent_24%),linear-gradient(180deg,#06111f_0%,#091827_45%,#0b1220_100%)]"
+        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
       >
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
         <div className="absolute -left-16 top-24 h-72 w-72 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
@@ -156,7 +156,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/5 border border-foreground/10 mb-6"
             >
               <Sparkles className="w-4 h-4 text-green-400" />
               <span className="text-sm text-gray-300">Cumplimiento PLD/FT México</span>
@@ -168,7 +168,7 @@ export function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight"
             >
               Cumplimiento{' '}
               <span className="text-gradient">PLD/FT</span>
@@ -290,12 +290,12 @@ export function HomePage() {
           <motion.div
             animate={{ y: [0, 10, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-2"
+            className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center p-2"
           >
             <motion.div
               animate={{ opacity: [1, 0.3, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-white/50"
+              className="w-1.5 h-1.5 rounded-full bg-foreground/50"
             />
           </motion.div>
         </motion.div>
@@ -313,7 +313,7 @@ export function HomePage() {
             <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 mb-4">
               Características
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Evaluación Integral de Riesgo
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
@@ -364,7 +364,7 @@ export function HomePage() {
       </section>
 
       {/* Risk Classification Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-transparent to-[#0f0f0f]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-7xl mx-auto">
           <motion.div
             {...fadeUp}
@@ -375,7 +375,7 @@ export function HomePage() {
             <Badge className="bg-red-500/20 text-red-400 border-red-500/30 mb-4">
               Clasificación de Riesgo
             </Badge>
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Sistema de Clasificación PLD/FT
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
@@ -414,7 +414,7 @@ export function HomePage() {
       </section>
 
       {/* Data Sources Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-[#0f0f0f]">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
         <div className="max-w-7xl mx-auto">
           <motion.div
             {...fadeUp}
@@ -422,7 +422,7 @@ export function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
               Fuentes de Datos Verificadas
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
@@ -464,7 +464,7 @@ export function HomePage() {
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
 
             <div className="relative">
-              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
                 ¿Listo para Fortalecer tu Cumplimiento?
               </h2>
               <p className="text-gray-400 mb-8 max-w-xl mx-auto">
@@ -482,7 +482,7 @@ export function HomePage() {
                 </Button>
                 <Button
                   variant="outline"
-                  className="gap-2 border-white/10 hover:bg-white/10 text-lg px-8 py-3"
+                  className="gap-2 border-foreground/10 hover:bg-foreground/10 text-lg px-8 py-3"
                 >
                   <FileCheck className="w-5 h-5" />
                   Ver Reporte Demo
@@ -494,15 +494,15 @@ export function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-white/5">
+      <footer className="py-12 px-4 sm:px-6 lg:px-8 border-t border-foreground/5">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h4 className="text-white font-semibold mb-4">Producto</h4>
+              <h4 className="text-foreground font-semibold mb-4">Producto</h4>
               <ul className="space-y-2">
                 {['Búsqueda', 'Monitoreo', 'API', 'Integraciones'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -510,11 +510,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
+              <h4 className="text-foreground font-semibold mb-4">Legal</h4>
               <ul className="space-y-2">
                 {['Términos de Uso', 'Privacidad', 'Cookies', 'CNBV', 'UIF'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -522,11 +522,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Recursos</h4>
+              <h4 className="text-foreground font-semibold mb-4">Recursos</h4>
               <ul className="space-y-2">
                 {['Documentación', 'Soporte', 'Status', 'Seguridad'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -534,11 +534,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-semibold mb-4">Regulación</h4>
+              <h4 className="text-foreground font-semibold mb-4">Regulación</h4>
               <ul className="space-y-2">
                 {['Ley Anti-Lavado', 'Circular 32/2013', 'Circular 40/2014', 'Criterios UIF'].map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -547,12 +547,12 @@ export function HomePage() {
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-white/5">
+          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-foreground/5">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-blue to-brand-electric flex items-center justify-center">
                 <Shield className="w-4 h-4 text-white" />
               </div>
-              <span className="text-white font-semibold">Sentinel PLD</span>
+              <span className="text-foreground font-semibold">Sentinel PLD</span>
             </div>
             <p className="text-gray-500 text-sm">
               © 2024 Sentinel PLD. Sistema de Cumplimiento PLD/FT.

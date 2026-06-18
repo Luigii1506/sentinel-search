@@ -137,7 +137,7 @@ export default function ApiKeysPage() {
         {/* Table */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-white">
+            <CardTitle className="text-lg text-foreground">
               Keys {keys ? `(${keys.length})` : ''}
             </CardTitle>
           </CardHeader>
@@ -147,7 +147,7 @@ export default function ApiKeysPage() {
                 {[0, 1, 2].map((i) => (
                   <PanelSkeleton
                     key={i}
-                    className="rounded-lg border border-white/5 bg-white/[0.02] p-4"
+                    className="rounded-lg border border-foreground/5 bg-foreground/[0.02] p-4"
                     lines={2}
                     titleWidthClassName="w-32"
                   />
@@ -169,7 +169,7 @@ export default function ApiKeysPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/10 text-left text-xs uppercase tracking-wide text-gray-500">
+                    <tr className="border-b border-foreground/10 text-left text-xs uppercase tracking-wide text-gray-500">
                       <th className="px-4 py-3 font-medium">Cliente</th>
                       <th className="px-4 py-3 font-medium">Prefix</th>
                       <th className="px-4 py-3 font-medium">Rol</th>
@@ -182,9 +182,9 @@ export default function ApiKeysPage() {
                   </thead>
                   <tbody>
                     {keys.map((k) => (
-                      <tr key={k.id} className="border-b border-white/5 hover:bg-white/5">
+                      <tr key={k.id} className="border-b border-foreground/5 hover:bg-foreground/5">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-white">{k.client_name}</div>
+                          <div className="font-medium text-foreground">{k.client_name}</div>
                           {k.description && (
                             <div className="text-xs text-gray-500 mt-0.5 max-w-xs truncate">
                               {k.description}
@@ -275,7 +275,7 @@ export default function ApiKeysPage() {
         title="¿Revocar esta API key?"
         description={
           <>
-            <strong className="text-white">{revokeTarget?.client_name}</strong> dejará
+            <strong className="text-foreground">{revokeTarget?.client_name}</strong> dejará
             de poder hacer requests inmediatamente. Esta acción no se puede deshacer.
           </>
         }
@@ -454,13 +454,13 @@ function NewKeyDialog({
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
               <Label>Cliente</Label>
-              <div className="text-sm text-white font-medium">{keyData.client_name}</div>
+              <div className="text-sm text-foreground font-medium">{keyData.client_name}</div>
             </div>
 
             <div className="space-y-1.5">
               <Label>API key</Label>
               <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-white/10 font-mono text-sm text-blue-300 break-all">
+                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-foreground/10 font-mono text-sm text-blue-300 break-all">
                   {visible ? keyData.api_key : '•'.repeat(Math.min(keyData.api_key.length, 40))}
                 </div>
                 <Button

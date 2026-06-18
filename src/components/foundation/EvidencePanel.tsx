@@ -75,17 +75,17 @@ export function EvidencePanel({
       <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
         <SheetContent
           side="right"
-          className="md:hidden w-full sm:max-w-md p-0 bg-brand-navy border-l border-navy-600"
+          className="md:hidden w-full sm:max-w-md p-0 bg-card border-l border-border"
         >
-          <SheetHeader className="p-4 border-b border-navy-600">
-            <SheetTitle className="text-white text-base">{title}</SheetTitle>
+          <SheetHeader className="p-4 border-b border-border">
+            <SheetTitle className="text-foreground text-base">{title}</SheetTitle>
             {subtitle && (
-              <div className="text-xs text-navy-100">{subtitle}</div>
+              <div className="text-xs text-muted-foreground">{subtitle}</div>
             )}
           </SheetHeader>
           <div className="overflow-y-auto p-4 flex-1">{children}</div>
           {actions && (
-            <div className="p-4 border-t border-navy-600 flex gap-2 justify-end">
+            <div className="p-4 border-t border-border flex gap-2 justify-end">
               {actions}
             </div>
           )}
@@ -105,16 +105,16 @@ export function EvidencePanel({
             aria-label="Detalle de evidencia"
             className={cn(
               'hidden md:flex fixed top-0 right-0 z-40 h-screen flex-col',
-              'bg-brand-navy border-l border-navy-600 shadow-2xl',
+              'bg-card border-l border-border shadow-2xl',
               className,
             )}
           >
             {/* Header */}
-            <div className="px-5 py-4 border-b border-navy-600 flex items-start gap-3">
+            <div className="px-5 py-4 border-b border-border flex items-start gap-3">
               <div className="flex-1 min-w-0">
-                <h2 className="text-base font-semibold text-white truncate">{title}</h2>
+                <h2 className="text-base font-semibold text-foreground truncate">{title}</h2>
                 {subtitle && (
-                  <p className="text-xs text-navy-100 mt-0.5 truncate">{subtitle}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 truncate">{subtitle}</p>
                 )}
               </div>
               <Button
@@ -135,7 +135,7 @@ export function EvidencePanel({
 
             {/* Sticky actions */}
             {actions && (
-              <div className="px-5 py-3 border-t border-navy-600 flex flex-wrap items-center justify-end gap-2 bg-brand-navy">
+              <div className="px-5 py-3 border-t border-border flex flex-wrap items-center justify-end gap-2 bg-card">
                 {actions}
               </div>
             )}
@@ -165,14 +165,14 @@ export function EvidenceSection({
   return (
     <section className={cn('space-y-2', className)}>
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="text-[11px] uppercase tracking-wider text-navy-200">{title}</h3>
+        <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground">{title}</h3>
         {count !== undefined && (
-          <span className="text-[10px] tabular-nums text-navy-200">
+          <span className="text-[10px] tabular-nums text-muted-foreground">
             {count}
           </span>
         )}
       </div>
-      <div className="text-sm text-navy-50">{children}</div>
+      <div className="text-sm text-muted-foreground">{children}</div>
     </section>
   );
 }

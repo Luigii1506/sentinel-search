@@ -152,7 +152,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               >
                 <Search className="mr-2 h-4 w-4 text-electric-400" />
                 <span>Buscar “{trimmed}” en sanciones</span>
-                <ArrowRight className="ml-auto h-3.5 w-3.5 text-navy-200" />
+                <ArrowRight className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
               </CommandItem>
             </CommandGroup>
             <CommandSeparator />
@@ -168,10 +168,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 value={`${a.label} ${a.to ?? ''}`}
                 onSelect={() => runAction(a)}
               >
-                <Icon className="mr-2 h-4 w-4 text-navy-100" />
+                <Icon className="mr-2 h-4 w-4 text-muted-foreground" />
                 <span>{a.label}</span>
                 {a.shortcut && (
-                  <kbd className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy-700 text-navy-200">
+                  <kbd className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                     {a.shortcut}
                   </kbd>
                 )}
@@ -188,7 +188,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 const Icon = a.icon;
                 return (
                   <CommandItem key={a.id} value={a.label} onSelect={() => runAction(a)}>
-                    <Icon className="mr-2 h-4 w-4 text-navy-100" />
+                    <Icon className="mr-2 h-4 w-4 text-muted-foreground" />
                     <span>{a.label}</span>
                   </CommandItem>
                 );

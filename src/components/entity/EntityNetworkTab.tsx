@@ -51,7 +51,7 @@ export function EntityNetworkTab({
     return (
       <div className="glass rounded-xl p-12 text-center">
         <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
+        <h3 className="text-xl font-medium text-foreground mb-2">Sin Relaciones</h3>
         <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
       </div>
     );

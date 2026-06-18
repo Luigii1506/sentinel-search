@@ -188,7 +188,7 @@ export function EntityRelationshipsTab({
     return (
       <div className="glass rounded-xl p-12 text-center">
         <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-white mb-2">Sin Relaciones</h3>
+        <h3 className="text-xl font-medium text-foreground mb-2">Sin Relaciones</h3>
         <p className="text-gray-400">
           {hasDetectedOrContextualRelationships
             ? 'Las relaciones detectadas para esta entidad son contextuales y quedaron ocultas por la vista AML priorizada.'
@@ -203,7 +203,7 @@ export function EntityRelationshipsTab({
               <Button
                 variant="outline"
                 onClick={() => setIncludeContextualRelationships(true)}
-                className="border-white/10 bg-white/5 text-white hover:bg-white/10"
+                className="border-foreground/10 bg-foreground/5 text-foreground hover:bg-foreground/10"
               >
                 Mostrar relaciones contextuales
               </Button>
@@ -252,7 +252,7 @@ export function EntityRelationshipsTab({
       {filteredRelationships.length === 0 ? (
         <div className="glass rounded-xl p-8 text-center">
           <Search className="w-10 h-10 text-gray-500 mx-auto mb-3" />
-          <h3 className="text-lg font-medium text-white mb-2">Sin coincidencias</h3>
+          <h3 className="text-lg font-medium text-foreground mb-2">Sin coincidencias</h3>
           <p className="text-gray-400">No hay relaciones que coincidan con ese filtro de búsqueda.</p>
         </div>
       ) : null}

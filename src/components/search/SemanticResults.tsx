@@ -58,7 +58,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
           >
             <Card
               className={cn(
-                'p-4 bg-white/5 border-white/10 hover:bg-white/10 transition-all cursor-pointer group',
+                'p-4 bg-foreground/5 border-foreground/10 hover:bg-foreground/10 transition-all cursor-pointer group',
                 'hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5'
               )}
               onClick={() => onSelectEntity?.(result.entity_id)}
@@ -82,7 +82,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                 <div className="flex-1 min-w-0">
                   {/* Header */}
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-2">
-                    <h3 className="text-base sm:text-lg font-semibold text-white break-words group-hover:text-purple-300 transition-colors">
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground break-words group-hover:text-purple-300 transition-colors">
                       {result.canonical_name ?? result.name}
                     </h3>
                     <Button
@@ -109,7 +109,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                     </Badge>
 
                     {/* Risk Score */}
-                    <Badge variant="outline" className="text-gray-400 border-white/10">
+                    <Badge variant="outline" className="text-gray-400 border-foreground/10">
                       Score: {result.risk_score ?? result.match_score ?? 'N/A'}
                     </Badge>
 
@@ -126,7 +126,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                       <Badge
                         key={source}
                         variant="outline"
-                        className="text-xs bg-white/5 border-white/10 text-gray-400"
+                        className="text-xs bg-foreground/5 border-foreground/10 text-gray-400"
                       >
                         {source}
                       </Badge>
@@ -135,7 +135,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
 
                   {/* Similarity Bar */}
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="flex-1 h-2 bg-foreground/10 rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${(result.similarity ?? result.confidence ?? result.match_score ?? 0) * 100}%` }}

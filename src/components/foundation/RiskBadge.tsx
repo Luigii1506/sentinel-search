@@ -48,8 +48,8 @@ const VARIANTS: Record<
   unknown: {
     label: 'Sin clasificar',
     icon: HelpCircle,
-    color: 'bg-navy-600 text-navy-100 border-navy-500',
-    ring: 'ring-navy-500/30',
+    color: 'bg-secondary text-muted-foreground border-border',
+    ring: 'ring-border',
   },
 };
 

@@ -47,9 +47,9 @@ export function PageHeader({
         <div className="flex items-start gap-3 min-w-0">
           {icon && <div className="shrink-0">{icon}</div>}
           <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-semibold text-white truncate">{title}</h1>
+            <h1 className="text-2xl font-semibold text-foreground truncate">{title}</h1>
             {description && (
-              <p className="text-sm text-navy-100 mt-1">{description}</p>
+              <p className="text-sm text-muted-foreground mt-1">{description}</p>
             )}
           </div>
         </div>

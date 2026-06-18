@@ -63,7 +63,7 @@ const VARIANTS: Record<
   neutral: {
     defaultLabel: 'Inactivo',
     icon: CircleDashed,
-    color: 'bg-navy-600 text-navy-100 border-navy-500',
+    color: 'bg-secondary text-muted-foreground border-border',
   },
   pending: {
     defaultLabel: 'Pendiente',

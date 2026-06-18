@@ -20,10 +20,10 @@ export function MetricGridSkeleton({
       {Array.from({ length: cards }).map((_, i) => (
         <div
           key={i}
-          className={cn('rounded-xl border border-white/5 bg-white/[0.03] p-4 space-y-3', cardClassName)}
+          className={cn('rounded-xl border border-foreground/5 bg-foreground/[0.03] p-4 space-y-3', cardClassName)}
         >
-          <Skeleton className="h-4 w-24 bg-white/10" />
-          <Skeleton className="h-8 w-20 bg-white/10" />
+          <Skeleton className="h-4 w-24 bg-foreground/10" />
+          <Skeleton className="h-8 w-20 bg-foreground/10" />
         </div>
       ))}
     </div>

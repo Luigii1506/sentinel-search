@@ -57,7 +57,7 @@ export function OAuthCallbackPage() {
   }, [navigate, refreshUser]);
 
   return (
-    <div className="min-h-screen bg-brand-carbon flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

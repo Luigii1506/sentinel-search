@@ -113,10 +113,10 @@ function Dial({
       </svg>
       {/* Numeric centerpiece */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="font-semibold text-white tabular-nums" style={{ fontSize: size * 0.32 }}>
+        <div className="font-semibold text-foreground tabular-nums" style={{ fontSize: size * 0.32 }}>
           {score === null || score === undefined ? '—' : Math.round(safeScore)}
         </div>
-        <div className="text-[10px] uppercase tracking-wide text-navy-200">
+        <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
           / 100
         </div>
       </div>
@@ -130,18 +130,18 @@ function FactorBar({ factor }: { factor: RiskFactor }) {
   return (
     <div className="space-y-1">
       <div className="flex items-baseline justify-between gap-2 text-xs">
-        <span className="text-navy-50 font-medium truncate">{factor.label}</span>
+        <span className="text-muted-foreground font-medium truncate">{factor.label}</span>
         <span
           className={cn(
             'tabular-nums shrink-0 text-[11px]',
-            isMitigation ? 'text-green-300' : 'text-navy-100',
+            isMitigation ? 'text-green-300' : 'text-muted-foreground',
           )}
         >
           {isMitigation ? '−' : '+'}
           {magnitude.toFixed(0)}
         </span>
       </div>
-      <div className="h-1 rounded-full bg-navy-700 overflow-hidden">
+      <div className="h-1 rounded-full bg-muted overflow-hidden">
         <motion.div
           initial={{ width: 0 }}
           animate={{ width: `${magnitude}%` }}
@@ -153,7 +153,7 @@ function FactorBar({ factor }: { factor: RiskFactor }) {
         />
       </div>
       {factor.detail && (
-        <p className="text-[11px] text-navy-200 leading-snug">{factor.detail}</p>
+        <p className="text-[11px] text-muted-foreground leading-snug">{factor.detail}</p>
       )}
     </div>
   );
@@ -185,7 +185,7 @@ export function RiskScoreGauge({
         <Dial score={score} level={resolvedLevel} size={size} />
         <RiskBadge level={resolvedLevel} size={variant === 'hero' ? 'md' : 'sm'} />
         {caption && (
-          <div className="text-[10px] text-navy-200 text-center max-w-[200px]">
+          <div className="text-[10px] text-muted-foreground text-center max-w-[200px]">
             {caption}
           </div>
         )}
@@ -194,7 +194,7 @@ export function RiskScoreGauge({
       {/* Factor breakdown */}
       {factors && factors.length > 0 && (
         <div className="flex-1 min-w-0 space-y-3 max-w-md">
-          <div className="text-[11px] uppercase tracking-wider text-navy-200">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
             Factores de riesgo
           </div>
           <div className="space-y-3">

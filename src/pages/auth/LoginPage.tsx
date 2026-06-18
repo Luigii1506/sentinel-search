@@ -39,7 +39,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-brand-carbon flex items-center justify-center">
+    <div className="relative min-h-screen overflow-hidden bg-background flex items-center justify-center">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_38%),radial-gradient(circle_at_80%_20%,rgba(34,197,94,0.10),transparent_26%),linear-gradient(180deg,#06111f_0%,#091827_48%,#0b1220_100%)]" aria-hidden="true" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
       <div className="absolute left-[8%] top-[14%] h-40 w-40 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
@@ -64,9 +64,9 @@ export function LoginPage() {
           <p className="text-gray-400 mt-2">Sistema de Cumplimiento PLD/FT</p>
         </div>
 
-        <Card className="bg-navy-700 border-white/10 backdrop-blur-xl">
+        <Card className="bg-muted border-foreground/10 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle className="text-white">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-foreground">Iniciar Sesión</CardTitle>
             <CardDescription className="text-gray-400">
               Ingresa tus credenciales para acceder al sistema
             </CardDescription>
@@ -81,7 +81,7 @@ export function LoginPage() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="tu@empresa.com o tu_usuario"
-                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="bg-foreground/5 border-foreground/10 text-white placeholder:text-gray-500"
                   disabled={isLoading}
                 />
               </div>
@@ -95,7 +95,7 @@ export function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 pr-10"
+                    className="bg-foreground/5 border-foreground/10 text-white placeholder:text-gray-500 pr-10"
                     disabled={isLoading}
                   />
                   <button
@@ -138,7 +138,7 @@ export function LoginPage() {
               <GoogleSignInButton label="Iniciar sesión con Google" />
             </div>
 
-            <div className="mt-6 pt-6 border-t border-white/10 space-y-3">
+            <div className="mt-6 pt-6 border-t border-foreground/10 space-y-3">
               <p className="text-sm text-gray-400 text-center">
                 ¿No tienes cuenta?{' '}
                 <Link

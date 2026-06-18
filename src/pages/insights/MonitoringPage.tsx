@@ -64,7 +64,7 @@ export function MonitoringPage() {
       <AppPage>
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-2">Error al cargar monitoreo</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Error al cargar monitoreo</h2>
           <p className="text-gray-400 mb-4">No se pudieron obtener los datos de los jobs</p>
           <Button onClick={() => refetchJobs()} variant="outline">
             <RefreshCw className="w-4 h-4 mr-2" />
@@ -163,7 +163,7 @@ export function MonitoringPage() {
                     ? 'border-red-500/30 bg-red-500/10 text-red-300'
                     : dataQualitySnapshot.is_stale
                       ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-                      : 'border-white/10 bg-white/5 text-gray-400'
+                      : 'border-foreground/10 bg-foreground/5 text-gray-400'
                 }`}
                 title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
               >
@@ -192,10 +192,10 @@ export function MonitoringPage() {
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4"
             >
-              <Card className="bg-brand-navy border-white/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.api?.status} label="API" icon={Server} detail={services.api?.status === 'ok' ? 'Operativo' : 'Error'} variant="card" /></CardContent></Card>
-              <Card className="bg-brand-navy border-white/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.database?.status} label="PostgreSQL" icon={HardDrive} detail={`${services.database?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
-              <Card className="bg-brand-navy border-white/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.redis?.status} label="Redis" icon={Wifi} detail={`${services.redis?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
-              <Card className="bg-brand-navy border-white/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.opensearch?.status} label="OpenSearch" icon={Search} detail={`${services.opensearch?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
+              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.api?.status} label="API" icon={Server} detail={services.api?.status === 'ok' ? 'Operativo' : 'Error'} variant="card" /></CardContent></Card>
+              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.database?.status} label="PostgreSQL" icon={HardDrive} detail={`${services.database?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
+              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.redis?.status} label="Redis" icon={Wifi} detail={`${services.redis?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
+              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.opensearch?.status} label="OpenSearch" icon={Search} detail={`${services.opensearch?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
             </motion.div>
           </Section>
         )}
@@ -204,12 +204,12 @@ export function MonitoringPage() {
           <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
             {entityMetricCards.map((item) => (
               <motion.div key={item.label} variants={fadeUpItem}>
-                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-brand-navy border-white/5" />
+                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-card border-foreground/5" />
               </motion.div>
             ))}
             {jobMetricCards.map((item) => (
               <motion.div key={item.label} variants={fadeUpItem}>
-                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-brand-navy border-white/5" />
+                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-card border-foreground/5" />
               </motion.div>
             ))}
           </motion.div>
@@ -219,7 +219,7 @@ export function MonitoringPage() {
           <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10">
             {operationalMetricCards.map((item) => (
               <motion.div key={item.label} variants={fadeUpItem}>
-                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-brand-navy border-white/5" />
+                <MetricCard label={item.label} value={item.value} icon={item.icon} className="bg-card border-foreground/5" />
               </motion.div>
             ))}
             <motion.div variants={fadeUpItem}>
@@ -227,7 +227,7 @@ export function MonitoringPage() {
                 label="Snapshots"
                 value={`${(snapshotsHealth?.total_snapshots || 0) - snapshotsStale}/${snapshotsHealth?.total_snapshots || 0}`}
                 icon={HardDrive}
-                className={snapshotsCritical > 0 ? 'bg-brand-navy border-red-500/30' : snapshotsStale > 0 ? 'bg-brand-navy border-amber-500/30' : 'bg-brand-navy border-white/5'}
+                className={snapshotsCritical > 0 ? 'bg-card border-red-500/30' : snapshotsStale > 0 ? 'bg-card border-amber-500/30' : 'bg-card border-foreground/5'}
               />
             </motion.div>
           </motion.div>
@@ -237,13 +237,13 @@ export function MonitoringPage() {
           <SectionCard title="Freshness y riesgo operativo" className="h-full">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-white/5 p-3">
+                <div className="rounded-lg bg-foreground/5 p-3">
                   <p className="text-xs text-gray-500 mb-1">Fuentes evaluadas</p>
-                  <p className="text-xl font-bold text-white">{freshness?.total_sources || 0}</p>
+                  <p className="text-xl font-bold text-foreground">{freshness?.total_sources || 0}</p>
                 </div>
-                <div className="rounded-lg bg-white/5 p-3">
+                <div className="rounded-lg bg-foreground/5 p-3">
                   <p className="text-xs text-gray-500 mb-1">Redis durability</p>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-foreground">
                     {redisDurability?.connected
                       ? `${redisDurability.aof_enabled ? 'AOF on' : 'AOF off'} / ${redisDurability.rdb_enabled ? 'RDB on' : 'RDB off'}`
                       : 'Sin datos'}
@@ -251,12 +251,12 @@ export function MonitoringPage() {
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-white mb-3">Top violaciones SLO</p>
+                <p className="text-sm font-medium text-foreground mb-3">Top violaciones SLO</p>
                 <div className="space-y-2">
                   {topViolations.length > 0 ? topViolations.map((item) => (
-                    <div key={item.source_id} className="rounded-lg bg-white/5 p-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div key={item.source_id} className="rounded-lg bg-foreground/5 p-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm text-white font-medium">{item.source_id}</p>
+                        <p className="text-sm text-foreground font-medium">{item.source_id}</p>
                         <p className="text-xs text-gray-500">
                           Tier {item.tier} · {item.age_hours.toFixed(1)}h · SLO {item.slo_hours}h
                         </p>
@@ -282,23 +282,23 @@ export function MonitoringPage() {
           <SectionCard title="DLQ y calidad" className="h-full">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-white/5 p-3">
+                <div className="rounded-lg bg-foreground/5 p-3">
                   <p className="text-xs text-gray-500 mb-1">Silver unmapped</p>
-                  <p className="text-xl font-bold text-white">{formatNumber(dataQuality?.counts?.silver_unmapped || 0)}</p>
+                  <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.silver_unmapped || 0)}</p>
                 </div>
-                <div className="rounded-lg bg-white/5 p-3">
+                <div className="rounded-lg bg-foreground/5 p-3">
                   <p className="text-xs text-gray-500 mb-1">Gold screenable</p>
-                  <p className="text-xl font-bold text-white">{formatNumber(dataQuality?.counts?.gold_screenable || 0)}</p>
+                  <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.gold_screenable || 0)}</p>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-white mb-3">Top dead letters</p>
+                <p className="text-sm font-medium text-foreground mb-3">Top dead letters</p>
                 <div className="space-y-2">
                   {topDlq.length > 0 ? topDlq.map((item) => (
-                    <div key={item.id} className="rounded-lg bg-white/5 p-3">
+                    <div key={item.id} className="rounded-lg bg-foreground/5 p-3">
                       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
-                          <p className="text-sm text-white truncate">{item.source || item.task_name}</p>
+                          <p className="text-sm text-foreground truncate">{item.source || item.task_name}</p>
                           <p className="text-xs text-gray-500 truncate">{item.step} · {item.task_name}</p>
                         </div>
                         <Badge className="bg-red-500/10 text-red-400 border-red-500/20">

@@ -25,7 +25,7 @@
  *   - consistent height (40px controls everywhere)
  *   - consistent focus ring (electric, not the default blue)
  *   - consistent mobile collapse (stack vertically below md)
- *   - consistent surface (navy-700 border-white/10 rounded-md)
+ *   - consistent surface (navy-700 border-foreground/10 rounded-md)
  * across every list page without each page having to remember.
  */
 import type { ReactNode, SelectHTMLAttributes } from 'react';
@@ -45,7 +45,7 @@ export function FilterBar({ children, bare, className }: FilterBarProps) {
     <div
       className={cn(
         'flex flex-col md:flex-row md:items-center gap-3',
-        !bare && 'rounded-md border border-white/10 bg-navy-700/60 px-3 py-2.5',
+        !bare && 'rounded-md border border-foreground/10 bg-muted/60 px-3 py-2.5',
         className,
       )}
     >
@@ -76,15 +76,15 @@ function Search({
 }: SearchProps) {
   return (
     <div className={cn('relative flex-1 min-w-[200px]', className)}>
-      <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-navy-200" />
+      <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
       <input
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          'w-full h-9 pl-8 pr-8 rounded-md bg-navy-800 border border-white/10',
-          'text-sm text-white placeholder:text-navy-300',
+          'w-full h-9 pl-8 pr-8 rounded-md bg-card border border-foreground/10',
+          'text-sm text-foreground placeholder:text-muted-foreground',
           'focus:outline-none focus:border-electric-500 focus:ring-1 focus:ring-electric-500/40',
         )}
       />
@@ -93,7 +93,7 @@ function Search({
           type="button"
           onClick={() => onChange('')}
           aria-label="Limpiar búsqueda"
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-navy-300 hover:text-white"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
           <XIcon className="w-3.5 h-3.5" />
         </button>
@@ -129,13 +129,13 @@ function Select({
 }: SelectProps) {
   return (
     <label className={cn('flex flex-col gap-1', className)}>
-      {label && <span className="text-[10px] uppercase tracking-wider text-navy-200 hidden md:block">{label}</span>}
+      {label && <span className="text-[10px] uppercase tracking-wider text-muted-foreground hidden md:block">{label}</span>}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className={cn(
-          'h-9 px-3 pr-8 rounded-md bg-navy-800 border border-white/10',
-          'text-sm text-white',
+          'h-9 px-3 pr-8 rounded-md bg-card border border-foreground/10',
+          'text-sm text-foreground',
           'focus:outline-none focus:border-electric-500 focus:ring-1 focus:ring-electric-500/40',
           // Custom chevron via background image — avoids the browser's
           // native dropdown arrow which doesn't theme.

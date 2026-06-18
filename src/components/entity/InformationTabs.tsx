@@ -46,7 +46,7 @@ export function InformationTabs({ entity, className }: InformationTabsProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className={cn('w-full', className)}>
-      <TabsList className="w-full justify-start bg-transparent border-b border-white/10 rounded-none h-auto p-0 gap-1 overflow-x-auto">
+      <TabsList className="w-full justify-start bg-transparent border-b border-foreground/10 rounded-none h-auto p-0 gap-1 overflow-x-auto">
         {[
           { id: 'identity', label: 'Identity', icon: User, count: null },
           { id: 'sanctions', label: 'Sanctions', icon: Shield, count: entity.sanctions.length || null },
@@ -59,14 +59,14 @@ export function InformationTabs({ entity, className }: InformationTabsProps) {
             key={tab.id}
             value={tab.id}
             className={cn(
-              'flex items-center gap-2 px-4 py-3 rounded-t-lg data-[state=active]:bg-white/5 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 transition-all',
-              'text-gray-400 data-[state=active]:text-white hover:text-white hover:bg-white/[0.02]'
+              'flex items-center gap-2 px-4 py-3 rounded-t-lg data-[state=active]:bg-foreground/5 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 transition-all',
+              'text-gray-400 data-[state=active]:text-foreground hover:text-foreground hover:bg-foreground/[0.02]'
             )}
           >
             <tab.icon className="w-4 h-4" />
             <span className="hidden sm:inline">{tab.label}</span>
             {tab.count !== null && tab.count > 0 && (
-              <Badge variant="secondary" className="bg-white/10 text-white text-[10px]">
+              <Badge variant="secondary" className="bg-foreground/10 text-foreground text-[10px]">
                 {tab.count}
               </Badge>
             )}
@@ -165,7 +165,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Personal Information */}
       <div className="glass rounded-xl p-5">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <UserCircle className="w-5 h-5 text-blue-400" />
           Personal Information
         </h3>
@@ -173,25 +173,25 @@ function IdentityTab({ entity }: { entity: Entity }) {
           {entity.gender && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Gender</span>
-              <span className="text-white capitalize break-words sm:text-right">{entity.gender}</span>
+              <span className="text-foreground capitalize break-words sm:text-right">{entity.gender}</span>
             </div>
           )}
           {entity.dateOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Date of Birth</span>
-              <span className="text-white break-words sm:text-right">{formatDate(entity.dateOfBirth)}</span>
+              <span className="text-foreground break-words sm:text-right">{formatDate(entity.dateOfBirth)}</span>
             </div>
           )}
           {entity.placeOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Place of Birth</span>
-              <span className="text-white break-words sm:text-right">{entity.placeOfBirth}</span>
+              <span className="text-foreground break-words sm:text-right">{entity.placeOfBirth}</span>
             </div>
           )}
           {entity.nationalities && entity.nationalities.length > 0 && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
               <span className="text-gray-400">Nationality</span>
-              <span className="text-white break-words sm:text-right">{entity.nationalities.join(', ')}</span>
+              <span className="text-foreground break-words sm:text-right">{entity.nationalities.join(', ')}</span>
             </div>
           )}
         </div>
@@ -200,7 +200,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
       {/* Company Information */}
       {entity.type === 'company' && (
         <div className="glass rounded-xl p-5">
-          <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+          <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
             <Building className="w-5 h-5 text-purple-400" />
             Company Information
           </h3>
@@ -208,19 +208,19 @@ function IdentityTab({ entity }: { entity: Entity }) {
             {entity.incorporationDate && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Incorporation Date</span>
-                <span className="text-white break-words sm:text-right">{formatDate(entity.incorporationDate)}</span>
+                <span className="text-foreground break-words sm:text-right">{formatDate(entity.incorporationDate)}</span>
               </div>
             )}
             {entity.incorporationCountry && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Incorporation Country</span>
-                <span className="text-white break-words sm:text-right">{entity.incorporationCountry}</span>
+                <span className="text-foreground break-words sm:text-right">{entity.incorporationCountry}</span>
               </div>
             )}
             {entity.companyType && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                 <span className="text-gray-400">Company Type</span>
-                <span className="text-white break-words sm:text-right">{entity.companyType}</span>
+                <span className="text-foreground break-words sm:text-right">{entity.companyType}</span>
               </div>
             )}
             {entity.status && (
@@ -245,7 +245,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
 
       {/* Addresses */}
       <div className="glass rounded-xl p-5 lg:col-span-2">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-red-400" />
           Addresses ({entity.addresses.length})
         </h3>
@@ -253,10 +253,10 @@ function IdentityTab({ entity }: { entity: Entity }) {
           {entity.addresses.map((address) => (
             <div
               key={address.id}
-              className="p-4 rounded-lg bg-white/5 border border-white/10"
+              className="p-4 rounded-lg bg-foreground/5 border border-foreground/10"
             >
               <div className="flex items-start justify-between mb-2">
-                <Badge variant="outline" className="text-[10px] bg-white/5">
+                <Badge variant="outline" className="text-[10px] bg-foreground/5">
                   {address.type}
                 </Badge>
                 {address.isCurrent && (
@@ -265,7 +265,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
                   </Badge>
                 )}
               </div>
-              <p className="text-white text-sm break-words">
+              <p className="text-foreground text-sm break-words">
                 {address.street && <>{address.street}<br /></>}
                 {address.city}{address.state && `, ${address.state}`}{address.postalCode && ` ${address.postalCode}`}
                 <br />
@@ -283,21 +283,21 @@ function IdentityTab({ entity }: { entity: Entity }) {
 
       {/* Identifications */}
       <div className="glass rounded-xl p-5 lg:col-span-2">
-        <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <CreditCard className="w-5 h-5 text-amber-400" />
           Identifications ({entity.identifications.length})
         </h3>
         <div className="space-y-3 md:hidden">
           {entity.identifications.map((id) => (
-            <div key={id.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
+            <div key={id.id} className="rounded-lg border border-foreground/10 bg-foreground/5 p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
                   <span className="text-[11px] uppercase tracking-wide text-gray-500">Type</span>
-                  <span className="text-white capitalize break-words">{id.type.replace('_', ' ')}</span>
+                  <span className="text-foreground capitalize break-words">{id.type.replace('_', ' ')}</span>
                 </div>
                 <div className="flex flex-col gap-1">
                   <span className="text-[11px] uppercase tracking-wide text-gray-500">Number</span>
-                  <span className="text-white font-mono break-all">{id.number}</span>
+                  <span className="text-foreground font-mono break-all">{id.number}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex flex-col gap-1">
@@ -322,7 +322,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
         <div className="hidden overflow-x-auto md:block">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-foreground/10">
                 <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Type</th>
                 <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Number</th>
                 <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Country</th>
@@ -331,9 +331,9 @@ function IdentityTab({ entity }: { entity: Entity }) {
             </thead>
             <tbody>
               {entity.identifications.map((id) => (
-                <tr key={id.id} className="border-b border-white/5 hover:bg-white/[0.02]">
-                  <td className="py-3 px-4 text-white capitalize">{id.type.replace('_', ' ')}</td>
-                  <td className="py-3 px-4 text-white font-mono">{id.number}</td>
+                <tr key={id.id} className="border-b border-foreground/5 hover:bg-foreground/[0.02]">
+                  <td className="py-3 px-4 text-foreground capitalize">{id.type.replace('_', ' ')}</td>
+                  <td className="py-3 px-4 text-foreground font-mono">{id.number}</td>
                   <td className="py-3 px-4 text-gray-300">{id.country || '-'}</td>
                   <td className="py-3 px-4">
                     {id.source && (
@@ -388,7 +388,7 @@ function SanctionsTab({ entity }: { entity: Entity }) {
                   </span>
                 )}
               </div>
-              <h4 className="text-lg font-medium text-white">
+              <h4 className="text-lg font-medium text-foreground">
                 {sanction.program ? `${sanction.program} Program` : 'Sanction'}
               </h4>
             </div>
@@ -413,30 +413,30 @@ function SanctionsTab({ entity }: { entity: Entity }) {
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
               <span className="text-gray-500">Listing Date:</span>
-              <span className="text-white ml-2">{formatDate(sanction.listingDate)}</span>
+              <span className="text-foreground ml-2">{formatDate(sanction.listingDate)}</span>
             </div>
             {sanction.start_date && (
               <div>
                 <span className="text-gray-500">Vigente desde:</span>
-                <span className="text-white ml-2">{formatDate(sanction.start_date)}</span>
+                <span className="text-foreground ml-2">{formatDate(sanction.start_date)}</span>
               </div>
             )}
             {sanction.end_date && (
               <div>
                 <span className="text-gray-500">Hasta:</span>
-                <span className="text-white ml-2">{formatDate(sanction.end_date)}</span>
+                <span className="text-foreground ml-2">{formatDate(sanction.end_date)}</span>
               </div>
             )}
             {sanction.provisions && (
               <div>
                 <span className="text-gray-500">Disposición:</span>
-                <span className="text-white ml-2">{sanction.provisions}</span>
+                <span className="text-foreground ml-2">{sanction.provisions}</span>
               </div>
             )}
             {sanction.referenceNumber && (
               <div>
                 <span className="text-gray-500">Reference:</span>
-                <span className="text-white ml-2 font-mono">{sanction.referenceNumber}</span>
+                <span className="text-foreground ml-2 font-mono">{sanction.referenceNumber}</span>
               </div>
             )}
           </div>
@@ -489,7 +489,7 @@ function PepTab({ entity }: { entity: Entity }) {
                 <Flag className="w-5 h-5 text-pink-500" />
                 <span className="text-xs text-gray-400 uppercase tracking-wider">PEP</span>
               </div>
-              <h4 className="text-lg font-medium text-white">{pep.role}</h4>
+              <h4 className="text-lg font-medium text-foreground">{pep.role}</h4>
             </div>
             <Badge
               variant="outline"
@@ -507,22 +507,22 @@ function PepTab({ entity }: { entity: Entity }) {
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
               <span className="text-gray-500">Country:</span>
-              <span className="text-white ml-2">{pep.country}</span>
+              <span className="text-foreground ml-2">{pep.country}</span>
             </div>
             <div>
               <span className="text-gray-500">Category:</span>
-              <span className="text-white ml-2 capitalize">{pep.category.replace('_', ' ')}</span>
+              <span className="text-foreground ml-2 capitalize">{pep.category.replace('_', ' ')}</span>
             </div>
             {pep.startDate && (
               <div>
                 <span className="text-gray-500">From:</span>
-                <span className="text-white ml-2">{formatDate(pep.startDate)}</span>
+                <span className="text-foreground ml-2">{formatDate(pep.startDate)}</span>
               </div>
             )}
             {pep.endDate && (
               <div>
                 <span className="text-gray-500">To:</span>
-                <span className="text-white ml-2">{formatDate(pep.endDate)}</span>
+                <span className="text-foreground ml-2">{formatDate(pep.endDate)}</span>
               </div>
             )}
           </div>
@@ -642,11 +642,11 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
 
             <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
-                <p className="text-lg font-bold text-white">{riskProfile.total_articles}</p>
+                <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
                 <p className="text-xs text-gray-400">Articulos</p>
               </div>
               <div>
-                <p className="text-lg font-bold text-white">{riskProfile.recent_30d}</p>
+                <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
                 <p className="text-xs text-gray-400">Ultimos 30d</p>
               </div>
               <div>
@@ -659,7 +659,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
             {riskProfile.top_categories.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {riskProfile.top_categories.map((cat) => (
-                  <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-white/5')}>
+                  <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-foreground/5')}>
                     {categoryLabels[cat] || cat}
                   </Badge>
                 ))}
@@ -678,10 +678,10 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
           </h4>
           <div className="space-y-2">
             {structured.categories.map((cat, i) => (
-              <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg bg-white/[0.02]">
-                <span className="text-sm text-white break-words">{categoryLabels[cat.category] || cat.category}</span>
+              <div key={i} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-2 rounded-lg bg-foreground/[0.02]">
+                <span className="text-sm text-foreground break-words">{categoryLabels[cat.category] || cat.category}</span>
                 <div className="flex items-center gap-2 sm:justify-end">
-                  <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="w-16 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                     <div className={cn('h-full rounded-full', severityBg(cat.severity))} style={{ width: `${cat.severity}%` }} />
                   </div>
                   <span className={cn('text-xs font-mono', severityColor(cat.severity))}>{cat.severity}</span>
@@ -730,10 +730,10 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                 )}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
-                  <h5 className="text-sm font-medium text-white flex-1 line-clamp-2">{article.title}</h5>
+                  <h5 className="text-sm font-medium text-foreground flex-1 line-clamp-2">{article.title}</h5>
                   {article.severity > 0 && (
                     <div className="flex items-center gap-1 shrink-0 sm:self-start">
-                      <div className="w-12 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                      <div className="w-12 h-1.5 bg-foreground/5 rounded-full overflow-hidden">
                         <div className={cn('h-full rounded-full', severityBg(article.severity))} style={{ width: `${article.severity}%` }} />
                       </div>
                       <span className={cn('text-xs font-mono font-bold', severityColor(article.severity))}>
@@ -749,7 +749,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {article.categories?.map((cat) => (
-                    <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-white/5')}>
+                    <Badge key={cat} variant="outline" className={cn('text-[10px]', categoryColors[cat] || 'bg-foreground/5')}>
                       {categoryLabels[cat] || cat}
                     </Badge>
                   ))}
@@ -850,17 +850,17 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
       <div className="grid gap-3 md:grid-cols-3">
         <div className="glass rounded-xl p-4">
           <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones detectadas</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{entity.relationships.length}</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{entity.relationships.length}</p>
           <p className="mt-1 text-sm text-gray-400">Vista consolidada de vinculos conocidos.</p>
         </div>
         <div className="glass rounded-xl p-4">
           <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones vigentes</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{currentRelationships}</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{currentRelationships}</p>
           <p className="mt-1 text-sm text-gray-400">Se marcan como activas en la data disponible.</p>
         </div>
         <div className="glass rounded-xl p-4">
           <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Alta confianza</p>
-          <p className="mt-2 text-2xl font-semibold text-white">{highConfidenceRelationships}</p>
+          <p className="mt-2 text-2xl font-semibold text-foreground">{highConfidenceRelationships}</p>
           <p className="mt-1 text-sm text-gray-400">Vinculos con score de 85% o superior.</p>
         </div>
       </div>
@@ -870,7 +870,7 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-medium uppercase tracking-[0.22em] text-gray-500">Tipos principales</span>
             {relationshipTypes.map(([type, count]) => (
-              <Badge key={type} variant="outline" className="text-[10px] bg-white/5 text-gray-200 border-white/10">
+              <Badge key={type} variant="outline" className="text-[10px] bg-foreground/5 text-gray-200 border-foreground/10">
                 {getRelationshipTypeLabel(type)} · {count}
               </Badge>
             ))}
@@ -899,7 +899,7 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
                   Confianza {rel.confidence}%
                 </Badge>
               </div>
-              <p className="text-sm leading-6 text-white">{rel.description || 'Relacion registrada sin descripcion adicional.'}</p>
+              <p className="text-sm leading-6 text-foreground">{rel.description || 'Relacion registrada sin descripcion adicional.'}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -911,13 +911,13 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
 
           {(rel.startDate || rel.endDate) && (
             <div className="mt-4 grid gap-3 text-sm text-gray-400 sm:grid-cols-2">
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+              <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
                 <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Inicio</span>
-                <span className="mt-1 block text-white">{rel.startDate ? formatDate(rel.startDate) : 'No disponible'}</span>
+                <span className="mt-1 block text-foreground">{rel.startDate ? formatDate(rel.startDate) : 'No disponible'}</span>
               </div>
-              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+              <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
                 <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Fin</span>
-                <span className="mt-1 block text-white">{rel.endDate ? formatDate(rel.endDate) : 'Sin cierre registrado'}</span>
+                <span className="mt-1 block text-foreground">{rel.endDate ? formatDate(rel.endDate) : 'Sin cierre registrado'}</span>
               </div>
             </div>
           )}
@@ -951,7 +951,7 @@ function AuditTab({ entity }: { entity: Entity }) {
 
   return (
     <div className="glass rounded-xl p-5">
-      <h3 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+      <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
         <History className="w-5 h-5 text-blue-400" />
         Activity History
       </h3>
@@ -964,7 +964,7 @@ function AuditTab({ entity }: { entity: Entity }) {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              className="flex gap-4 p-3 rounded-lg hover:bg-white/[0.02]"
+              className="flex gap-4 p-3 rounded-lg hover:bg-foreground/[0.02]"
             >
               <div className="flex flex-col items-center">
                 <div className={cn(
@@ -972,13 +972,13 @@ function AuditTab({ entity }: { entity: Entity }) {
                   event.type === 'system' ? 'bg-blue-500' : 'bg-amber-500'
                 )} />
                 {index < auditEvents.length - 1 && (
-                  <div className="w-px h-full bg-white/10 mt-1" />
+                  <div className="w-px h-full bg-foreground/10 mt-1" />
                 )}
               </div>
 
               <div className="flex-1 pb-4">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <span className="text-white font-medium">{event.action}</span>
+                  <span className="text-foreground font-medium">{event.action}</span>
                   <span className="text-xs text-gray-500">by {event.user}</span>
                 </div>
                 <span className="text-xs text-gray-500">{formatDate(event.date)}</span>

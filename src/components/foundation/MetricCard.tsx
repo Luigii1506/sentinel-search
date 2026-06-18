@@ -52,7 +52,7 @@ export function MetricCard({
     accent === 'red'     ? 'text-red-300' :
     accent === 'amber'   ? 'text-amber-300' :
     accent === 'success' ? 'text-green-300' :
-    'text-white';
+    'text-foreground';
 
   // Resolve delta presentation. higherIsBetter inverts the color when
   // the metric is "lower = better" (errors, latency).
@@ -65,10 +65,10 @@ export function MetricCard({
     const isBad  = higherIsBetter ? isNegative : isPositive;
 
     const deltaColor =
-      delta.value === 0 ? 'text-navy-200' :
+      delta.value === 0 ? 'text-muted-foreground' :
       isGood            ? 'text-green-300' :
       isBad             ? 'text-red-300' :
-      'text-navy-100';
+      'text-muted-foreground';
 
     const Arrow =
       delta.value === 0 ? Minus :
@@ -81,7 +81,7 @@ export function MetricCard({
         <span className="tabular-nums">
           {Math.abs(delta.value).toFixed(1)}%
         </span>
-        {delta.label && <span className="text-navy-200 ml-1">{delta.label}</span>}
+        {delta.label && <span className="text-muted-foreground ml-1">{delta.label}</span>}
       </div>
     );
   }
@@ -95,7 +95,7 @@ export function MetricCard({
       <Card className={cn('h-full', className)}>
         <CardContent className="p-4 space-y-1">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] uppercase tracking-wide text-navy-200 flex items-center gap-1.5 min-w-0">
+            <span className="text-[11px] uppercase tracking-wide text-muted-foreground flex items-center gap-1.5 min-w-0">
               {Icon && <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
               <span className="truncate">{label}</span>
             </span>
@@ -105,7 +105,7 @@ export function MetricCard({
             <div className={cn('text-2xl font-semibold tabular-nums', valueColor)}>
               {value}
             </div>
-            {unit && <div className="text-sm text-navy-200">{unit}</div>}
+            {unit && <div className="text-sm text-muted-foreground">{unit}</div>}
           </div>
         </CardContent>
       </Card>

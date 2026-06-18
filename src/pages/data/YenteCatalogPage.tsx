@@ -68,19 +68,19 @@ export function YenteCatalogPage() {
 
           {catalog && (
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <MetricCard label="Datasets" value={catalog.datasets.length} icon={Database} className="bg-white/5 border-white/10" />
-              <MetricCard label="Entities indexadas" value={totalEntities.toLocaleString()} icon={Globe} className="bg-white/5 border-white/10" />
-              <MetricCard label="Actualizado" value={new Date(catalog.updated_at).toLocaleString()} className="bg-white/5 border-white/10" />
+              <MetricCard label="Datasets" value={catalog.datasets.length} icon={Database} className="bg-foreground/5 border-foreground/10" />
+              <MetricCard label="Entities indexadas" value={totalEntities.toLocaleString()} icon={Globe} className="bg-foreground/5 border-foreground/10" />
+              <MetricCard label="Actualizado" value={new Date(catalog.updated_at).toLocaleString()} className="bg-foreground/5 border-foreground/10" />
             </div>
           )}
 
-          <Card className="bg-white/5 border-white/10">
+          <Card className="bg-foreground/5 border-foreground/10">
             <CardHeader>
               <CardTitle className="text-base flex items-center justify-between">
                 <span>Datasets disponibles</span>
                 <div className="relative w-64">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
-                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filtrar..." className="pl-8 bg-white/5 border-white/10 text-sm" />
+                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filtrar..." className="pl-8 bg-foreground/5 border-foreground/10 text-sm" />
                 </div>
               </CardTitle>
             </CardHeader>
@@ -106,10 +106,10 @@ export function YenteCatalogPage() {
 function DatasetCard({ ds }: { ds: YenteDataset }) {
   const tier = tierFor(ds.entity_count);
   return (
-    <div className="bg-black/30 border border-white/10 rounded-lg p-3 hover:border-white/20 transition">
+    <div className="bg-black/30 border border-foreground/10 rounded-lg p-3 hover:border-foreground/20 transition">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium text-white font-mono truncate" title={ds.name}>{ds.name}</div>
+          <div className="text-sm font-medium text-foreground font-mono truncate" title={ds.name}>{ds.name}</div>
           {ds.title && ds.title !== ds.name && <div className="text-xs text-gray-500 truncate" title={ds.title}>{ds.title}</div>}
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded border ${tier.color} shrink-0`}>{tier.label}</span>
