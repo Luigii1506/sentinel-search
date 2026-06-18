@@ -32,7 +32,7 @@ export function PublicOnlyRoute({
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
 
-  // While AuthContext is rehydrating from localStorage, render nothing
+  // While AuthContext is rehydrating from the backend session, render nothing
   // (rather than flashing the login form for a frame before the
   // redirect kicks in).
   if (isLoading) return null;

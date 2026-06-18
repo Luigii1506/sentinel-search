@@ -1,36 +1,21 @@
 /**
- * OAuth callback landing page — receives the tokens the backend hands
- * off in the URL fragment after a successful Google login, persists
- * them, hydrates AuthContext, and navigates the user to `next`.
+ * OAuth callback landing page.
  *
- * URL shapes we handle:
- *   /auth/callback#access_token=…&refresh_token=…&role=admin&next=/
- *   /auth/callback#error=access_denied
- *
- * We use the fragment (not the query string) because it never crosses
- * the wire — the access token only lives in the browser.
- *
- * After processing we clean the URL with replaceState so a refresh
- * doesn't try to re-import an already-consumed (and now bogus, since
- * we set it as the active session) token. We do NOT depend on
- * window.location.hash for routing — `useEffect` parses it once on
- * mount, then we're done with it.
+ * Backend now owns the Google handshake and sets same-site session
+ * cookies before redirecting the browser back to the SPA. This route
+ * only hydrates /me and redirects to the destination.
  */
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
-import { tokenManager } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 export function OAuthCallbackPage() {
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
-  // StrictMode mounts effects twice in dev. The token-consume is
-  // idempotent in practice (same tokens land twice) but the toast
-  // would also fire twice — gate it.
   const handled = useRef(false);
 
   useEffect(() => {
@@ -50,32 +35,16 @@ export function OAuthCallbackPage() {
           : `Error de Google: ${oauthError}`;
       setError(friendly);
       toast.error(friendly);
-      // Give the user a chance to read the message before bouncing.
       window.setTimeout(() => navigate('/login', { replace: true }), 1800);
       return;
     }
 
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
     const next = params.get('next') || '/';
 
-    if (!accessToken || !refreshToken) {
-      setError('Respuesta de autenticación incompleta.');
-      toast.error('Respuesta de autenticación incompleta.');
-      window.setTimeout(() => navigate('/login', { replace: true }), 1800);
-      return;
+    if (raw) {
+      window.history.replaceState(null, '', window.location.pathname);
     }
 
-    // Wipe the fragment so the access token never survives a refresh
-    // (or a "copy current URL" gesture by the user).
-    window.history.replaceState(null, '', window.location.pathname);
-
-    tokenManager.setToken(accessToken);
-    tokenManager.setRefreshToken(refreshToken);
-
-    // Hydrate AuthContext from /me so the rest of the app sees the
-    // user immediately. We don't `await login()` — the tokens are
-    // already in place; we just need to fetch the profile.
     refreshUser()
       .then(() => {
         toast.success('Bienvenido');
@@ -83,7 +52,6 @@ export function OAuthCallbackPage() {
       })
       .catch(() => {
         setError('No pudimos cargar tu perfil. Intenta de nuevo.');
-        tokenManager.clearTokens();
         window.setTimeout(() => navigate('/login', { replace: true }), 1500);
       });
   }, [navigate, refreshUser]);

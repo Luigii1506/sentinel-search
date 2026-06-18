@@ -5,8 +5,8 @@ export type Role = 'admin' | 'analyst' | 'reviewer' | 'viewer' | 'readonly';
 // Hierarchy: each role inherits the permissions of every role below it.
 const ROLE_RANK: Record<Role, number> = {
   admin: 100,
-  analyst: 50,
-  reviewer: 40,
+  reviewer: 80,
+  analyst: 60,
   viewer: 20,
   readonly: 10,
 };
@@ -43,7 +43,7 @@ export function usePermissions() {
       manageApiKeys: role === 'admin',
       manageSources: role === 'admin',
       reviewMerges: role === 'admin' || role === 'reviewer',
-      viewAuditTrail: role === 'admin' || role === 'reviewer',
+      viewAuditTrail: role === 'admin',
       runSync: role === 'admin',
       seeOperations: role === 'admin' || role === 'reviewer',
       bulkScreen: role !== 'viewer' && role !== 'readonly',

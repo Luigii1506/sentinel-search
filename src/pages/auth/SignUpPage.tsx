@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 function PasswordStrengthMeter({ password }: { password: string }) {
@@ -96,8 +95,11 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon flex items-center justify-center relative overflow-hidden py-8 px-4">
-      <NeuralNetworkBackground />
+    <div className="relative min-h-screen overflow-hidden bg-brand-carbon flex items-center justify-center py-8 px-4">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(14,165,233,0.10),transparent_24%),linear-gradient(180deg,#06111f_0%,#091827_48%,#0b1220_100%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
+      <div className="absolute left-[10%] top-[12%] h-44 w-44 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
+      <div className="absolute bottom-[10%] right-[8%] h-60 w-60 rounded-full border border-cyan-400/10 bg-cyan-500/5 blur-3xl" aria-hidden="true" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}

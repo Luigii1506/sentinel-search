@@ -7,15 +7,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
-import { NeuralNetworkBackground } from '@/components/NeuralNetworkBackground';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isLoading } = useAuth();
-  
-  const [email, setEmail] = useState('');
+
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -26,24 +25,26 @@ export function LoginPage() {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('Por favor ingresa tu correo y contraseña');
+    if (!identifier || !password) {
+      setError('Por favor ingresa tu correo o usuario y tu contraseña');
       return;
     }
 
     try {
-      await login({ email, password });
+      await login({ email: identifier, password });
       navigate(from, { replace: true });
-    } catch (err) {
-      // Error is handled by auth service (toast)
+    } catch {
       setError('Credenciales inválidas');
     }
   };
 
   return (
-    <div className="min-h-screen bg-brand-carbon flex items-center justify-center relative overflow-hidden">
-      <NeuralNetworkBackground />
-      
+    <div className="relative min-h-screen overflow-hidden bg-brand-carbon flex items-center justify-center">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_38%),radial-gradient(circle_at_80%_20%,rgba(34,197,94,0.10),transparent_26%),linear-gradient(180deg,#06111f_0%,#091827_48%,#0b1220_100%)]" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
+      <div className="absolute left-[8%] top-[14%] h-40 w-40 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
+      <div className="absolute bottom-[12%] right-[10%] h-56 w-56 rounded-full border border-emerald-400/10 bg-emerald-500/5 blur-3xl" aria-hidden="true" />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -73,13 +74,13 @@ export function LoginPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-300">Correo Electrónico</Label>
+                <Label htmlFor="identifier" className="text-gray-300">Correo o usuario</Label>
                 <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@empresa.com"
+                  id="identifier"
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  placeholder="tu@empresa.com o tu_usuario"
                   className="bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                   disabled={isLoading}
                 />
