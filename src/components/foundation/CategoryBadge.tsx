@@ -1,0 +1,79 @@
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
+interface CategoryBadgeProps {
+  category: string;
+  label?: string;
+  className?: string;
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  SANCTIONS: 'Sanciones',
+  PEP: 'PEP',
+  DEBARMENT: 'Inhabilitados',
+  REGULATORY: 'Regulatorio',
+  LAW_ENFORCEMENT: 'Fuerza Publica',
+  TAX: 'Fiscal',
+  OTHER: 'Otros',
+  TERRORISM: 'Terrorismo',
+  FINANCIAL_DISCLOSURE: 'Divulgacion',
+  CORPORATE: 'Corporativo',
+  UBO: 'UBO',
+  LEGAL: 'Legal',
+  MEDIA: 'Media',
+  sanctions: 'Sanciones',
+  pep: 'PEP',
+  debarment: 'Inhabilitados',
+  regulatory: 'Regulatorio',
+  law_enforcement: 'Fuerza Publica',
+  tax: 'Fiscal',
+  other: 'Otros',
+  terrorism: 'Terrorismo',
+};
+
+const CATEGORY_STYLES: Record<string, string> = {
+  SANCTIONS: 'bg-red-500/10 text-red-400 border-red-500/20',
+  PEP: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  DEBARMENT: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  REGULATORY: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  LAW_ENFORCEMENT: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+  TAX: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  OTHER: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+  TERRORISM: 'bg-red-600/10 text-red-500 border-red-600/20',
+  FINANCIAL_DISCLOSURE: 'bg-teal-500/10 text-teal-400 border-teal-500/20',
+  CORPORATE: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+  UBO: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
+  LEGAL: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  MEDIA: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+  sanctions: 'bg-red-500/10 text-red-400 border-red-500/20',
+  pep: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+  debarment: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+  regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+  law_enforcement: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
+  tax: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+  other: 'bg-gray-500/10 text-gray-400 border-gray-500/20',
+  terrorism: 'bg-red-600/10 text-red-500 border-red-600/20',
+};
+
+export function categoryLabel(category: string): string {
+  return CATEGORY_LABELS[category] || category;
+}
+
+export function CategoryBadge({
+  category,
+  label,
+  className,
+}: CategoryBadgeProps) {
+  return (
+    <Badge
+      variant="outline"
+      className={cn(
+        'text-[10px]',
+        CATEGORY_STYLES[category] || CATEGORY_STYLES.OTHER,
+        className,
+      )}
+    >
+      {label || categoryLabel(category)}
+    </Badge>
+  );
+}

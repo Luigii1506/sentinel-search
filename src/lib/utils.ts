@@ -5,6 +5,18 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+function isDateOnlyString(value: string): boolean {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function parseDisplayDate(value: string): Date {
+  if (isDateOnlyString(value)) {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+  }
+  return new Date(value);
+}
+
 // Format number with commas
 export function formatNumber(num: number): string {
   return num.toLocaleString('en-US');
@@ -26,29 +38,31 @@ export function formatCompactNumber(num: number): string {
 
 // Format date
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseDisplayDate(dateString);
   return date.toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: isDateOnlyString(dateString) ? 'UTC' : undefined,
   });
 }
 
 // Format datetime
 export function formatDateTime(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseDisplayDate(dateString);
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: isDateOnlyString(dateString) ? 'UTC' : undefined,
   });
 }
 
 // Format relative time (e.g., "2 days ago")
 export function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
+  const date = parseDisplayDate(dateString);
   const now = new Date();
   const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
@@ -161,15 +175,15 @@ export function getSourceBadgeClass(source: string): string {
 // Get relationship type label
 export function getRelationshipTypeLabel(type: string): string {
   const labels: Record<string, string> = {
-    'ownership': 'Ownership',
-    'family': 'Family Relation',
-    'employment': 'Employment',
-    'partnership': 'Business Partnership',
-    'transaction': 'Transaction Link',
-    'shared_address': 'Shared Address',
-    'shared_contact': 'Shared Contact',
-    'legal_rep': 'Legal Representative',
-    'beneficial_owner': 'Beneficial Owner',
+    ownership: 'Propiedad',
+    family: 'Relacion familiar',
+    employment: 'Empleo',
+    partnership: 'Asociacion comercial',
+    transaction: 'Vinculo transaccional',
+    shared_address: 'Domicilio compartido',
+    shared_contact: 'Contacto compartido',
+    legal_rep: 'Representante legal',
+    beneficial_owner: 'Beneficiario final',
   };
   return labels[type] || type.replace('_', ' ');
 }

@@ -12,7 +12,7 @@
  * localStorage so the user's chrome preference survives reloads.
  */
 import { useEffect, useState, type ReactNode } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Search,
   LayoutDashboard,
@@ -28,13 +28,11 @@ import {
   Key,
   Webhook,
   Shield,
-  Settings,
   BarChart3,
   Menu,
   ChevronLeft,
   ChevronRight,
   LogOut,
-  User as UserIcon,
   Command as CommandIcon,
   Server,
   FileSearch,
@@ -119,8 +117,8 @@ const NAV: NavGroup[] = [
     items: [
       { path: '/',               label: 'Home',           icon: LayoutDashboard, shortcut: 'G H' },
       { path: '/search',         label: 'Búsqueda',       icon: Search,          shortcut: 'G S' },
-      { path: '/screening/bulk', label: 'Bulk Screening', icon: Upload,          shortcut: 'G B' },
-      { path: '/federated',      label: 'Federated Search', icon: Globe,         shortcut: 'G F' },
+      { path: '/screening/bulk', label: 'Screening masivo', icon: Upload,          shortcut: 'G B', minRole: 'analyst' },
+      { path: '/federated',      label: 'Busqueda federada', icon: Globe,         shortcut: 'G F' },
     ],
   },
   {
@@ -138,7 +136,7 @@ const NAV: NavGroup[] = [
     minRole: 'reviewer',
     items: [
       { path: '/operations',          label: 'Operaciones',  icon: Activity },
-      { path: '/admin/activity-log',  label: 'Activity Log', icon: ClipboardList },
+      { path: '/admin/activity-log',  label: 'Registro de actividad', icon: ClipboardList, minRole: 'admin' },
       { path: '/monitoring',          label: 'Monitoring',   icon: Activity },
       { path: '/reports',             label: 'Reportes',     icon: BarChart3 },
     ],
@@ -149,7 +147,7 @@ const NAV: NavGroup[] = [
     minRole: 'reviewer',
     items: [
       { path: '/admin/merges',             label: 'Merge Review',      icon: GitMerge },
-      { path: '/admin/resolver-review',    label: 'Resolver Review',   icon: GitBranchPlus },
+      { path: '/admin/resolver-review',    label: 'Revision de resolucion',   icon: GitBranchPlus },
       { path: '/admin/validation-review',  label: 'Validation Review', icon: ShieldCheck },
     ],
   },
@@ -160,7 +158,7 @@ const NAV: NavGroup[] = [
     items: [
       { path: '/admin/sources',     label: 'Sources Dashboard', icon: Database },
       { path: '/admin/audit',       label: 'Sources Audit',     icon: FileSearch },
-      { path: '/data/yente-catalog', label: 'Yente Catalog',    icon: Server },
+      { path: '/data/yente-catalog', label: 'Catalogo Yente',    icon: Server },
     ],
   },
   {
@@ -171,7 +169,6 @@ const NAV: NavGroup[] = [
       { path: '/admin/users',    label: 'Users',    icon: UsersIcon, shortcut: 'G U' },
       { path: '/admin/api-keys', label: 'API Keys', icon: Key,       shortcut: 'G K' },
       { path: '/admin/webhooks', label: 'Webhooks', icon: Webhook },
-      { path: '/settings',       label: 'Settings', icon: Settings },
     ],
   },
 ];
@@ -265,7 +262,6 @@ function SidebarBody({
   onNavigate?: () => void;
   onToggleCommand: () => void;
 }) {
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { atLeast } = usePermissions();
 
@@ -368,13 +364,17 @@ function SidebarBody({
                 >
                   <Avatar className="h-7 w-7 shrink-0">
                     <AvatarFallback className="bg-gradient-to-br from-brand-blue to-brand-electric text-white text-xs">
-                      {getInitials(`${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() || user.email)}
+                      {getInitials(
+                        `${user.first_name ?? ''} ${user.last_name ?? ''}`.trim() ||
+                        user.email ||
+                        user.username,
+                      )}
                     </AvatarFallback>
                   </Avatar>
                   {!collapsed && (
                     <div className="flex-1 min-w-0 text-left">
                       <div className="text-xs font-medium text-white truncate">
-                        {user.first_name || user.email}
+                        {user.first_name || user.email || user.username}
                       </div>
                       <div className="text-[10px] text-navy-200 truncate">
                         {user.role}
@@ -388,11 +388,6 @@ function SidebarBody({
                   <div className="text-xs text-navy-100">Sesión iniciada como</div>
                   <div className="text-sm font-medium text-white truncate">{user.email}</div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/settings')}>
-                  <UserIcon className="mr-2 h-4 w-4" />
-                  Configuración
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} className="text-red-300 focus:text-red-200">
                   <LogOut className="mr-2 h-4 w-4" />

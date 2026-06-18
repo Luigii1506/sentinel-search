@@ -10,12 +10,18 @@
  */
 export { AppPage, Section } from './AppPage';
 export { PageHeader } from './PageHeader';
+export { PageHeaderSkeleton } from './PageHeaderSkeleton';
+export { MetricGridSkeleton } from './MetricGridSkeleton';
+export { DetailPageSkeleton } from './DetailPageSkeleton';
+export { ListPageSkeleton } from './ListPageSkeleton';
+export { PanelSkeleton } from './PanelSkeleton';
 export { EmptyState } from './EmptyState';
 export { DataTable } from './DataTable';
 export type { DataTableColumn } from './DataTable';
 export { RiskBadge, levelFromScore } from './RiskBadge';
 export type { RiskLevel } from './RiskBadge';
 export { MetricCard } from './MetricCard';
+export { SectionCard } from './SectionCard';
 export { SkeletonTable } from './SkeletonTable';
 export { RiskScoreGauge } from './RiskScoreGauge';
 export type { RiskFactor } from './RiskScoreGauge';
@@ -26,3 +32,5 @@ export { FilterBar } from './FilterBar';
 export { DetailList, DetailRow } from './DetailList';
 export { ConfirmAction } from './ConfirmAction';
 export type { ConfirmVariant } from './ConfirmAction';
+export { CategoryBadge, categoryLabel } from './CategoryBadge';
+export { HealthDot } from './HealthDot';

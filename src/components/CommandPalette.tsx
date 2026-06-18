@@ -26,7 +26,6 @@ import {
   Key,
   Webhook,
   Shield,
-  Settings,
   BarChart3,
   LogOut,
   Plus,
@@ -77,8 +76,8 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     // Workspace
     { id: 'p-home',        label: 'Home',              icon: LayoutDashboard, group: 'pages', to: '/' },
     { id: 'p-search',      label: 'Búsqueda',          icon: Search,          group: 'pages', to: '/search',         shortcut: 'G S' },
-    { id: 'p-bulk',        label: 'Bulk Screening',    icon: Upload,          group: 'pages', to: '/screening/bulk', shortcut: 'G B' },
-    { id: 'p-federated',   label: 'Federated Search',  icon: Globe,           group: 'pages', to: '/federated',      shortcut: 'G F' },
+    { id: 'p-bulk',        label: 'Screening masivo',    icon: Upload,          group: 'pages', to: '/screening/bulk', shortcut: 'G B', minRole: 'analyst' },
+    { id: 'p-federated',   label: 'Busqueda federada',  icon: Globe,           group: 'pages', to: '/federated',      shortcut: 'G F' },
 
     // Compliance (analyst+)
     { id: 'p-compliance',  label: 'Cases & Watchlist', icon: Shield,    group: 'pages', to: '/compliance',      shortcut: 'G C', minRole: 'analyst' },
@@ -86,25 +85,24 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
     // Insights (reviewer+)
     { id: 'p-operations',  label: 'Operaciones',  icon: Activity,       group: 'pages', to: '/operations',         minRole: 'reviewer' },
-    { id: 'p-activity',    label: 'Activity Log', icon: ClipboardList,  group: 'pages', to: '/admin/activity-log', minRole: 'reviewer' },
+    { id: 'p-activity',    label: 'Registro de actividad', icon: ClipboardList,  group: 'pages', to: '/admin/activity-log', minRole: 'admin' },
     { id: 'p-monitoring',  label: 'Monitoring',   icon: Activity,       group: 'pages', to: '/monitoring',         minRole: 'reviewer' },
     { id: 'p-reports',     label: 'Reportes',     icon: BarChart3,      group: 'pages', to: '/reports',            minRole: 'reviewer' },
 
     // Data Review (reviewer+)
     { id: 'p-merges',      label: 'Merge Review',      icon: GitMerge,       group: 'pages', to: '/admin/merges',             minRole: 'reviewer' },
-    { id: 'p-resolver',    label: 'Resolver Review',   icon: GitBranchPlus,  group: 'pages', to: '/admin/resolver-review',    minRole: 'reviewer' },
+    { id: 'p-resolver',    label: 'Revision de resolucion',   icon: GitBranchPlus,  group: 'pages', to: '/admin/resolver-review',    minRole: 'reviewer' },
     { id: 'p-validation',  label: 'Validation Review', icon: ShieldCheck,    group: 'pages', to: '/admin/validation-review',  minRole: 'reviewer' },
 
     // Data Management (admin)
     { id: 'p-sources',     label: 'Sources Dashboard', icon: Database,   group: 'pages', to: '/admin/sources',        minRole: 'admin' },
     { id: 'p-audit',       label: 'Sources Audit',     icon: FileSearch, group: 'pages', to: '/admin/audit',          minRole: 'admin' },
-    { id: 'p-yente',       label: 'Yente Catalog',     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
+    { id: 'p-yente',       label: 'Catalogo Yente',     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
 
     // System (admin)
     { id: 'p-users',       label: 'Users',     icon: UsersIcon, group: 'pages', to: '/admin/users',    shortcut: 'G U', minRole: 'admin' },
     { id: 'p-api-keys',    label: 'API Keys',  icon: Key,       group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
     { id: 'p-webhooks',    label: 'Webhooks',  icon: Webhook,   group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
-    { id: 'p-settings',    label: 'Settings',  icon: Settings,  group: 'pages', to: '/settings',                        minRole: 'admin' },
 
     // Actions (role-gated)
     { id: 'a-new-user',    label: 'Crear nuevo usuario', icon: Plus,   group: 'actions', to: '/admin/users',    minRole: 'admin' },
