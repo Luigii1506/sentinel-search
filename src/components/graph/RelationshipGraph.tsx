@@ -33,6 +33,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState } from '@/components/foundation';
 import { cn, getRiskColor } from '@/lib/utils';
 import type { NetworkNode, NetworkEdge } from '@/types/api';
 
@@ -352,9 +353,12 @@ export function RelationshipGraph({
   if (!center) {
     return (
       <div className={cn('rounded-xl overflow-hidden border border-white/10 bg-brand-carbon', className)} style={{ height }}>
-        <div className="h-full flex flex-col items-center justify-center text-gray-500">
-          <Users className="w-12 h-12 mb-4" />
-          <p>No hay datos de relaciones disponibles</p>
+        <div className="h-full p-6">
+          <EmptyState
+            icon={Users}
+            title="Sin relaciones disponibles"
+            description="No hay datos de relaciones disponibles para esta entidad."
+          />
         </div>
       </div>
     );
