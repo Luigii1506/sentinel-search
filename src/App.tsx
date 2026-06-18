@@ -139,7 +139,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <Router>
-          <div className="min-h-screen bg-brand-carbon text-white">
+          <div className="min-h-screen bg-background text-foreground">
             <Routes>
               {/* Guest-only routes: redirect to / if already authenticated */}
               <Route
@@ -353,13 +353,13 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
             
-            <Toaster 
+            <Toaster
               position="bottom-right"
               toastOptions={{
                 style: {
-                  background: '#1a1a1a',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  color: '#fff',
+                  background: 'hsl(var(--popover))',
+                  border: '1px solid hsl(var(--border))',
+                  color: 'hsl(var(--popover-foreground))',
                 },
               }}
             />

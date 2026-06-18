@@ -66,6 +66,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePermissions, type Role } from '@/hooks/usePermissions';
 import { HealthIndicator } from '@/components/HealthIndicator';
 import { UsageIndicator } from '@/components/UsageIndicator';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 // ────────────────────────────── Nav config ──────────────────────────────
 //
@@ -212,12 +213,12 @@ function NavLink({
       className={cn(
         'group flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm',
         isActive
-          ? 'bg-brand-blue/15 text-white border-l-2 border-brand-electric pl-[10px]'
-          : 'text-navy-100 hover:text-white hover:bg-navy-700',
+          ? 'bg-primary/10 text-foreground border-l-2 border-brand-electric pl-[10px]'
+          : 'text-muted-foreground hover:text-foreground hover:bg-muted',
         collapsed && 'justify-center px-0',
       )}
     >
-      <Icon className={cn('shrink-0 w-4 h-4', isActive && 'text-electric-400')} aria-hidden="true" />
+      <Icon className={cn('shrink-0 w-4 h-4', isActive && 'text-brand-electric')} aria-hidden="true" />
       {!collapsed && <span className="truncate">{item.label}</span>}
     </Link>
   );
@@ -229,7 +230,7 @@ function NavLink({
         <TooltipContent side="right" className="flex items-center gap-2">
           {item.label}
           {item.shortcut && (
-            <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy-700 text-navy-100">
+            <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
               {item.shortcut}
             </kbd>
           )}
@@ -242,10 +243,10 @@ function NavLink({
 
 function SectionLabel({ children, collapsed }: { children: ReactNode; collapsed: boolean }) {
   if (collapsed) {
-    return <div className="h-px bg-navy-600 mx-3 my-2" />;
+    return <div className="h-px bg-border mx-3 my-2" />;
   }
   return (
-    <div className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider text-navy-200">
+    <div className="px-3 pt-4 pb-1 text-[10px] uppercase tracking-wider text-muted-foreground">
       {children}
     </div>
   );
@@ -284,7 +285,7 @@ function SidebarBody({
           to="/"
           onClick={onNavigate}
           className={cn(
-            'flex items-center gap-2 px-4 py-4 border-b border-navy-600',
+            'flex items-center gap-2 px-4 py-4 border-b border-border',
             collapsed && 'justify-center px-0',
           )}
         >
@@ -292,7 +293,7 @@ function SidebarBody({
             <Shield className="w-4 h-4 text-white" />
           </div>
           {!collapsed && (
-            <span className="text-base font-semibold text-white">Sentinel</span>
+            <span className="text-base font-semibold text-foreground">Sentinel</span>
           )}
         </Link>
 
@@ -304,7 +305,7 @@ function SidebarBody({
             aria-label="Abrir paleta de comandos"
             className={cn(
               'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg',
-              'bg-navy-700 hover:bg-navy-600 text-navy-100 text-sm transition-colors',
+              'bg-muted hover:bg-secondary text-muted-foreground text-sm transition-colors',
               collapsed && 'justify-center px-0',
             )}
           >
@@ -313,7 +314,7 @@ function SidebarBody({
               {!collapsed && <span className="truncate">Buscar o saltar…</span>}
             </div>
             {!collapsed && (
-              <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-navy-800 text-navy-200">
+              <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-background text-muted-foreground">
                 ⌘K
               </kbd>
             )}
@@ -342,14 +343,16 @@ function SidebarBody({
           ))}
         </nav>
 
-        {/* Bottom rail: usage + health + user */}
-        <div className={cn('border-t border-navy-600 p-2 space-y-2', collapsed && 'px-2')}>
+        {/* Bottom rail: usage + health + theme toggle + user */}
+        <div className={cn('border-t border-border p-2 space-y-2', collapsed && 'px-2')}>
           {!collapsed && (
             <div className="flex items-center justify-around px-1">
               <UsageIndicator />
               <HealthIndicator />
             </div>
           )}
+
+          <ThemeToggle collapsed={collapsed} />
 
           {user && (
             <DropdownMenu>
@@ -358,7 +361,7 @@ function SidebarBody({
                   type="button"
                   aria-label="Menú de usuario"
                   className={cn(
-                    'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-navy-700 transition-colors',
+                    'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors',
                     collapsed && 'justify-center px-0',
                   )}
                 >
@@ -373,10 +376,10 @@ function SidebarBody({
                   </Avatar>
                   {!collapsed && (
                     <div className="flex-1 min-w-0 text-left">
-                      <div className="text-xs font-medium text-white truncate">
+                      <div className="text-xs font-medium text-foreground truncate">
                         {user.first_name || user.email || user.username}
                       </div>
-                      <div className="text-[10px] text-navy-200 truncate">
+                      <div className="text-[10px] text-muted-foreground truncate">
                         {user.role}
                       </div>
                     </div>
@@ -385,8 +388,8 @@ function SidebarBody({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="right" className="w-56">
                 <DropdownMenuLabel className="font-normal">
-                  <div className="text-xs text-navy-100">Sesión iniciada como</div>
-                  <div className="text-sm font-medium text-white truncate">{user.email}</div>
+                  <div className="text-xs text-muted-foreground">Sesión iniciada como</div>
+                  <div className="text-sm font-medium text-foreground truncate">{user.email}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout} className="text-red-300 focus:text-red-200">
@@ -419,7 +422,7 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
     <aside
       className={cn(
         'hidden lg:flex fixed inset-y-0 left-0 z-30 flex-col',
-        'bg-brand-carbon border-r border-navy-600',
+        'bg-sidebar border-r border-sidebar-border',
         'transition-[width] duration-200',
         collapsed ? 'w-[60px]' : 'w-[240px]',
       )}
@@ -434,8 +437,8 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
         aria-label={collapsed ? 'Expandir sidebar' : 'Contraer sidebar'}
         className={cn(
           'absolute -right-3 top-20 z-40',
-          'w-6 h-6 rounded-full bg-navy-700 border border-navy-500',
-          'flex items-center justify-center text-navy-100 hover:text-white hover:bg-navy-600',
+          'w-6 h-6 rounded-full bg-muted border border-border',
+          'flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary',
           'transition-colors shadow-sm',
         )}
       >
@@ -455,7 +458,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
       className={cn(
         'lg:hidden sticky top-0 z-30',
         'flex items-center justify-between gap-2 h-14 px-3',
-        'bg-brand-carbon/95 backdrop-blur-xl border-b border-navy-600',
+        'bg-sidebar/95 backdrop-blur-xl border-b border-sidebar-border',
       )}
     >
       <Sheet open={open} onOpenChange={setOpen}>
@@ -466,7 +469,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
         </SheetTrigger>
         <SheetContent
           side="left"
-          className="p-0 w-[280px] bg-brand-carbon border-r border-navy-600"
+          className="p-0 w-[280px] bg-sidebar border-r border-sidebar-border"
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Navegación</SheetTitle>
@@ -486,7 +489,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
         <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-brand-blue to-brand-electric flex items-center justify-center">
           <Shield className="w-3.5 h-3.5 text-white" />
         </div>
-        <span className="text-sm font-semibold text-white">Sentinel</span>
+        <span className="text-sm font-semibold text-foreground">Sentinel</span>
       </Link>
 
       <Button

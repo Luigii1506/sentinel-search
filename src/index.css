@@ -11,39 +11,51 @@
  * scrollbars) pick up the new palette without rewriting every selector.
  * shadcn/ui has its own HSL-formatted vars further down in @layer base.
  */
+/* :root holds the LIGHT theme; `.dark` (toggled on <html> by next-themes)
+ * overrides only the values that change. Brand / risk / accent / easing
+ * stay constant across themes, so they live here once.
+ *
+ * NOTE: --background, --card and --border are NOT redefined here — they are
+ * owned by the shadcn HSL layer below (single source of truth). Non-Tailwind
+ * CSS reads them via hsl(var(--token)). This avoids the old name collision
+ * where a hex `--background` shadowed the HSL one and broke bg-background.
+ */
 :root {
-  /* Brand */
+  /* Brand (identity colors — constant across themes) */
   --brand-electric: #00D4FF;
   --brand-blue:     #1F6FEB;
   --brand-navy:     #0A2540;
   --brand-blanco:   #FFFFFF;
   --brand-carbon:   #0B1220;
 
-  /* Surfaces (carbon → navy ramp, all in the same hue family) */
-  --background: #0B1220;            /* carbon — app background */
-  --background-secondary: #0F1C32;  /* raised */
-  --card: #0A2540;                  /* navy — primary surface */
-  --card-hover: #142849;
-  --border: #1B3760;
-  --border-hover: #274A7A;
+  /* Surfaces — LIGHT */
+  --background-secondary: #F1F5F9;  /* raised */
+  --card-hover: #F1F5F9;
+  --border-hover: #CBD5E1;
 
-  /* Text */
-  --text-primary: #FFFFFF;
-  --text-secondary: #B7C9DD;
-  --text-muted: #7794B8;
+  /* Text — LIGHT */
+  --text-primary: #0A2540;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
 
-  /* Risk (semantic — kept independent of brand palette) */
+  /* Risk (semantic — identical across themes) */
   --risk-critical: #EF4444;
   --risk-high: #F97316;
   --risk-medium: #EAB308;
   --risk-low: #22C55E;
 
-  /* UI Accents — all derived from brand */
+  /* UI Accents — all derived from brand (constant) */
   --accent-blue: #1F6FEB;           /* legacy alias → brand blue */
   --accent-electric: #00D4FF;       /* brand accent */
   --accent-purple: #8B5CF6;         /* kept for risk-network heatmaps */
   --accent-cyan: #00D4FF;           /* alias → brand electric */
-  
+
+  /* Theme-aware surface helpers (consumed by .glass, tables, inputs) — LIGHT */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --hover-overlay: rgba(15, 23, 42, 0.04);
+  --input-bg: rgba(15, 23, 42, 0.03);
+
   /* Animation Easings */
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-expo-in: cubic-bezier(0.7, 0, 0.84, 0);
@@ -52,14 +64,32 @@
   --ease-dramatic: cubic-bezier(0.87, 0, 0.13, 1);
   --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   --ease-neural: cubic-bezier(0.23, 1, 0.32, 1);
-  
+
   /* Radius */
   --radius: 0.625rem;
 }
 
+.dark {
+  /* Surfaces — DARK (carbon → navy ramp, the principal theme) */
+  --background-secondary: #0F1C32;
+  --card-hover: #142849;
+  --border-hover: #274A7A;
+
+  /* Text — DARK */
+  --text-primary: #FFFFFF;
+  --text-secondary: #B7C9DD;
+  --text-muted: #7794B8;
+
+  /* Theme-aware surface helpers — DARK */
+  --glass-bg: rgba(10, 37, 64, 0.7);
+  --glass-border: rgba(31, 111, 235, 0.15);
+  --hover-overlay: rgba(255, 255, 255, 0.02);
+  --input-bg: rgba(255, 255, 255, 0.05);
+}
+
 /* Base Styles */
 * {
-  border-color: var(--border);
+  border-color: hsl(var(--border));
 }
 
 html {
@@ -68,7 +98,7 @@ html {
 
 body {
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  background-color: var(--background);
+  background-color: hsl(var(--background));
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -137,11 +167,11 @@ h5 {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--background);
+  background: hsl(var(--background));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border);
+  background: hsl(var(--border));
   border-radius: 4px;
 }
 
@@ -151,12 +181,12 @@ h5 {
 
 /* Glassmorphism */
 .glass {
-  /* Navy-tinted glass — sits on top of #0B1220 carbon background
-   * and reads as a slightly raised surface in the brand hue family. */
-  background: rgba(10, 37, 64, 0.7);
+  /* Theme-aware glass: navy tint on dark, white tint on light.
+   * Values flip via --glass-* in :root / .dark. */
+  background: var(--glass-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(31, 111, 235, 0.15);
+  border: 1px solid var(--glass-border);
 }
 
 .glass-light {
@@ -380,17 +410,17 @@ h5 {
   font-weight: 500;
   font-size: 0.875rem;
   color: var(--text-secondary);
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .data-table td {
   padding: 12px 16px;
   font-size: 0.875rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid hsl(var(--border));
 }
 
 .data-table tr:hover td {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--hover-overlay);
 }
 
 /* Badge Styles */
@@ -457,8 +487,8 @@ h5 {
 
 /* Input Styles */
 .input-dark {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
+  background: var(--input-bg);
+  border: 1px solid hsl(var(--border));
   border-radius: 8px;
   padding: 10px 14px;
   color: var(--text-primary);
@@ -528,7 +558,51 @@ h5 {
  * invisible. That's why --accent-foreground != --primary-foreground.
  */
 @layer base {
+  /* LIGHT theme (default) — white background, navy text. */
   :root {
+    --background: 0 0% 100%;
+    --foreground: 213 73% 15%;             /* navy text on white */
+
+    --card: 0 0% 100%;
+    --card-foreground: 213 73% 15%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 73% 15%;
+
+    --primary: 217 84% 52%;                /* brand blue — constant */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 214 32% 91%;              /* slate-200 — raised chrome */
+    --secondary-foreground: 213 73% 15%;
+
+    --muted: 210 40% 96%;                  /* slate-100 — muted surfaces */
+    --muted-foreground: 215 16% 47%;       /* slate-500 — secondary text */
+
+    --accent: 190 100% 50%;                /* electric — constant accent */
+    --accent-foreground: 213 73% 15%;      /* navy on electric — readable */
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;                 /* slate-200 */
+    --input: 214 32% 91%;
+    --ring: 217 84% 52%;                   /* blue ring (electric is invisible on white) */
+
+    --radius: 0.625rem;
+
+    /* Sidebar (used by shadcn `sidebar-*` utilities) */
+    --sidebar-background: 210 40% 98%;     /* near-white, a hair off the page */
+    --sidebar-foreground: 213 73% 15%;
+    --sidebar-primary: 217 84% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 190 100% 50%;
+    --sidebar-accent-foreground: 213 73% 15%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 217 84% 52%;
+  }
+
+  /* DARK theme (principal) — carbon background, navy surfaces, electric accent. */
+  .dark {
     --background: 220 49% 9%;
     --foreground: 0 0% 100%;
 
@@ -548,7 +622,7 @@ h5 {
     --muted-foreground: 213 30% 67%;
 
     --accent: 190 100% 50%;
-    --accent-foreground: 213 73% 15%;     /* navy on electric — readable */
+    --accent-foreground: 213 73% 15%;      /* navy on electric — readable */
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -557,9 +631,7 @@ h5 {
     --input: 215 49% 24%;
     --ring: 190 100% 50%;                  /* focus ring = electric */
 
-    --radius: 0.625rem;
-
-    /* Sidebar (used by shadcn `sidebar-*` utilities) */
+    /* Sidebar */
     --sidebar-background: 220 49% 9%;
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 217 84% 52%;

@@ -1,9 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AML Risk Intelligence Platform</title>
+    <!-- Apply the stored theme before paint to avoid a flash of the wrong
+         theme (FOUC). Dark is the default. Key must match next-themes'
+         storageKey ("sentinel-theme") in main.tsx. -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('sentinel-theme');
+          var dark = stored ? stored === 'dark' : true;
+          document.documentElement.classList.toggle('dark', dark);
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
