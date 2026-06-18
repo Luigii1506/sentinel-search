@@ -25,7 +25,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Skeleton } from '@/components/ui/skeleton';
+import { EmptyState, PanelSkeleton } from '@/components/foundation';
 import { cn, formatDate, getSourceBadgeClass, getRelationshipTypeLabel } from '@/lib/utils';
 import { complianceService } from '@/services/compliance';
 import type { Entity } from '@/types';
@@ -356,11 +356,12 @@ function IdentityTab({ entity }: { entity: Entity }) {
 function SanctionsTab({ entity }: { entity: Entity }) {
   if (entity.sanctions.length === 0) {
     return (
-      <div className="glass rounded-xl p-8 text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">No Sanctions Found</h3>
-        <p className="text-gray-400">This entity has no known sanctions listings.</p>
-      </div>
+      <EmptyState
+        icon={CheckCircle}
+        title="Sin sanciones"
+        description="Esta entidad no tiene listados de sanciones conocidos."
+        tone="success"
+      />
     );
   }
 
@@ -463,11 +464,12 @@ function SanctionsTab({ entity }: { entity: Entity }) {
 function PepTab({ entity }: { entity: Entity }) {
   if (entity.pepEntries.length === 0) {
     return (
-      <div className="glass rounded-xl p-8 text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">No PEP Status</h3>
-        <p className="text-gray-400">This entity is not identified as a Politically Exposed Person.</p>
-      </div>
+      <EmptyState
+        icon={CheckCircle}
+        title="Sin estatus PEP"
+        description="Esta entidad no está identificada como Persona Políticamente Expuesta."
+        tone="success"
+      />
     );
   }
 
@@ -546,9 +548,9 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   if (isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-24 rounded-xl" />
-        <Skeleton className="h-32 rounded-xl" />
-        <Skeleton className="h-32 rounded-xl" />
+        <PanelSkeleton lines={2} className="rounded-xl" />
+        <PanelSkeleton lines={3} className="rounded-xl" />
+        <PanelSkeleton lines={3} className="rounded-xl" />
       </div>
     );
   }
@@ -561,11 +563,12 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
 
   if (!hasContent) {
     return (
-      <div className="glass rounded-xl p-8 text-center">
-        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">No Adverse Media</h3>
-        <p className="text-gray-400">No negative media coverage found for this entity.</p>
-      </div>
+      <EmptyState
+        icon={CheckCircle}
+        title="Sin adverse media"
+        description="No se encontró cobertura negativa para esta entidad."
+        tone="success"
+      />
     );
   }
 
@@ -807,65 +810,117 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   );
 }
 
+function getRelationshipConfidenceTone(confidence: number): string {
+  if (confidence >= 85) return 'bg-green-500/10 text-green-400 border-green-500/30';
+  if (confidence >= 70) return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+  return 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+}
+
+function getRelationshipStatusTone(isCurrent: boolean): string {
+  return isCurrent
+    ? 'bg-green-500/10 text-green-400 border-green-500/30'
+    : 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+}
+
 // Relationships Tab
 function RelationshipsTab({ entity }: { entity: Entity }) {
   if (entity.relationships.length === 0) {
     return (
-      <div className="glass rounded-xl p-8 text-center">
-        <Network className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-white mb-2">No Relationships</h3>
-        <p className="text-gray-400">No known relationships found for this entity.</p>
-      </div>
+      <EmptyState
+        icon={Network}
+        title="Sin relaciones"
+        description="No se encontraron relaciones conocidas para esta entidad."
+      />
     );
   }
 
+  const currentRelationships = entity.relationships.filter((rel) => rel.isCurrent).length;
+  const highConfidenceRelationships = entity.relationships.filter((rel) => rel.confidence >= 85).length;
+  const relationshipTypes = Object.entries(
+    entity.relationships.reduce<Record<string, number>>((acc, rel) => {
+      acc[rel.type] = (acc[rel.type] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
   return (
     <div className="space-y-4">
+      <div className="grid gap-3 md:grid-cols-3">
+        <div className="glass rounded-xl p-4">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones detectadas</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{entity.relationships.length}</p>
+          <p className="mt-1 text-sm text-gray-400">Vista consolidada de vinculos conocidos.</p>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones vigentes</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{currentRelationships}</p>
+          <p className="mt-1 text-sm text-gray-400">Se marcan como activas en la data disponible.</p>
+        </div>
+        <div className="glass rounded-xl p-4">
+          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Alta confianza</p>
+          <p className="mt-2 text-2xl font-semibold text-white">{highConfidenceRelationships}</p>
+          <p className="mt-1 text-sm text-gray-400">Vinculos con score de 85% o superior.</p>
+        </div>
+      </div>
+
+      {relationshipTypes.length > 0 && (
+        <div className="glass rounded-xl p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.22em] text-gray-500">Tipos principales</span>
+            {relationshipTypes.map(([type, count]) => (
+              <Badge key={type} variant="outline" className="text-[10px] bg-white/5 text-gray-200 border-white/10">
+                {getRelationshipTypeLabel(type)} · {count}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
       {entity.relationships.map((rel, index) => (
         <motion.div
           key={rel.id}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
+          transition={{ delay: index * 0.06 }}
           className="glass rounded-xl p-5"
         >
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 mb-3">
                 <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
                   {getRelationshipTypeLabel(rel.type)}
                 </Badge>
-                <span className="text-xs text-gray-500">
-                  Confidence: {rel.confidence}%
-                </span>
+                <Badge variant="outline" className={cn('text-[10px]', getRelationshipStatusTone(rel.isCurrent))}>
+                  {rel.isCurrent ? 'Vigente' : 'Historica'}
+                </Badge>
+                <Badge variant="outline" className={cn('text-[10px]', getRelationshipConfidenceTone(rel.confidence))}>
+                  Confianza {rel.confidence}%
+                </Badge>
               </div>
-              <p className="text-white">{rel.description || 'No description available'}</p>
+              <p className="text-sm leading-6 text-white">{rel.description || 'Relacion registrada sin descripcion adicional.'}</p>
             </div>
-            <div className="text-right">
-              {rel.isCurrent ? (
-                <Badge className="bg-green-500/10 text-green-400 border-green-500/30">Current</Badge>
-              ) : (
-                <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/30">Former</Badge>
-              )}
+
+            <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+              <span className={cn('text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(rel.source))}>
+                {rel.source}
+              </span>
             </div>
           </div>
 
           {(rel.startDate || rel.endDate) && (
-            <div className="flex gap-4 mt-3 text-sm text-gray-400">
-              {rel.startDate && (
-                <span>From: {formatDate(rel.startDate)}</span>
-              )}
-              {rel.endDate && (
-                <span>To: {formatDate(rel.endDate)}</span>
-              )}
+            <div className="mt-4 grid gap-3 text-sm text-gray-400 sm:grid-cols-2">
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Inicio</span>
+                <span className="mt-1 block text-white">{rel.startDate ? formatDate(rel.startDate) : 'No disponible'}</span>
+              </div>
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2">
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Fin</span>
+                <span className="mt-1 block text-white">{rel.endDate ? formatDate(rel.endDate) : 'Sin cierre registrado'}</span>
+              </div>
             </div>
           )}
-
-          <div className="mt-3">
-            <span className={cn('text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(rel.source))}>
-              {rel.source}
-            </span>
-          </div>
         </motion.div>
       ))}
     </div>

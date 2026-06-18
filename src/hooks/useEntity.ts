@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { entityService } from '@/services/entities';
 import type { EntityProfile } from '@/services/entities';
 import type { APIEntity } from '@/types/api';
@@ -9,6 +9,7 @@ export function useEntity(entityId: string | undefined, source_level?: number) {
     queryFn: () => entityService.getById(entityId!, source_level),
     enabled: !!entityId,
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   return {
@@ -25,6 +26,7 @@ export function useEntityProfile(entityId: string | undefined, lang: string = 'e
     queryFn: () => entityService.getProfile(entityId!, lang),
     enabled: !!entityId,
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   return {

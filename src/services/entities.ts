@@ -1,5 +1,6 @@
 import api from './api';
 import type { APIEntity } from '@/types/api';
+import type { RelationshipListItem } from './graph';
 
 const referenceResolutionCache = new Map<string, ReferenceResolution>();
 
@@ -48,6 +49,12 @@ export interface ProfileOverview {
   source_count: number;
   is_pep: boolean;
   is_current_pep?: boolean;
+  pep_in_office?: boolean;
+  pep_monitoring_active?: boolean;
+  pep_status?: 'current_pep' | 'former_pep_in_monitoring' | 'ex_pep' | 'non_pep';
+  pep_monitoring_until?: string | null;
+  pep_last_office_end_date?: string | null;
+  pep_policy_years?: number;
   pep_category?: string;
 }
 
@@ -57,14 +64,14 @@ export interface ProfileCareer {
   political: WikidataLink[];
   occupations: string[];
   pep_positions: Array<{
-    cargo: string;
-    estado?: string;
-    source?: string;
+    name?: string;
+    cargo?: string;
+    status?: string;
     country?: string;
-    partido?: string;
-    is_current?: boolean;
     start_date?: string;
-    pep_category?: string;
+    end_date?: string;
+    source_dataset?: string;
+    source?: string;
   }>;
 }
 
@@ -87,6 +94,12 @@ export interface ProfileConnections {
   total_relationships: number;
   aml_visible_relationships: number;
   contextual_relationships: number;
+  total_detected_relationships: number;
+  all_relationship_counts: Record<string, number>;
+  contextual_relationship_counts: Record<string, number>;
+  visible_relationships_preview: RelationshipListItem[];
+  visible_relationships_preview_total: number;
+  visible_relationships_preview_by_type: Record<string, number>;
 }
 
 export interface ProfileRisk {
