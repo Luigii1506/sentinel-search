@@ -266,7 +266,11 @@ export function humanizeEntityName(name?: string | null): string {
     return trimmed.replace(/\s+[–—-]\s+/g, ' – ');
   }
 
+  // Fully uppercase input (canonical names) carries no case info — lowercase
+  // first so titleCaseSegment doesn't treat every word as an acronym and
+  // leave it uppercase. Genuine mixed-case names keep their acronyms above.
   return trimmed
+    .toLowerCase()
     .replace(/\s+[–—-]\s+/g, ' – ')
     .split(/([–—-])/)
     .map((part) => {
