@@ -175,7 +175,18 @@ export const entityService = {
       date_of_birth: d.birth_date ?? d.date_of_birth,
       country: Array.isArray(d.countries) ? d.countries[0] : d.country,
       is_sanctioned: d.is_sanctioned ?? ((d.sanctions_details?.length ?? 0) > 0),
+      // APIEntity declara estos arrays como requeridos; EntityDetail (v2) usa
+      // otros nombres o no los trae. Se proveen defaults para que el consumidor
+      // (que lee .length sin guard) no crashee.
       sanctions: d.sanctions ?? d.sanctions_details ?? [],
+      sanctions_details: d.sanctions_details ?? [],
+      pep_entries: d.pep_entries ?? d.pep_positions ?? [],
+      adverse_media: d.adverse_media ?? [],
+      aliases: d.aliases ?? [],
+      addresses: d.addresses ?? [],
+      identifications: d.identifications ?? [],
+      risk_factors: d.risk_factors ?? [],
+      source_records: d.source_records ?? [],
     } as APIEntity;
   },
 

@@ -215,8 +215,8 @@ function isWikidataOnlyProfile(profile?: EntityProfile): boolean {
 
 function isReferenceLikeEntity(entity: APIEntity, profile?: EntityProfile): boolean {
   const hasPrimarySignals =
-    entity.sanctions.length > 0 ||
-    entity.pep_entries.length > 0 ||
+    (entity.sanctions?.length || 0) > 0 ||
+    (entity.pep_entries?.length || 0) > 0 ||
     entity.is_current_pep === true ||
     (entity.adverse_media?.length || 0) > 0;
 
