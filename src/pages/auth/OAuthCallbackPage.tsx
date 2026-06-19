@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Loader2, ShieldAlert } from 'lucide-react';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export function OAuthCallbackPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { refreshUser } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const handled = useRef(false);
@@ -31,8 +33,8 @@ export function OAuthCallbackPage() {
     if (oauthError) {
       const friendly =
         oauthError === 'access_denied'
-          ? 'Cancelaste el inicio de sesión con Google.'
-          : `Error de Google: ${oauthError}`;
+          ? t('account.auth.callbackCancelled')
+          : t('account.auth.callbackGoogleError', { error: oauthError });
       setError(friendly);
       toast.error(friendly);
       window.setTimeout(() => navigate('/login', { replace: true }), 1800);
@@ -47,14 +49,14 @@ export function OAuthCallbackPage() {
 
     refreshUser()
       .then(() => {
-        toast.success('Bienvenido');
+        toast.success(t('account.auth.callbackWelcome'));
         navigate(next, { replace: true });
       })
       .catch(() => {
-        setError('No pudimos cargar tu perfil. Intenta de nuevo.');
+        setError(t('account.auth.callbackProfileError'));
         window.setTimeout(() => navigate('/login', { replace: true }), 1500);
       });
-  }, [navigate, refreshUser]);
+  }, [navigate, refreshUser, t]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
@@ -67,12 +69,12 @@ export function OAuthCallbackPage() {
           <>
             <ShieldAlert className="w-10 h-10 text-red-600 dark:text-red-400 mx-auto" />
             <p className="text-red-600 dark:text-red-300">{error}</p>
-            <p className="text-sm text-muted-foreground">Te enviaremos al login…</p>
+            <p className="text-sm text-muted-foreground">{t('account.auth.callbackRedirecting')}</p>
           </>
         ) : (
           <>
             <Loader2 className="w-10 h-10 text-electric-700 dark:text-electric-400 mx-auto animate-spin" />
-            <p className="text-muted-foreground">Validando sesión con Google…</p>
+            <p className="text-muted-foreground">{t('account.auth.callbackValidating')}</p>
           </>
         )}
       </motion.div>

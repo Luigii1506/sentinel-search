@@ -1,5 +1,6 @@
 import { Users } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn, humanizeEntityName } from '@/lib/utils';
@@ -34,17 +35,6 @@ type RelationshipContextSummaryCardProps = {
   getRiskBadgeClasses: (risk?: string) => string;
 };
 
-const relationshipTypeLabels: Record<string, string> = {
-  family: 'Familiar',
-  associate: 'Asociado',
-  corporate: 'Corporativo',
-  beneficial_ownership: 'Beneficiario',
-  membership: 'Miembro',
-  political: 'Político',
-  sanction: 'Sanción',
-  unknown: 'Otro',
-};
-
 export function RelationshipContextSummaryCard({
   referenceLike,
   overviewFamilyRelationships,
@@ -57,6 +47,17 @@ export function RelationshipContextSummaryCard({
   translateSubtype,
   getRiskBadgeClasses,
 }: RelationshipContextSummaryCardProps) {
+  const { t } = useTranslation();
+  const relationshipTypeLabels: Record<string, string> = {
+    family: t('entity.relationships.type.family'),
+    associate: t('entity.relationships.type.associate'),
+    corporate: t('entity.relationships.type.corporate'),
+    beneficial_ownership: t('entity.relationships.type.beneficial_ownership'),
+    membership: t('entity.relationships.type.membership'),
+    political: t('entity.relationships.type.political'),
+    sanction: t('entity.relationships.type.sanction'),
+    unknown: t('entity.relationships.type.unknown'),
+  };
   const hasFamilySummary = !referenceLike && (overviewFamilyRelationships.length > 0 || overviewStructuredFamily.length > 0);
 
   return (
@@ -64,7 +65,7 @@ export function RelationshipContextSummaryCard({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
         <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2 uppercase tracking-wide">
           <Users className="w-4 h-4" />
-          Contexto Relacional
+          {t('entity.relationships.context.title')}
         </h3>
         <Button
           variant="ghost"
@@ -72,13 +73,13 @@ export function RelationshipContextSummaryCard({
           onClick={onOpenRelationships}
           className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
         >
-          Ver relaciones
+          {t('entity.relationships.context.viewRelationships')}
         </Button>
       </div>
 
       {hasFamilySummary ? (
         <div className="mb-4">
-          <p className="text-xs text-purple-600 dark:text-purple-400 uppercase mb-2">Familiares relevantes detectados</p>
+          <p className="text-xs text-purple-600 dark:text-purple-400 uppercase mb-2">{t('entity.relationships.context.relevantFamily')}</p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {overviewFamilyRelationships.length > 0
               ? overviewFamilyRelationships.slice(0, 6).map((rel, index) => (
@@ -112,7 +113,7 @@ export function RelationshipContextSummaryCard({
                       </Badge>
                       {rel.is_current ? (
                         <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
-                          Vigente
+                          {t('entity.relationships.context.current')}
                         </Badge>
                       ) : null}
                     </div>
@@ -121,31 +122,31 @@ export function RelationshipContextSummaryCard({
           </div>
           {overviewFamilyRelationships.length > 6 && (
             <p className="text-xs text-muted-foreground mt-2">
-              +{overviewFamilyRelationships.length - 6} familiares más en la pestaña de relaciones
+              {t('entity.relationships.context.moreFamily', { count: overviewFamilyRelationships.length - 6 })}
             </p>
           )}
           {overviewFamilyRelationships.length === 0 && overviewStructuredFamily.length > 6 ? (
             <p className="text-xs text-muted-foreground mt-2">
-              +{overviewStructuredFamily.length - 6} familiares más disponibles desde el contexto estructurado.
+              {t('entity.relationships.context.moreFamilyStructured', { count: overviewStructuredFamily.length - 6 })}
             </p>
           ) : null}
         </div>
       ) : referenceLike ? (
         <div className="mb-4 rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
-          <p className="text-sm text-foreground">Se identificaron {totalDetectedRelationships} relaciones para esta entidad contextual.</p>
+          <p className="text-sm text-foreground">{t('entity.relationships.context.referenceDetected', { count: totalDetectedRelationships })}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Para acelerar la apertura de referencias, el resumen general no carga el detalle completo de relaciones. Usa la pestaña de relaciones para ver personas y organizaciones vinculadas.
+            {t('entity.relationships.context.referenceHint')}
           </p>
         </div>
       ) : (
         <div className="mb-4 rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-sm text-foreground">
-            Se identificaron {amlVisibleRelationships} relaciones AML visibles de {totalDetectedRelationships} relaciones detectadas.
+            {t('entity.relationships.context.amlVisible', { visible: amlVisibleRelationships, total: totalDetectedRelationships })}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {contextualRelationships > 0
-              ? `Hay ${contextualRelationships} vínculos adicionales de contexto/perfil fuera de la vista AML principal.`
-              : 'En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.'}
+              ? t('entity.relationships.context.contextualExtra', { count: contextualRelationships })
+              : t('entity.relationships.context.noResolvedFamily')}
           </p>
         </div>
       )}

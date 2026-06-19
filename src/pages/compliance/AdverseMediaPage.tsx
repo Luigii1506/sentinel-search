@@ -1,4 +1,6 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AppPage, PageHeader, MetricCard, EmptyState, PanelSkeleton } from '@/components/foundation';
@@ -78,23 +80,30 @@ const categoryColors: Record<string, string> = {
   regulatory: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
 };
 
-const categoryLabels: Record<string, string> = {
-  terrorism: 'Terrorismo',
-  sanctions_evasion: 'Evasion Sanciones',
-  wanted: 'Buscados',
-  crime: 'Crimen',
-  human_rights: 'DDHH',
-  financial_crime: 'Crimen Financiero',
-  corruption: 'Corrupcion',
-  offshore: 'Offshore',
-  regulatory: 'Regulatorio',
-};
+const CATEGORY_KEYS = [
+  'terrorism',
+  'sanctions_evasion',
+  'wanted',
+  'crime',
+  'human_rights',
+  'financial_crime',
+  'corruption',
+  'offshore',
+  'regulatory',
+] as const;
 
-const methodLabels: Record<string, { label: string; color: string; icon: typeof Zap }> = {
-  moonshot_ai: { label: 'Moonshot AI', color: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30', icon: Brain },
-  claude_ai: { label: 'Claude AI', color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30', icon: Brain },
-  keyword: { label: 'Keywords', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Tag },
-  unknown: { label: 'Sin clasificar', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Cpu },
+// i18n key per category: `compliance.adverseMedia.category.<key>`
+function categoryLabel(t: TFunction, cat: string): string {
+  return t(`compliance.adverseMedia.category.${cat}`, { defaultValue: cat });
+}
+
+// Method labels are localized via `compliance.adverseMedia.method.<key>`; brand
+// names (Moonshot AI, Claude AI) are not translated.
+const methodMeta: Record<string, { color: string; icon: typeof Zap }> = {
+  moonshot_ai: { color: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30', icon: Brain },
+  claude_ai: { color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30', icon: Brain },
+  keyword: { color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Tag },
+  unknown: { color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Cpu },
 };
 
 const sourceTypeColors: Record<string, string> = {
@@ -119,27 +128,27 @@ function getSeverityBarColor(severity: number): string {
   return 'bg-gray-500';
 }
 
-function formatDate(dateStr: string | null): string {
+function formatDate(dateStr: string | null, t: TFunction): string {
   if (!dateStr) return 'N/A';
   const date = new Date(dateStr);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  if (diffHours < 1) return 'Hace menos de 1h';
-  if (diffHours < 24) return `Hace ${diffHours}h`;
+  if (diffHours < 1) return t('compliance.adverseMedia.time.lessThanHour');
+  if (diffHours < 24) return t('compliance.adverseMedia.time.hoursAgo', { count: diffHours });
   const diffDays = Math.floor(diffHours / 24);
-  if (diffDays < 7) return `Hace ${diffDays}d`;
+  if (diffDays < 7) return t('compliance.adverseMedia.time.daysAgo', { count: diffDays });
   return date.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-function getMethodBadge(method: string | null | undefined) {
+function getMethodBadge(method: string | null | undefined, t: TFunction) {
   const key = method || 'unknown';
-  const meta = methodLabels[key] || methodLabels.unknown;
+  const meta = methodMeta[key] || methodMeta.unknown;
   const Icon = meta.icon;
   return (
     <Badge variant="outline" className={cn('text-[10px] gap-1', meta.color)}>
       <Icon className="w-3 h-3" />
-      {meta.label}
+      {t(`compliance.adverseMedia.method.${key}`, { defaultValue: key })}
     </Badge>
   );
 }
@@ -147,6 +156,7 @@ function getMethodBadge(method: string | null | undefined) {
 // ── Articles Tab ──
 
 function ArticlesTab() {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedDays, setSelectedDays] = useState<string>('30');
@@ -186,7 +196,7 @@ function ArticlesTab() {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
-                placeholder="Buscar en titulos..."
+                placeholder={t('compliance.adverseMedia.articles.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 bg-foreground/5 border-foreground/10"
@@ -196,12 +206,12 @@ function ArticlesTab() {
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10">
               <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Categoria" />
+              <SelectValue placeholder={t('compliance.adverseMedia.articles.categoryPlaceholder')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todas</SelectItem>
-              {Object.entries(categoryLabels).map(([key, label]) => (
-                <SelectItem key={key} value={key}>{label}</SelectItem>
+              <SelectItem value="all">{t('common.states.all')}</SelectItem>
+              {CATEGORY_KEYS.map((key) => (
+                <SelectItem key={key} value={key}>{categoryLabel(t, key)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -211,16 +221,16 @@ function ArticlesTab() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Hoy</SelectItem>
-              <SelectItem value="7">7 dias</SelectItem>
-              <SelectItem value="30">30 dias</SelectItem>
-              <SelectItem value="90">90 dias</SelectItem>
-              <SelectItem value="365">1 ano</SelectItem>
+              <SelectItem value="1">{t('compliance.adverseMedia.articles.range.today')}</SelectItem>
+              <SelectItem value="7">{t('compliance.adverseMedia.articles.range.days7')}</SelectItem>
+              <SelectItem value="30">{t('compliance.adverseMedia.articles.range.days30')}</SelectItem>
+              <SelectItem value="90">{t('compliance.adverseMedia.articles.range.days90')}</SelectItem>
+              <SelectItem value="365">{t('compliance.adverseMedia.articles.range.year1')}</SelectItem>
             </SelectContent>
           </Select>
           <div className="w-full sm:w-[180px]">
             <p className="text-[10px] text-muted-foreground mb-1">
-              Severidad minima: <span className="text-foreground font-mono">{minSeverity}</span>
+              {t('compliance.adverseMedia.articles.minSeverity')}: <span className="text-foreground font-mono">{minSeverity}</span>
             </p>
             <Slider
               value={[minSeverity]}
@@ -232,22 +242,22 @@ function ArticlesTab() {
           </div>
           <Button variant="outline" size="sm" onClick={() => refetch()} className="w-full sm:w-auto border-foreground/10">
             <RefreshCw className="w-4 h-4 mr-1" />
-            Refrescar
+            {t('common.actions.refresh')}
           </Button>
         </div>
       </div>
 
       {/* Results count */}
       <p className="text-sm text-muted-foreground">
-        {data?.total ?? 0} articulos encontrados
+        {t('compliance.adverseMedia.articles.resultsCount', { count: data?.total ?? 0 })}
       </p>
 
       {/* Article list */}
       {articles.length === 0 ? (
         <EmptyState
           icon={CheckCircle}
-          title="Sin resultados"
-          description="No se encontraron artículos con los filtros aplicados."
+          title={t('common.states.noResults')}
+          description={t('compliance.adverseMedia.articles.empty')}
           tone="success"
         />
       ) : (
@@ -273,6 +283,7 @@ function ArticlesTab() {
 }
 
 function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onClick?: () => void }) {
+  const { t } = useTranslation();
   const sourceDomain = useMemo(() => {
     try {
       return new URL(article.source_url).hostname.replace('www.', '');
@@ -301,10 +312,10 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
                 variant="outline"
                 className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-muted-foreground')}
               >
-                {categoryLabels[cat] || cat}
+                {categoryLabel(t, cat)}
               </Badge>
             ))}
-            {getMethodBadge(article.classification_method)}
+            {getMethodBadge(article.classification_method, t)}
           </div>
 
           <h4 className="text-sm font-medium text-foreground mb-1 line-clamp-2 group-hover:text-blue-300 transition-colors">
@@ -324,14 +335,14 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
             )}
             <span className="flex items-center gap-1">
               <Clock className="w-3 h-3" />
-              {formatDate(article.publication_date)}
+              {formatDate(article.publication_date, t)}
             </span>
             {article.language && (
               <span className="uppercase text-muted-foreground">{article.language}</span>
             )}
             {article.classification_confidence != null && article.classification_confidence > 0 && (
               <span className="text-muted-foreground">
-                {Math.round(article.classification_confidence * 100)}% conf
+                {t('compliance.adverseMedia.articles.confShort', { count: Math.round(article.classification_confidence * 100) })}
               </span>
             )}
           </div>
@@ -373,6 +384,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
 // ── Sources Tab ──
 
 function SourcesTab() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [filterType, setFilterType] = useState<string>('all');
 
@@ -384,10 +396,10 @@ function SourcesTab() {
   const crawlMutation = useMutation({
     mutationFn: (sourceKey: string) => complianceService.triggerCrawl(sourceKey),
     onSuccess: (_, sourceKey) => {
-      toast.success(`Crawl iniciado para ${sourceKey}`);
+      toast.success(t('compliance.adverseMedia.sources.toast.crawlStarted', { name: sourceKey }));
       queryClient.invalidateQueries({ queryKey: ['adverse-media-sources'] });
     },
-    onError: () => toast.error('Error al iniciar crawl'),
+    onError: () => toast.error(t('compliance.adverseMedia.sources.toast.crawlError')),
   });
 
   if (isLoading) {
@@ -417,25 +429,25 @@ function SourcesTab() {
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="glass rounded-lg p-3 text-center">
           <p className="text-xl font-bold text-green-700 dark:text-green-400">{activeSources.length}</p>
-          <p className="text-xs text-muted-foreground">Activas</p>
+          <p className="text-xs text-muted-foreground">{t('compliance.adverseMedia.sources.active')}</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
           <p className="text-xl font-bold text-red-600 dark:text-red-400">{inactiveSources.length}</p>
-          <p className="text-xs text-muted-foreground">Inactivas</p>
+          <p className="text-xs text-muted-foreground">{t('compliance.adverseMedia.sources.inactive')}</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
           <p className="text-xl font-bold text-foreground">{totalArticles.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground">Total Articulos</p>
+          <p className="text-xs text-muted-foreground">{t('compliance.adverseMedia.sources.totalArticles')}</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
           <p className={cn('text-xl font-bold', totalErrors > 0 ? 'text-orange-700 dark:text-orange-400' : 'text-muted-foreground')}>{totalErrors}</p>
-          <p className="text-xs text-muted-foreground">Errores Acumulados</p>
+          <p className="text-xs text-muted-foreground">{t('compliance.adverseMedia.sources.accumulatedErrors')}</p>
         </div>
       </div>
 
       {/* Filter by type */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className="text-xs text-muted-foreground">Filtrar:</span>
+        <span className="text-xs text-muted-foreground">{t('common.actions.filter')}:</span>
         {['all', 'rss', 'api', 'gdelt'].map((type) => (
           <Button
             key={type}
@@ -447,7 +459,7 @@ function SourcesTab() {
             )}
             onClick={() => setFilterType(type)}
           >
-            {type === 'all' ? 'Todas' : type.toUpperCase()}
+            {type === 'all' ? t('common.states.all') : type.toUpperCase()}
           </Button>
         ))}
       </div>
@@ -455,7 +467,7 @@ function SourcesTab() {
       {/* Active sources */}
       <div>
         <h3 className="text-sm font-medium text-muted-foreground mb-3">
-          Fuentes Activas ({filteredActive.length})
+          {t('compliance.adverseMedia.sources.activeSources', { count: filteredActive.length })}
         </h3>
         <div className="space-y-3 md:hidden">
           {filteredActive
@@ -476,22 +488,22 @@ function SourcesTab() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Articulos</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.articles')}</p>
                     <p className="text-foreground font-mono">{source.total_articles}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Calidad</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.quality')}</p>
                     <p className="text-muted-foreground">{source.quality_score}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Errores</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.errors')}</p>
                     <p className={cn(source.error_count > 5 ? 'text-red-600 dark:text-red-400' : source.error_count > 0 ? 'text-orange-700 dark:text-orange-400' : 'text-muted-foreground')}>
                       {source.error_count}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Ultimo Crawl</p>
-                    <p className="text-muted-foreground">{formatDate(source.last_crawled_at)}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.lastCrawl')}</p>
+                    <p className="text-muted-foreground">{formatDate(source.last_crawled_at, t)}</p>
                   </div>
                 </div>
                 <Button
@@ -502,7 +514,7 @@ function SourcesTab() {
                   className="w-full border-foreground/10 text-muted-foreground"
                 >
                   <RefreshCw className={cn('w-3.5 h-3.5 mr-2', crawlMutation.isPending && 'animate-spin')} />
-                  Ejecutar Crawl
+                  {t('compliance.adverseMedia.sources.runCrawl')}
                 </Button>
               </div>
             ))}
@@ -511,12 +523,12 @@ function SourcesTab() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-foreground/5">
-                <th className="text-left p-3 text-muted-foreground font-medium">Fuente</th>
-                <th className="text-left p-3 text-muted-foreground font-medium">Tipo</th>
-                <th className="text-right p-3 text-muted-foreground font-medium">Articulos</th>
-                <th className="text-right p-3 text-muted-foreground font-medium">Calidad</th>
-                <th className="text-right p-3 text-muted-foreground font-medium">Errores</th>
-                <th className="text-right p-3 text-muted-foreground font-medium">Ultimo Crawl</th>
+                <th className="text-left p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.source')}</th>
+                <th className="text-left p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.type')}</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.articles')}</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.quality')}</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.errors')}</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.lastCrawl')}</th>
                 <th className="text-right p-3 text-muted-foreground font-medium"></th>
               </tr>
             </thead>
@@ -540,7 +552,7 @@ function SourcesTab() {
       {inactiveSources.length > 0 && (
         <div>
           <h3 className="text-sm font-medium text-muted-foreground mb-3">
-            Fuentes Inactivas ({inactiveSources.length})
+            {t('compliance.adverseMedia.sources.inactiveSources', { count: inactiveSources.length })}
           </h3>
           <div className="space-y-3 md:hidden opacity-60">
             {inactiveSources.map((source) => (
@@ -556,11 +568,11 @@ function SourcesTab() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Articulos</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.articles')}</p>
                     <p className="text-muted-foreground">{source.total_articles}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Errores</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('compliance.adverseMedia.sources.columns.errors')}</p>
                     <p className="text-red-600 dark:text-red-400/60">{source.error_count}</p>
                   </div>
                 </div>
@@ -571,10 +583,10 @@ function SourcesTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-foreground/5">
-                  <th className="text-left p-3 text-muted-foreground font-medium">Fuente</th>
-                  <th className="text-left p-3 text-muted-foreground font-medium">Tipo</th>
-                  <th className="text-right p-3 text-muted-foreground font-medium">Articulos</th>
-                  <th className="text-right p-3 text-muted-foreground font-medium">Errores</th>
+                  <th className="text-left p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.source')}</th>
+                  <th className="text-left p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.type')}</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.articles')}</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">{t('compliance.adverseMedia.sources.columns.errors')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -608,6 +620,7 @@ function SourceRow({
   onCrawl: () => void;
   isCrawling: boolean;
 }) {
+  const { t } = useTranslation();
   return (
     <tr className="border-b border-foreground/5 last:border-0 hover:bg-foreground/[0.02]">
       <td className="p-3">
@@ -636,7 +649,7 @@ function SourceRow({
         )}
       </td>
       <td className="p-3 text-right text-muted-foreground text-xs">
-        {formatDate(source.last_crawled_at)}
+        {formatDate(source.last_crawled_at, t)}
       </td>
       <td className="p-3 text-right">
         <Button
@@ -656,6 +669,7 @@ function SourceRow({
 // ── Analytics Tab ──
 
 function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
+  const { t } = useTranslation();
   if (!stats) return null;
 
   const categories = Object.entries(stats.by_category)
@@ -679,7 +693,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
         <div className="glass rounded-xl p-5">
           <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5 text-orange-700 dark:text-orange-400" />
-            Actividad reciente de adverse media
+            {t('compliance.adverseMedia.analytics.recentActivity')}
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {recentTrend.map((item) => (
@@ -702,13 +716,13 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
         <div className="glass rounded-xl p-5">
           <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-            Distribucion por Categoria
+            {t('compliance.adverseMedia.analytics.categoryDistribution')}
           </h3>
           <div className="space-y-3">
             {categories.map(([category, count]) => (
               <div key={category} className="flex items-center gap-3">
                 <span className="text-sm text-muted-foreground w-32 shrink-0 truncate">
-                  {categoryLabels[category] || category}
+                  {categoryLabel(t, category)}
                 </span>
                 <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
                   <motion.div
@@ -729,7 +743,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
               </div>
             ))}
             {categories.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Sin datos de categorias</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{t('compliance.adverseMedia.analytics.noCategoryData')}</p>
             )}
           </div>
         </div>
@@ -738,18 +752,18 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
         <div className="glass rounded-xl p-5">
           <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
             <Brain className="w-5 h-5 text-violet-600 dark:text-violet-400" />
-            Metodo de Clasificacion
+            {t('compliance.adverseMedia.analytics.classificationMethod')}
           </h3>
           <div className="space-y-3">
             {methods.map(([method, count]) => {
-              const meta = methodLabels[method] || methodLabels.unknown;
+              const meta = methodMeta[method] || methodMeta.unknown;
               const Icon = meta.icon;
               const pct = totalClassified > 0 ? Math.round((count / totalClassified) * 100) : 0;
               return (
                 <div key={method} className="flex items-center gap-3">
                   <div className="flex items-center gap-2 w-32 shrink-0">
                     <Icon className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground truncate">{meta.label}</span>
+                    <span className="text-sm text-muted-foreground truncate">{t(`compliance.adverseMedia.method.${method}`, { defaultValue: method })}</span>
                   </div>
                   <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
                     <motion.div
@@ -771,7 +785,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
               );
             })}
             {methods.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-4">Sin datos de metodos</p>
+              <p className="text-sm text-muted-foreground text-center py-4">{t('compliance.adverseMedia.analytics.noMethodData')}</p>
             )}
           </div>
         </div>
@@ -780,24 +794,24 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-muted-foreground mb-1">Tasa Adverse Media</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('compliance.adverseMedia.analytics.adverseRate')}</p>
           <p className="text-3xl font-bold text-foreground">{stats.adverse_rate_pct}%</p>
           <p className="text-xs text-muted-foreground mt-1">
-            {stats.adverse} de {stats.total_articles} articulos
+            {t('compliance.adverseMedia.analytics.adverseOfTotal', { adverse: stats.adverse, total: stats.total_articles })}
           </p>
         </div>
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-muted-foreground mb-1">Entity Links</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('compliance.adverseMedia.metrics.entityLinks')}</p>
           <p className="text-3xl font-bold text-foreground">{stats.total_entity_links}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            {stats.entities_with_articles} entidades vinculadas
+            {t('compliance.adverseMedia.analytics.linkedEntities', { count: stats.entities_with_articles })}
           </p>
         </div>
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-muted-foreground mb-1">Sin Clasificar</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('compliance.adverseMedia.analytics.unclassified')}</p>
           <p className="text-3xl font-bold text-foreground">{stats.unclassified}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            {stats.classified} clasificados
+            {t('compliance.adverseMedia.analytics.classifiedCount', { count: stats.classified })}
           </p>
         </div>
       </div>
@@ -816,6 +830,7 @@ function ArticleDetailModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const { data: article, isLoading } = useQuery({
@@ -835,10 +850,10 @@ function ArticleDetailModal({
         categories: article?.categories || [],
       }),
     onSuccess: (data) => {
-      toast.success(`Caso ${data.case_number} creado`);
+      toast.success(t('compliance.adverseMedia.detail.toast.caseCreated', { name: data.case_number }));
       queryClient.invalidateQueries({ queryKey: ['compliance'] });
     },
-    onError: () => toast.error('Error al crear caso'),
+    onError: () => toast.error(t('compliance.adverseMedia.detail.toast.caseError')),
   });
 
   return (
@@ -858,12 +873,12 @@ function ArticleDetailModal({
                     {article.title}
                   </DialogTitle>
                   <DialogDescription className="sr-only">
-                    Detalle del articulo de adverse media
+                    {t('compliance.adverseMedia.detail.srDescription')}
                   </DialogDescription>
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     {article.severity > 0 && (
                       <Badge variant="outline" className={cn('text-xs', getSeverityColor(article.severity))}>
-                        Severity: {article.severity}
+                        {t('compliance.adverseMedia.detail.severity')}: {article.severity}
                       </Badge>
                     )}
                     {article.categories?.map((cat) => (
@@ -872,10 +887,10 @@ function ArticleDetailModal({
                         variant="outline"
                         className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-muted-foreground')}
                       >
-                        {categoryLabels[cat] || cat}
+                        {categoryLabel(t, cat)}
                       </Badge>
                     ))}
-                    {getMethodBadge(article.classification_method)}
+                    {getMethodBadge(article.classification_method, t)}
                   </div>
                 </div>
               </div>
@@ -891,14 +906,14 @@ function ArticleDetailModal({
               )}
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                {formatDate(article.publication_date)}
+                {formatDate(article.publication_date, t)}
               </span>
               {article.language && (
                 <span className="uppercase">{article.language}</span>
               )}
               {article.classification_confidence != null && (
                 <span className="text-muted-foreground">
-                  Confianza: {Math.round(article.classification_confidence * 100)}%
+                  {t('compliance.adverseMedia.detail.confidence')}: {Math.round(article.classification_confidence * 100)}%
                 </span>
               )}
               <a
@@ -908,7 +923,7 @@ function ArticleDetailModal({
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1 ml-auto"
               >
                 <ExternalLink className="w-3 h-3" />
-                Ver fuente
+                {t('compliance.adverseMedia.detail.viewSource')}
               </a>
             </div>
 
@@ -917,7 +932,7 @@ function ArticleDetailModal({
               <div className="bg-foreground/5 rounded-lg p-4 text-sm text-muted-foreground leading-relaxed">
                 <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <FileText className="w-3 h-3" />
-                  Extracto
+                  {t('compliance.adverseMedia.detail.excerpt')}
                 </p>
                 {article.content_snippet}
               </div>
@@ -926,7 +941,7 @@ function ArticleDetailModal({
             {/* Summary */}
             {article.summary && article.summary !== article.content_snippet && (
               <div className="text-sm text-muted-foreground">
-                <p className="font-medium text-muted-foreground mb-1">Resumen</p>
+                <p className="font-medium text-muted-foreground mb-1">{t('compliance.adverseMedia.detail.summary')}</p>
                 {article.summary}
               </div>
             )}
@@ -936,7 +951,7 @@ function ArticleDetailModal({
               <div>
                 <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <User className="w-3 h-3" />
-                  Entidades Extraidas ({article.extracted_entities.length})
+                  {t('compliance.adverseMedia.detail.extractedEntities', { count: article.extracted_entities.length })}
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {article.extracted_entities.map((entity, i) => (
@@ -967,7 +982,7 @@ function ArticleDetailModal({
               <div>
                 <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <Link2 className="w-3 h-3" />
-                  Entidades Vinculadas ({article.entity_links.length})
+                  {t('compliance.adverseMedia.detail.linkedEntities', { count: article.entity_links.length })}
                 </p>
                 <div className="space-y-2">
                   {article.entity_links.map((link) => (
@@ -983,9 +998,9 @@ function ArticleDetailModal({
                         <div>
                           <p className="text-sm text-foreground font-medium">{link.mentioned_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            Confianza: {Math.round(link.match_confidence * 100)}%
+                            {t('compliance.adverseMedia.detail.confidence')}: {Math.round(link.match_confidence * 100)}%
                             {link.match_method && ` · ${link.match_method}`}
-                            {link.is_primary_subject && ' · Sujeto principal'}
+                            {link.is_primary_subject && ` · ${t('compliance.adverseMedia.detail.primarySubject')}`}
                           </p>
                         </div>
                       </div>
@@ -995,7 +1010,7 @@ function ArticleDetailModal({
                           className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1"
                         >
                           <Eye className="w-3 h-3" />
-                          Ver perfil
+                          {t('compliance.adverseMedia.detail.viewProfile')}
                         </a>
                         <Button
                           variant="outline"
@@ -1008,7 +1023,7 @@ function ArticleDetailModal({
                           disabled={createCaseMutation.isPending}
                         >
                           <ShieldAlert className="w-3 h-3 mr-1" />
-                          Crear Caso
+                          {t('compliance.adverseMedia.detail.createCase')}
                         </Button>
                       </div>
                     </div>
@@ -1024,18 +1039,17 @@ function ArticleDetailModal({
               <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-3">
                 <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-1 flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" />
-                  Entidades detectadas sin vincular a Gold
+                  {t('compliance.adverseMedia.detail.unlinkedTitle')}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Las entidades extraidas aun no estan vinculadas a entidades del sistema.
-                  Usa la busqueda para vincularlas manualmente.
+                  {t('compliance.adverseMedia.detail.unlinkedDescription')}
                 </p>
               </div>
             )}
           </>
         ) : (
           <div className="p-8 text-center text-muted-foreground">
-            Articulo no encontrado
+            {t('compliance.adverseMedia.detail.notFound')}
           </div>
         )}
       </DialogContent>
@@ -1046,6 +1060,7 @@ function ArticleDetailModal({
 // ── Main Page ──
 
 export function AdverseMediaPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('articles');
   const queryClient = useQueryClient();
 
@@ -1058,10 +1073,10 @@ export function AdverseMediaPage() {
   const reclassifyMutation = useMutation({
     mutationFn: () => complianceService.reclassifyArticles(),
     onSuccess: (data) => {
-      toast.success(`Reclasificados: ${data.reclassified} articulos (${data.adverse} adverse)`);
+      toast.success(t('compliance.adverseMedia.toast.reclassified', { reclassified: data.reclassified, adverse: data.adverse }));
       queryClient.invalidateQueries({ queryKey: ['adverse-media'] });
     },
-    onError: () => toast.error('Error al reclasificar'),
+    onError: () => toast.error(t('compliance.adverseMedia.toast.reclassifyError')),
   });
 
   // Compute AI vs keyword ratio for stat card
@@ -1069,8 +1084,8 @@ export function AdverseMediaPage() {
   return (
     <AppPage>
         <PageHeader
-          title="Adverse Media"
-          description="Monitoreo continuo de noticias AML/CFT."
+          title={t('compliance.adverseMedia.title')}
+          description={t('compliance.adverseMedia.description')}
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30">
               <Newspaper className="w-6 h-6 text-orange-700 dark:text-orange-400" aria-hidden="true" />
@@ -1083,10 +1098,10 @@ export function AdverseMediaPage() {
               onClick={() => reclassifyMutation.mutate()}
               disabled={reclassifyMutation.isPending}
               className="gap-2"
-              aria-label="Reclasificar noticias"
+              aria-label={t('compliance.adverseMedia.reclassifyAria')}
             >
               <RefreshCw className={cn('w-4 h-4', reclassifyMutation.isPending && 'animate-spin')} />
-              Reclasificar
+              {t('compliance.adverseMedia.reclassify')}
             </Button>
           }
         />
@@ -1103,33 +1118,33 @@ export function AdverseMediaPage() {
         ) : (
           <>
             <MetricCard
-              label="Total Articulos"
+              label={t('compliance.adverseMedia.metrics.totalArticles')}
               value={stats?.total_articles?.toLocaleString() ?? 0}
               icon={Newspaper}
               className="glass rounded-xl"
             />
             <MetricCard
-              label="Adverse Media"
+              label={t('compliance.adverseMedia.metrics.adverseMedia')}
               value={stats?.adverse ?? 0}
               icon={AlertTriangle}
               accent="amber"
               className="glass rounded-xl"
             />
             <MetricCard
-              label="Fuentes Activas"
+              label={t('compliance.adverseMedia.metrics.activeSources')}
               value={stats?.active_sources ?? 0}
               icon={Globe}
               accent="success"
               className="glass rounded-xl"
             />
             <MetricCard
-              label="Entity Links"
+              label={t('compliance.adverseMedia.metrics.entityLinks')}
               value={stats?.total_entity_links ?? 0}
               icon={Activity}
               className="glass rounded-xl"
             />
             <MetricCard
-              label="Clasificacion AI"
+              label={t('compliance.adverseMedia.metrics.aiClassification')}
               value={aiArticles}
               icon={Brain}
               className="glass rounded-xl"
@@ -1143,15 +1158,15 @@ export function AdverseMediaPage() {
         <TabsList className="mb-6 bg-foreground/5 border border-foreground/10">
           <TabsTrigger value="articles" className="data-[state=active]:bg-foreground/10">
             <Newspaper className="w-4 h-4 mr-2" />
-            Articulos
+            {t('compliance.adverseMedia.tabs.articles')}
           </TabsTrigger>
           <TabsTrigger value="sources" className="data-[state=active]:bg-foreground/10">
             <Database className="w-4 h-4 mr-2" />
-            Fuentes
+            {t('compliance.adverseMedia.tabs.sources')}
           </TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-foreground/10">
             <TrendingUp className="w-4 h-4 mr-2" />
-            Analisis
+            {t('compliance.adverseMedia.tabs.analytics')}
           </TabsTrigger>
         </TabsList>
 

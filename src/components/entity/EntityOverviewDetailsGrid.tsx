@@ -1,5 +1,6 @@
 import { CreditCard, FileText, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { fadeUp } from '@/lib/motion';
@@ -35,13 +36,14 @@ export function EntityOverviewDetailsGrid({
   formatAddressValue,
   getAliasTypeLabel,
 }: EntityOverviewDetailsGridProps) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {entity.identifications?.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="glass rounded-xl p-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2 uppercase tracking-wide">
             <CreditCard className="w-4 h-4" />
-            Identificaciones
+            {t('entity.details.identifications')}
           </h3>
           <div className="space-y-2">
             {entity.identifications.map((ident, i) => (
@@ -65,7 +67,7 @@ export function EntityOverviewDetailsGrid({
         <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="glass rounded-xl p-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2 uppercase tracking-wide">
             <FileText className="w-4 h-4" />
-            Nombres y Alias
+            {t('entity.details.namesAndAliases')}
             <span className="text-[10px] text-muted-foreground ml-auto">{entity.aliases?.length || 0}</span>
           </h3>
           <div className="space-y-3">
@@ -89,7 +91,7 @@ export function EntityOverviewDetailsGrid({
                 onClick={() => setShowAllAliases((value) => !value)}
                 className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 px-0"
               >
-                {showAllAliases ? 'Mostrar menos' : `Ver todos los alias (${entity.aliases?.length || 0})`}
+                {showAllAliases ? t('entity.details.showLess') : t('entity.details.showAllAliases', { count: entity.aliases?.length || 0 })}
               </Button>
             )}
           </div>
@@ -100,19 +102,19 @@ export function EntityOverviewDetailsGrid({
         <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="glass rounded-xl p-6">
           <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2 uppercase tracking-wide">
             <MapPin className="w-4 h-4" />
-            Direcciones
+            {t('entity.details.addresses')}
           </h3>
           <div className="space-y-2">
             {validAddresses.slice(0, 5).map((addr, i) => (
               <div key={i} className="p-2 rounded-lg bg-foreground/[0.03]">
                 <p className="text-sm text-foreground">{formatAddressValue(addr)}</p>
                 {addr.is_current && (
-                  <Badge className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 mt-1">Actual</Badge>
+                  <Badge className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 mt-1">{t('entity.details.currentAddress')}</Badge>
                 )}
               </div>
             ))}
             {validAddresses.length > 5 && (
-              <p className="text-[10px] text-muted-foreground">+{validAddresses.length - 5} más</p>
+              <p className="text-[10px] text-muted-foreground">{t('entity.details.moreAddresses', { count: validAddresses.length - 5 })}</p>
             )}
           </div>
         </motion.div>

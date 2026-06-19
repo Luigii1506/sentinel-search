@@ -14,6 +14,8 @@
  * Sin tablas separadas — una sola "fuente de verdad" por source.
  */
 import { Suspense, lazy, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Activity,
@@ -58,27 +60,27 @@ function formatDuration(seconds: number | null | undefined): string {
   return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 }
 
-function formatAgo(minutes: number | null | undefined): string {
+function formatAgo(minutes: number | null | undefined, t: TFunction): string {
   if (minutes == null) return '—';
-  if (minutes < 1) return 'ahora';
-  if (minutes < 60) return `hace ${minutes}m`;
+  if (minutes < 1) return t('insights.operations.time.now');
+  if (minutes < 60) return t('insights.operations.time.agoMinutes', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `hace ${hours}h`;
-  return `hace ${Math.floor(hours / 24)}d`;
+  if (hours < 24) return t('insights.operations.time.agoHours', { count: hours });
+  return t('insights.operations.time.agoDays', { count: Math.floor(hours / 24) });
 }
 
-function formatUntil(minutes: number | null | undefined): string {
+function formatUntil(minutes: number | null | undefined, t: TFunction): string {
   if (minutes == null) return '—';
-  if (minutes < 1) return 'ahora';
-  if (minutes < 60) return `en ${minutes}m`;
+  if (minutes < 1) return t('insights.operations.time.now');
+  if (minutes < 60) return t('insights.operations.time.inMinutes', { count: minutes });
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `en ${hours}h`;
-  return `en ${Math.floor(hours / 24)}d`;
+  if (hours < 24) return t('insights.operations.time.inHours', { count: hours });
+  return t('insights.operations.time.inDays', { count: Math.floor(hours / 24) });
 }
 
-function formatAgoOrFuture(hours: number | null | undefined): string {
+function formatAgoOrFuture(hours: number | null | undefined, t: TFunction): string {
   if (hours == null) return '—';
-  if (hours < 0) return `en ${Math.abs(hours).toFixed(1)}h`;
+  if (hours < 0) return t('insights.operations.time.inHoursDecimal', { value: Math.abs(hours).toFixed(1) });
   if (hours < 1) return `${Math.round(hours * 60)}m`;
   if (hours < 24) return `${hours.toFixed(1)}h`;
   return `${Math.floor(hours / 24)}d`;
@@ -124,6 +126,7 @@ function tierBadge(tier: number) {
 // ── Historial expandible ────────────────────────────────────────────────
 
 function SourceRunsHistory({ sourceId }: { sourceId: string }) {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery<SourceRunsResponse>({
     queryKey: ['source-runs', sourceId],
     queryFn: () => adminService.getSourceRuns(sourceId, 10),
@@ -134,7 +137,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
   if (isLoading) {
     return (
       <div className="px-3 py-3 text-xs text-muted-foreground">
-        <Loader2 className="w-3 h-3 inline animate-spin mr-1" /> Cargando historial…
+        <Loader2 className="w-3 h-3 inline animate-spin mr-1" /> {t('insights.operations.history.loading')}
       </div>
     );
   }
@@ -142,7 +145,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
   if (!data || data.runs.length === 0) {
     return (
       <div className="px-3 py-3 text-xs text-muted-foreground">
-        Sin runs registrados para esta fuente.
+        {t('insights.operations.history.empty')}
       </div>
     );
   }
@@ -150,7 +153,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
   return (
     <div className="px-3 py-2 bg-black/30">
       <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-        Últimos {data.runs.length} runs
+        {t('insights.operations.history.lastRuns', { count: data.runs.length })}
       </p>
       <div className="space-y-1">
         {data.runs.map((r) => {
@@ -164,15 +167,15 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
             r.status === 'running' ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground';
 
           const parts: string[] = [];
-          if (r.records_processed) parts.push(`${formatNumber(r.records_processed)} procesados`);
-          if (r.records_inserted) parts.push(`+${formatNumber(r.records_inserted)} nuevos`);
-          if (r.records_updated) parts.push(`~${formatNumber(r.records_updated)} cambiaron`);
+          if (r.records_processed) parts.push(t('insights.operations.records.processed', { count: formatNumber(r.records_processed) }));
+          if (r.records_inserted) parts.push(t('insights.operations.records.inserted', { count: formatNumber(r.records_inserted) }));
+          if (r.records_updated) parts.push(t('insights.operations.records.updated', { count: formatNumber(r.records_updated) }));
           const summary =
-            r.is_skip ? 'sin cambios (skip)' :
+            r.is_skip ? t('insights.operations.summary.noChangesSkip') :
             (parts.length > 0 ? parts.join(' · ') :
-              r.status === 'running' ? 'corriendo…' :
-              r.status === 'failed' ? 'falló' :
-              'sin actividad');
+              r.status === 'running' ? t('insights.operations.summary.running') :
+              r.status === 'failed' ? t('insights.operations.summary.failed') :
+              t('insights.operations.summary.noActivity'));
 
           return (
             <div key={r.id} className="grid grid-cols-12 gap-2 text-[11px] py-1.5 px-2 rounded hover:bg-foreground/5">
@@ -182,7 +185,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
               {/* Inicio */}
               <div className="col-span-3">
                 <p className="text-muted-foreground font-mono">{formatLocalTime(r.started_at)}</p>
-                <p className="text-muted-foreground text-[10px]">inicio</p>
+                <p className="text-muted-foreground text-[10px]">{t('insights.operations.history.start')}</p>
               </div>
 
               {/* Fin */}
@@ -191,14 +194,14 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
                   {r.completed_at ? formatLocalTime(r.completed_at) : '—'}
                 </p>
                 <p className="text-muted-foreground text-[10px]">
-                  {r.completed_at ? 'fin' : (r.status === 'running' ? 'aún corriendo' : '—')}
+                  {r.completed_at ? t('insights.operations.history.end') : (r.status === 'running' ? t('insights.operations.history.stillRunning') : '—')}
                 </p>
               </div>
 
               {/* Duración */}
               <div className="col-span-2 text-right">
                 <p className="text-muted-foreground font-mono">{formatDuration(r.duration_seconds)}</p>
-                <p className="text-muted-foreground text-[10px]">duración</p>
+                <p className="text-muted-foreground text-[10px]">{t('insights.operations.history.duration')}</p>
               </div>
 
               {/* Resumen */}
@@ -362,6 +365,7 @@ function PipelineProgressBar({ sourceId, isRunning }: { sourceId: string; isRunn
 
 
 function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDispatched?: () => void }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const meta = STATE_META[source.state] || STATE_META.idle;
@@ -378,7 +382,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
           {s.step}{s.cursor && <span className="text-muted-foreground ml-1">· {s.cursor}</span>}
         </p>
         <p className="text-[11px] text-muted-foreground">
-          corriendo {formatDuration(s.elapsed_seconds)}
+          {t('insights.operations.row.runningFor', { duration: formatDuration(s.elapsed_seconds) })}
         </p>
       </div>
     );
@@ -388,7 +392,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
       subInfo = (
         <div className="space-y-0.5">
           <p className="text-xs text-red-600 dark:text-red-300/90">
-            falló {formatAgo(r.minutes_ago)} · duración {formatDuration(r.duration_seconds)}
+            {t('insights.operations.row.failedAgo', { ago: formatAgo(r.minutes_ago, t), duration: formatDuration(r.duration_seconds) })}
           </p>
           {r.error_message && (
             <details className="text-[11px] text-red-600 dark:text-red-300/70 group">
@@ -408,24 +412,24 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
     } else if (r.is_skip || (r.records_processed === 0 && r.records_inserted === 0 && r.records_updated === 0)) {
       subInfo = (
         <p className="text-xs text-muted-foreground">
-          {r.is_skip ? 'omitido' : 'sin cambios'} {formatAgo(r.minutes_ago)} · duración {formatDuration(r.duration_seconds)}
+          {(r.is_skip ? t('insights.operations.row.skipped') : t('insights.operations.row.noChanges'))} {formatAgo(r.minutes_ago, t)} · {t('insights.operations.row.durationLabel', { duration: formatDuration(r.duration_seconds) })}
         </p>
       );
     } else {
       const parts: string[] = [];
-      if (r.records_inserted) parts.push(`+${formatNumber(r.records_inserted)} nuevos`);
-      if (r.records_updated) parts.push(`~${formatNumber(r.records_updated)} cambiaron`);
-      if (r.records_processed && !parts.length) parts.push(`${formatNumber(r.records_processed)} procesados`);
+      if (r.records_inserted) parts.push(t('insights.operations.records.inserted', { count: formatNumber(r.records_inserted) }));
+      if (r.records_updated) parts.push(t('insights.operations.records.updated', { count: formatNumber(r.records_updated) }));
+      if (r.records_processed && !parts.length) parts.push(t('insights.operations.records.processed', { count: formatNumber(r.records_processed) }));
       subInfo = (
         <p className="text-xs text-muted-foreground">
-          {formatAgo(r.minutes_ago)} · {parts.join(' · ') || 'completado'} · {formatDuration(r.duration_seconds)}
+          {formatAgo(r.minutes_ago, t)} · {parts.join(' · ') || t('insights.operations.row.completed')} · {formatDuration(r.duration_seconds)}
         </p>
       );
     }
   } else if (source.state === 'never') {
     subInfo = (
       <p className="text-xs text-muted-foreground">
-        Nunca sincronizada · {source.schedule_frequency || 'sin schedule'}
+        {t('insights.operations.row.neverSynced')} · {source.schedule_frequency || t('insights.operations.row.noSchedule')}
       </p>
     );
   }
@@ -435,7 +439,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
   if (source.state !== 'running' && source.next_due_minutes != null && source.next_due_minutes > 0) {
     nextInfo = (
       <span className="text-[11px] text-muted-foreground font-mono">
-        próximo {formatUntil(source.next_due_minutes)}
+        {t('insights.operations.row.next', { until: formatUntil(source.next_due_minutes, t) })}
       </span>
     );
   }
@@ -452,15 +456,15 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
       : result === 'success'       ? 'text-emerald-700 dark:text-emerald-400'
       : 'text-muted-foreground';
     const resultLabel =
-      result === 'skipped_smart' ? 'sin cambios remotos'
-      : result === 'skipped_lock'  ? 'omitido (lock)'
-      : result === 'success'       ? 'OK'
-      : result === 'failed'        ? 'falló'
+      result === 'skipped_smart' ? t('insights.operations.dispatch.noRemoteChanges')
+      : result === 'skipped_lock'  ? t('insights.operations.dispatch.skippedLock')
+      : result === 'success'       ? t('insights.operations.dispatch.ok')
+      : result === 'failed'        ? t('insights.operations.dispatch.failed')
       : result;
-    const ago = formatAgoOrFuture(source.hours_since_last_dispatch);
+    const ago = formatAgoOrFuture(source.hours_since_last_dispatch, t);
     dispatchInfo = (
-      <span className={`text-[11px] font-mono ${resultColor}`} title={`Última decisión del dispatcher hace ${ago} → ${result}`}>
-        dispatch {ago} · {resultLabel}
+      <span className={`text-[11px] font-mono ${resultColor}`} title={t('insights.operations.dispatch.title', { ago, result })}>
+        {t('insights.operations.dispatch.label', { ago, result: resultLabel })}
       </span>
     );
   }
@@ -473,16 +477,16 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
     const date = new Date(source.os_last_change);
     const daysAgo = (Date.now() - date.getTime()) / 86_400_000;
     const ageStr = daysAgo < 1
-      ? 'hoy'
+      ? t('insights.operations.os.today')
       : daysAgo < 30
-        ? `hace ${Math.round(daysAgo)}d`
-        : `hace ${Math.round(daysAgo / 30)}m`;
+        ? t('insights.operations.time.agoDays', { count: Math.round(daysAgo) })
+        : t('insights.operations.os.agoMonths', { count: Math.round(daysAgo / 30) });
     osInfo = (
       <span
         className="text-[10px] font-mono text-purple-600 dark:text-purple-300/70"
-        title={`OpenSanctions reporta último cambio real ${ageStr} (${source.os_last_change})`}
+        title={t('insights.operations.os.title', { age: ageStr, date: source.os_last_change })}
       >
-        OS {ageStr}
+        {t('insights.operations.os.label', { age: ageStr })}
       </span>
     );
   }
@@ -494,7 +498,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
         <button
           onClick={() => setExpanded(!expanded)}
           className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
-          title={expanded ? 'Colapsar' : 'Expandir historial'}
+          title={expanded ? t('insights.operations.row.collapse') : t('insights.operations.row.expandHistory')}
         >
           {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
         </button>
@@ -537,7 +541,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
             size="sm"
             className="h-7 text-xs text-muted-foreground hover:text-foreground"
             onClick={() => navigate(`/admin/sources?focus=${source.source_id}`)}
-            title="Ver en /admin/sources"
+            title={t('insights.operations.row.viewInSources', { path: '/admin/sources' })}
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </Button>
@@ -565,6 +569,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
 // ── Component ──────────────────────────────────────────────────────────
 
 export function OperationsPage() {
+  const { t } = useTranslation();
   const [filter, setFilter] = useState<'active' | 'running' | 'failing' | 'critical' | 'all'>('active');
   const [tierFilter, setTierFilter] = useState<1 | 2 | 3 | 4 | null>(null);
   // Marca de la última vez que el usuario disparó un sync. Mientras esté
@@ -623,12 +628,12 @@ export function OperationsPage() {
 
   // ── Filtros (segmented control) ───────────────
   const filterOptions: { key: typeof filter; label: string; count?: number; color?: string }[] = useMemo(() => [
-    { key: 'active', label: 'Activas', count: undefined },
-    { key: 'running', label: 'Corriendo', count: runningCount, color: 'blue' },
-    { key: 'failing', label: 'Fallando', count: recentFailedCount, color: 'red' },
-    { key: 'critical', label: 'Críticas', count: undefined, color: 'amber' },
-    { key: 'all', label: 'Todas' },
-  ], [runningCount, recentFailedCount]);
+    { key: 'active', label: t('insights.operations.filters.active'), count: undefined },
+    { key: 'running', label: t('insights.operations.filters.running'), count: runningCount, color: 'blue' },
+    { key: 'failing', label: t('insights.operations.filters.failing'), count: recentFailedCount, color: 'red' },
+    { key: 'critical', label: t('insights.operations.filters.critical'), count: undefined, color: 'amber' },
+    { key: 'all', label: t('insights.operations.filters.all') },
+  ], [runningCount, recentFailedCount, t]);
 
   const dataAge = dataUpdatedAt ? Math.floor((Date.now() - dataUpdatedAt) / 1000) : 0;
   const recentTriggerWindow = Date.now() - lastTriggerAt < 30_000;
@@ -640,28 +645,28 @@ export function OperationsPage() {
     accent?: 'success' | 'red' | 'amber';
   }> = isActivityPending
     ? [
-        { label: 'saludables', value: '—', icon: CheckCircle2 },
-        { label: 'corriendo', value: '—', icon: Loader2 },
-        { label: 'fallaron', value: '—', icon: XCircle },
-        { label: 'desactualizadas', value: '—', icon: AlertTriangle },
-        { label: 'sin sync', value: '—', icon: Clock },
+        { label: t('insights.operations.status.healthy'), value: '—', icon: CheckCircle2 },
+        { label: t('insights.operations.status.running'), value: '—', icon: Loader2 },
+        { label: t('insights.operations.status.failed'), value: '—', icon: XCircle },
+        { label: t('insights.operations.status.stale'), value: '—', icon: AlertTriangle },
+        { label: t('insights.operations.status.neverSynced'), value: '—', icon: Clock },
       ]
     : [
-        { label: 'saludables', value: counts.healthy || 0, accent: 'success', icon: CheckCircle2 },
-        { label: 'corriendo', value: runningCount, icon: Loader2 },
-        { label: 'fallaron', value: recentFailedCount, accent: 'red', icon: XCircle },
-        { label: 'desactualizadas', value: staleCount, accent: 'amber', icon: AlertTriangle },
-        { label: 'sin sync', value: neverCount, icon: Clock },
+        { label: t('insights.operations.status.healthy'), value: counts.healthy || 0, accent: 'success', icon: CheckCircle2 },
+        { label: t('insights.operations.status.running'), value: runningCount, icon: Loader2 },
+        { label: t('insights.operations.status.failed'), value: recentFailedCount, accent: 'red', icon: XCircle },
+        { label: t('insights.operations.status.stale'), value: staleCount, accent: 'amber', icon: AlertTriangle },
+        { label: t('insights.operations.status.neverSynced'), value: neverCount, icon: Clock },
       ];
 
   return (
     <AppPage spacing="compact">
       <PageHeader
-        title="Operaciones"
+        title={t('insights.operations.title')}
         description={
           isActivityPending
-            ? 'Cargando estado operativo de las fuentes…'
-            : `${sources.length} fuentes · actualizado hace ${dataAge}s · auto-refresh ${refreshRate}`
+            ? t('insights.operations.loadingDescription')
+            : t('insights.operations.description', { count: sources.length, age: dataAge, rate: refreshRate })
         }
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
@@ -671,7 +676,7 @@ export function OperationsPage() {
         actions={
           <>
             {runningCount > 0 && (
-              <StatusPill kind="running" label={`${runningCount} corriendo`} size="sm" />
+              <StatusPill kind="running" label={t('insights.operations.runningPill', { count: runningCount })} size="sm" />
             )}
             <Button variant="outline" size="sm" onClick={() => refetch()}>
               <RefreshCw className="w-3.5 h-3.5" />
@@ -684,34 +689,34 @@ export function OperationsPage() {
         {opsSummary ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/5">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Skip rate 7d</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t('insights.operations.infra.skipRate7d')}</span>
               <span className="text-lg font-mono text-emerald-700 dark:text-emerald-400">
                 {(opsSummary.execution_stats_7d?.skip_rate_pct ?? 0).toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground">
-                {opsSummary.execution_stats_7d?.skipped ?? 0} de {(opsSummary.execution_stats_7d?.total_runs ?? 0) - (opsSummary.execution_stats_7d?.running ?? 0)} terminados
+                {t('insights.operations.infra.skippedOfFinished', { skipped: opsSummary.execution_stats_7d?.skipped ?? 0, total: (opsSummary.execution_stats_7d?.total_runs ?? 0) - (opsSummary.execution_stats_7d?.running ?? 0) })}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Success rate</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t('insights.operations.infra.successRate')}</span>
               <span className="text-lg font-mono text-blue-600 dark:text-blue-400">
                 {(opsSummary.execution_stats_7d?.success_rate_pct ?? 0).toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground">
-                {opsSummary.execution_stats_7d?.success ?? 0} success
+                {t('insights.operations.infra.successCount', { count: opsSummary.execution_stats_7d?.success ?? 0 })}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Failure rate</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t('insights.operations.infra.failureRate')}</span>
               <span className={`text-lg font-mono ${(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0) > 10 ? 'text-red-600 dark:text-red-400' : 'text-yellow-700 dark:text-yellow-400'}`}>
                 {(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0).toFixed(1)}%
               </span>
               <span className="text-[10px] text-muted-foreground">
-                {opsSummary.execution_stats_7d?.failed ?? 0} failed
+                {t('insights.operations.infra.failedCount', { count: opsSummary.execution_stats_7d?.failed ?? 0 })}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Workers</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t('insights.operations.infra.workers')}</span>
               <span className="text-lg font-mono text-cyan-700 dark:text-cyan-400">
                 {opsSummary.workers?.count ?? '?'}
               </span>
@@ -720,7 +725,7 @@ export function OperationsPage() {
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Queues</span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">{t('insights.operations.infra.queues')}</span>
               <span className="text-lg font-mono text-purple-600 dark:text-purple-400">
                 {Object.values(opsSummary.queues || {}).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) as number}
               </span>
@@ -766,7 +771,7 @@ export function OperationsPage() {
           <div className="h-5 w-px bg-foreground/10 mx-1" />
 
           {/* Filtro por tier */}
-          <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">Tier:</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">{t('insights.operations.tier.label')}</span>
           <button
             onClick={() => setTierFilter(null)}
             className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
@@ -775,16 +780,16 @@ export function OperationsPage() {
                 : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border border-transparent'
             }`}
           >
-            Todos
+            {t('insights.operations.tier.all')}
           </button>
-          {[1, 2, 3, 4].map((t) => {
-            const active = tierFilter === t;
+          {[1, 2, 3, 4].map((tt) => {
+            const active = tierFilter === tt;
             const tColor =
-              t === 1 ? 'red' : t === 2 ? 'amber' : t === 3 ? 'blue' : 'gray';
+              tt === 1 ? 'red' : tt === 2 ? 'amber' : tt === 3 ? 'blue' : 'gray';
             return (
               <button
-                key={t}
-                onClick={() => setTierFilter(t as 1 | 2 | 3 | 4)}
+                key={tt}
+                onClick={() => setTierFilter(tt as 1 | 2 | 3 | 4)}
                 className={`px-2.5 py-1 rounded-md text-xs font-mono font-medium transition-colors border ${
                   active
                     ? (
@@ -796,13 +801,13 @@ export function OperationsPage() {
                     : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border-transparent'
                 }`}
                 title={
-                  t === 1 ? 'Sanciones críticas / Fugitivos' :
-                  t === 2 ? 'Enforcement / Debarments' :
-                  t === 3 ? 'PEPs / Compliance' :
-                  'Investigación / Otros'
+                  tt === 1 ? t('insights.operations.tier.tooltip1') :
+                  tt === 2 ? t('insights.operations.tier.tooltip2') :
+                  tt === 3 ? t('insights.operations.tier.tooltip3') :
+                  t('insights.operations.tier.tooltip4')
                 }
               >
-                T{t}
+                T{tt}
               </button>
             );
           })}
@@ -820,8 +825,8 @@ export function OperationsPage() {
           ) : sources.length === 0 ? (
             <EmptyState
               icon={CheckCircle2}
-              title="Sin fuentes para este filtro"
-              description={`No hay fuentes que coincidan con "${filter}".`}
+              title={t('insights.operations.empty.title')}
+              description={t('insights.operations.empty.description', { filter })}
               tone="success"
             />
           ) : (
@@ -856,7 +861,7 @@ export function OperationsPage() {
 
         {/* ── Infra footer ──────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2 text-xs pt-2 border-t border-foreground/5">
-          <span className="text-muted-foreground mr-2">Infraestructura:</span>
+          <span className="text-muted-foreground mr-2">{t('insights.operations.infra.footerTitle')}</span>
           {services && [
             { name: 'API', icon: Zap, ok: services.api?.status === 'ok' },
             { name: 'PG', icon: Database, ok: services.database?.status === 'ok', latency: services.database?.latency_ms },
@@ -877,7 +882,7 @@ export function OperationsPage() {
           })}
           {snapshotsHealth?.snapshots && snapshotsHealth.snapshots.length > 0 && (
             <>
-              <span className="text-muted-foreground ml-2">Snapshots:</span>
+              <span className="text-muted-foreground ml-2">{t('insights.operations.infra.snapshotsTitle')}</span>
               {snapshotsHealth.snapshots.map((snap) => (
                 <HealthDot
                   key={snap.scope}

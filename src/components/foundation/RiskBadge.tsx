@@ -1,5 +1,6 @@
 import { AlertOctagon, AlertTriangle, AlertCircle, CheckCircle2, HelpCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export type RiskLevel = 'critical' | 'high' | 'medium' | 'low' | 'unknown';
@@ -19,34 +20,29 @@ export type RiskLevel = 'critical' | 'high' | 'medium' | 'low' | 'unknown';
  */
 const VARIANTS: Record<
   RiskLevel,
-  { label: string; icon: LucideIcon; color: string; ring: string }
+  { icon: LucideIcon; color: string; ring: string }
 > = {
   critical: {
-    label: 'Crítico',
     icon: AlertOctagon,
     color: 'bg-red-500/15 text-red-200 border-red-500/40',
     ring: 'ring-red-500/30',
   },
   high: {
-    label: 'Alto',
     icon: AlertTriangle,
     color: 'bg-orange-500/15 text-orange-200 border-orange-500/40',
     ring: 'ring-orange-500/30',
   },
   medium: {
-    label: 'Medio',
     icon: AlertCircle,
     color: 'bg-amber-500/15 text-amber-200 border-amber-500/40',
     ring: 'ring-amber-500/30',
   },
   low: {
-    label: 'Bajo',
     icon: CheckCircle2,
     color: 'bg-green-500/15 text-green-200 border-green-500/40',
     ring: 'ring-green-500/30',
   },
   unknown: {
-    label: 'Sin clasificar',
     icon: HelpCircle,
     color: 'bg-secondary text-muted-foreground border-border',
     ring: 'ring-border',
@@ -89,13 +85,14 @@ export function RiskBadge({
   withRing = false,
   className,
 }: RiskBadgeProps) {
+  const { t } = useTranslation();
   const v = VARIANTS[level];
   const Icon = v.icon;
-  const text = label ?? v.label;
+  const text = label ?? t(`common.risk.${level}`);
   return (
     <span
       role="status"
-      aria-label={`Riesgo: ${text}`}
+      aria-label={t('components.foundation.riskBadge.aria', { label: text })}
       className={cn(
         'inline-flex items-center font-medium rounded-md border whitespace-nowrap',
         v.color,

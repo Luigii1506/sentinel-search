@@ -2,6 +2,7 @@
  * ResolverReviewPage — Cola de UNSURE pairs para review humano (Fase C).
  */
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus } from 'lucide-react';
@@ -21,6 +22,7 @@ interface EntitySummary {
 }
 
 export function ResolverReviewPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -77,17 +79,17 @@ export function ResolverReviewPage() {
     onSuccess: async (_data, variables) => {
       toast.success(
         variables.judgement === 'positive'
-          ? 'Merge marcado — se aplicará en próximo ciclo'
-          : 'Marcado como entidades distintas',
+          ? t('review.resolver.toast.mergeMarked')
+          : t('review.resolver.toast.markedDistinct'),
       );
       await queryClient.invalidateQueries({ queryKey: ['resolver-review'] });
     },
     onError: (err: any) => {
-      toast.error(err?.message || 'Error al decidir');
+      toast.error(err?.message || t('review.resolver.toast.decideError'));
     },
   });
 
-  const errorMessage = error instanceof Error ? error.message : 'Error cargando cola de revisión';
+  const errorMessage = error instanceof Error ? error.message : t('review.resolver.loadError');
   const deciding = decideMutation.isPending;
   const entityLoading = pair && (leftQuery.isLoading || rightQuery.isLoading);
   const leftEnt = leftQuery.data ?? (pair ? { id: pair.source } : null);
@@ -97,19 +99,19 @@ export function ResolverReviewPage() {
     if (!status) return null;
     return (
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <MetricCard label="UNSURE pendientes" value={status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label="Positive pendientes" value={status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label="Negative" value={status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label="Canonical groups" value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label={t('review.resolver.stats.unsurePending')} value={status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label={t('review.resolver.stats.positivePending')} value={status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label={t('review.resolver.stats.negative')} value={status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
+        <MetricCard label={t('review.resolver.stats.canonicalGroups')} value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
       </div>
     );
-  }, [status]);
+  }, [status, t]);
 
   return (
     <AppPage>
       <PageHeader
-        title="Revisión de resolución"
-        description="Pares UNSURE generados por nomenklatura xref. Decide si son la misma entidad o entidades distintas."
+        title={t('review.resolver.title')}
+        description={t('review.resolver.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <GitBranchPlus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -131,13 +133,13 @@ export function ResolverReviewPage() {
       ) : !pair ? (
         <EmptyState
           icon={CheckCircle}
-          title="Cola vacía"
-          description="No hay pares UNSURE pendientes de review."
+          title={t('review.resolver.emptyTitle')}
+          description={t('review.resolver.emptyDescription')}
           tone="success"
           action={
             <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Actualizar
+              {t('common.actions.refresh')}
             </Button>
           }
         />
@@ -146,8 +148,8 @@ export function ResolverReviewPage() {
           <Card className="bg-foreground/5 border-foreground/10 mb-4">
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-base">
-                <span>¿Son la misma entidad?</span>
-                {pair.score !== null && <Badge variant="outline">Score: {pair.score.toFixed(3)}</Badge>}
+                <span>{t('review.resolver.sameEntityQuestion')}</span>
+                {pair.score !== null && <Badge variant="outline">{t('review.resolver.score')}: {pair.score.toFixed(3)}</Badge>}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -165,15 +167,15 @@ export function ResolverReviewPage() {
           <div className="flex justify-center gap-3">
             <Button size="lg" variant="default" className="bg-green-600 hover:bg-green-700" disabled={deciding} onClick={() => decideMutation.mutate({ judgement: 'positive', currentPair: pair })}>
               <CheckCircle className="h-4 w-4 mr-2" />
-              MISMA entidad (merge)
+              {t('review.resolver.sameEntity')}
             </Button>
             <Button size="lg" variant="destructive" disabled={deciding} onClick={() => decideMutation.mutate({ judgement: 'negative', currentPair: pair })}>
               <XCircle className="h-4 w-4 mr-2" />
-              DISTINTAS entidades
+              {t('review.resolver.distinctEntities')}
             </Button>
             <Button size="lg" variant="outline" disabled={deciding || isFetching} onClick={() => refetch()}>
               {isFetching ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <SkipForward className="h-4 w-4 mr-2" />}
-              Saltar
+              {t('review.resolver.skip')}
             </Button>
           </div>
         </>
@@ -183,6 +185,7 @@ export function ResolverReviewPage() {
 }
 
 function EntityCard({ entity, id, side, navigate }: { entity: EntitySummary | null; id: string; side: string; navigate: ReturnType<typeof useNavigate>; }) {
+  const { t } = useTranslation();
   const data: any = entity || { id };
   const name = data.canonical_name || data?.overview?.canonical_name || `${id.slice(0, 12)}...`;
   const datasets: string[] = data?.overview?.sources || data?.sources || [];
@@ -194,18 +197,18 @@ function EntityCard({ entity, id, side, navigate }: { entity: EntitySummary | nu
       <div className="flex items-start justify-between mb-2">
         <Badge variant="outline" className="text-xs">{side}</Badge>
         <button onClick={() => navigate(`/entity/${id}`)} className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
-          Ver perfil <ExternalLink className="h-3 w-3" />
+          {t('review.resolver.viewProfile')} <ExternalLink className="h-3 w-3" />
         </button>
       </div>
       <div className="text-foreground font-medium mb-2">{name}</div>
       <div className="text-xs text-muted-foreground mb-2 font-mono">{id.slice(0, 16)}...</div>
       <div className="flex flex-wrap gap-1 mb-2">
         {isPep && <Badge className="text-xs bg-amber-500/20 text-amber-700 dark:text-amber-300">PEP</Badge>}
-        {isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-600 dark:text-red-300">SANCION</Badge>}
+        {isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-600 dark:text-red-300">{t('review.resolver.sanction')}</Badge>}
       </div>
       {datasets.length > 0 && (
         <div className="text-xs text-muted-foreground">
-          <span className="text-muted-foreground">Fuentes:</span> {datasets.slice(0, 5).join(', ')}
+          <span className="text-muted-foreground">{t('review.resolver.sources')}:</span> {datasets.slice(0, 5).join(', ')}
           {datasets.length > 5 && ` +${datasets.length - 5}`}
         </div>
       )}

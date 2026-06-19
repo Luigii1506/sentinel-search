@@ -12,8 +12,51 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import es from './locales/es.json';
-import en from './locales/en.json';
+import esBase from './locales/es.json';
+import enBase from './locales/en.json';
+// Per-area namespace fragments (created by area). Some are wrapped in their
+// namespace key (compliance/components/data/entity/review) → spread; others
+// hold their content directly (account/insights/workspace) → assigned.
+import esWorkspace from './locales/es/workspace.json';
+import enWorkspace from './locales/en/workspace.json';
+import esInsights from './locales/es/insights.json';
+import enInsights from './locales/en/insights.json';
+import esAccount from './locales/es/account.json';
+import enAccount from './locales/en/account.json';
+import esCompliance from './locales/es/compliance.json';
+import enCompliance from './locales/en/compliance.json';
+import esComponents from './locales/es/components.json';
+import enComponents from './locales/en/components.json';
+import esData from './locales/es/data.json';
+import enData from './locales/en/data.json';
+import esEntity from './locales/es/entity.json';
+import enEntity from './locales/en/entity.json';
+import esReview from './locales/es/review.json';
+import enReview from './locales/en/review.json';
+
+const es = {
+  ...esBase,
+  workspace: esWorkspace,
+  insights: esInsights,
+  account: esAccount,
+  ...esCompliance,
+  ...esComponents,
+  ...esData,
+  ...esEntity,
+  ...esReview,
+};
+
+const en = {
+  ...enBase,
+  workspace: enWorkspace,
+  insights: enInsights,
+  account: enAccount,
+  ...enCompliance,
+  ...enComponents,
+  ...enData,
+  ...enEntity,
+  ...enReview,
+};
 
 export const SUPPORTED_LANGS = ['es', 'en'] as const;
 export type AppLang = (typeof SUPPORTED_LANGS)[number];

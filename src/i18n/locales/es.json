@@ -7,6 +7,58 @@
       "dark": "Modo oscuro",
       "toLight": "Cambiar a modo claro",
       "toDark": "Cambiar a modo oscuro"
+    },
+    "actions": {
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "close": "Cerrar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "create": "Crear",
+      "add": "Agregar",
+      "remove": "Quitar",
+      "confirm": "Confirmar",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "previous": "Anterior",
+      "retry": "Reintentar",
+      "refresh": "Actualizar",
+      "loadMore": "Cargar más",
+      "viewAll": "Ver todo",
+      "view": "Ver",
+      "export": "Exportar",
+      "download": "Descargar",
+      "submit": "Enviar",
+      "filter": "Filtrar",
+      "filters": "Filtros",
+      "clear": "Limpiar",
+      "apply": "Aplicar",
+      "copy": "Copiar",
+      "copied": "Copiado"
+    },
+    "states": {
+      "loading": "Cargando…",
+      "noResults": "Sin resultados",
+      "error": "Error",
+      "empty": "Sin datos",
+      "all": "Todos",
+      "none": "Ninguno",
+      "yes": "Sí",
+      "no": "No"
+    },
+    "risk": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo",
+      "unknown": "Desconocido"
+    },
+    "entityType": {
+      "person": "Persona",
+      "company": "Empresa",
+      "vessel": "Embarcación",
+      "aircraft": "Aeronave",
+      "organization": "Organización"
     }
   },
   "nav": {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { ChevronRight, Database, Loader2, AlertTriangle, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,7 @@ interface Props {
 }
 
 export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
+  const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
   const { data, isLoading, error } = useQuery({
     queryKey: ['provenance-tooltip', entityId],
@@ -25,28 +27,28 @@ export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
   return (
     <Popover open={opened} onOpenChange={setOpened}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-purple-600 dark:text-purple-300 hover:bg-purple-500/10 hover:text-purple-200" onClick={(e) => e.stopPropagation()} title="Ver provenance per-property">
-          <ChevronRight className="h-3 w-3 mr-1" />Provenance
+        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-purple-600 dark:text-purple-300 hover:bg-purple-500/10 hover:text-purple-200" onClick={(e) => e.stopPropagation()} title={t('components.search.provenance.viewFullTooltip')}>
+          <ChevronRight className="h-3 w-3 mr-1" />{t('components.search.provenance.trigger')}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 max-h-96 overflow-y-auto bg-card border-foreground/10 text-gray-100" onClick={(e) => e.stopPropagation()}>
         <div className="mb-2 flex items-start justify-between gap-2 sticky top-0 bg-card pb-2 border-b border-foreground/5">
           <div>
             <div className="text-sm font-medium text-foreground">{canonicalName || `${entityId.slice(0, 12)}...`}</div>
-            <div className="text-xs text-muted-foreground">Provenance per-property</div>
+            <div className="text-xs text-muted-foreground">{t('components.search.provenance.title')}</div>
           </div>
-          <Link to={`/entity/${entityId}?tab=provenance`} className="text-xs text-purple-600 dark:text-purple-300 hover:underline inline-flex items-center gap-1">Completo <ExternalLink className="h-3 w-3" /></Link>
+          <Link to={`/entity/${entityId}?tab=provenance`} className="text-xs text-purple-600 dark:text-purple-300 hover:underline inline-flex items-center gap-1">{t('components.search.provenance.viewFull')} <ExternalLink className="h-3 w-3" /></Link>
         </div>
 
         {isLoading && <div className="flex justify-center py-4"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div>}
-        {error && <div className="text-xs text-red-600 dark:text-red-400 py-2 flex items-start gap-1"><AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />{error instanceof Error ? error.message : 'Error'}</div>}
+        {error && <div className="text-xs text-red-600 dark:text-red-400 py-2 flex items-start gap-1"><AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />{error instanceof Error ? error.message : t('components.search.provenance.error')}</div>}
 
         {data && (
           <div className="space-y-2 mt-2">
             <div className="grid grid-cols-3 gap-2 text-xs">
-              <Stat label="Statements" value={data.statement_count} />
-              <Stat label="Datasets" value={data.datasets.length} />
-              <Stat label="Conflicts" value={data.has_conflicts ? 'YES' : 'no'} accent={data.has_conflicts ? 'red' : 'gray'} />
+              <Stat label={t('components.search.provenance.statements')} value={data.statement_count} />
+              <Stat label={t('components.search.provenance.datasets')} value={data.datasets.length} />
+              <Stat label={t('components.search.provenance.conflicts')} value={data.has_conflicts ? t('components.search.provenance.conflictsYes') : t('components.search.provenance.conflictsNo')} accent={data.has_conflicts ? 'red' : 'gray'} />
             </div>
             <div className="text-xs space-y-1.5 max-h-60 overflow-y-auto">
               {Object.values(data.properties).sort((a, b) => (b.conflict ? 1 : 0) - (a.conflict ? 1 : 0)).slice(0, 6).map((prop) => (
@@ -68,7 +70,7 @@ export function ProvenanceTooltip({ entityId, canonicalName }: Props) {
                   </div>
                 </div>
               ))}
-              {Object.keys(data.properties).length > 6 && <div className="text-center text-muted-foreground text-[10px] pt-1">+{Object.keys(data.properties).length - 6} mas — abre "Completo" para ver todas</div>}
+              {Object.keys(data.properties).length > 6 && <div className="text-center text-muted-foreground text-[10px] pt-1">{t('components.search.provenance.moreProps', { count: Object.keys(data.properties).length - 6 })}</div>}
             </div>
           </div>
         )}

@@ -1,0 +1,167 @@
+{
+  "bulk": {
+    "title": "Bulk screening",
+    "description": "Bulk screening of names against the database.",
+    "uploadCsv": "Upload CSV",
+    "pasteNames": "Paste names",
+    "namesToSearch": "Names to screen",
+    "textareaPlaceholder": "Paste names here, one per line...\nExample:\nJuan Perez\nMaria Garcia\nCarlos Lopez",
+    "namesDetected": "{{count}} names detected",
+    "minScore": "Minimum match score",
+    "scoreMoreResults": "50% (More results)",
+    "scoreExactOnly": "100% (Exact only)",
+    "startScreening": "Start screening",
+    "processing": "Processing...",
+    "processedOf": "{{processed}} of {{total}} names processed",
+    "successful": "{{count}} successful",
+    "failed": "{{count}} failed",
+    "results": "Results",
+    "resultsSummary": "{{processed}} processed · {{failed}} failed",
+    "new": "New",
+    "dropzone": {
+      "title": "Drag a CSV file or click to select",
+      "hint": "It must have a column named \"name\" or \"nombre\""
+    },
+    "status": {
+      "found": "Found",
+      "notFound": "Not found",
+      "error": "Error"
+    },
+    "table": {
+      "searchedName": "Searched name",
+      "status": "Status",
+      "matches": "Matches",
+      "bestMatch": "Best match",
+      "score": "Score"
+    },
+    "toast": {
+      "invalidFile": "Please upload a CSV file",
+      "noNames": "No names found to process",
+      "tooManyNames": "Maximum 1000 names per batch",
+      "jobCreated": "Job created: {{count}} names",
+      "jobError": "Failed to create the job",
+      "completed": "Screening completed",
+      "downloaded": "Downloaded: {{format}}",
+      "downloadError": "Download failed"
+    }
+  },
+  "federated": {
+    "title": "Extended search",
+    "description": "Look up a person or company once and review internal coverage, leaks and external intelligence with a more actionable read.",
+    "searchPlaceholder": "Search for a person, company or beneficial owner",
+    "settings": "Settings",
+    "search": "Search",
+    "error": "The search could not be executed.",
+    "matchSensitivity": "Match sensitivity",
+    "currentThreshold": "Current threshold:",
+    "thresholdLevel": {
+      "strict": "strict",
+      "broad": "broad",
+      "balanced": "balanced"
+    },
+    "thresholdPresets": {
+      "broad": {
+        "label": "Broad",
+        "hint": "Greater coverage, more noise."
+      },
+      "balanced": {
+        "label": "Balanced",
+        "hint": "A good starting point for analysts."
+      },
+      "strict": {
+        "label": "Strict",
+        "hint": "Less noise, prioritizes precision."
+      }
+    },
+    "info": {
+      "whenTitle": "When to use this view",
+      "whenBody": "When you need to confirm broader coverage and not just a local match.",
+      "returnsTitle": "What it returns",
+      "returnsBody": "Results grouped by source type, with a unified score and critical signals visible.",
+      "decisionTitle": "What decision it enables",
+      "decisionBody": "Prioritize manual review, open a case or dismiss with greater confidence."
+    },
+    "loading": {
+      "title": "Querying extended coverage",
+      "description": "The platform is comparing the search against internal sources, leaks and external catalogs."
+    },
+    "execSummary": {
+      "title": "Executive summary",
+      "description": "A quick read of the search to decide whether it is worth digging in right away."
+    },
+    "metrics": {
+      "totalMatches": "Total matches",
+      "sourcesWithFindings": "Sources with findings",
+      "sanctionSignals": "Sanction signals",
+      "pepSignals": "PEP signals"
+    },
+    "reading": {
+      "title": "Result interpretation",
+      "description": "This view synthesizes the detected coverage and highlights the most relevant finding."
+    },
+    "operationalConclusion": "Operational conclusion",
+    "noData": "No data",
+    "candidatesEvaluated": "{{count}} candidates evaluated",
+    "thresholdBadge": "Threshold {{value}}",
+    "mainFinding": "Top finding",
+    "scoreBadge": "Score {{value}}",
+    "sanction": "Sanction",
+    "featuredDataset": "Featured dataset:",
+    "noDataset": "No dataset visible",
+    "openProfile": "Open profile",
+    "goToMainSearch": "Go to main search",
+    "noMainFinding": "There was no top finding because no source returned matches above the current threshold.",
+    "howToRead": {
+      "title": "How to read this query",
+      "p1": "This view does not replace identity verification. It serves to concentrate coverage and indicate where to review first.",
+      "p2": "Prioritize matches with sanctions or a high score. Then review leaks and external context for reputational risk.",
+      "p3": "If there are too many results, raise the threshold. If coverage is lacking, lower the threshold or supplement with the main search."
+    },
+    "coverageBySource": {
+      "title": "Coverage by source",
+      "description": "Each block explains what type of intelligence was queried and which matches it returned."
+    },
+    "noMatches": {
+      "title": "No matches above the threshold",
+      "description": "The query ran correctly, but no source returned sufficient results at the current sensitivity."
+    },
+    "tryBroadMode": "Try broad mode",
+    "matchesCount": "{{count}} matches",
+    "coverage": {
+      "none": "No positive coverage",
+      "full": "Coverage across 3/3 sources",
+      "partial": "Coverage across {{count}}/3 sources"
+    },
+    "summary": {
+      "none": "No matches were detected in the queried sources for this search.",
+      "sanctions": "Matches with sensitive exposure were detected. Prioritize reviewing sanctions and verify identity before closing the case.",
+      "pepAndLeaks": "The search combines political exposure and reputational signals. It is advisable to review context, beneficiaries and related links.",
+      "pep": "Matches with a politically exposed profile were identified. Review the relationship, jurisdiction and how current the context is.",
+      "leaks": "Exposure was detected in investigative sources. Assess whether the finding changes the reputational risk or the level of due diligence.",
+      "generic": "There are useful matches for investigation, but no immediate critical signals. Verify identity and coverage before dismissing."
+    },
+    "origin": {
+      "local": {
+        "label": "Internal and regulatory sources",
+        "shortLabel": "Local",
+        "description": "Regulatory lists, sanctions, PEPs and priority sources already integrated into the platform.",
+        "summary": "Validates immediate exposure within your most critical sources.",
+        "emptyMessage": "No matches in regulatory or internal sources."
+      },
+      "leaks": {
+        "label": "Leaks and investigative journalism",
+        "shortLabel": "Leaks",
+        "description": "Journalistic consortia and databases such as Panama, Paradise and Pandora Papers.",
+        "summary": "Useful for detecting reputational exposure or offshore structures.",
+        "emptyMessage": "No matches in investigative leaks."
+      },
+      "external": {
+        "label": "Extended external coverage",
+        "shortLabel": "External",
+        "description": "External catalogs such as OpenSanctions and Wikidata to broaden the context.",
+        "summary": "Helps validate additional coverage beyond your base sources.",
+        "emptyMessage": "No matches in external catalogs."
+      }
+    }
+  }
+}

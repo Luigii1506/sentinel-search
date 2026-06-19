@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   Clock,
   Database,
@@ -36,21 +37,23 @@ function formatDate(dateStr?: string): string {
   });
 }
 
-const JOB_TYPE_LABELS: Record<string, string> = {
-  full: 'Pipeline completo',
-  bronze_silver: 'Bronze + Silver',
-  bronze: 'Bronze',
-  silver: 'Silver',
-  gold: 'Gold',
-  refresh: 'Actualizacion',
-  reindex: 'Reindex',
-  scrape: 'Scrape',
-  file_import: 'Importacion de archivo',
-  incremental: 'Incremental',
+const JOB_TYPE_LABEL_KEYS: Record<string, string> = {
+  full: 'full',
+  bronze_silver: 'bronzeSilver',
+  bronze: 'bronze',
+  silver: 'silver',
+  gold: 'gold',
+  refresh: 'refresh',
+  reindex: 'reindex',
+  scrape: 'scrape',
+  file_import: 'fileImport',
+  incremental: 'incremental',
 };
 
 function JobTypeBadge({ type }: { type: string }) {
-  const label = JOB_TYPE_LABELS[type] || type;
+  const { t } = useTranslation();
+  const labelKey = JOB_TYPE_LABEL_KEYS[type];
+  const label = labelKey ? t(`components.monitoringJobs.jobType.${labelKey}`) : type;
   const color = type === 'full' ? 'text-purple-600 dark:text-purple-400 bg-purple-500/10' :
                 type === 'bronze_silver' ? 'text-orange-700 dark:text-orange-400 bg-orange-500/10' :
                 type === 'bronze' ? 'text-amber-700 dark:text-amber-400 bg-amber-500/10' :
@@ -64,6 +67,7 @@ function JobTypeBadge({ type }: { type: string }) {
 }
 
 export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
+  const { t } = useTranslation();
   return (
     <>
       <motion.div
@@ -73,7 +77,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
       >
         <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
           <Play className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          Jobs en Ejecucion
+          {t('components.monitoringJobs.runningTitle')}
           {jobs?.running && jobs.running.length > 0 && (
             <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20">
               {jobs.running.length}
@@ -99,31 +103,31 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                       </div>
                       <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-blue-500/10">
                         <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                        <span className="text-xs text-blue-600 dark:text-blue-400">Corriendo</span>
+                        <span className="text-xs text-blue-600 dark:text-blue-400">{t('components.monitoringJobs.running')}</span>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tipo:</span>
+                        <span className="text-muted-foreground">{t('components.monitoringJobs.type')}</span>
                         <JobTypeBadge type={job.job_type} />
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Procesados:</span>
+                        <span className="text-muted-foreground">{t('components.monitoringJobs.processed')}</span>
                         <span className="text-foreground">
                           {job.records_processed > 0
                             ? job.records_processed.toLocaleString()
                             : job.records_inserted > 0
                             ? job.records_inserted.toLocaleString()
-                            : 'En progreso...'}
+                            : t('components.monitoringJobs.inProgress')}
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Tiempo:</span>
+                        <span className="text-muted-foreground">{t('components.monitoringJobs.time')}</span>
                         <span className="text-foreground">{formatElapsed(job.elapsed_seconds)}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Inicio:</span>
+                        <span className="text-muted-foreground">{t('components.monitoringJobs.start')}</span>
                         <span className="text-foreground">{formatDate(job.started_at)}</span>
                       </div>
                     </div>
@@ -143,8 +147,8 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
             <CardContent className="p-8">
               <EmptyState
                 icon={Clock}
-                title="Sin jobs en ejecución"
-                description="No hay procesos activos ahora mismo. Los jobs recientes siguen apareciendo abajo."
+                title={t('components.monitoringJobs.noRunningTitle')}
+                description={t('components.monitoringJobs.noRunningDescription')}
                 className="p-6 sm:p-6"
               />
             </CardContent>
@@ -158,7 +162,7 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
       >
         <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
           <Database className="w-5 h-5 text-muted-foreground" />
-          Jobs Recientes
+          {t('components.monitoringJobs.recentTitle')}
           {jobs?.recent && jobs.recent.length > 0 && (
             <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">
               {jobs.recent.length}
@@ -172,22 +176,22 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
               <thead className="bg-foreground/5 border-b border-foreground/5">
                 <tr>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Fuente
+                    {t('components.monitoringJobs.colSource')}
                   </th>
                   <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                    Tipo
+                    {t('components.monitoringJobs.colType')}
                   </th>
                   <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                    Status
+                    {t('components.monitoringJobs.colStatus')}
                   </th>
                   <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Registros
+                    {t('components.monitoringJobs.colRecords')}
                   </th>
                   <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Inicio
+                    {t('components.monitoringJobs.colStart')}
                   </th>
                   <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                    Duracion
+                    {t('components.monitoringJobs.colDuration')}
                   </th>
                 </tr>
               </thead>
@@ -213,9 +217,9 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
                       <StatusPill
                         kind={statusKindFromString(job.status)}
                         label={
-                          job.status === 'success' || job.status === 'completed' ? 'Éxito'
-                          : job.status === 'failed' ? 'Fallido'
-                          : job.status === 'pending' ? 'Pendiente'
+                          job.status === 'success' || job.status === 'completed' ? t('components.monitoringJobs.statusSuccess')
+                          : job.status === 'failed' ? t('components.monitoringJobs.statusFailed')
+                          : job.status === 'pending' ? t('components.monitoringJobs.statusPending')
                           : job.status
                         }
                         title={job.status === 'failed' ? job.error_message ?? undefined : undefined}
@@ -244,8 +248,8 @@ export function MonitoringJobsSection({ jobs }: { jobs?: JobsResponse }) {
           {!jobs?.recent?.length && (
             <EmptyState
               icon={Database}
-              title="Sin jobs recientes"
-              description="Aún no hay ejecuciones recientes para mostrar."
+              title={t('components.monitoringJobs.noRecentTitle')}
+              description={t('components.monitoringJobs.noRecentDescription')}
               className="rounded-none border-0 bg-transparent p-12 shadow-none"
             />
           )}

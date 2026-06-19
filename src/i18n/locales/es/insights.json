@@ -1,0 +1,260 @@
+{
+  "activity": {
+    "title": "Registro de actividad",
+    "description": "Auditoría de acciones de usuarios y llamadas al API.",
+    "refreshAria": "Refrescar lista",
+    "anonymous": "anónimo",
+    "columns": {
+      "when": "Cuándo",
+      "user": "Usuario",
+      "auth": "Auth",
+      "method": "Método",
+      "endpoint": "Endpoint",
+      "status": "Status",
+      "latency": "Latencia",
+      "ip": "IP"
+    },
+    "metrics": {
+      "events": "Eventos",
+      "uniqueUsers": "Usuarios únicos",
+      "errors": "Errores 4xx/5xx",
+      "p95Latency": "P95 latencia"
+    },
+    "filters": {
+      "usernamePlaceholder": "Usuario (subcadena)",
+      "usernameAria": "Filtrar por usuario",
+      "endpointPlaceholder": "Endpoint (subcadena)",
+      "endpointAria": "Filtrar por endpoint",
+      "methodPlaceholder": "Método",
+      "methodAria": "Filtrar por método HTTP",
+      "allMethods": "Todos los métodos",
+      "limitAria": "Cantidad de resultados",
+      "lastN": "Últimos {{count}}"
+    },
+    "empty": {
+      "title": "Sin eventos",
+      "description": "No hay actividad que coincida con estos filtros."
+    }
+  },
+  "monitoring": {
+    "title": "Monitoreo del sistema",
+    "description": "Estado de servicios, pipelines y jobs de ingestión",
+    "dataLabel": "Datos:",
+    "snapshotAt": "Snapshot: {{date}}",
+    "noSnapshot": "Sin snapshot",
+    "error": {
+      "title": "Error al cargar monitoreo",
+      "description": "No se pudieron obtener los datos de los jobs"
+    },
+    "jobs": {
+      "running": "Corriendo",
+      "success": "Exitosos",
+      "failed": "Fallidos",
+      "totalJobs": "Total jobs"
+    },
+    "operational": {
+      "sloBreached": "SLO rotos",
+      "neverSynced": "Nunca sync",
+      "coverage": "Cobertura",
+      "dedupGold": "Dedup gold",
+      "dlqTasks": "DLQ tasks",
+      "disappeared": "Desaparecidas",
+      "runtime": "Runtime",
+      "alerting": "Alertando",
+      "pendingChange": "Cambio pendiente",
+      "snapshots": "Snapshots"
+    },
+    "relativeAge": {
+      "noData": "sin datos",
+      "seconds": "hace {{count}}s",
+      "minutes": "hace {{count}} min",
+      "hours": "hace {{count}} h",
+      "days": "hace {{count}} d"
+    },
+    "sections": {
+      "services": "Servicios",
+      "volumeAndJobs": "Volumen y jobs",
+      "operationalSignals": "Señales operativas"
+    },
+    "services": {
+      "operational": "Operativo"
+    },
+    "snapshots": {
+      "critical": "{{count}} snapshots críticos",
+      "stale": "{{count}} snapshots stale",
+      "healthy": "Snapshots saludables"
+    },
+    "freshness": {
+      "title": "Freshness y riesgo operativo",
+      "evaluatedSources": "Fuentes evaluadas",
+      "redisDurability": "Durabilidad Redis",
+      "topSloViolations": "Top violaciones SLO",
+      "emptyTitle": "Sin violaciones SLO",
+      "emptyDescription": "No hay violaciones activas de frescura u operación."
+    },
+    "dlq": {
+      "title": "DLQ y calidad",
+      "silverUnmapped": "Silver sin mapear",
+      "goldScreenable": "Gold consultable",
+      "topDeadLetters": "Top dead letters",
+      "emptyTitle": "Sin dead letters abiertos",
+      "emptyDescription": "No hay tareas atrapadas en la cola de errores."
+    }
+  },
+  "operations": {
+    "title": "Operaciones",
+    "loadingDescription": "Cargando estado operativo de las fuentes…",
+    "description": "{{count}} fuentes · actualizado hace {{age}}s · auto-refresh {{rate}}",
+    "runningPill": "{{count}} corriendo",
+    "time": {
+      "now": "ahora",
+      "agoMinutes": "hace {{count}}m",
+      "agoHours": "hace {{count}}h",
+      "agoDays": "hace {{count}}d",
+      "inMinutes": "en {{count}}m",
+      "inHours": "en {{count}}h",
+      "inDays": "en {{count}}d",
+      "inHoursDecimal": "en {{value}}h"
+    },
+    "records": {
+      "processed": "{{count}} procesados",
+      "inserted": "+{{count}} nuevos",
+      "updated": "~{{count}} cambiaron"
+    },
+    "summary": {
+      "noChangesSkip": "sin cambios (skip)",
+      "running": "corriendo…",
+      "failed": "falló",
+      "noActivity": "sin actividad"
+    },
+    "history": {
+      "loading": "Cargando historial…",
+      "empty": "Sin runs registrados para esta fuente.",
+      "lastRuns": "Últimos {{count}} runs",
+      "start": "inicio",
+      "end": "fin",
+      "stillRunning": "aún corriendo",
+      "duration": "duración"
+    },
+    "row": {
+      "runningFor": "corriendo {{duration}}",
+      "failedAgo": "falló {{ago}} · duración {{duration}}",
+      "skipped": "omitido",
+      "noChanges": "sin cambios",
+      "durationLabel": "duración {{duration}}",
+      "completed": "completado",
+      "neverSynced": "Nunca sincronizada",
+      "noSchedule": "sin schedule",
+      "next": "próximo {{until}}",
+      "collapse": "Colapsar",
+      "expandHistory": "Expandir historial",
+      "viewInSources": "Ver en {{path}}"
+    },
+    "dispatch": {
+      "noRemoteChanges": "sin cambios remotos",
+      "skippedLock": "omitido (lock)",
+      "ok": "OK",
+      "failed": "falló",
+      "title": "Última decisión del dispatcher hace {{ago}} → {{result}}",
+      "label": "dispatch {{ago}} · {{result}}"
+    },
+    "os": {
+      "today": "hoy",
+      "agoMonths": "hace {{count}}m",
+      "title": "OpenSanctions reporta último cambio real {{age}} ({{date}})",
+      "label": "OS {{age}}"
+    },
+    "filters": {
+      "active": "Activas",
+      "running": "Corriendo",
+      "failing": "Fallando",
+      "critical": "Críticas",
+      "all": "Todas"
+    },
+    "status": {
+      "healthy": "saludables",
+      "running": "corriendo",
+      "failed": "fallaron",
+      "stale": "desactualizadas",
+      "neverSynced": "sin sync"
+    },
+    "infra": {
+      "skipRate7d": "Skip rate 7d",
+      "skippedOfFinished": "{{skipped}} de {{total}} terminados",
+      "successRate": "Success rate",
+      "successCount": "{{count}} success",
+      "failureRate": "Failure rate",
+      "failedCount": "{{count}} failed",
+      "workers": "Workers",
+      "queues": "Queues",
+      "footerTitle": "Infraestructura:",
+      "snapshotsTitle": "Snapshots:"
+    },
+    "tier": {
+      "label": "Tier:",
+      "all": "Todos",
+      "tooltip1": "Sanciones críticas / Fugitivos",
+      "tooltip2": "Enforcement / Inhabilitaciones",
+      "tooltip3": "PEPs / Compliance",
+      "tooltip4": "Investigación / Otros"
+    },
+    "empty": {
+      "title": "Sin fuentes para este filtro",
+      "description": "No hay fuentes que coincidan con \"{{filter}}\"."
+    }
+  },
+  "reports": {
+    "title": "Reportes de Compliance",
+    "description": "KPIs y métricas del sistema PLD/AML",
+    "caseStatus": {
+      "open": "Abiertos",
+      "in_review": "En Revisión",
+      "escalated": "Escalados",
+      "closed_tp": "Cerrados (TP)",
+      "closed_fp": "Cerrados (FP)",
+      "closed_inconclusive": "Inconclusos",
+      "sar_filed": "SAR Reportado"
+    },
+    "period": {
+      "last7": "Últimos 7 días",
+      "last30": "Últimos 30 días",
+      "last90": "Últimos 90 días",
+      "lastYear": "Último año"
+    },
+    "kpi": {
+      "alertsGenerated": "Alertas Generadas",
+      "casesCreated": "Casos Creados",
+      "slaCompliance": "Cumplimiento SLA",
+      "fpRate": "Tasa Falsos Positivos"
+    },
+    "sections": {
+      "alertsBySeverity": "Alertas por Severidad",
+      "casesByStatus": "Casos por Estado",
+      "analystDecisions": "Decisiones de Analistas",
+      "operationalMetrics": "Métricas Operativas"
+    },
+    "empty": {
+      "noAlerts": "Sin alertas en el período",
+      "noCases": "Sin casos en el período",
+      "noDecisions": "Sin decisiones en el período"
+    },
+    "decisions": {
+      "truePositives": "Verdaderos Positivos",
+      "falsePositives": "Falsos Positivos",
+      "fpRateLabel": "Tasa FP:"
+    },
+    "operational": {
+      "avgResolution": "Tiempo promedio resolución",
+      "sarsFiled": "SARs presentados",
+      "monitoredEntities": "Entidades monitoreadas",
+      "activeWhitelist": "Whitelist activas"
+    },
+    "topEntities": {
+      "title": "Top Entidades con Más Alertas",
+      "entity": "Entidad",
+      "alerts": "Alertas",
+      "riskScore": "Risk Score"
+    },
+    "generatedAt": "Generado: {{date}}"
+  }
+}

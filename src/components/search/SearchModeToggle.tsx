@@ -5,6 +5,7 @@ import {
   BrainCircuit,
   Info
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -29,34 +30,34 @@ interface ModeOption {
   color: string;
 }
 
-const modes: ModeOption[] = [
-  {
-    value: 'auto',
-    label: 'Auto',
-    description: 'El sistema elige automáticamente la mejor estrategia según tu query',
-    icon: <BrainCircuit className="w-4 h-4" />,
-    color: 'bg-blue-500',
-  },
-  {
-    value: 'traditional',
-    label: 'Nombres',
-    description: 'Búsqueda exacta y fonética para nombres de personas/empresas',
-    icon: <Database className="w-4 h-4" />,
-    color: 'bg-green-500',
-  },
-  {
-    value: 'semantic',
-    label: 'Conceptos',
-    description: 'Búsqueda semántica por conceptos abstractos (riesgo, actividades)',
-    icon: <Sparkles className="w-4 h-4" />,
-    color: 'bg-purple-500',
-  },
-];
-
 export function SearchModeToggle({ mode, onChange, className }: SearchModeToggleProps) {
+  const { t } = useTranslation();
+  const modes: ModeOption[] = [
+    {
+      value: 'auto',
+      label: t('components.search.modeToggle.auto'),
+      description: t('components.search.modeToggle.autoDesc'),
+      icon: <BrainCircuit className="w-4 h-4" />,
+      color: 'bg-blue-500',
+    },
+    {
+      value: 'traditional',
+      label: t('components.search.modeToggle.names'),
+      description: t('components.search.modeToggle.namesDesc'),
+      icon: <Database className="w-4 h-4" />,
+      color: 'bg-green-500',
+    },
+    {
+      value: 'semantic',
+      label: t('components.search.modeToggle.concepts'),
+      description: t('components.search.modeToggle.conceptsDesc'),
+      icon: <Sparkles className="w-4 h-4" />,
+      color: 'bg-purple-500',
+    },
+  ];
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-sm text-muted-foreground mr-2">Modo:</span>
+      <span className="text-sm text-muted-foreground mr-2">{t('components.search.modeToggle.label')}</span>
       
       <div className="flex bg-foreground/5 rounded-lg p-1 gap-1">
         {modes.map((option) => (
@@ -112,11 +113,11 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-sm">
             <div className="space-y-2 text-sm">
-              <p className="font-medium">¿Qué modo elegir?</p>
+              <p className="font-medium">{t('components.search.modeToggle.helpTitle')}</p>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><strong className="text-blue-600 dark:text-blue-400">Auto:</strong> Recomendado. El sistema detecta automáticamente si buscas un nombre o concepto.</li>
-                <li><strong className="text-green-700 dark:text-green-400">Nombres:</strong> Mejor para "Juan García", "Empresa XYZ". Usa OpenSearch + fonético.</li>
-                <li><strong className="text-purple-600 dark:text-purple-400">Conceptos:</strong> Mejor para "terrorismo financiero", "alto riesgo". Usa embeddings.</li>
+                <li><strong className="text-blue-600 dark:text-blue-400">{t('components.search.modeToggle.auto')}:</strong> {t('components.search.modeToggle.helpAuto')}</li>
+                <li><strong className="text-green-700 dark:text-green-400">{t('components.search.modeToggle.names')}:</strong> {t('components.search.modeToggle.helpNames')}</li>
+                <li><strong className="text-purple-600 dark:text-purple-400">{t('components.search.modeToggle.concepts')}:</strong> {t('components.search.modeToggle.helpConcepts')}</li>
               </ul>
             </div>
           </TooltipContent>

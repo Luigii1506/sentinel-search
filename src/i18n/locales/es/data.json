@@ -1,0 +1,187 @@
+{
+  "data": {
+    "audit": {
+      "title": "Auditoría de Datos",
+      "description": "Frescura, estado y confiabilidad de las fuentes de datos",
+      "status": {
+        "healthy": "Saludable",
+        "warning": "Atención",
+        "critical": "Crítico",
+        "inactive": "Inactiva"
+      },
+      "freshness": {
+        "noData": "Sin datos",
+        "today": "Hoy"
+      },
+      "zombie": {
+        "title_one": "{{count}} job zombie detectado",
+        "title_other": "{{count}} jobs zombie detectados",
+        "description": "Marcados como \"running\" en DB pero sin worker ejecutándolos. El cleanup automático los corrige en menos de 5 min.",
+        "moreItems_one": "...y {{count}} más",
+        "moreItems_other": "...y {{count}} más",
+        "jobFallback": "job",
+        "age": "hace {{hours}}h"
+      },
+      "coverage": {
+        "label": "Cobertura últimas 24h",
+        "caption": "fuentes activas sincronizadas en 24h"
+      },
+      "health": {
+        "label": "Estado de salud"
+      },
+      "upcoming": {
+        "label": "Próximos syncs",
+        "emptyTitle": "Sin syncs próximos",
+        "emptyDescription": "No hay ejecuciones programadas en el corto plazo."
+      },
+      "metrics": {
+        "catalog": "Catalogo",
+        "monitored": "Monitoreadas",
+        "healthy": "Saludables",
+        "warning": "En atención",
+        "critical": "Críticas",
+        "inactive": "Inactivas"
+      },
+      "failedJobs": {
+        "title": "Jobs Fallidos Recientes",
+        "badge": "Fallido"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por fuente, nombre o pais...",
+        "statusPlaceholder": "Filtrar por estado",
+        "allStatuses": "Todos los estados"
+      },
+      "disappeared": {
+        "title": "Fuentes Desaparecidas",
+        "emptyTitle": "Sin fuentes desaparecidas",
+        "emptyDescription": "No hay fuentes marcadas como desaparecidas en este momento."
+      },
+      "lifecycle": {
+        "title": "Eventos de Lifecycle",
+        "sourceFallback": "source",
+        "emptyTitle": "Sin eventos recientes",
+        "emptyDescription": "No hubo cambios recientes en el lifecycle de fuentes."
+      },
+      "table": {
+        "title": "Fuentes de Datos",
+        "source": "Fuente",
+        "category": "Categoria",
+        "status": "Estado",
+        "health": "Salud",
+        "records": "Records",
+        "lastSync": "Ultimo Sync",
+        "freshness": "Frescura",
+        "actions": "Acciones",
+        "emptyTitle": "Sin resultados",
+        "emptyDescription": "No se encontraron fuentes con los filtros aplicados."
+      }
+    },
+    "sources": {
+      "title": "Dashboard de Fuentes",
+      "description": "{{registered}} fuentes registradas · {{withData}} con datos",
+      "status": {
+        "active": "Activo",
+        "pending": "Pendiente",
+        "error": "Error",
+        "stale": "Desactualizado",
+        "disappeared": "Desaparecida",
+        "inactive": "Inactiva"
+      },
+      "date": {
+        "never": "Nunca",
+        "minutesAgo": "Hace minutos",
+        "hoursAgo": "Hace {{count}}h",
+        "daysAgo": "Hace {{count}}d"
+      },
+      "errorState": {
+        "title": "Error al cargar fuentes",
+        "description": "No se pudieron obtener los datos"
+      },
+      "metrics": {
+        "registered": "Registradas",
+        "progress": "Progreso"
+      },
+      "tabs": {
+        "all": "Todas ({{count}})"
+      },
+      "filters": {
+        "searchPlaceholder": "Buscar por nombre, source_id, dataset, pais...",
+        "statusPlaceholder": "Status",
+        "dataPlaceholder": "Datos",
+        "allStatuses": "Todos los status",
+        "statusActive": "Activo ({{count}})",
+        "statusPending": "Pendiente ({{count}})",
+        "statusError": "Error ({{count}})",
+        "statusStale": "Desactualizado ({{count}})",
+        "statusInactive": "Inactiva",
+        "dataAll": "Todas",
+        "dataHas": "Con datos",
+        "dataNone": "Sin datos"
+      },
+      "detail": {
+        "loading": "Cargando...",
+        "status": "Estado",
+        "category": "Categoria",
+        "country": "Pais",
+        "entities": "Entidades",
+        "layerCounts": "Conteos por Capa",
+        "layerBronze": "Bronze (Raw)",
+        "layerSilver": "Silver (Clean)",
+        "layerGold": "Gold (Unified)",
+        "metrics7d": "Metricas (7 dias)",
+        "successJobs": "Jobs Exitosos",
+        "failedJobs": "Jobs Fallidos",
+        "recentJobs": "Jobs Recientes",
+        "records": "{{formatted}} registros"
+      },
+      "card": {
+        "lastSync": "Último sync",
+        "viewDetail": "Ver detalle"
+      },
+      "table": {
+        "source": "Fuente",
+        "category": "Cat",
+        "country": "Pais",
+        "risk": "Risk",
+        "sync": "Sync",
+        "status": "Status",
+        "emptyTitle": "No se encontraron fuentes",
+        "showing": "Mostrando {{shown}} de {{total}} fuentes",
+        "totals": "Bronze: {{bronze}} · Silver: {{silver}} · Gold: {{gold}}"
+      },
+      "expanded": {
+        "importer": "Importer",
+        "queue": "cola: {{queue}}",
+        "queueDefault": "default",
+        "syncStrategyDefault": "scheduled_snapshot",
+        "freshnessDefault": "n/a",
+        "pep": "PEP",
+        "pepNo": "No",
+        "inactiveScheduler": "Inactiva en scheduler",
+        "criticalSource": "Fuente crítica",
+        "normalSource": "Fuente normal",
+        "dataUrl": "Data URL",
+        "smartUpdateUrl": "Smart Update URL",
+        "notConfigured": "No configurada"
+      }
+    },
+    "yente": {
+      "title": "Catalogo Yente",
+      "description": "Catálogo de datasets en formato Yente/OpenSanctions. Consumible por Aleph/ICIJ/OCCRP.",
+      "exportJson": "Export JSON",
+      "errorFallback": "Error cargando catálogo",
+      "metrics": {
+        "datasets": "Datasets",
+        "indexedEntities": "Entities indexadas",
+        "updated": "Actualizado"
+      },
+      "available": "Datasets disponibles",
+      "filterPlaceholder": "Filtrar...",
+      "emptyTitle": "Sin datasets",
+      "emptyDescription": "No hay datasets que coincidan con \"{{query}}\".",
+      "card": {
+        "entities": "entities"
+      }
+    }
+  }
+}

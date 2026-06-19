@@ -12,22 +12,11 @@ import {
   Tag,
   TrendingUp,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { EmptyState, PanelSkeleton } from '@/components/foundation';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatDate } from '@/lib/utils';
 import { complianceService } from '@/services/compliance';
-
-const amCategoryLabels: Record<string, string> = {
-  terrorism: 'Terrorismo',
-  sanctions_evasion: 'Evasion Sanciones',
-  wanted: 'Buscados',
-  crime: 'Crimen',
-  human_rights: 'DDHH',
-  financial_crime: 'Crimen Financiero',
-  corruption: 'Corrupcion',
-  offshore: 'Offshore',
-  regulatory: 'Regulatorio',
-};
 
 const amCategoryColors: Record<string, string> = {
   terrorism: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
@@ -46,6 +35,18 @@ interface EntityAdverseMediaTabProps {
 }
 
 export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) {
+  const { t } = useTranslation();
+  const amCategoryLabels: Record<string, string> = {
+    terrorism: t('entity.adverseMedia.category.terrorism'),
+    sanctions_evasion: t('entity.adverseMedia.category.sanctions_evasion'),
+    wanted: t('entity.adverseMedia.category.wanted'),
+    crime: t('entity.adverseMedia.category.crime'),
+    human_rights: t('entity.adverseMedia.category.human_rights'),
+    financial_crime: t('entity.adverseMedia.category.financial_crime'),
+    corruption: t('entity.adverseMedia.category.corruption'),
+    offshore: t('entity.adverseMedia.category.offshore'),
+    regulatory: t('entity.adverseMedia.category.regulatory'),
+  };
   const { data: profile, isLoading } = useQuery({
     queryKey: ['adverse-media-entity', entityId],
     queryFn: () => complianceService.getAdverseMediaProfile(entityId),
@@ -70,8 +71,8 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
     return (
       <EmptyState
         icon={CheckCircle}
-        title="Sin adverse media"
-        description="No se encontraron noticias adversas sobre esta entidad."
+        title={t('entity.adverseMedia.empty.title')}
+        description={t('entity.adverseMedia.empty.description')}
         tone="success"
       />
     );
@@ -82,7 +83,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
   const sevBg = (score: number) =>
     score >= 90 ? 'bg-red-500' : score >= 70 ? 'bg-orange-500' : score >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
   const sevLabel = (score: number) =>
-    score >= 90 ? 'Critico' : score >= 70 ? 'Alto' : score >= 50 ? 'Medio' : score >= 30 ? 'Bajo' : 'Minimo';
+    score >= 90 ? t('entity.adverseMedia.severity.critical') : score >= 70 ? t('entity.adverseMedia.severity.high') : score >= 50 ? t('entity.adverseMedia.severity.medium') : score >= 30 ? t('entity.adverseMedia.severity.low') : t('entity.adverseMedia.severity.minimal');
 
   const getMethodBadge = (method: string | undefined) => {
     if (method === 'moonshot_ai' || method === 'moonshot') {
@@ -105,7 +106,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
       return (
         <Badge variant="outline" className="text-[10px] gap-1 bg-gray-500/10 text-muted-foreground border-gray-500/30">
           <Tag className="w-3 h-3" />
-          Keywords
+          {t('entity.adverseMedia.method.keywords')}
         </Badge>
       );
     }
@@ -149,17 +150,17 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
             <div className="flex-1 grid grid-cols-3 gap-4">
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
-                <p className="text-xs text-muted-foreground">Articulos</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.articles')}</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
-                <p className="text-xs text-muted-foreground">Ultimos 30d</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.recent30d')}</p>
               </div>
               <div>
                 <p className={cn('text-lg font-bold', sevColor(riskProfile.max_severity))}>
                   {riskProfile.max_severity}
                 </p>
-                <p className="text-xs text-muted-foreground">Max Severity</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.maxSeverity')}</p>
               </div>
             </div>
             {riskProfile.top_categories.length > 0 && (
@@ -179,7 +180,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
         <div className="glass rounded-xl p-5">
           <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            Categorias Estructuradas (Sources)
+            {t('entity.adverseMedia.structuredCategories')}
           </h4>
           <div className="space-y-2">
             {structured.categories.map((category, index) => (
@@ -202,10 +203,10 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Newspaper className="w-4 h-4" />
-              Articulos de Noticias ({articles.length})
+              {t('entity.adverseMedia.newsArticles', { count: articles.length })}
             </h4>
             <a href="/adverse-media" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
-              Ver dashboard completo <ArrowRight className="w-3 h-3" />
+              {t('entity.adverseMedia.viewDashboard')} <ArrowRight className="w-3 h-3" />
             </a>
           </div>
           {articles.map((article, index) => {
@@ -270,12 +271,12 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                   {article.link_confidence != null && (
                     <span className="text-muted-foreground flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
-                      {Math.round(article.link_confidence * 100)}% match
+                      {t('entity.adverseMedia.match', { pct: Math.round(article.link_confidence * 100) })}
                     </span>
                   )}
                   {article.is_verified && (
                     <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                      Verificado
+                      {t('entity.adverseMedia.verified')}
                     </Badge>
                   )}
                 </div>
@@ -288,7 +289,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                     className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
                   >
                     <ExternalLink className="w-3 h-3" />
-                    Leer articulo
+                    {t('entity.adverseMedia.readArticle')}
                   </a>
                 )}
               </motion.div>

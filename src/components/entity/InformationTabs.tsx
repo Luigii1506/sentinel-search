@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
   User,
   Shield,
@@ -42,18 +43,19 @@ const tabVariants = {
 };
 
 export function InformationTabs({ entity, className }: InformationTabsProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('identity');
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className={cn('w-full', className)}>
       <TabsList className="w-full justify-start bg-transparent border-b border-foreground/10 rounded-none h-auto p-0 gap-1 overflow-x-auto">
         {[
-          { id: 'identity', label: 'Identity', icon: User, count: null },
-          { id: 'sanctions', label: 'Sanctions', icon: Shield, count: entity.sanctions.length || null },
-          { id: 'pep', label: 'PEP', icon: Flag, count: entity.pepEntries.length || null },
-          { id: 'media', label: 'Adverse Media', icon: Newspaper, count: entity.adverseMedia.length || null },
-          { id: 'relationships', label: 'Related', icon: Network, count: entity.relationships.length || null },
-          { id: 'audit', label: 'History', icon: History, count: null },
+          { id: 'identity', label: t('entity.infoTabs.tabs.identity'), icon: User, count: null },
+          { id: 'sanctions', label: t('entity.infoTabs.tabs.sanctions'), icon: Shield, count: entity.sanctions.length || null },
+          { id: 'pep', label: t('entity.infoTabs.tabs.pep'), icon: Flag, count: entity.pepEntries.length || null },
+          { id: 'media', label: t('entity.infoTabs.tabs.media'), icon: Newspaper, count: entity.adverseMedia.length || null },
+          { id: 'relationships', label: t('entity.infoTabs.tabs.related'), icon: Network, count: entity.relationships.length || null },
+          { id: 'audit', label: t('entity.infoTabs.tabs.history'), icon: History, count: null },
         ].map((tab) => (
           <TabsTrigger
             key={tab.id}
@@ -161,36 +163,37 @@ export function InformationTabs({ entity, className }: InformationTabsProps) {
 
 // Identity Tab
 function IdentityTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Personal Information */}
       <div className="glass rounded-xl p-5">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <UserCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          Personal Information
+          {t('entity.infoTabs.personalInfo')}
         </h3>
         <div className="space-y-4">
           {entity.gender && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-muted-foreground">Gender</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.gender')}</span>
               <span className="text-foreground capitalize break-words sm:text-right">{entity.gender}</span>
             </div>
           )}
           {entity.dateOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-muted-foreground">Date of Birth</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.dateOfBirth')}</span>
               <span className="text-foreground break-words sm:text-right">{formatDate(entity.dateOfBirth)}</span>
             </div>
           )}
           {entity.placeOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-muted-foreground">Place of Birth</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.placeOfBirth')}</span>
               <span className="text-foreground break-words sm:text-right">{entity.placeOfBirth}</span>
             </div>
           )}
           {entity.nationalities && entity.nationalities.length > 0 && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-muted-foreground">Nationality</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.nationality')}</span>
               <span className="text-foreground break-words sm:text-right">{entity.nationalities.join(', ')}</span>
             </div>
           )}
@@ -202,30 +205,30 @@ function IdentityTab({ entity }: { entity: Entity }) {
         <div className="glass rounded-xl p-5">
           <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
             <Building className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-            Company Information
+            {t('entity.infoTabs.companyInfo')}
           </h3>
           <div className="space-y-4">
             {entity.incorporationDate && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-muted-foreground">Incorporation Date</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.incorporationDate')}</span>
                 <span className="text-foreground break-words sm:text-right">{formatDate(entity.incorporationDate)}</span>
               </div>
             )}
             {entity.incorporationCountry && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-muted-foreground">Incorporation Country</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.incorporationCountry')}</span>
                 <span className="text-foreground break-words sm:text-right">{entity.incorporationCountry}</span>
               </div>
             )}
             {entity.companyType && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-muted-foreground">Company Type</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.companyType')}</span>
                 <span className="text-foreground break-words sm:text-right">{entity.companyType}</span>
               </div>
             )}
             {entity.status && (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-muted-foreground">Status</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.status')}</span>
                 <Badge
                   variant="outline"
                   className={cn(
@@ -247,7 +250,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
       <div className="glass rounded-xl p-5 lg:col-span-2">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <MapPin className="w-5 h-5 text-red-600 dark:text-red-400" />
-          Addresses ({entity.addresses.length})
+          {t('entity.infoTabs.addresses', { count: entity.addresses.length })}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {entity.addresses.map((address) => (
@@ -261,7 +264,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
                 </Badge>
                 {address.isCurrent && (
                   <Badge className="text-[10px] bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
-                    Current
+                    {t('entity.infoTabs.current')}
                   </Badge>
                 )}
               </div>
@@ -285,27 +288,27 @@ function IdentityTab({ entity }: { entity: Entity }) {
       <div className="glass rounded-xl p-5 lg:col-span-2">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <CreditCard className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-          Identifications ({entity.identifications.length})
+          {t('entity.infoTabs.identifications', { count: entity.identifications.length })}
         </h3>
         <div className="space-y-3 md:hidden">
           {entity.identifications.map((id) => (
             <div key={id.id} className="rounded-lg border border-foreground/10 bg-foreground/5 p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Type</span>
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{t('entity.infoTabs.type')}</span>
                   <span className="text-foreground capitalize break-words">{id.type.replace('_', ' ')}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Number</span>
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{t('entity.infoTabs.number')}</span>
                   <span className="text-foreground font-mono break-all">{id.number}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Country</span>
+                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{t('entity.infoTabs.country')}</span>
                     <span className="text-muted-foreground break-words">{id.country || '-'}</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Source</span>
+                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">{t('entity.infoTabs.source')}</span>
                     {id.source ? (
                       <span className={cn('inline-flex w-fit text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(id.source))}>
                         {id.source}
@@ -323,10 +326,10 @@ function IdentityTab({ entity }: { entity: Entity }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-foreground/10">
-                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Type</th>
-                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Number</th>
-                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Country</th>
-                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Source</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">{t('entity.infoTabs.type')}</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">{t('entity.infoTabs.number')}</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">{t('entity.infoTabs.country')}</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">{t('entity.infoTabs.source')}</th>
               </tr>
             </thead>
             <tbody>
@@ -354,12 +357,13 @@ function IdentityTab({ entity }: { entity: Entity }) {
 
 // Sanctions Tab
 function SanctionsTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   if (entity.sanctions.length === 0) {
     return (
       <EmptyState
         icon={CheckCircle}
-        title="Sin sanciones"
-        description="Esta entidad no tiene listados de sanciones conocidos."
+        title={t('entity.infoTabs.sanctions.empty.title')}
+        description={t('entity.infoTabs.sanctions.empty.description')}
         tone="success"
       />
     );
@@ -389,7 +393,7 @@ function SanctionsTab({ entity }: { entity: Entity }) {
                 )}
               </div>
               <h4 className="text-lg font-medium text-foreground">
-                {sanction.program ? `${sanction.program} Program` : 'Sanction'}
+                {sanction.program ? t('entity.infoTabs.sanctions.programLabel', { program: sanction.program }) : t('entity.infoTabs.sanctions.sanctionLabel')}
               </h4>
             </div>
             <Badge
@@ -412,30 +416,30 @@ function SanctionsTab({ entity }: { entity: Entity }) {
 
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
-              <span className="text-muted-foreground">Listing Date:</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.listingDate')}</span>
               <span className="text-foreground ml-2">{formatDate(sanction.listingDate)}</span>
             </div>
             {sanction.start_date && (
               <div>
-                <span className="text-muted-foreground">Vigente desde:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.validFrom')}</span>
                 <span className="text-foreground ml-2">{formatDate(sanction.start_date)}</span>
               </div>
             )}
             {sanction.end_date && (
               <div>
-                <span className="text-muted-foreground">Hasta:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.until')}</span>
                 <span className="text-foreground ml-2">{formatDate(sanction.end_date)}</span>
               </div>
             )}
             {sanction.provisions && (
               <div>
-                <span className="text-muted-foreground">Disposición:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.provision')}</span>
                 <span className="text-foreground ml-2">{sanction.provisions}</span>
               </div>
             )}
             {sanction.referenceNumber && (
               <div>
-                <span className="text-muted-foreground">Reference:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.reference')}</span>
                 <span className="text-foreground ml-2 font-mono">{sanction.referenceNumber}</span>
               </div>
             )}
@@ -450,7 +454,7 @@ function SanctionsTab({ entity }: { entity: Entity }) {
                 className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
-                Ver documento oficial
+                {t('entity.infoTabs.sanctions.officialDocument')}
               </a>
             </div>
           )}
@@ -462,12 +466,13 @@ function SanctionsTab({ entity }: { entity: Entity }) {
 
 // PEP Tab
 function PepTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   if (entity.pepEntries.length === 0) {
     return (
       <EmptyState
         icon={CheckCircle}
-        title="Sin estatus PEP"
-        description="Esta entidad no está identificada como Persona Políticamente Expuesta."
+        title={t('entity.infoTabs.pep.empty.title')}
+        description={t('entity.infoTabs.pep.empty.description')}
         tone="success"
       />
     );
@@ -500,28 +505,28 @@ function PepTab({ entity }: { entity: Entity }) {
                   : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
               )}
             >
-              {pep.isCurrent ? 'Current' : 'Former'}
+              {pep.isCurrent ? t('entity.infoTabs.pep.current') : t('entity.infoTabs.pep.former')}
             </Badge>
           </div>
 
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
-              <span className="text-muted-foreground">Country:</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.pep.country')}</span>
               <span className="text-foreground ml-2">{pep.country}</span>
             </div>
             <div>
-              <span className="text-muted-foreground">Category:</span>
+              <span className="text-muted-foreground">{t('entity.infoTabs.pep.category')}</span>
               <span className="text-foreground ml-2 capitalize">{pep.category.replace('_', ' ')}</span>
             </div>
             {pep.startDate && (
               <div>
-                <span className="text-muted-foreground">From:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.pep.from')}</span>
                 <span className="text-foreground ml-2">{formatDate(pep.startDate)}</span>
               </div>
             )}
             {pep.endDate && (
               <div>
-                <span className="text-muted-foreground">To:</span>
+                <span className="text-muted-foreground">{t('entity.infoTabs.pep.to')}</span>
                 <span className="text-foreground ml-2">{formatDate(pep.endDate)}</span>
               </div>
             )}
@@ -540,6 +545,7 @@ function PepTab({ entity }: { entity: Entity }) {
 
 // Adverse Media Tab — connected to real API
 function AdverseMediaTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['adverse-media-entity', entity.id],
     queryFn: () => complianceService.getAdverseMediaProfile(entity.id),
@@ -565,8 +571,8 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
     return (
       <EmptyState
         icon={CheckCircle}
-        title="Sin adverse media"
-        description="No se encontró cobertura negativa para esta entidad."
+        title={t('entity.infoTabs.media.empty.title')}
+        description={t('entity.infoTabs.media.empty.description')}
         tone="success"
       />
     );
@@ -579,12 +585,12 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
     s >= 90 ? 'bg-red-500' : s >= 70 ? 'bg-orange-500' : s >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
 
   const severityLabel = (s: number) =>
-    s >= 90 ? 'Critico' : s >= 70 ? 'Alto' : s >= 50 ? 'Medio' : s >= 30 ? 'Bajo' : 'Minimo';
+    s >= 90 ? t('entity.adverseMedia.severity.critical') : s >= 70 ? t('entity.adverseMedia.severity.high') : s >= 50 ? t('entity.adverseMedia.severity.medium') : s >= 30 ? t('entity.adverseMedia.severity.low') : t('entity.adverseMedia.severity.minimal');
 
   const categoryLabels: Record<string, string> = {
-    terrorism: 'Terrorismo', sanctions_evasion: 'Evasion Sanciones', wanted: 'Buscados',
-    crime: 'Crimen', human_rights: 'DDHH', financial_crime: 'Crimen Financiero',
-    corruption: 'Corrupcion', offshore: 'Offshore', regulatory: 'Regulatorio',
+    terrorism: t('entity.adverseMedia.category.terrorism'), sanctions_evasion: t('entity.adverseMedia.category.sanctions_evasion'), wanted: t('entity.adverseMedia.category.wanted'),
+    crime: t('entity.adverseMedia.category.crime'), human_rights: t('entity.adverseMedia.category.human_rights'), financial_crime: t('entity.adverseMedia.category.financial_crime'),
+    corruption: t('entity.adverseMedia.category.corruption'), offshore: t('entity.adverseMedia.category.offshore'), regulatory: t('entity.adverseMedia.category.regulatory'),
   };
 
   const categoryColors: Record<string, string> = {
@@ -608,7 +614,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   const getMethodLabel = (method: string | undefined) => {
     if (method === 'moonshot_ai') return 'Moonshot AI';
     if (method === 'claude_ai') return 'Claude AI';
-    if (method === 'keyword') return 'Keywords';
+    if (method === 'keyword') return t('entity.adverseMedia.method.keywords');
     return method || '';
   };
 
@@ -643,17 +649,17 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
             <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
-                <p className="text-xs text-muted-foreground">Articulos</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.articles')}</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
-                <p className="text-xs text-muted-foreground">Ultimos 30d</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.recent30d')}</p>
               </div>
               <div>
                 <p className={cn('text-lg font-bold', severityColor(riskProfile.max_severity))}>
                   {riskProfile.max_severity}
                 </p>
-                <p className="text-xs text-muted-foreground">Max Severity</p>
+                <p className="text-xs text-muted-foreground">{t('entity.adverseMedia.maxSeverity')}</p>
               </div>
             </div>
             {riskProfile.top_categories.length > 0 && (
@@ -674,7 +680,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
         <div className="glass rounded-xl p-5">
           <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4" />
-            Categorias Estructuradas (Sources)
+            {t('entity.adverseMedia.structuredCategories')}
           </h4>
           <div className="space-y-2">
             {structured.categories.map((cat, i) => (
@@ -698,13 +704,13 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Newspaper className="w-4 h-4" />
-              Articulos de Noticias ({articles.length})
+              {t('entity.adverseMedia.newsArticles', { count: articles.length })}
             </h4>
             <a
               href="/adverse-media"
               className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
-              Ver dashboard completo
+              {t('entity.adverseMedia.viewDashboard')}
               <ArrowRight className="w-3 h-3" />
             </a>
           </div>
@@ -780,12 +786,12 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                   {article.link_confidence != null && (
                     <span className="text-muted-foreground flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
-                      {Math.round(article.link_confidence * 100)}% match
+                      {t('entity.adverseMedia.match', { pct: Math.round(article.link_confidence * 100) })}
                     </span>
                   )}
                   {article.is_verified && (
                     <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
-                      Verificado
+                      {t('entity.adverseMedia.verified')}
                     </Badge>
                   )}
                 </div>
@@ -798,7 +804,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                     className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
                   >
                     <ExternalLink className="w-3 h-3" />
-                    Leer articulo
+                    {t('entity.adverseMedia.readArticle')}
                   </a>
                 )}
               </motion.div>
@@ -824,12 +830,13 @@ function getRelationshipStatusTone(isCurrent: boolean): string {
 
 // Relationships Tab
 function RelationshipsTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   if (entity.relationships.length === 0) {
     return (
       <EmptyState
         icon={Network}
-        title="Sin relaciones"
-        description="No se encontraron relaciones conocidas para esta entidad."
+        title={t('entity.infoTabs.relationships.empty.title')}
+        description={t('entity.infoTabs.relationships.empty.description')}
       />
     );
   }
@@ -849,26 +856,26 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-3">
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Relaciones detectadas</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">{t('entity.infoTabs.relationships.detected')}</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{entity.relationships.length}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Vista consolidada de vinculos conocidos.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('entity.infoTabs.relationships.detectedHint')}</p>
         </div>
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Relaciones vigentes</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">{t('entity.infoTabs.relationships.current')}</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{currentRelationships}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Se marcan como activas en la data disponible.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('entity.infoTabs.relationships.currentHint')}</p>
         </div>
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Alta confianza</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">{t('entity.infoTabs.relationships.highConfidence')}</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{highConfidenceRelationships}</p>
-          <p className="mt-1 text-sm text-muted-foreground">Vinculos con score de 85% o superior.</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('entity.infoTabs.relationships.highConfidenceHint')}</p>
         </div>
       </div>
 
       {relationshipTypes.length > 0 && (
         <div className="glass rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">Tipos principales</span>
+            <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">{t('entity.infoTabs.relationships.mainTypes')}</span>
             {relationshipTypes.map(([type, count]) => (
               <Badge key={type} variant="outline" className="text-[10px] bg-foreground/5 text-gray-200 border-foreground/10">
                 {getRelationshipTypeLabel(type)} · {count}
@@ -893,13 +900,13 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
                   {getRelationshipTypeLabel(rel.type)}
                 </Badge>
                 <Badge variant="outline" className={cn('text-[10px]', getRelationshipStatusTone(rel.isCurrent))}>
-                  {rel.isCurrent ? 'Vigente' : 'Historica'}
+                  {rel.isCurrent ? t('entity.infoTabs.relationships.currentBadge') : t('entity.infoTabs.relationships.historicalBadge')}
                 </Badge>
                 <Badge variant="outline" className={cn('text-[10px]', getRelationshipConfidenceTone(rel.confidence))}>
-                  Confianza {rel.confidence}%
+                  {t('entity.infoTabs.relationships.confidence', { value: rel.confidence })}
                 </Badge>
               </div>
-              <p className="text-sm leading-6 text-foreground">{rel.description || 'Relacion registrada sin descripcion adicional.'}</p>
+              <p className="text-sm leading-6 text-foreground">{rel.description || t('entity.infoTabs.relationships.noDescription')}</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 lg:justify-end">
@@ -912,12 +919,12 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
           {(rel.startDate || rel.endDate) && (
             <div className="mt-4 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
               <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
-                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Inicio</span>
-                <span className="mt-1 block text-foreground">{rel.startDate ? formatDate(rel.startDate) : 'No disponible'}</span>
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{t('entity.infoTabs.relationships.start')}</span>
+                <span className="mt-1 block text-foreground">{rel.startDate ? formatDate(rel.startDate) : t('entity.infoTabs.relationships.startUnavailable')}</span>
               </div>
               <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
-                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Fin</span>
-                <span className="mt-1 block text-foreground">{rel.endDate ? formatDate(rel.endDate) : 'Sin cierre registrado'}</span>
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">{t('entity.infoTabs.relationships.end')}</span>
+                <span className="mt-1 block text-foreground">{rel.endDate ? formatDate(rel.endDate) : t('entity.infoTabs.relationships.endUnavailable')}</span>
               </div>
             </div>
           )}
@@ -929,6 +936,7 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
 
 // Audit Tab
 function AuditTab({ entity }: { entity: Entity }) {
+  const { t } = useTranslation();
   const auditEvents: Array<{
     date: string;
     action: string;
@@ -936,12 +944,12 @@ function AuditTab({ entity }: { entity: Entity }) {
     type: string;
     content?: string;
   }> = [
-    { date: entity.firstSeen, action: 'Entity First Seen', user: 'System', type: 'system' },
-    { date: entity.lastUpdated, action: 'Data Updated', user: 'System', type: 'system' },
+    { date: entity.firstSeen, action: t('entity.infoTabs.audit.firstSeen'), user: t('entity.infoTabs.audit.system'), type: 'system' },
+    { date: entity.lastUpdated, action: t('entity.infoTabs.audit.dataUpdated'), user: t('entity.infoTabs.audit.system'), type: 'system' },
     ...entity.investigations.flatMap(inv =>
       inv.notes.map(note => ({
         date: note.createdAt,
-        action: `Note: ${note.type}`,
+        action: t('entity.infoTabs.audit.note', { type: note.type }),
         user: note.author,
         type: 'note',
         content: note.content,
@@ -953,7 +961,7 @@ function AuditTab({ entity }: { entity: Entity }) {
     <div className="glass rounded-xl p-5">
       <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
         <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-        Activity History
+        {t('entity.infoTabs.audit.title')}
       </h3>
 
       <ScrollArea className="h-[400px]">
@@ -979,7 +987,7 @@ function AuditTab({ entity }: { entity: Entity }) {
               <div className="flex-1 pb-4">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className="text-foreground font-medium">{event.action}</span>
-                  <span className="text-xs text-muted-foreground">by {event.user}</span>
+                  <span className="text-xs text-muted-foreground">{t('entity.infoTabs.audit.by', { user: event.user })}</span>
                 </div>
                 <span className="text-xs text-muted-foreground">{formatDate(event.date)}</span>
                 {'content' in event && event.content && (

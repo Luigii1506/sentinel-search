@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Database, Download, Globe, Search } from 'lucide-react';
 import { yenteService, type YenteDataset } from '@/services';
@@ -20,6 +21,7 @@ function tierFor(count: number) {
 }
 
 export function YenteCatalogPage() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState('');
   const { data: catalog, isLoading, error } = useQuery({
     queryKey: ['yente-catalog'],
@@ -51,7 +53,7 @@ export function YenteCatalogPage() {
     URL.revokeObjectURL(url);
   };
 
-  const errorMessage = error instanceof Error ? error.message : 'Error cargando catálogo';
+  const errorMessage = error instanceof Error ? error.message : t('data.yente.errorFallback');
 
   return (
     <AppPage>
@@ -60,27 +62,27 @@ export function YenteCatalogPage() {
       ) : (
         <>
           <PageHeader
-            title="Catalogo Yente"
-            description="Catálogo de datasets en formato Yente/OpenSanctions. Consumible por Aleph/ICIJ/OCCRP."
+            title={t('data.yente.title')}
+            description={t('data.yente.description')}
             icon={<div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30"><Globe className="w-6 h-6 text-purple-600 dark:text-purple-400" /></div>}
-            actions={<Button onClick={handleExport} disabled={!catalog} variant="outline"><Download className="h-4 w-4 mr-2" />Export JSON</Button>}
+            actions={<Button onClick={handleExport} disabled={!catalog} variant="outline"><Download className="h-4 w-4 mr-2" />{t('data.yente.exportJson')}</Button>}
           />
 
           {catalog && (
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <MetricCard label="Datasets" value={catalog.datasets.length} icon={Database} className="bg-foreground/5 border-foreground/10" />
-              <MetricCard label="Entities indexadas" value={totalEntities.toLocaleString()} icon={Globe} className="bg-foreground/5 border-foreground/10" />
-              <MetricCard label="Actualizado" value={new Date(catalog.updated_at).toLocaleString()} className="bg-foreground/5 border-foreground/10" />
+              <MetricCard label={t('data.yente.metrics.datasets')} value={catalog.datasets.length} icon={Database} className="bg-foreground/5 border-foreground/10" />
+              <MetricCard label={t('data.yente.metrics.indexedEntities')} value={totalEntities.toLocaleString()} icon={Globe} className="bg-foreground/5 border-foreground/10" />
+              <MetricCard label={t('data.yente.metrics.updated')} value={new Date(catalog.updated_at).toLocaleString()} className="bg-foreground/5 border-foreground/10" />
             </div>
           )}
 
           <Card className="bg-foreground/5 border-foreground/10">
             <CardHeader>
               <CardTitle className="text-base flex items-center justify-between">
-                <span>Datasets disponibles</span>
+                <span>{t('data.yente.available')}</span>
                 <div className="relative w-64">
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filtrar..." className="pl-8 bg-foreground/5 border-foreground/10 text-sm" />
+                  <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('data.yente.filterPlaceholder')} className="pl-8 bg-foreground/5 border-foreground/10 text-sm" />
                 </div>
               </CardTitle>
             </CardHeader>
@@ -93,7 +95,7 @@ export function YenteCatalogPage() {
                 </div>
               )}
               {!isLoading && !error && filtered.length === 0 && (
-                <EmptyState icon={Search} title="Sin datasets" description={`No hay datasets que coincidan con "${search}".`} />
+                <EmptyState icon={Search} title={t('data.yente.emptyTitle')} description={t('data.yente.emptyDescription', { query: search })} />
               )}
             </CardContent>
           </Card>
@@ -104,6 +106,7 @@ export function YenteCatalogPage() {
 }
 
 function DatasetCard({ ds }: { ds: YenteDataset }) {
+  const { t } = useTranslation();
   const tier = tierFor(ds.entity_count);
   return (
     <div className="bg-black/30 border border-foreground/10 rounded-lg p-3 hover:border-foreground/20 transition">
@@ -117,7 +120,7 @@ function DatasetCard({ ds }: { ds: YenteDataset }) {
       <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
         <Database className="h-3 w-3" />
         <span className="tabular-nums">{ds.entity_count.toLocaleString()}</span>
-        <span className="text-muted-foreground">entities</span>
+        <span className="text-muted-foreground">{t('data.yente.card.entities')}</span>
       </div>
     </div>
   );

@@ -1,0 +1,167 @@
+{
+  "bulk": {
+    "title": "Screening masivo",
+    "description": "Screening masivo de nombres contra la base de datos.",
+    "uploadCsv": "Subir CSV",
+    "pasteNames": "Pegar nombres",
+    "namesToSearch": "Nombres a buscar",
+    "textareaPlaceholder": "Pega los nombres aqui, uno por linea...\nEjemplo:\nJuan Perez\nMaria Garcia\nCarlos Lopez",
+    "namesDetected": "{{count}} nombres detectados",
+    "minScore": "Score minimo de coincidencia",
+    "scoreMoreResults": "50% (Mas resultados)",
+    "scoreExactOnly": "100% (Solo exactos)",
+    "startScreening": "Iniciar screening",
+    "processing": "Procesando...",
+    "processedOf": "{{processed}} de {{total}} nombres procesados",
+    "successful": "{{count}} exitosos",
+    "failed": "{{count}} fallidos",
+    "results": "Resultados",
+    "resultsSummary": "{{processed}} procesados · {{failed}} fallidos",
+    "new": "Nuevo",
+    "dropzone": {
+      "title": "Arrastra un archivo CSV o haz click para seleccionar",
+      "hint": "Debe tener una columna llamada \"name\" o \"nombre\""
+    },
+    "status": {
+      "found": "Encontrado",
+      "notFound": "No encontrado",
+      "error": "Error"
+    },
+    "table": {
+      "searchedName": "Nombre buscado",
+      "status": "Estado",
+      "matches": "Coincidencias",
+      "bestMatch": "Mejor coincidencia",
+      "score": "Score"
+    },
+    "toast": {
+      "invalidFile": "Por favor sube un archivo CSV",
+      "noNames": "No se encontraron nombres para procesar",
+      "tooManyNames": "Maximo 1000 nombres por batch",
+      "jobCreated": "Job creado: {{count}} nombres",
+      "jobError": "Error al crear el job",
+      "completed": "Screening completado",
+      "downloaded": "Descargado: {{format}}",
+      "downloadError": "Error al descargar"
+    }
+  },
+  "federated": {
+    "title": "Búsqueda ampliada",
+    "description": "Consulta una persona o empresa una sola vez y revisa cobertura interna, leaks e inteligencia externa con una lectura más accionable.",
+    "searchPlaceholder": "Busca una persona, empresa o beneficiario final",
+    "settings": "Ajustes",
+    "search": "Buscar",
+    "error": "No fue posible ejecutar la búsqueda.",
+    "matchSensitivity": "Sensibilidad de coincidencia",
+    "currentThreshold": "Umbral actual:",
+    "thresholdLevel": {
+      "strict": "estricto",
+      "broad": "amplio",
+      "balanced": "balanceado"
+    },
+    "thresholdPresets": {
+      "broad": {
+        "label": "Amplio",
+        "hint": "Mayor cobertura, más ruido."
+      },
+      "balanced": {
+        "label": "Balanceado",
+        "hint": "Buen punto de partida para analistas."
+      },
+      "strict": {
+        "label": "Estricto",
+        "hint": "Menos ruido, prioriza precisión."
+      }
+    },
+    "info": {
+      "whenTitle": "Cuándo usar esta vista",
+      "whenBody": "Cuando necesitas confirmar cobertura ampliada y no solo una coincidencia local.",
+      "returnsTitle": "Qué devuelve",
+      "returnsBody": "Resultados agrupados por tipo de fuente, con score unificado y señales críticas visibles.",
+      "decisionTitle": "Qué decisión habilita",
+      "decisionBody": "Priorizar revisión manual, abrir expediente o descartar con mayor confianza."
+    },
+    "loading": {
+      "title": "Consultando cobertura ampliada",
+      "description": "La plataforma está comparando la búsqueda contra fuentes internas, leaks y catálogos externos."
+    },
+    "execSummary": {
+      "title": "Resumen ejecutivo",
+      "description": "Lectura rápida de la búsqueda para decidir si vale la pena profundizar de inmediato."
+    },
+    "metrics": {
+      "totalMatches": "Coincidencias totales",
+      "sourcesWithFindings": "Fuentes con hallazgos",
+      "sanctionSignals": "Señales de sanción",
+      "pepSignals": "Señales PEP"
+    },
+    "reading": {
+      "title": "Lectura del resultado",
+      "description": "Esta vista sintetiza la cobertura detectada y resalta el hallazgo más relevante."
+    },
+    "operationalConclusion": "Conclusión operativa",
+    "noData": "Sin datos",
+    "candidatesEvaluated": "{{count}} candidatos evaluados",
+    "thresholdBadge": "Umbral {{value}}",
+    "mainFinding": "Hallazgo principal",
+    "scoreBadge": "Score {{value}}",
+    "sanction": "Sanción",
+    "featuredDataset": "Dataset destacado:",
+    "noDataset": "Sin dataset visible",
+    "openProfile": "Abrir perfil",
+    "goToMainSearch": "Ir a búsqueda principal",
+    "noMainFinding": "No hubo un hallazgo principal porque ninguna fuente devolvió coincidencias por encima del umbral actual.",
+    "howToRead": {
+      "title": "Cómo leer esta consulta",
+      "p1": "La vista no sustituye la validación de identidad. Sirve para concentrar cobertura y señalar dónde revisar primero.",
+      "p2": "Prioriza coincidencias con sanción o score alto. Después revisa leaks y contexto externo para riesgo reputacional.",
+      "p3": "Si hay demasiados resultados, sube el umbral. Si falta cobertura, baja el umbral o complementa con la búsqueda principal."
+    },
+    "coverageBySource": {
+      "title": "Cobertura por fuente",
+      "description": "Cada bloque explica qué tipo de inteligencia se consultó y qué coincidencias devolvió."
+    },
+    "noMatches": {
+      "title": "Sin coincidencias por encima del umbral",
+      "description": "La consulta se ejecutó correctamente, pero ninguna fuente devolvió resultados suficientes con la sensibilidad actual."
+    },
+    "tryBroadMode": "Probar modo amplio",
+    "matchesCount": "{{count}} coincidencias",
+    "coverage": {
+      "none": "Sin cobertura positiva",
+      "full": "Cobertura en 3/3 fuentes",
+      "partial": "Cobertura en {{count}}/3 fuentes"
+    },
+    "summary": {
+      "none": "No se detectaron coincidencias en las fuentes consultadas para esta búsqueda.",
+      "sanctions": "Se detectaron coincidencias con exposición sensible. Prioriza revisión de sanciones y valida identidad antes de cerrar el caso.",
+      "pepAndLeaks": "La búsqueda combina exposición política y señales reputacionales. Conviene revisar contexto, beneficiarios y vínculos relacionados.",
+      "pep": "Se identificaron coincidencias con perfil políticamente expuesto. Revisa relación, jurisdicción y vigencia del contexto.",
+      "leaks": "Se detectó exposición en fuentes investigativas. Evalúa si el hallazgo cambia el riesgo reputacional o el nivel de debida diligencia.",
+      "generic": "Hay coincidencias útiles para investigación, pero sin señales críticas inmediatas. Valida identidad y cobertura antes de descartar."
+    },
+    "origin": {
+      "local": {
+        "label": "Fuentes internas y regulatorias",
+        "shortLabel": "Local",
+        "description": "Listas regulatorias, sanciones, PEPs y fuentes prioritarias ya integradas en la plataforma.",
+        "summary": "Valida exposición inmediata dentro de tus fuentes más críticas.",
+        "emptyMessage": "No hubo coincidencias en fuentes regulatorias o internas."
+      },
+      "leaks": {
+        "label": "Leaks e investigación periodística",
+        "shortLabel": "Leaks",
+        "description": "Consorcios periodísticos y bases tipo Panama, Paradise y Pandora Papers.",
+        "summary": "Útil para detectar exposición reputacional o estructuras offshore.",
+        "emptyMessage": "No hubo coincidencias en leaks investigativos."
+      },
+      "external": {
+        "label": "Cobertura externa ampliada",
+        "shortLabel": "Externo",
+        "description": "Catálogos externos como OpenSanctions y Wikidata para ampliar el contexto.",
+        "summary": "Ayuda a validar cobertura adicional fuera de tus fuentes base.",
+        "emptyMessage": "No hubo coincidencias en catálogos externos."
+      }
+    }
+  }
+}

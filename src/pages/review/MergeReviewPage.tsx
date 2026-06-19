@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   GitMerge,
@@ -56,11 +57,11 @@ const METHOD_COLORS: Record<string, string> = {
 };
 
 const ENTITY_TYPE_OPTIONS = [
-  { value: 'all', label: 'Todos los tipos', icon: Users },
-  { value: 'Person', label: 'Persona', icon: Users },
-  { value: 'Organization', label: 'Organización', icon: Building2 },
-  { value: 'Vessel', label: 'Embarcación', icon: Ship },
-  { value: 'Aircraft', label: 'Aeronave', icon: Plane },
+  { value: 'all', labelKey: 'review.entityTypeFilter.all', icon: Users },
+  { value: 'Person', labelKey: 'common.entityType.person', icon: Users },
+  { value: 'Organization', labelKey: 'common.entityType.organization', icon: Building2 },
+  { value: 'Vessel', labelKey: 'common.entityType.vessel', icon: Ship },
+  { value: 'Aircraft', labelKey: 'common.entityType.aircraft', icon: Plane },
 ];
 
 function confidenceColor(conf: number | undefined | null): string {
@@ -103,6 +104,7 @@ function formatNumber(num: number): string {
 
 // Expandable row detail component
 function MergeDetailPanel({ entityId }: { entityId: string }) {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useMergeDetail(entityId);
   const navigate = useNavigate();
 
@@ -121,7 +123,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
   if (error || !data) {
     return (
       <div className="px-6 py-4 text-red-600 dark:text-red-400 text-sm">
-        Error cargando detalle: {(error as Error)?.message || 'Sin datos'}
+        {t('review.detail.loadError')}: {(error as Error)?.message || t('common.states.empty')}
       </div>
     );
   }
@@ -137,28 +139,28 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
       {/* Gold entity summary */}
       <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Tipo</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('review.detail.type')}</p>
           <p className="text-sm text-foreground">{data.entity_type || 'N/A'}</p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Paises</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('review.detail.countries')}</p>
           <p className="text-sm text-foreground break-words">
             {data.countries?.join(', ') || 'N/A'}
           </p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">Nacimiento</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('review.detail.birth')}</p>
           <p className="text-sm text-foreground">{data.birth_date || 'N/A'}</p>
         </div>
         <div>
-          <p className="text-xs text-muted-foreground mb-1">PEP</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('review.detail.pep')}</p>
           <p className="text-sm text-foreground">
             {data.is_current_pep ? (
               <Badge variant="outline" className="bg-yellow-500/20 text-yellow-700 dark:text-yellow-400 border-yellow-500/30">
                 {data.pep_category || 'PEP'}
               </Badge>
             ) : (
-              'No'
+              t('common.states.no')
             )}
           </p>
         </div>
@@ -167,7 +169,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
       {/* All names */}
       {data.all_names.length > 1 && (
         <div className="mb-4">
-          <p className="text-xs text-muted-foreground mb-1">Todos los nombres ({data.all_names.length})</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('review.detail.allNames', { count: data.all_names.length })}</p>
           <div className="flex flex-wrap gap-1.5">
             {data.all_names.map((name, i) => (
               <Badge key={i} variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
@@ -181,7 +183,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
       {/* Silver children table */}
       <div className="mt-3">
         <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wider">
-          Silver Entities Mapeados ({data.children.length})
+          {t('review.detail.silverMapped', { count: data.children.length })}
         </p>
         <div className="space-y-3 md:hidden">
           {data.children.map((child: MergeChildInfo, idx: number) => (
@@ -199,22 +201,22 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
                   </Badge>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Nombre</p>
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.table.name')}</p>
                   <p className="text-muted-foreground break-words">{child.name || child.name_normalized || '-'}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">External ID</p>
+                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.table.externalId')}</p>
                   <p className="text-muted-foreground font-mono text-xs break-all">{child.external_id || '-'}</p>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Confianza</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.table.confidence')}</p>
                     <p className={`font-mono text-xs ${confidenceColor(child.match_confidence)}`}>
                       {formatConfidence(child.match_confidence)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Fecha</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.table.date')}</p>
                     <p className="text-muted-foreground text-xs">{formatDate(child.matched_at)}</p>
                   </div>
                 </div>
@@ -226,12 +228,12 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
           <table className="w-full text-sm">
             <thead className="bg-foreground/5">
               <tr>
-                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">Fuente</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">Nombre</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">External ID</th>
-                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">Metodo</th>
-                <th className="text-right text-xs font-medium text-muted-foreground px-3 py-2">Confianza</th>
-                <th className="text-right text-xs font-medium text-muted-foreground px-3 py-2">Fecha</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.source')}</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.name')}</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.externalId')}</th>
+                <th className="text-left text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.method')}</th>
+                <th className="text-right text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.confidence')}</th>
+                <th className="text-right text-xs font-medium text-muted-foreground px-3 py-2">{t('review.table.date')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-foreground/5">
@@ -278,7 +280,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
           onClick={() => navigate(`/entity/${data.entity_id}`)}
         >
           <ExternalLink className="w-3 h-3 mr-1" />
-          Ver Perfil Completo
+          {t('review.detail.viewFullProfile')}
         </Button>
       </div>
     </motion.div>
@@ -286,6 +288,7 @@ function MergeDetailPanel({ entityId }: { entityId: string }) {
 }
 
 export function MergeReviewPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [sortBy, setSortBy] = useState<MergeReviewSortBy>('confidence_asc');
@@ -354,8 +357,8 @@ export function MergeReviewPage() {
   return (
     <AppPage>
       <PageHeader
-        title="Merge Review"
-        description="Auditar entidades Gold con múltiples fuentes fusionadas"
+        title={t('review.merge.title')}
+        description={t('review.merge.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
             <GitMerge className="w-6 h-6 text-purple-600 dark:text-purple-400" />
@@ -371,12 +374,12 @@ export function MergeReviewPage() {
                       <Clock className="w-3.5 h-3.5" />
                       {String(meta.elapsed_ms)}ms
                       {!!meta.cached_count && (
-                        <span className="text-green-700 dark:text-green-400">(cached)</span>
+                        <span className="text-green-700 dark:text-green-400">{t('review.merge.cached')}</span>
                       )}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="bg-card border-foreground/10">
-                    Tiempo de respuesta del servidor
+                    {t('review.merge.serverResponseTime')}
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -388,7 +391,7 @@ export function MergeReviewPage() {
               className="border-foreground/10 text-muted-foreground hover:text-foreground"
             >
               <RefreshCw className={`w-4 h-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              Actualizar
+              {t('common.actions.refresh')}
             </Button>
           </>
         }
@@ -398,25 +401,25 @@ export function MergeReviewPage() {
         {page === 0 && Object.keys(stats).length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <MetricCard
-              label="Total Merges"
+              label={t('review.merge.stats.totalMerges')}
               value={stats.total_merged_entities || 0}
               icon={Database}
               className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
-              label="Cross-Source"
+              label={t('review.merge.stats.crossSource')}
               value={stats.cross_source_merges || 0}
               icon={GitMerge}
               className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
-              label="Entity Resolution"
+              label={t('review.merge.stats.entityResolution')}
               value={stats.er_v4_merges || 0}
               icon={TrendingUp}
               className="bg-foreground/[0.02] border-foreground/5"
             />
             <MetricCard
-              label="Deduplicación"
+              label={t('review.merge.stats.deduplication')}
               value={(stats.gold_dedup_merges || 0) + (stats.exact_dedup_merges || 0)}
               icon={CheckCircle2}
               accent="amber"
@@ -432,14 +435,14 @@ export function MergeReviewPage() {
             <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Filter className="w-4 h-4" />
-                <span className="text-sm font-medium">Filtros</span>
+                <span className="text-sm font-medium">{t('common.actions.filters')}</span>
               </div>
 
               {/* Search by name */}
               <div className="relative w-full sm:w-auto">
                 <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por nombre..."
+                  placeholder={t('review.filters.searchByName')}
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(0); }}
                   className="pl-9 w-full sm:w-[250px] bg-foreground/5 border-foreground/10 text-muted-foreground placeholder:text-muted-foreground"
@@ -448,14 +451,14 @@ export function MergeReviewPage() {
 
               <Select value={entityType} onValueChange={(v) => { setEntityType(v); setPage(0); }}>
                 <SelectTrigger className="w-full sm:w-[160px] bg-foreground/5 border-foreground/10 text-muted-foreground">
-                  <SelectValue placeholder="Tipo" />
+                  <SelectValue placeholder={t('review.filters.type')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-foreground/10">
                   {ENTITY_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.value} value={opt.value}>
                       <div className="flex items-center gap-2">
                         <opt.icon className="w-4 h-4" />
-                        {opt.label}
+                        {t(opt.labelKey)}
                       </div>
                     </SelectItem>
                   ))}
@@ -464,14 +467,14 @@ export function MergeReviewPage() {
 
               <Select value={sortBy} onValueChange={(v) => { setSortBy(v as MergeReviewSortBy); setPage(0); }}>
                 <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-muted-foreground">
-                  <SelectValue placeholder="Ordenar por" />
+                  <SelectValue placeholder={t('review.filters.sortBy')} />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-foreground/10">
-                  <SelectItem value="confidence_asc">Confianza (menor)</SelectItem>
-                  <SelectItem value="confidence_desc">Confianza (mayor)</SelectItem>
-                  <SelectItem value="sources_desc">Mas fuentes</SelectItem>
-                  <SelectItem value="recent">Mas recientes</SelectItem>
-                  <SelectItem value="name_asc">Nombre A-Z</SelectItem>
+                  <SelectItem value="confidence_asc">{t('review.filters.sort.confidenceAsc')}</SelectItem>
+                  <SelectItem value="confidence_desc">{t('review.filters.sort.confidenceDesc')}</SelectItem>
+                  <SelectItem value="sources_desc">{t('review.filters.sort.sourcesDesc')}</SelectItem>
+                  <SelectItem value="recent">{t('review.filters.sort.recent')}</SelectItem>
+                  <SelectItem value="name_asc">{t('review.filters.sort.nameAsc')}</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -481,7 +484,7 @@ export function MergeReviewPage() {
                 onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
                 className={showAdvancedFilters || hasActiveFilters ? 'text-primary-400' : 'text-muted-foreground'}
               >
-                Avanzados
+                {t('review.filters.advanced')}
                 {hasActiveFilters && (
                   <span className="ml-2 bg-primary-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                     !
@@ -498,7 +501,7 @@ export function MergeReviewPage() {
                   className="text-muted-foreground hover:text-red-400"
                 >
                   <X className="w-4 h-4 mr-1" />
-                  Limpiar
+                  {t('common.actions.clear')}
                 </Button>
               )}
             </div>
@@ -515,10 +518,10 @@ export function MergeReviewPage() {
                   <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3">
                     <Select value={matchMethod} onValueChange={(v) => { setMatchMethod(v); setPage(0); }}>
                       <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-muted-foreground">
-                        <SelectValue placeholder="Metodo" />
+                        <SelectValue placeholder={t('review.table.method')} />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-foreground/10">
-                        <SelectItem value="all">Todos los metodos</SelectItem>
+                        <SelectItem value="all">{t('review.filters.allMethods')}</SelectItem>
                         <SelectItem value="cross_source_merge">Cross-Source</SelectItem>
                         <SelectItem value="gold_dedup_merge">Gold Dedup</SelectItem>
                         <SelectItem value="ENTITY_RESOLUTION_V4">ER v4</SelectItem>
@@ -528,20 +531,20 @@ export function MergeReviewPage() {
 
                     <Select value={String(minSources)} onValueChange={(v) => { setMinSources(Number(v)); setPage(0); }}>
                       <SelectTrigger className="w-full sm:w-[140px] bg-foreground/5 border-foreground/10 text-muted-foreground">
-                        <SelectValue placeholder="Min fuentes" />
+                        <SelectValue placeholder={t('review.filters.minSources')} />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-foreground/10">
-                        <SelectItem value="2">2+ fuentes</SelectItem>
-                        <SelectItem value="3">3+ fuentes</SelectItem>
-                        <SelectItem value="5">5+ fuentes</SelectItem>
-                        <SelectItem value="10">10+ fuentes</SelectItem>
+                        <SelectItem value="2">{t('review.filters.sourcesPlus', { count: 2 })}</SelectItem>
+                        <SelectItem value="3">{t('review.filters.sourcesPlus', { count: 3 })}</SelectItem>
+                        <SelectItem value="5">{t('review.filters.sourcesPlus', { count: 5 })}</SelectItem>
+                        <SelectItem value="10">{t('review.filters.sourcesPlus', { count: 10 })}</SelectItem>
                       </SelectContent>
                     </Select>
 
                     <div className="relative w-full sm:w-auto">
                       <Globe className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder="Filtrar por fuente..."
+                        placeholder={t('review.filters.filterBySource')}
                         value={sourceFilter}
                         onChange={(e) => { setSourceFilter(e.target.value); setPage(0); }}
                         className="pl-9 w-full sm:w-[180px] bg-foreground/5 border-foreground/10 text-muted-foreground placeholder:text-muted-foreground"
@@ -554,7 +557,7 @@ export function MergeReviewPage() {
                         type="number"
                         min={0}
                         max={100}
-                        placeholder="Confianza min %"
+                        placeholder={t('review.filters.minConfidencePct')}
                         value={minConfidence}
                         onChange={(e) => { setMinConfidence(e.target.value); setPage(0); }}
                         className="pl-9 w-full sm:w-[150px] bg-foreground/5 border-foreground/10 text-muted-foreground placeholder:text-muted-foreground"
@@ -579,8 +582,8 @@ export function MergeReviewPage() {
             <CardContent className="p-8">
               <EmptyState
                 icon={AlertTriangle}
-                title="Error cargando datos"
-                description={(error as Error)?.message || 'Error desconocido'}
+                title={t('review.merge.errorTitle')}
+                description={(error as Error)?.message || t('review.merge.errorUnknown')}
                 tone="warning"
                 action={
                   <Button
@@ -588,7 +591,7 @@ export function MergeReviewPage() {
                     onClick={() => refetch()}
                     className="mt-4 border-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-500/10"
                   >
-                    Reintentar
+                    {t('common.actions.retry')}
                   </Button>
                 }
               />
@@ -599,8 +602,8 @@ export function MergeReviewPage() {
             <CardContent className="p-8">
               <EmptyState
                 icon={CheckCircle2}
-                title="No hay merges con estos filtros"
-                description="Ajusta los filtros para ver más resultados."
+                title={t('review.merge.emptyTitle')}
+                description={t('review.merge.emptyDescription')}
                 tone="success"
               />
             </CardContent>
@@ -627,7 +630,7 @@ export function MergeReviewPage() {
                             {entity.is_current_pep && <Shield className="w-3.5 h-3.5 text-yellow-700 dark:text-yellow-400 shrink-0" />}
                           </div>
                           {entity.all_names.length > 1 && (
-                            <p className="text-xs text-muted-foreground mt-0.5">+{entity.all_names.length - 1} nombres</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{t('review.row.moreNames', { count: entity.all_names.length - 1 })}</p>
                           )}
                         </div>
                         {isExpanded ? <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0" /> : <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />}
@@ -648,11 +651,11 @@ export function MergeReviewPage() {
                           </span>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Mappings</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.row.mappings')}</p>
                           <p className="text-foreground font-mono">{entity.mapping_count}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Confianza avg</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('review.row.avgConfidence')}</p>
                           <p className={`font-mono ${confidenceColor(entity.avg_confidence)}`}>{formatConfidence(entity.avg_confidence)}</p>
                         </div>
                       </div>
@@ -676,14 +679,14 @@ export function MergeReviewPage() {
                 <thead className="bg-foreground/5 border-b border-foreground/5">
                   <tr>
                     <th className="w-8 px-3 py-3" />
-                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">Nombre Canonico</th>
-                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">Tipo</th>
-                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">Fuentes</th>
-                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">Metodos</th>
-                    <th className="text-center text-xs font-medium text-muted-foreground px-3 py-3">Mappings</th>
-                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">Min Conf.</th>
-                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">Avg Conf.</th>
-                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">Risk</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.canonicalName')}</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.type')}</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.sources')}</th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.methods')}</th>
+                    <th className="text-center text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.mappings')}</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.minConf')}</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.avgConf')}</th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-3 py-3">{t('review.table.risk')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-foreground/5">
@@ -721,7 +724,7 @@ export function MergeReviewPage() {
                                       <Shield className="w-3.5 h-3.5 text-yellow-700 dark:text-yellow-400" />
                                     </TooltipTrigger>
                                     <TooltipContent className="bg-card border-foreground/10">
-                                      PEP: {entity.pep_category}
+                                      {t('review.row.pepLabel')}: {entity.pep_category}
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
@@ -729,7 +732,7 @@ export function MergeReviewPage() {
                             </div>
                             {entity.all_names.length > 1 && (
                               <p className="text-xs text-muted-foreground mt-0.5 break-words max-w-full">
-                                +{entity.all_names.length - 1} nombres
+                                {t('review.row.moreNames', { count: entity.all_names.length - 1 })}
                               </p>
                             )}
                           </td>
@@ -823,8 +826,11 @@ export function MergeReviewPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4 px-2 gap-4">
               <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <p className="text-sm text-muted-foreground">
-                  Mostrando {formatNumber(startItem)}-{formatNumber(endItem)} de{' '}
-                  {formatNumber(data.total)} entidades
+                  {t('review.pagination.showing', {
+                    start: formatNumber(startItem),
+                    end: formatNumber(endItem),
+                    total: formatNumber(data.total),
+                  })}
                 </p>
                 
                 <Select 
@@ -837,7 +843,7 @@ export function MergeReviewPage() {
                   <SelectContent className="bg-card border-foreground/10">
                     {PAGE_SIZE_OPTIONS.map(size => (
                       <SelectItem key={size} value={String(size)}>
-                        {size} / página
+                        {t('review.pagination.perPage', { size })}
                       </SelectItem>
                     ))}
                   </SelectContent>

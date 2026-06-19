@@ -1,0 +1,260 @@
+{
+  "activity": {
+    "title": "Activity log",
+    "description": "Audit trail of user actions and API calls.",
+    "refreshAria": "Refresh list",
+    "anonymous": "anonymous",
+    "columns": {
+      "when": "When",
+      "user": "User",
+      "auth": "Auth",
+      "method": "Method",
+      "endpoint": "Endpoint",
+      "status": "Status",
+      "latency": "Latency",
+      "ip": "IP"
+    },
+    "metrics": {
+      "events": "Events",
+      "uniqueUsers": "Unique users",
+      "errors": "4xx/5xx errors",
+      "p95Latency": "P95 latency"
+    },
+    "filters": {
+      "usernamePlaceholder": "User (substring)",
+      "usernameAria": "Filter by user",
+      "endpointPlaceholder": "Endpoint (substring)",
+      "endpointAria": "Filter by endpoint",
+      "methodPlaceholder": "Method",
+      "methodAria": "Filter by HTTP method",
+      "allMethods": "All methods",
+      "limitAria": "Number of results",
+      "lastN": "Last {{count}}"
+    },
+    "empty": {
+      "title": "No events",
+      "description": "No activity matches these filters."
+    }
+  },
+  "monitoring": {
+    "title": "System monitoring",
+    "description": "Status of services, pipelines and ingestion jobs",
+    "dataLabel": "Data:",
+    "snapshotAt": "Snapshot: {{date}}",
+    "noSnapshot": "No snapshot",
+    "error": {
+      "title": "Failed to load monitoring",
+      "description": "Could not retrieve job data"
+    },
+    "jobs": {
+      "running": "Running",
+      "success": "Successful",
+      "failed": "Failed",
+      "totalJobs": "Total jobs"
+    },
+    "operational": {
+      "sloBreached": "SLO breached",
+      "neverSynced": "Never synced",
+      "coverage": "Coverage",
+      "dedupGold": "Gold dedup",
+      "dlqTasks": "DLQ tasks",
+      "disappeared": "Disappeared",
+      "runtime": "Runtime",
+      "alerting": "Alerting",
+      "pendingChange": "Pending change",
+      "snapshots": "Snapshots"
+    },
+    "relativeAge": {
+      "noData": "no data",
+      "seconds": "{{count}}s ago",
+      "minutes": "{{count}} min ago",
+      "hours": "{{count}} h ago",
+      "days": "{{count}} d ago"
+    },
+    "sections": {
+      "services": "Services",
+      "volumeAndJobs": "Volume and jobs",
+      "operationalSignals": "Operational signals"
+    },
+    "services": {
+      "operational": "Operational"
+    },
+    "snapshots": {
+      "critical": "{{count}} critical snapshots",
+      "stale": "{{count}} stale snapshots",
+      "healthy": "Healthy snapshots"
+    },
+    "freshness": {
+      "title": "Freshness and operational risk",
+      "evaluatedSources": "Evaluated sources",
+      "redisDurability": "Redis durability",
+      "topSloViolations": "Top SLO violations",
+      "emptyTitle": "No SLO violations",
+      "emptyDescription": "No active freshness or operational violations."
+    },
+    "dlq": {
+      "title": "DLQ and quality",
+      "silverUnmapped": "Silver unmapped",
+      "goldScreenable": "Gold screenable",
+      "topDeadLetters": "Top dead letters",
+      "emptyTitle": "No open dead letters",
+      "emptyDescription": "No tasks stuck in the error queue."
+    }
+  },
+  "operations": {
+    "title": "Operations",
+    "loadingDescription": "Loading the operational state of sources…",
+    "description": "{{count}} sources · updated {{age}}s ago · auto-refresh {{rate}}",
+    "runningPill": "{{count}} running",
+    "time": {
+      "now": "now",
+      "agoMinutes": "{{count}}m ago",
+      "agoHours": "{{count}}h ago",
+      "agoDays": "{{count}}d ago",
+      "inMinutes": "in {{count}}m",
+      "inHours": "in {{count}}h",
+      "inDays": "in {{count}}d",
+      "inHoursDecimal": "in {{value}}h"
+    },
+    "records": {
+      "processed": "{{count}} processed",
+      "inserted": "+{{count}} new",
+      "updated": "~{{count}} changed"
+    },
+    "summary": {
+      "noChangesSkip": "no changes (skip)",
+      "running": "running…",
+      "failed": "failed",
+      "noActivity": "no activity"
+    },
+    "history": {
+      "loading": "Loading history…",
+      "empty": "No runs recorded for this source.",
+      "lastRuns": "Last {{count}} runs",
+      "start": "start",
+      "end": "end",
+      "stillRunning": "still running",
+      "duration": "duration"
+    },
+    "row": {
+      "runningFor": "running {{duration}}",
+      "failedAgo": "failed {{ago}} · duration {{duration}}",
+      "skipped": "skipped",
+      "noChanges": "no changes",
+      "durationLabel": "duration {{duration}}",
+      "completed": "completed",
+      "neverSynced": "Never synced",
+      "noSchedule": "no schedule",
+      "next": "next {{until}}",
+      "collapse": "Collapse",
+      "expandHistory": "Expand history",
+      "viewInSources": "View in {{path}}"
+    },
+    "dispatch": {
+      "noRemoteChanges": "no remote changes",
+      "skippedLock": "skipped (lock)",
+      "ok": "OK",
+      "failed": "failed",
+      "title": "Dispatcher last decided {{ago}} → {{result}}",
+      "label": "dispatch {{ago}} · {{result}}"
+    },
+    "os": {
+      "today": "today",
+      "agoMonths": "{{count}}mo ago",
+      "title": "OpenSanctions reports last real change {{age}} ({{date}})",
+      "label": "OS {{age}}"
+    },
+    "filters": {
+      "active": "Active",
+      "running": "Running",
+      "failing": "Failing",
+      "critical": "Critical",
+      "all": "All"
+    },
+    "status": {
+      "healthy": "healthy",
+      "running": "running",
+      "failed": "failed",
+      "stale": "stale",
+      "neverSynced": "never synced"
+    },
+    "infra": {
+      "skipRate7d": "Skip rate 7d",
+      "skippedOfFinished": "{{skipped}} of {{total}} finished",
+      "successRate": "Success rate",
+      "successCount": "{{count}} success",
+      "failureRate": "Failure rate",
+      "failedCount": "{{count}} failed",
+      "workers": "Workers",
+      "queues": "Queues",
+      "footerTitle": "Infrastructure:",
+      "snapshotsTitle": "Snapshots:"
+    },
+    "tier": {
+      "label": "Tier:",
+      "all": "All",
+      "tooltip1": "Critical sanctions / Fugitives",
+      "tooltip2": "Enforcement / Debarments",
+      "tooltip3": "PEPs / Compliance",
+      "tooltip4": "Investigation / Other"
+    },
+    "empty": {
+      "title": "No sources for this filter",
+      "description": "No sources match \"{{filter}}\"."
+    }
+  },
+  "reports": {
+    "title": "Compliance Reports",
+    "description": "KPIs and metrics for the AML/CFT system",
+    "caseStatus": {
+      "open": "Open",
+      "in_review": "In Review",
+      "escalated": "Escalated",
+      "closed_tp": "Closed (TP)",
+      "closed_fp": "Closed (FP)",
+      "closed_inconclusive": "Inconclusive",
+      "sar_filed": "SAR Filed"
+    },
+    "period": {
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days",
+      "lastYear": "Last year"
+    },
+    "kpi": {
+      "alertsGenerated": "Alerts Generated",
+      "casesCreated": "Cases Created",
+      "slaCompliance": "SLA Compliance",
+      "fpRate": "False Positive Rate"
+    },
+    "sections": {
+      "alertsBySeverity": "Alerts by Severity",
+      "casesByStatus": "Cases by Status",
+      "analystDecisions": "Analyst Decisions",
+      "operationalMetrics": "Operational Metrics"
+    },
+    "empty": {
+      "noAlerts": "No alerts in the period",
+      "noCases": "No cases in the period",
+      "noDecisions": "No decisions in the period"
+    },
+    "decisions": {
+      "truePositives": "True Positives",
+      "falsePositives": "False Positives",
+      "fpRateLabel": "FP Rate:"
+    },
+    "operational": {
+      "avgResolution": "Average resolution time",
+      "sarsFiled": "SARs filed",
+      "monitoredEntities": "Monitored entities",
+      "activeWhitelist": "Active whitelist"
+    },
+    "topEntities": {
+      "title": "Top Entities with Most Alerts",
+      "entity": "Entity",
+      "alerts": "Alerts",
+      "riskScore": "Risk Score"
+    },
+    "generatedAt": "Generated: {{date}}"
+  }
+}

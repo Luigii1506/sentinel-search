@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Upload,
@@ -52,6 +53,7 @@ const itemVariants = {
 };
 
 export function BulkScreeningPage() {
+  const { t } = useTranslation();
   const [step, setStep] = useState<'upload' | 'processing' | 'results'>('upload');
   const [inputMethod, setInputMethod] = useState<'file' | 'text'>('file');
   const [file, setFile] = useState<File | null>(null);
@@ -69,7 +71,7 @@ export function BulkScreeningPage() {
     if (droppedFile && (droppedFile.type === 'text/csv' || droppedFile.name.endsWith('.csv'))) {
       setFile(droppedFile);
     } else {
-      toast.error('Por favor sube un archivo CSV');
+      toast.error(t('workspace.bulk.toast.invalidFile'));
     }
   }, []);
 
@@ -114,12 +116,12 @@ export function BulkScreeningPage() {
     }
     
     if (names.length === 0) {
-      toast.error('No se encontraron nombres para procesar');
+      toast.error(t('workspace.bulk.toast.noNames'));
       return;
     }
-    
+
     if (names.length > 1000) {
-      toast.error('Maximo 1000 nombres por batch');
+      toast.error(t('workspace.bulk.toast.tooManyNames'));
       return;
     }
     
@@ -142,9 +144,9 @@ export function BulkScreeningPage() {
       
       setJob(newJob);
       startPolling(response.data.job_id);
-      toast.success(`Job creado: ${names.length} nombres`);
+      toast.success(t('workspace.bulk.toast.jobCreated', { count: names.length }));
     } catch (error) {
-      toast.error('Error al crear el job');
+      toast.error(t('workspace.bulk.toast.jobError'));
       setStep('upload');
     }
   };
@@ -171,7 +173,7 @@ export function BulkScreeningPage() {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setStep('results');
           if (data.status === 'completed') {
-            toast.success('Screening completado');
+            toast.success(t('workspace.bulk.toast.completed'));
           }
         }
       } catch (error) {
@@ -200,9 +202,9 @@ export function BulkScreeningPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
-      toast.success(`Descargado: ${format.toUpperCase()}`);
+      toast.success(t('workspace.bulk.toast.downloaded', { format: format.toUpperCase() }));
     } catch (error) {
-      toast.error('Error al descargar');
+      toast.error(t('workspace.bulk.toast.downloadError'));
     }
   };
 
@@ -217,8 +219,8 @@ export function BulkScreeningPage() {
   return (
     <AppPage width="default">
         <PageHeader
-          title="Screening masivo"
-          description="Screening masivo de nombres contra la base de datos."
+          title={t('workspace.bulk.title')}
+          description={t('workspace.bulk.description')}
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
               <FileSpreadsheet className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
@@ -244,7 +246,7 @@ export function BulkScreeningPage() {
                   className="flex-1"
                 >
                   <Upload className="w-4 h-4 mr-2" />
-                  Subir CSV
+                  {t('workspace.bulk.uploadCsv')}
                 </Button>
                 <Button
                   variant={inputMethod === 'text' ? 'default' : 'outline'}
@@ -252,7 +254,7 @@ export function BulkScreeningPage() {
                   className="flex-1"
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  Pegar Nombres
+                  {t('workspace.bulk.pasteNames')}
                 </Button>
               </motion.div>
 
@@ -304,10 +306,10 @@ export function BulkScreeningPage() {
                         >
                           <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-foreground font-medium mb-2">
-                            Arrastra un archivo CSV o haz click para seleccionar
+                            {t('workspace.bulk.dropzone.title')}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Debe tener una columna llamada "name" o "nombre"
+                            {t('workspace.bulk.dropzone.hint')}
                           </p>
                         </div>
                       )}
@@ -321,17 +323,17 @@ export function BulkScreeningPage() {
                 <motion.div variants={itemVariants}>
                   <Card className="bg-card border-foreground/5">
                     <CardHeader>
-                      <CardTitle className="text-foreground">Nombres a buscar</CardTitle>
+                      <CardTitle className="text-foreground">{t('workspace.bulk.namesToSearch')}</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <Textarea
                         value={namesText}
                         onChange={(e) => setNamesText(e.target.value)}
-                        placeholder="Pega los nombres aqui, uno por linea...&#10;Ejemplo:&#10;Juan Perez&#10;Maria Garcia&#10;Carlos Lopez"
+                        placeholder={t('workspace.bulk.textareaPlaceholder')}
                         className="min-h-[200px] bg-background border-foreground/10 text-foreground placeholder:text-muted-foreground"
                       />
                       <p className="text-sm text-muted-foreground mt-2">
-                        {parseNamesFromText().length} nombres detectados
+                        {t('workspace.bulk.namesDetected', { count: parseNamesFromText().length })}
                       </p>
                     </CardContent>
                   </Card>
@@ -343,7 +345,7 @@ export function BulkScreeningPage() {
                 <Card className="bg-card border-foreground/5">
                   <CardHeader>
                     <CardTitle className="text-foreground flex items-center justify-between">
-                      <span>Score minimo de coincidencia</span>
+                      <span>{t('workspace.bulk.minScore')}</span>
                       <Badge variant="outline" className="text-lg">
                         {Math.round(minScore * 100)}%
                       </Badge>
@@ -359,8 +361,8 @@ export function BulkScreeningPage() {
                       className="py-4"
                     />
                     <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm text-muted-foreground">
-                      <span>50% (Mas resultados)</span>
-                      <span>100% (Solo exactos)</span>
+                      <span>{t('workspace.bulk.scoreMoreResults')}</span>
+                      <span>{t('workspace.bulk.scoreExactOnly')}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -378,7 +380,7 @@ export function BulkScreeningPage() {
                   }
                 >
                   <Play className="w-5 h-5 mr-2" />
-                  Iniciar Screening
+                  {t('workspace.bulk.startScreening')}
                 </Button>
               </motion.div>
             </motion.div>
@@ -426,9 +428,9 @@ export function BulkScreeningPage() {
                     </div>
                   </div>
                   
-                  <h2 className="text-2xl font-bold text-foreground mb-2">Procesando...</h2>
+                  <h2 className="text-2xl font-bold text-foreground mb-2">{t('workspace.bulk.processing')}</h2>
                   <p className="text-muted-foreground mb-6">
-                    {job?.processed} de {job?.total} nombres procesados
+                    {t('workspace.bulk.processedOf', { processed: job?.processed ?? 0, total: job?.total ?? 0 })}
                   </p>
                   
                   <div className="w-full max-w-md mx-auto bg-foreground/10 rounded-full h-2 mb-4">
@@ -441,11 +443,11 @@ export function BulkScreeningPage() {
                   <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 text-sm">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-700 dark:text-green-400" />
-                      <span className="text-muted-foreground">{job?.completed_count} exitosos</span>
+                      <span className="text-muted-foreground">{t('workspace.bulk.successful', { count: job?.completed_count ?? 0 })}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                      <span className="text-muted-foreground">{job?.failed_count} fallidos</span>
+                      <span className="text-muted-foreground">{t('workspace.bulk.failed', { count: job?.failed_count ?? 0 })}</span>
                     </div>
                   </div>
                 </div>
@@ -468,9 +470,9 @@ export function BulkScreeningPage() {
                   <CardContent className="p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
-                        <h2 className="text-2xl font-bold text-foreground mb-1">Resultados</h2>
+                        <h2 className="text-2xl font-bold text-foreground mb-1">{t('workspace.bulk.results')}</h2>
                         <p className="text-muted-foreground">
-                          {job?.completed_count} procesados · {job?.failed_count} fallidos
+                          {t('workspace.bulk.resultsSummary', { processed: job?.completed_count ?? 0, failed: job?.failed_count ?? 0 })}
                         </p>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full sm:w-auto">
@@ -484,7 +486,7 @@ export function BulkScreeningPage() {
                         </Button>
                         <Button variant="ghost" onClick={reset}>
                           <RefreshCw className="w-4 h-4 mr-2" />
-                          Nuevo
+                          {t('workspace.bulk.new')}
                         </Button>
                       </div>
                     </div>
@@ -508,20 +510,20 @@ export function BulkScreeningPage() {
                             <div className="flex items-start justify-between gap-3">
                               <p className="text-sm text-foreground break-words">{result.query}</p>
                               {result.status === 'found' ? (
-                                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">Encontrado</Badge>
+                                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">{t('workspace.bulk.status.found')}</Badge>
                               ) : result.status === 'not_found' ? (
-                                <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">No encontrado</Badge>
+                                <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">{t('workspace.bulk.status.notFound')}</Badge>
                               ) : (
-                                <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">Error</Badge>
+                                <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">{t('workspace.bulk.status.error')}</Badge>
                               )}
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-sm">
                               <div>
-                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Matches</p>
+                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.matches')}</p>
                                 <p className="text-muted-foreground">{result.match_count}</p>
                               </div>
                               <div>
-                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Score</p>
+                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.score')}</p>
                                 {result.top_score ? (
                                   <Badge
                                     variant="outline"
@@ -541,7 +543,7 @@ export function BulkScreeningPage() {
                               </div>
                             </div>
                             <div>
-                              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Mejor Coincidencia</p>
+                              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.bestMatch')}</p>
                               <p className="text-sm text-muted-foreground break-words">{result.top_match_name || '-'}</p>
                             </div>
                           </CardContent>
@@ -556,19 +558,19 @@ export function BulkScreeningPage() {
                         <thead className="bg-foreground/5 border-b border-foreground/5">
                           <tr>
                             <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                              Nombre Buscado
+                              {t('workspace.bulk.table.searchedName')}
                             </th>
                             <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                              Status
+                              {t('workspace.bulk.table.status')}
                             </th>
                             <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                              Matches
+                              {t('workspace.bulk.table.matches')}
                             </th>
                             <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                              Mejor Coincidencia
+                              {t('workspace.bulk.table.bestMatch')}
                             </th>
                             <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
-                              Score
+                              {t('workspace.bulk.table.score')}
                             </th>
                           </tr>
                         </thead>
@@ -587,15 +589,15 @@ export function BulkScreeningPage() {
                               <td className="px-6 py-4 text-center">
                                 {result.status === 'found' ? (
                                   <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
-                                    Encontrado
+                                    {t('workspace.bulk.status.found')}
                                   </Badge>
                                 ) : result.status === 'not_found' ? (
                                   <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">
-                                    No encontrado
+                                    {t('workspace.bulk.status.notFound')}
                                   </Badge>
                                 ) : (
                                   <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
-                                    Error
+                                    {t('workspace.bulk.status.error')}
                                   </Badge>
                                 )}
                               </td>

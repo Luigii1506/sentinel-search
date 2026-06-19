@@ -11,6 +11,7 @@ import {
   Globe,
   Flag,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -35,6 +36,7 @@ export function RiskSummaryHeader({
   onAddNote,
   className,
 }: RiskSummaryHeaderProps) {
+  const { t } = useTranslation();
   const hasSanctions = entity.sanctions.length > 0;
   const hasPep = entity.pepEntries.length > 0;
   const hasAdverseMedia = entity.adverseMedia.length > 0;
@@ -80,7 +82,7 @@ export function RiskSummaryHeader({
                     {entity.primaryName}
                   </h1>
                   <Badge className={cn('capitalize', getRiskColorClass(entity.riskLevel))}>
-                    {entity.riskLevel}
+                    {t(`common.risk.${entity.riskLevel}`, { defaultValue: entity.riskLevel })}
                   </Badge>
                 </div>
 
@@ -91,7 +93,7 @@ export function RiskSummaryHeader({
                     {entity.type === 'vessel' && <span className="text-cyan-700 dark:text-cyan-400">●</span>}
                     {entity.type === 'aircraft' && <span className="text-amber-700 dark:text-amber-400">●</span>}
                     {entity.type === 'organization' && <span className="text-red-600 dark:text-red-400">●</span>}
-                    {entity.type}
+                    {t(`common.entityType.${entity.type}`, { defaultValue: entity.type })}
                   </span>
 
                   {entity.nationalities && entity.nationalities.length > 0 && (
@@ -119,7 +121,7 @@ export function RiskSummaryHeader({
                       <span className="text-muted-foreground">•</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" />
-                        Inc. {new Date(entity.incorporationDate).toLocaleDateString()}
+                        {t('entity.riskHeader.incorporatedShort')} {new Date(entity.incorporationDate).toLocaleDateString()}
                       </span>
                     </>
                   )}
@@ -131,7 +133,7 @@ export function RiskSummaryHeader({
             {entity.aliases.length > 0 && (
               <div className="mb-4">
                 <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Also Known As
+                  {t('entity.riskHeader.alsoKnownAs')}
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {entity.aliases.slice(0, 5).map((alias, index) => (
@@ -145,7 +147,7 @@ export function RiskSummaryHeader({
                   ))}
                   {entity.aliases.length > 5 && (
                     <Badge variant="outline" className="bg-foreground/5 border-foreground/10 text-muted-foreground">
-                      +{entity.aliases.length - 5} more
+                      {t('entity.riskHeader.more', { count: entity.aliases.length - 5 })}
                     </Badge>
                   )}
                 </div>
@@ -155,7 +157,7 @@ export function RiskSummaryHeader({
             {/* Data Sources */}
             <div className="mb-6">
               <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
-                Data Sources
+                {t('entity.riskHeader.dataSources')}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {entity.dataSources.map((source) => (
@@ -180,7 +182,7 @@ export function RiskSummaryHeader({
                 >
                   <Shield className="w-4 h-4 text-red-600 dark:text-red-500" />
                   <span className="text-sm text-red-600 dark:text-red-400">
-                    {entity.sanctions.length} Sanction{entity.sanctions.length > 1 ? 's' : ''}
+                    {t('entity.riskHeader.sanction', { count: entity.sanctions.length })}
                   </span>
                 </motion.div>
               )}
@@ -206,7 +208,7 @@ export function RiskSummaryHeader({
                 >
                   <AlertTriangle className="w-4 h-4 text-orange-700 dark:text-orange-500" />
                   <span className="text-sm text-orange-700 dark:text-orange-400">
-                    {entity.adverseMedia.length} Media Alert{entity.adverseMedia.length > 1 ? 's' : ''}
+                    {t('entity.riskHeader.mediaAlert', { count: entity.adverseMedia.length })}
                   </span>
                 </motion.div>
               )}
@@ -215,7 +217,7 @@ export function RiskSummaryHeader({
             {/* Last Updated */}
             <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />
-              <span>Last updated: {formatDateTime(entity.lastUpdated)}</span>
+              <span>{t('entity.riskHeader.lastUpdated', { date: formatDateTime(entity.lastUpdated) })}</span>
             </div>
           </div>
 
@@ -239,7 +241,7 @@ export function RiskSummaryHeader({
                 className="btn-primary gap-2"
               >
                 <Play className="w-4 h-4" />
-                Start Investigation
+                {t('entity.riskHeader.startInvestigation')}
               </Button>
 
               <Button
@@ -248,7 +250,7 @@ export function RiskSummaryHeader({
                 className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <Download className="w-4 h-4" />
-                Export Report
+                {t('entity.riskHeader.exportReport')}
               </Button>
 
               <Button
@@ -257,7 +259,7 @@ export function RiskSummaryHeader({
                 className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <Bell className="w-4 h-4" />
-                Monitor
+                {t('entity.riskHeader.monitor')}
               </Button>
 
               <Button
@@ -266,7 +268,7 @@ export function RiskSummaryHeader({
                 className="gap-2 border-foreground/10 hover:bg-foreground/10"
               >
                 <StickyNote className="w-4 h-4" />
-                Add Note
+                {t('entity.riskHeader.addNote')}
               </Button>
             </div>
           </div>

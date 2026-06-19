@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { 
   Activity, 
@@ -22,6 +23,7 @@ interface PerformanceStats {
 }
 
 export function PerformanceMonitor() {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<PerformanceStats>({
     avgTime: 0,
     minTime: 0,
@@ -69,7 +71,7 @@ export function PerformanceMonitor() {
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
           <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          Performance Monitor
+          {t('components.search.performance.title')}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -79,7 +81,7 @@ export function PerformanceMonitor() {
           <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Clock className="w-3 h-3" />
-              Tiempo Medio
+              {t('components.search.performance.avgTime')}
             </div>
             <div className={`text-2xl font-bold ${getPerformanceColor(stats.avgTime)}`}>
               {stats.avgTime.toFixed(0)}ms
@@ -90,7 +92,7 @@ export function PerformanceMonitor() {
           <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Database className="w-3 h-3" />
-              Cache Hit Rate
+              {t('components.search.performance.cacheHitRate')}
             </div>
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {stats.cacheHitRate.toFixed(0)}%
@@ -105,13 +107,13 @@ export function PerformanceMonitor() {
           <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Zap className="w-3 h-3" />
-              Cache Size
+              {t('components.search.performance.cacheSize')}
             </div>
             <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {stats.cacheSize}
             </div>
             <div className="text-xs text-muted-foreground">
-              / {screeningService.getCacheStats().maxSize} max
+              {t('components.search.performance.maxSuffix', { value: screeningService.getCacheStats().maxSize })}
             </div>
           </div>
 
@@ -119,7 +121,7 @@ export function PerformanceMonitor() {
           <div className="p-3 rounded-lg bg-foreground/5">
             <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <TrendingUp className="w-3 h-3" />
-              Queries
+              {t('components.search.performance.queries')}
             </div>
             <div className="text-2xl font-bold text-gray-200">
               {stats.totalQueries}
@@ -131,7 +133,7 @@ export function PerformanceMonitor() {
         {recentQueries.length > 0 && (
           <div className="space-y-2">
             <div className="text-xs text-muted-foreground font-medium">
-              Últimas búsquedas
+              {t('components.search.performance.recentSearches')}
             </div>
             <div className="space-y-1 max-h-32 overflow-y-auto">
               {recentQueries.slice(-5).reverse().map((query, idx) => (
@@ -149,7 +151,7 @@ export function PerformanceMonitor() {
                     {query.fromCache && (
                       <Badge variant="outline" className="text-xs border-purple-500/30 
                                                           text-purple-600 dark:text-purple-400">
-                        cache
+                        {t('components.search.performance.cache')}
                       </Badge>
                     )}
                     <span className={`text-xs ${getPerformanceColor(query.time)}`}>

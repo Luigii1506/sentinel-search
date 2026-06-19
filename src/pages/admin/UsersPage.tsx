@@ -10,6 +10,7 @@
  * mirrors usePermissions → admin > reviewer > analyst > viewer > readonly.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Users,
@@ -68,12 +69,12 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
-const ROLE_OPTIONS: { value: UserRoleName; label: string; description: string }[] = [
-  { value: 'admin',    label: 'Admin',    description: 'Acceso completo (keys, sources, system).' },
-  { value: 'reviewer', label: 'Reviewer', description: 'Insights + data review.' },
-  { value: 'analyst',  label: 'Analyst',  description: 'Cases + watchlist + adverse media.' },
-  { value: 'viewer',   label: 'Viewer',   description: 'Solo dashboards.' },
-  { value: 'readonly', label: 'Readonly', description: 'Solo búsqueda — el tier free.' },
+const ROLE_OPTIONS: { value: UserRoleName; labelKey: string; descriptionKey: string }[] = [
+  { value: 'admin',    labelKey: 'account.users.roleAdminLabel',    descriptionKey: 'account.users.roleAdminDescription' },
+  { value: 'reviewer', labelKey: 'account.users.roleReviewerLabel', descriptionKey: 'account.users.roleReviewerDescription' },
+  { value: 'analyst',  labelKey: 'account.users.roleAnalystLabel',  descriptionKey: 'account.users.roleAnalystDescription' },
+  { value: 'viewer',   labelKey: 'account.users.roleViewerLabel',   descriptionKey: 'account.users.roleViewerDescription' },
+  { value: 'readonly', labelKey: 'account.users.roleReadonlyLabel', descriptionKey: 'account.users.roleReadonlyDescription' },
 ];
 
 const ROLE_COLOR: Record<UserRoleName, string> = {
@@ -94,6 +95,7 @@ function formatDate(iso: string | null | undefined, fallback = '—'): string {
 }
 
 export default function UsersPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { user: currentUser } = useAuth();
   const [createOpen, setCreateOpen] = useState(false);
@@ -108,23 +110,23 @@ export default function UsersPage() {
     mutationFn: ({ id, payload }: { id: string; payload: Parameters<typeof usersService.update>[1] }) =>
       usersService.update(id, payload),
     onSuccess: () => {
-      toast.success('Usuario actualizado');
+      toast.success(t('account.users.toastUpdated'));
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     },
     onError: (err: unknown) => {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(detail || 'No se pudo actualizar el usuario');
+      toast.error(detail || t('account.users.toastUpdateError'));
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => usersService.remove(id),
     onSuccess: () => {
-      toast.success('Usuario eliminado');
+      toast.success(t('account.users.toastDeleted'));
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });
       setDeleteTarget(null);
     },
-    onError: () => toast.error('No se pudo eliminar'),
+    onError: () => toast.error(t('account.users.toastDeleteError')),
   });
 
   const isCurrentUser = (u: AppUser) =>
@@ -133,7 +135,7 @@ export default function UsersPage() {
   const columns: DataTableColumn<AppUser>[] = [
     {
       id: 'username',
-      header: 'Usuario',
+      header: t('account.users.columnUser'),
       primary: true,
       cell: (u) => (
         <div className="space-y-0.5">
@@ -141,7 +143,7 @@ export default function UsersPage() {
             {u.username}
             {isCurrentUser(u) && (
               <Badge variant="outline" className="text-[10px] bg-electric-500/10 text-electric-200 border-electric-500/40">
-                Tú
+                {t('account.users.you')}
               </Badge>
             )}
           </div>
@@ -151,7 +153,7 @@ export default function UsersPage() {
     },
     {
       id: 'role',
-      header: 'Rol',
+      header: t('account.users.columnRole'),
       cell: (u) => (
         <Select
           value={u.role}
@@ -165,7 +167,7 @@ export default function UsersPage() {
               'h-7 min-w-[120px] text-xs',
               ROLE_COLOR[u.role],
             )}
-            aria-label={`Rol de ${u.username}`}
+            aria-label={t('account.users.roleAria', { username: u.username })}
           >
             <SelectValue />
           </SelectTrigger>
@@ -173,8 +175,8 @@ export default function UsersPage() {
             {ROLE_OPTIONS.map((opt) => (
               <SelectItem key={opt.value} value={opt.value}>
                 <div className="flex flex-col">
-                  <span className="text-sm">{opt.label}</span>
-                  <span className="text-[11px] text-muted-foreground">{opt.description}</span>
+                  <span className="text-sm">{t(opt.labelKey)}</span>
+                  <span className="text-[11px] text-muted-foreground">{t(opt.descriptionKey)}</span>
                 </div>
               </SelectItem>
             ))}
@@ -184,24 +186,24 @@ export default function UsersPage() {
     },
     {
       id: 'status',
-      header: 'Status',
+      header: t('account.users.columnStatus'),
       cell: (u) => (
         u.is_active ? (
           <span className="inline-flex items-center gap-1 text-xs text-green-700 dark:text-green-300">
             <CheckCircle2 className="w-3.5 h-3.5" />
-            Activo
+            {t('account.users.statusActive')}
           </span>
         ) : (
           <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
             <XCircle className="w-3.5 h-3.5" />
-            Desactivado
+            {t('account.users.statusInactive')}
           </span>
         )
       ),
     },
     {
       id: 'api_key',
-      header: 'API Key',
+      header: t('account.users.columnApiKey'),
       hideOnMobile: true,
       cell: (u) => (
         u.api_key_name
@@ -211,14 +213,14 @@ export default function UsersPage() {
     },
     {
       id: 'created',
-      header: 'Creado',
+      header: t('account.users.columnCreated'),
       hideOnMobile: true,
       cell: (u) => <span className="text-xs text-muted-foreground">{formatDate(u.created_at)}</span>,
     },
     {
       id: 'last_login',
-      header: 'Último login',
-      cell: (u) => <span className="text-xs text-muted-foreground">{formatDate(u.last_login, 'Nunca')}</span>,
+      header: t('account.users.columnLastLogin'),
+      cell: (u) => <span className="text-xs text-muted-foreground">{formatDate(u.last_login, t('account.users.neverLoggedIn'))}</span>,
     },
     {
       id: 'actions',
@@ -234,9 +236,11 @@ export default function UsersPage() {
             onClick={() =>
               updateMutation.mutate({ id: u.id, payload: { is_active: !u.is_active } })
             }
-            aria-label={u.is_active ? `Desactivar ${u.username}` : `Activar ${u.username}`}
+            aria-label={u.is_active
+              ? t('account.users.deactivateAria', { username: u.username })
+              : t('account.users.activateAria', { username: u.username })}
           >
-            {u.is_active ? 'Desactivar' : 'Activar'}
+            {u.is_active ? t('account.users.deactivate') : t('account.users.activate')}
           </Button>
           <Button
             size="sm"
@@ -244,7 +248,7 @@ export default function UsersPage() {
             className="h-8 px-2 text-red-600 dark:text-red-300 hover:text-red-200"
             disabled={isCurrentUser(u)}
             onClick={() => setDeleteTarget(u)}
-            aria-label={`Eliminar ${u.username}`}
+            aria-label={t('account.users.deleteAria', { username: u.username })}
           >
             <Trash2 className="w-3.5 h-3.5" />
           </Button>
@@ -256,8 +260,8 @@ export default function UsersPage() {
   return (
     <AppPage>
       <PageHeader
-        title="Usuarios"
-        description="Gestión de cuentas y roles. Los cambios se aplican inmediatamente."
+        title={t('account.users.title')}
+        description={t('account.users.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
             <Users className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
@@ -271,14 +275,14 @@ export default function UsersPage() {
               onClick={() => refetch()}
               disabled={isFetching}
               className="gap-2"
-              aria-label="Refrescar lista"
+              aria-label={t('account.users.refreshAria')}
             >
               <RefreshCw className={cn('w-4 h-4', isFetching && 'animate-spin')} />
-              Refrescar
+              {t('account.users.refresh')}
             </Button>
             <Button size="sm" onClick={() => setCreateOpen(true)} className="gap-2">
               <Plus className="w-4 h-4" />
-              Nuevo usuario
+              {t('account.users.newUser')}
             </Button>
           </>
         }
@@ -295,12 +299,12 @@ export default function UsersPage() {
             empty={
               <EmptyState
                 icon={Users}
-                title="Sin usuarios"
-                description="Crea el primer usuario para empezar."
+                title={t('account.users.emptyTitle')}
+                description={t('account.users.emptyDescription')}
                 action={
                   <Button onClick={() => setCreateOpen(true)} className="gap-2">
                     <Plus className="w-4 h-4" />
-                    Nuevo usuario
+                    {t('account.users.newUser')}
                   </Button>
                 }
               />
@@ -321,21 +325,18 @@ export default function UsersPage() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(o) => !o && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Eliminar este usuario?</AlertDialogTitle>
+            <AlertDialogTitle>{t('account.users.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              <strong className="text-foreground">{deleteTarget?.username}</strong> perderá
-              acceso inmediatamente. Sus tokens activos seguirán válidos hasta expirar
-              (máx 30 min). Esta acción no se puede deshacer — considera desactivarlo
-              en su lugar si quieres conservar el historial.
+              <strong className="text-foreground">{deleteTarget?.username}</strong>{t('account.users.deleteWarning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.actions.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-red-500 hover:bg-red-600 text-white"
               onClick={() => deleteTarget && deleteMutation.mutate(deleteTarget.id)}
             >
-              Eliminar
+              {t('common.actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -355,6 +356,7 @@ function CreateUserDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: () => void;
 }) {
+  const { t } = useTranslation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -373,12 +375,12 @@ function CreateUserDialog({
       setEmail('');
       setPassword('');
       setRole('readonly');
-      toast.success('Usuario creado');
+      toast.success(t('account.users.toastCreated'));
       onCreated();
     },
     onError: (err: unknown) => {
       const detail = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(detail || 'No se pudo crear el usuario');
+      toast.error(detail || t('account.users.toastCreateError'));
     },
   });
 
@@ -391,52 +393,51 @@ function CreateUserDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Nuevo usuario</DialogTitle>
+          <DialogTitle>{t('account.users.createTitle')}</DialogTitle>
           <DialogDescription>
-            La contraseña se le entrega al usuario por canal seguro. El sistema no la
-            volverá a mostrar.
+            {t('account.users.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="new-username">Username *</Label>
+            <Label htmlFor="new-username">{t('account.users.createUsernameLabel')}</Label>
             <Input
               id="new-username"
               value={username}
               onChange={(e) => setUsername(e.target.value.toLowerCase())}
-              placeholder="ej. juan_perez"
+              placeholder={t('account.users.createUsernamePlaceholder')}
               autoFocus
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="new-email">Email (opcional)</Label>
+            <Label htmlFor="new-email">{t('account.users.createEmailLabel')}</Label>
             <Input
               id="new-email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="juan@empresa.com"
+              placeholder={t('account.users.createEmailPlaceholder')}
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="new-password">Contraseña *</Label>
+            <Label htmlFor="new-password">{t('account.users.createPasswordLabel')}</Label>
             <Input
               id="new-password"
               type="text"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="mínimo 8 caracteres"
+              placeholder={t('account.users.createPasswordPlaceholder')}
             />
             <p className="text-[10px] text-muted-foreground">
-              Visible mientras la tipeas — cópiala antes de cerrar el diálogo.
+              {t('account.users.createPasswordHint')}
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="new-role">Rol</Label>
+            <Label htmlFor="new-role">{t('account.users.columnRole')}</Label>
             <Select value={role} onValueChange={(v) => setRole(v as UserRoleName)}>
               <SelectTrigger id="new-role">
                 <SelectValue />
@@ -445,8 +446,8 @@ function CreateUserDialog({
                 {ROLE_OPTIONS.map((opt) => (
                   <SelectItem key={opt.value} value={opt.value}>
                     <div className="flex flex-col">
-                      <span className="text-sm">{opt.label}</span>
-                      <span className="text-[11px] text-muted-foreground">{opt.description}</span>
+                      <span className="text-sm">{t(opt.labelKey)}</span>
+                      <span className="text-[11px] text-muted-foreground">{t(opt.descriptionKey)}</span>
                     </div>
                   </SelectItem>
                 ))}
@@ -457,10 +458,10 @@ function CreateUserDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t('common.actions.cancel')}
           </Button>
           <Button disabled={!canSubmit} onClick={() => createMutation.mutate()}>
-            {createMutation.isPending ? 'Creando…' : 'Crear usuario'}
+            {createMutation.isPending ? t('account.users.creating') : t('account.users.createSubmit')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -49,9 +50,11 @@ interface SearchMetrics {
 export function OptimizedSearch({
   onResultSelect,
   className,
-  placeholder = "Buscar persona, empresa o concepto...",
+  placeholder,
   showMetrics = true,
 }: OptimizedSearchProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t('components.search.placeholder');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<OptimizedSearchResult[]>([]);
   const [metrics, setMetrics] = useState<SearchMetrics | null>(null);
@@ -100,10 +103,10 @@ export function OptimizedSearch({
     },
     onSuccess: (_data, result) => {
       setWatchlistedIds(prev => new Set(prev).add(result.entity_id));
-      toast.success(`${result.name} agregado a monitoreo continuo`);
+      toast.success(t('components.search.actions.watchSuccess', { name: result.name }));
     },
     onError: (_err, result) => {
-      toast.error(`Error al agregar ${result.name} a monitoreo`);
+      toast.error(t('components.search.actions.watchError', { name: result.name }));
     },
   });
 
@@ -121,10 +124,10 @@ export function OptimizedSearch({
       });
     },
     onSuccess: (data) => {
-      toast.success(`Alerta creada — Caso ${data.case_number}`);
+      toast.success(t('components.search.actions.alertSuccess', { caseNumber: data.case_number }));
     },
     onError: () => {
-      toast.error('Error al crear alerta');
+      toast.error(t('components.search.actions.alertError'));
     },
   });
 
@@ -174,7 +177,7 @@ export function OptimizedSearch({
       case 'concept':
         return 'Smart Search';
       case 'hybrid':
-        return 'Híbrido';
+        return t('components.search.metrics.strategyHybridLabel');
       default:
         return strategy;
     }
@@ -194,7 +197,7 @@ export function OptimizedSearch({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           className="w-full pl-12 pr-24 py-6 text-lg bg-foreground/5 border-foreground/10
                      text-foreground placeholder:text-muted-foreground rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
@@ -227,7 +230,7 @@ export function OptimizedSearch({
             ) : (
               <>
                 <Search className="w-4 h-4 mr-2" />
-                Buscar
+                {t('components.search.button')}
               </>
             )}
           </Button>
@@ -236,12 +239,12 @@ export function OptimizedSearch({
 
       {/* Source Level Selector */}
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-xs text-muted-foreground mr-1">Nivel:</span>
+        <span className="text-xs text-muted-foreground mr-1">{t('components.search.level')}</span>
         {([
-          { level: 1 as const, label: 'Critical', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
-          { level: 2 as const, label: 'Sanciones', desc: '+ Sanciones, Terrorismo, Law Enforcement restantes' },
-          { level: 3 as const, label: 'PEP & Compliance', desc: '+ PEP, Inhabilitaciones, Regulatorio, Fiscal' },
-          { level: 4 as const, label: 'Completo', desc: 'Todas las fuentes' },
+          { level: 1 as const, label: t('components.search.levels.critical'), desc: t('components.search.levels.criticalDesc') },
+          { level: 2 as const, label: t('components.search.levels.sanctions'), desc: t('components.search.levels.sanctionsDesc') },
+          { level: 3 as const, label: t('components.search.levels.pepCompliance'), desc: t('components.search.levels.pepComplianceDesc') },
+          { level: 4 as const, label: t('components.search.levels.complete'), desc: t('components.search.levels.completeDesc') },
         ]).map(({ level, label, desc }) => (
           <TooltipProvider key={level}>
             <Tooltip>
@@ -293,11 +296,11 @@ export function OptimizedSearch({
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Tiempo de respuesta</p>
+                  <p>{t('components.search.metrics.responseTime')}</p>
                   <p className="text-xs text-muted-foreground">
-                    {metrics.executionTimeMs < 100 ? '⚡ Ultra-rápido' :
-                     metrics.executionTimeMs < 300 ? '✅ Rápido' :
-                     '⏱ Normal'}
+                    {metrics.executionTimeMs < 100 ? t('components.search.metrics.ultraFast') :
+                     metrics.executionTimeMs < 300 ? t('components.search.metrics.fast') :
+                     t('components.search.metrics.normal')}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -316,11 +319,11 @@ export function OptimizedSearch({
                   </Badge>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Estrategia de búsqueda</p>
+                  <p>{t('components.search.metrics.strategy')}</p>
                   <p className="text-xs text-muted-foreground">
-                    {metrics.strategy === 'name' && 'Búsqueda por nombre (OpenSearch)'}
-                    {metrics.strategy === 'concept' && 'Búsqueda semántica (Embeddings)'}
-                    {metrics.strategy === 'hybrid' && 'Combinación de múltiples fuentes'}
+                    {metrics.strategy === 'name' && t('components.search.metrics.strategyName')}
+                    {metrics.strategy === 'concept' && t('components.search.metrics.strategyConcept')}
+                    {metrics.strategy === 'hybrid' && t('components.search.metrics.strategyHybrid')}
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -336,12 +339,12 @@ export function OptimizedSearch({
                       className="gap-1.5 border-purple-500/30 text-purple-600 dark:text-purple-400 cursor-help"
                     >
                       <Database className="w-3 h-3" />
-                      Cache
+                      {t('components.search.metrics.cache')}
                     </Badge>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Resultado desde caché</p>
-                    <p className="text-xs text-muted-foreground">Consulta previa encontrada</p>
+                    <p>{t('components.search.metrics.cacheResult')}</p>
+                    <p className="text-xs text-muted-foreground">{t('components.search.metrics.cacheHint')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -353,7 +356,7 @@ export function OptimizedSearch({
               className="gap-1.5 border-gray-500/30 text-muted-foreground"
             >
               <BarChart3 className="w-3 h-3" />
-              {metrics.totalMatches} resultados
+              {t('components.search.metrics.results', { count: metrics.totalMatches })}
             </Badge>
 
             {/* Fuentes usadas */}
@@ -435,7 +438,7 @@ export function OptimizedSearch({
                         className="text-xs gap-1 border-orange-500/30 text-orange-700 dark:text-orange-400"
                       >
                         <Newspaper className="w-3 h-3" />
-                        {result.article_count ?? 0} media
+                        {t('components.search.metrics.mediaCount', { count: result.article_count ?? 0 })}
                       </Badge>
                     )}
                   </div>
@@ -443,10 +446,10 @@ export function OptimizedSearch({
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="capitalize">{result.entity_type}</span>
                     <span>•</span>
-                    <span>Score: {(result.confidence * 100).toFixed(1)}%</span>
+                    <span>{t('components.search.metrics.score', { value: (result.confidence * 100).toFixed(1) })}</span>
                     <span>•</span>
                     <span className="text-xs">
-                      via {result.match_sources?.join(', ') || 'unknown'}
+                      {t('components.search.metrics.via', { sources: result.match_sources?.join(', ') || t('components.search.metrics.viaUnknown') })}
                     </span>
                   </div>
 
@@ -497,7 +500,7 @@ export function OptimizedSearch({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>{watchlistedIds.has(result.entity_id) ? 'En monitoreo' : 'Monitorear'}</p>
+                        <p>{watchlistedIds.has(result.entity_id) ? t('components.search.actions.watching') : t('components.search.actions.watch')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -522,7 +525,7 @@ export function OptimizedSearch({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Investigar (crear alerta)</p>
+                        <p>{t('components.search.actions.investigate')}</p>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
@@ -546,8 +549,8 @@ export function OptimizedSearch({
           >
             <EmptyState
               icon={AlertCircle}
-              title="Sin resultados"
-              description="Intenta con términos diferentes o revisa la ortografía."
+              title={t('components.search.empty.title')}
+              description={t('components.search.empty.description')}
             />
           </motion.div>
         )}

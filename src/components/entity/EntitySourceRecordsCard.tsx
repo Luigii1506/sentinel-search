@@ -1,5 +1,6 @@
 import { Database } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { fadeUp } from '@/lib/motion';
@@ -18,13 +19,14 @@ export function EntitySourceRecordsCard({
   formatSourceName,
   getRiskBadgeClasses,
 }: EntitySourceRecordsCardProps) {
+  const { t } = useTranslation();
   const catLabels: Record<string, string> = {
-    SANCTIONS: 'Sanciones',
-    LAW_ENFORCEMENT: 'Ley',
-    PEP: 'PEP',
-    REGULATORY: 'Regulatorio',
-    TAX: 'Fiscal',
-    DEBARMENT: 'Inhabilitación',
+    SANCTIONS: t('entity.sourceRecords.category.sanctions'),
+    LAW_ENFORCEMENT: t('entity.sourceRecords.category.lawEnforcement'),
+    PEP: t('entity.sourceRecords.category.pep'),
+    REGULATORY: t('entity.sourceRecords.category.regulatory'),
+    TAX: t('entity.sourceRecords.category.tax'),
+    DEBARMENT: t('entity.sourceRecords.category.debarment'),
   };
 
   const catColors: Record<string, string> = {
@@ -43,8 +45,8 @@ export function EntitySourceRecordsCard({
       <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="glass rounded-xl p-6">
         <h3 className="text-sm font-medium text-muted-foreground mb-4 flex items-center gap-2 uppercase tracking-wide">
           <Database className="w-4 h-4" />
-          Registros por Fuente
-          <span className="text-[10px] text-muted-foreground ml-auto">{sourceRecords.length} fuentes</span>
+          {t('entity.sourceRecords.title')}
+          <span className="text-[10px] text-muted-foreground ml-auto">{t('entity.sourceRecords.sourcesCount', { count: sourceRecords.length })}</span>
         </h3>
         <div className="space-y-2">
           {sourceRecords.map((rec, i) => (

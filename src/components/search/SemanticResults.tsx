@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { Brain, ArrowRight, AlertTriangle, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,12 +16,13 @@ interface SemanticResultsProps {
 }
 
 export function SemanticResults({ results, executionTime, onSelectEntity }: SemanticResultsProps) {
+  const { t } = useTranslation();
   if (results.length === 0) {
     return (
       <EmptyState
         icon={Brain}
-        title="Sin resultados semánticos"
-        description="Intenta con otra consulta o reduce el umbral de similitud."
+        title={t('components.search.semantic.emptyTitle')}
+        description={t('components.search.semantic.emptyDescription')}
       />
     );
   }
@@ -36,7 +38,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
           </div>
           <span className="text-muted-foreground">•</span>
           <span className="text-sm text-muted-foreground">
-            {results.length} resultados semánticos
+            {t('components.search.semantic.resultsCount', { count: results.length })}
           </span>
           {executionTime && (
             <>
@@ -90,7 +92,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                       size="sm"
                       className="self-start sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     >
-                      Ver detalles
+                      {t('components.search.semantic.viewDetails')}
                       <ArrowRight className="w-4 h-4 ml-1" />
                     </Button>
                   </div>
@@ -105,12 +107,12 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                       )}
                     >
                       <AlertTriangle className="w-3 h-3 mr-1" />
-                      {result.risk_level} Risk
+                      {t('components.search.semantic.riskSuffix', { level: result.risk_level })}
                     </Badge>
 
                     {/* Risk Score */}
                     <Badge variant="outline" className="text-muted-foreground border-foreground/10">
-                      Score: {result.risk_score ?? result.match_score ?? 'N/A'}
+                      {t('components.search.semantic.score', { value: result.risk_score ?? result.match_score ?? 'N/A' })}
                     </Badge>
 
                     {/* PEP Badge */}
@@ -151,7 +153,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                       />
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      Similitud semántica
+                      {t('components.search.semantic.semanticSimilarity')}
                     </span>
                   </div>
                 </div>
@@ -165,7 +167,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
       <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-4">
         <Brain className="w-3 h-3" />
         <span>
-          Resultados basados en embeddings de 526K entidades usando all-MiniLM-L6-v2
+          {t('components.search.semantic.footer')}
         </span>
       </div>
     </div>

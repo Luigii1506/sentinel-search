@@ -1,0 +1,187 @@
+{
+  "data": {
+    "audit": {
+      "title": "Data Audit",
+      "description": "Freshness, status and reliability of data sources",
+      "status": {
+        "healthy": "Healthy",
+        "warning": "Attention",
+        "critical": "Critical",
+        "inactive": "Inactive"
+      },
+      "freshness": {
+        "noData": "No data",
+        "today": "Today"
+      },
+      "zombie": {
+        "title_one": "{{count}} zombie job detected",
+        "title_other": "{{count}} zombie jobs detected",
+        "description": "Marked as \"running\" in the DB but with no worker executing them. Automatic cleanup fixes them in under 5 min.",
+        "moreItems_one": "...and {{count}} more",
+        "moreItems_other": "...and {{count}} more",
+        "jobFallback": "job",
+        "age": "{{hours}}h ago"
+      },
+      "coverage": {
+        "label": "Coverage last 24h",
+        "caption": "active sources synced in 24h"
+      },
+      "health": {
+        "label": "Health status"
+      },
+      "upcoming": {
+        "label": "Upcoming syncs",
+        "emptyTitle": "No upcoming syncs",
+        "emptyDescription": "No runs scheduled in the short term."
+      },
+      "metrics": {
+        "catalog": "Catalog",
+        "monitored": "Monitored",
+        "healthy": "Healthy",
+        "warning": "Needs attention",
+        "critical": "Critical",
+        "inactive": "Inactive"
+      },
+      "failedJobs": {
+        "title": "Recent Failed Jobs",
+        "badge": "Failed"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by source, name or country...",
+        "statusPlaceholder": "Filter by status",
+        "allStatuses": "All statuses"
+      },
+      "disappeared": {
+        "title": "Disappeared Sources",
+        "emptyTitle": "No disappeared sources",
+        "emptyDescription": "No sources are currently flagged as disappeared."
+      },
+      "lifecycle": {
+        "title": "Lifecycle Events",
+        "sourceFallback": "source",
+        "emptyTitle": "No recent events",
+        "emptyDescription": "There were no recent changes in the source lifecycle."
+      },
+      "table": {
+        "title": "Data Sources",
+        "source": "Source",
+        "category": "Category",
+        "status": "Status",
+        "health": "Health",
+        "records": "Records",
+        "lastSync": "Last Sync",
+        "freshness": "Freshness",
+        "actions": "Actions",
+        "emptyTitle": "No results",
+        "emptyDescription": "No sources matched the applied filters."
+      }
+    },
+    "sources": {
+      "title": "Sources Dashboard",
+      "description": "{{registered}} registered sources · {{withData}} with data",
+      "status": {
+        "active": "Active",
+        "pending": "Pending",
+        "error": "Error",
+        "stale": "Stale",
+        "disappeared": "Disappeared",
+        "inactive": "Inactive"
+      },
+      "date": {
+        "never": "Never",
+        "minutesAgo": "Minutes ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "errorState": {
+        "title": "Failed to load sources",
+        "description": "The data could not be retrieved"
+      },
+      "metrics": {
+        "registered": "Registered",
+        "progress": "Progress"
+      },
+      "tabs": {
+        "all": "All ({{count}})"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by name, source_id, dataset, country...",
+        "statusPlaceholder": "Status",
+        "dataPlaceholder": "Data",
+        "allStatuses": "All statuses",
+        "statusActive": "Active ({{count}})",
+        "statusPending": "Pending ({{count}})",
+        "statusError": "Error ({{count}})",
+        "statusStale": "Stale ({{count}})",
+        "statusInactive": "Inactive",
+        "dataAll": "All",
+        "dataHas": "With data",
+        "dataNone": "Without data"
+      },
+      "detail": {
+        "loading": "Loading...",
+        "status": "Status",
+        "category": "Category",
+        "country": "Country",
+        "entities": "Entities",
+        "layerCounts": "Counts by Layer",
+        "layerBronze": "Bronze (Raw)",
+        "layerSilver": "Silver (Clean)",
+        "layerGold": "Gold (Unified)",
+        "metrics7d": "Metrics (7 days)",
+        "successJobs": "Successful Jobs",
+        "failedJobs": "Failed Jobs",
+        "recentJobs": "Recent Jobs",
+        "records": "{{formatted}} records"
+      },
+      "card": {
+        "lastSync": "Last sync",
+        "viewDetail": "View detail"
+      },
+      "table": {
+        "source": "Source",
+        "category": "Cat",
+        "country": "Country",
+        "risk": "Risk",
+        "sync": "Sync",
+        "status": "Status",
+        "emptyTitle": "No sources found",
+        "showing": "Showing {{shown}} of {{total}} sources",
+        "totals": "Bronze: {{bronze}} · Silver: {{silver}} · Gold: {{gold}}"
+      },
+      "expanded": {
+        "importer": "Importer",
+        "queue": "queue: {{queue}}",
+        "queueDefault": "default",
+        "syncStrategyDefault": "scheduled_snapshot",
+        "freshnessDefault": "n/a",
+        "pep": "PEP",
+        "pepNo": "No",
+        "inactiveScheduler": "Inactive in scheduler",
+        "criticalSource": "Critical source",
+        "normalSource": "Normal source",
+        "dataUrl": "Data URL",
+        "smartUpdateUrl": "Smart Update URL",
+        "notConfigured": "Not configured"
+      }
+    },
+    "yente": {
+      "title": "Yente Catalog",
+      "description": "Catalog of datasets in Yente/OpenSanctions format. Consumable by Aleph/ICIJ/OCCRP.",
+      "exportJson": "Export JSON",
+      "errorFallback": "Error loading catalog",
+      "metrics": {
+        "datasets": "Datasets",
+        "indexedEntities": "Indexed entities",
+        "updated": "Updated"
+      },
+      "available": "Available datasets",
+      "filterPlaceholder": "Filter...",
+      "emptyTitle": "No datasets",
+      "emptyDescription": "No datasets match \"{{query}}\".",
+      "card": {
+        "entities": "entities"
+      }
+    }
+  }
+}

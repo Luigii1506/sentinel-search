@@ -1,5 +1,6 @@
 import { Calendar, ChevronDown, ChevronRight, Database, FileText } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn, formatDate, humanizeEntityName } from '@/lib/utils';
 import { formatSourceName } from '@/components/entity/entityProfileUtils';
 
@@ -46,6 +47,7 @@ export function RelationshipSectionsList({
   countryNames,
   onNavigateEntity,
 }: RelationshipSectionsListProps) {
+  const { t } = useTranslation();
   return (
     <>
       {sectionConfig.map((section) => {
@@ -169,16 +171,16 @@ export function RelationshipSectionsList({
                                 )}
                                 {rel.is_resolved ? (
                                   <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
-                                    Resuelta
+                                    {t('entity.relationships.card.resolved')}
                                   </span>
                                 ) : (
                                   <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
-                                    Sin resolver
+                                    {t('entity.relationships.card.unresolved')}
                                   </span>
                                 )}
                                 {(rel.context_category === 'profile_context' || rel.context_category === 'unknown') && (
                                   <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-500/10 text-muted-foreground border border-slate-500/20">
-                                    Contextual
+                                    {t('entity.relationships.card.contextual')}
                                   </span>
                                 )}
                                 {rel.related_entity_is_pep && (
@@ -189,10 +191,10 @@ export function RelationshipSectionsList({
                                 {rel.related_entity_risk_score != null && rel.related_entity_risk_score >= 40 && (
                                   <span className={cn('px-1.5 py-0.5 rounded text-[10px] font-medium border', riskBg, riskColor)}>
                                     {rel.related_entity_risk_level === 'critical'
-                                      ? 'Crítico'
+                                      ? t('entity.relationships.card.risk.critical')
                                       : rel.related_entity_risk_level === 'high'
-                                        ? 'Alto'
-                                        : 'Medio'}{' '}
+                                        ? t('entity.relationships.card.risk.high')
+                                        : t('entity.relationships.card.risk.medium')}{' '}
                                     {rel.related_entity_risk_score}
                                   </span>
                                 )}
@@ -207,20 +209,20 @@ export function RelationshipSectionsList({
                               ) : (
                                 <span className="text-muted-foreground text-xs">
                                   {referenceLike
-                                    ? 'Vínculo contextual'
+                                    ? t('entity.relationships.card.fallback.contextualLink')
                                     : section.key === 'family'
-                                      ? 'Familiar'
+                                      ? t('entity.relationships.card.fallback.family')
                                       : section.key === 'associates'
-                                        ? 'Asociado'
+                                        ? t('entity.relationships.card.fallback.associate')
                                         : section.key === 'corporate'
-                                          ? 'Relación corporativa'
+                                          ? t('entity.relationships.card.fallback.corporate')
                                           : section.key === 'political'
-                                            ? 'Relación política'
+                                            ? t('entity.relationships.card.fallback.political')
                                             : section.key === 'sanctions'
-                                              ? 'Relación sancionatoria'
+                                              ? t('entity.relationships.card.fallback.sanction')
                                               : section.key === 'profile'
-                                                ? 'Contexto de perfil'
-                                                : 'Relacionado'}
+                                                ? t('entity.relationships.card.fallback.profile')
+                                                : t('entity.relationships.card.fallback.related')}
                                 </span>
                               )}
                               {entityTypeLabel && (
@@ -234,12 +236,12 @@ export function RelationshipSectionsList({
                                   <span className="text-muted-foreground text-xs">·</span>
                                   <span className="text-xs text-muted-foreground">
                                     {rel.context_category === 'aml_core'
-                                      ? 'AML Core'
+                                      ? t('entity.relationships.card.context.amlCore')
                                       : rel.context_category === 'affiliation'
-                                        ? 'Afiliación'
+                                        ? t('entity.relationships.card.context.affiliation')
                                         : rel.context_category === 'profile_context'
-                                          ? 'Perfil'
-                                          : 'Contexto'}
+                                          ? t('entity.relationships.card.context.profile')
+                                          : t('entity.relationships.card.context.context')}
                                   </span>
                                 </>
                               )}
@@ -266,8 +268,8 @@ export function RelationshipSectionsList({
                                   {rel.start_date && rel.end_date
                                     ? `${formatDate(rel.start_date)} — ${formatDate(rel.end_date)}`
                                     : rel.start_date
-                                      ? `Desde ${formatDate(rel.start_date)}`
-                                      : `Hasta ${formatDate(rel.end_date!)}`}
+                                      ? t('entity.relationships.card.from', { date: formatDate(rel.start_date) })
+                                      : t('entity.relationships.card.until', { date: formatDate(rel.end_date!) })}
                                 </span>
                               )}
 
@@ -290,23 +292,23 @@ export function RelationshipSectionsList({
                                   )}
                                 >
                                   {rel.relationship_level === 'DIRECT'
-                                    ? 'Directa'
+                                    ? t('entity.relationships.card.level.direct')
                                     : rel.relationship_level === 'AFFILIATION'
-                                      ? 'Afiliación'
-                                      : 'Indirecta'}
+                                      ? t('entity.relationships.card.level.affiliation')
+                                      : t('entity.relationships.card.level.indirect')}
                                 </span>
                               )}
 
                               {!rel.is_resolved && (
                                 <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px]">
-                                  Requiere resolución
+                                  {t('entity.relationships.card.requiresResolution')}
                                 </span>
                               )}
 
                               {rel.related_entity_sources && rel.related_entity_sources.length > 1 && (
                                 <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-muted-foreground">
                                   <FileText className="w-3 h-3" />
-                                  {rel.related_entity_sources.length} fuentes
+                                  {t('entity.relationships.card.sources', { count: rel.related_entity_sources.length })}
                                 </span>
                               )}
                             </div>

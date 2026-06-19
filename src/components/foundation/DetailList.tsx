@@ -28,6 +28,7 @@
  */
 import { useState, type ReactNode } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface DetailListProps {
@@ -115,6 +116,7 @@ export function DetailRow({
 }
 
 function CopyButton({ value }: { value: string }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
   const onClick = async () => {
     try {
@@ -133,7 +135,7 @@ function CopyButton({ value }: { value: string }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label={copied ? 'Copiado' : 'Copiar al portapapeles'}
+      aria-label={copied ? t('components.foundation.detailList.copied') : t('components.foundation.detailList.copy')}
       className="shrink-0 text-muted-foreground hover:text-electric-300 transition-colors"
     >
       {copied ? <Check className="w-3.5 h-3.5 text-green-700 dark:text-green-400" /> : <Copy className="w-3.5 h-3.5" />}

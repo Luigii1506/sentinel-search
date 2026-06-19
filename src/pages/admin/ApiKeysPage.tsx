@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Key,
@@ -54,10 +55,10 @@ function formatDateOr(value: string | null | undefined, fallback = '—'): strin
   }
 }
 
-const ROLE_LABEL: Record<ApiKeyRole, string> = {
-  admin: 'Admin',
-  analyst: 'Analista',
-  readonly: 'Solo lectura',
+const ROLE_LABEL_KEY: Record<ApiKeyRole, string> = {
+  admin: 'account.apiKeys.roleAdmin',
+  analyst: 'account.apiKeys.roleAnalyst',
+  readonly: 'account.apiKeys.roleReadonly',
 };
 
 const ROLE_COLOR: Record<ApiKeyRole, string> = {
@@ -67,6 +68,7 @@ const ROLE_COLOR: Record<ApiKeyRole, string> = {
 };
 
 export default function ApiKeysPage() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [includeRevoked, setIncludeRevoked] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
@@ -81,28 +83,28 @@ export default function ApiKeysPage() {
   const revokeMutation = useMutation({
     mutationFn: (id: string) => apiKeysService.revoke(id),
     onSuccess: () => {
-      toast.success('API key revocada');
+      toast.success(t('account.apiKeys.toastRevoked'));
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
       setRevokeTarget(null);
     },
-    onError: () => toast.error('No se pudo revocar la key'),
+    onError: () => toast.error(t('account.apiKeys.toastRevokeError')),
   });
 
   const rotateMutation = useMutation({
     mutationFn: (id: string) => apiKeysService.rotate(id),
     onSuccess: (created) => {
-      toast.success('Key rotada — copia la nueva ahora');
+      toast.success(t('account.apiKeys.toastRotated'));
       queryClient.invalidateQueries({ queryKey: ['api-keys'] });
       setNewKeyDisplay(created);
     },
-    onError: () => toast.error('No se pudo rotar la key'),
+    onError: () => toast.error(t('account.apiKeys.toastRotateError')),
   });
 
   return (
     <AppPage>
       <PageHeader
-        title="API Keys"
-        description="Administra las llaves de acceso al API para cada cliente y rol."
+        title={t('account.apiKeys.title')}
+        description={t('account.apiKeys.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <Key className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -112,11 +114,11 @@ export default function ApiKeysPage() {
           <>
             <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
               <Switch checked={includeRevoked} onCheckedChange={setIncludeRevoked} />
-              Mostrar revocadas
+              {t('account.apiKeys.showRevoked')}
             </label>
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <Plus className="w-4 h-4" />
-              Nueva key
+              {t('account.apiKeys.newKey')}
             </Button>
           </>
         }
@@ -127,9 +129,7 @@ export default function ApiKeysPage() {
           <CardContent className="p-4 flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="text-sm text-amber-200/90">
-              <strong className="text-amber-700 dark:text-amber-300">Importante:</strong> la key completa
-              se muestra una sola vez al crearla o rotarla. Cópiala y guárdala en
-              un gestor seguro — no podrás verla de nuevo.
+              <strong className="text-amber-700 dark:text-amber-300">{t('account.apiKeys.warningStrong')}</strong>{t('account.apiKeys.warningBody')}
             </div>
           </CardContent>
         </Card>
@@ -138,7 +138,7 @@ export default function ApiKeysPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg text-foreground">
-              Keys {keys ? `(${keys.length})` : ''}
+              {keys ? t('account.apiKeys.tableTitle', { count: `(${keys.length})` }) : t('account.apiKeys.tableTitleEmpty')}
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
@@ -156,12 +156,12 @@ export default function ApiKeysPage() {
             ) : !keys || keys.length === 0 ? (
               <EmptyState
                 icon={Key}
-                title="Sin API keys"
-                description="Aún no hay API keys creadas para clientes o integraciones."
+                title={t('account.apiKeys.emptyTitle')}
+                description={t('account.apiKeys.emptyDescription')}
                 action={
                   <Button onClick={() => setCreateOpen(true)} className="gap-2">
                     <Plus className="w-4 h-4" />
-                    Nueva key
+                    {t('account.apiKeys.newKey')}
                   </Button>
                 }
               />
@@ -170,14 +170,14 @@ export default function ApiKeysPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-foreground/10 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                      <th className="px-4 py-3 font-medium">Cliente</th>
-                      <th className="px-4 py-3 font-medium">Prefix</th>
-                      <th className="px-4 py-3 font-medium">Rol</th>
-                      <th className="px-4 py-3 font-medium">Creada</th>
-                      <th className="px-4 py-3 font-medium">Último uso</th>
-                      <th className="px-4 py-3 font-medium">Expira</th>
-                      <th className="px-4 py-3 font-medium">Status</th>
-                      <th className="px-4 py-3 font-medium text-right">Acciones</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnClient')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnPrefix')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnRole')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnCreated')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnLastUsed')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnExpires')}</th>
+                      <th className="px-4 py-3 font-medium">{t('account.apiKeys.columnStatus')}</th>
+                      <th className="px-4 py-3 font-medium text-right">{t('account.apiKeys.columnActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -198,22 +198,22 @@ export default function ApiKeysPage() {
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant="outline" className={cn('text-xs', ROLE_COLOR[k.role])}>
-                            {ROLE_LABEL[k.role]}
+                            {t(ROLE_LABEL_KEY[k.role])}
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">
                           {formatDateOr(k.created_at)}
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {formatDateOr(k.last_used_at, 'Nunca')}
+                          {formatDateOr(k.last_used_at, t('account.apiKeys.neverUsed'))}
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">
-                          {formatDateOr(k.expires_at, 'Sin caducidad')}
+                          {formatDateOr(k.expires_at, t('account.apiKeys.noExpiry'))}
                         </td>
                         <td className="px-4 py-3">
                           <StatusPill
                             kind={k.is_active ? 'success' : 'neutral'}
-                            label={k.is_active ? 'Activa' : 'Revocada'}
+                            label={k.is_active ? t('account.apiKeys.statusActive') : t('account.apiKeys.statusRevoked')}
                             size="sm"
                           />
                         </td>
@@ -229,7 +229,7 @@ export default function ApiKeysPage() {
                                   disabled={rotateMutation.isPending}
                                 >
                                   <RotateCw className="w-3.5 h-3.5 mr-1" />
-                                  Rotar
+                                  {t('account.apiKeys.rotate')}
                                 </Button>
                                 <Button
                                   size="sm"
@@ -238,7 +238,7 @@ export default function ApiKeysPage() {
                                   onClick={() => setRevokeTarget(k)}
                                 >
                                   <Trash2 className="w-3.5 h-3.5 mr-1" />
-                                  Revocar
+                                  {t('account.apiKeys.revoke')}
                                 </Button>
                               </>
                             )}
@@ -272,14 +272,13 @@ export default function ApiKeysPage() {
         open={!!revokeTarget}
         onOpenChange={(o) => !o && setRevokeTarget(null)}
         variant="destructive"
-        title="¿Revocar esta API key?"
+        title={t('account.apiKeys.revokeTitle')}
         description={
           <>
-            <strong className="text-foreground">{revokeTarget?.client_name}</strong> dejará
-            de poder hacer requests inmediatamente. Esta acción no se puede deshacer.
+            <strong className="text-foreground">{revokeTarget?.client_name}</strong>{t('account.apiKeys.revokeWarning')}
           </>
         }
-        confirmLabel="Revocar"
+        confirmLabel={t('account.apiKeys.revoke')}
         onConfirm={() => {
           if (!revokeTarget) return;
           return revokeMutation.mutateAsync(revokeTarget.id);
@@ -300,6 +299,7 @@ function CreateKeyDialog({
   onOpenChange: (open: boolean) => void;
   onCreated: (key: ApiKeyCreated) => void;
 }) {
+  const { t } = useTranslation();
   const [clientName, setClientName] = useState('');
   const [role, setRole] = useState<ApiKeyRole>('analyst');
   const [description, setDescription] = useState('');
@@ -320,7 +320,7 @@ function CreateKeyDialog({
       setExpiresInDays('');
       onCreated(created);
     },
-    onError: () => toast.error('No se pudo crear la key'),
+    onError: () => toast.error(t('account.apiKeys.toastCreateError')),
   });
 
   const canSubmit = clientName.trim().length >= 2 && !createMutation.isPending;
@@ -329,46 +329,46 @@ function CreateKeyDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Nueva API key</DialogTitle>
+          <DialogTitle>{t('account.apiKeys.createTitle')}</DialogTitle>
           <DialogDescription>
-            La key completa se mostrará una sola vez en la siguiente pantalla.
+            {t('account.apiKeys.createDescription')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label htmlFor="client_name">Nombre del cliente *</Label>
+            <Label htmlFor="client_name">{t('account.apiKeys.createClientLabel')}</Label>
             <Input
               id="client_name"
-              placeholder="ej. banco_x_prod"
+              placeholder={t('account.apiKeys.createClientPlaceholder')}
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               autoFocus
             />
             <p className="text-[10px] text-muted-foreground">
-              Identificador interno. Usa snake_case (sin espacios).
+              {t('account.apiKeys.createClientHint')}
             </p>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="role">Rol</Label>
+            <Label htmlFor="role">{t('account.apiKeys.createRoleLabel')}</Label>
             <Select value={role} onValueChange={(v) => setRole(v as ApiKeyRole)}>
               <SelectTrigger id="role">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="readonly">Solo lectura — search only</SelectItem>
-                <SelectItem value="analyst">Analista — search + casos</SelectItem>
-                <SelectItem value="admin">Admin — full access</SelectItem>
+                <SelectItem value="readonly">{t('account.apiKeys.createRoleReadonly')}</SelectItem>
+                <SelectItem value="analyst">{t('account.apiKeys.createRoleAnalyst')}</SelectItem>
+                <SelectItem value="admin">{t('account.apiKeys.createRoleAdmin')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="description">Descripción (opcional)</Label>
+            <Label htmlFor="description">{t('account.apiKeys.createDescriptionLabel')}</Label>
             <Textarea
               id="description"
-              placeholder="ej. Integración de KYC para banca corporativa"
+              placeholder={t('account.apiKeys.createDescriptionPlaceholder')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
@@ -376,30 +376,30 @@ function CreateKeyDialog({
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="expires">Expira en días (opcional)</Label>
+            <Label htmlFor="expires">{t('account.apiKeys.createExpiresLabel')}</Label>
             <Input
               id="expires"
               type="number"
               min={1}
-              placeholder="ej. 90"
+              placeholder={t('account.apiKeys.createExpiresPlaceholder')}
               value={expiresInDays}
               onChange={(e) => setExpiresInDays(e.target.value)}
             />
             <p className="text-[10px] text-muted-foreground">
-              Vacío = sin caducidad. Recomendado: 90 días con rotación automática.
+              {t('account.apiKeys.createExpiresHint')}
             </p>
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
+            {t('common.actions.cancel')}
           </Button>
           <Button
             disabled={!canSubmit}
             onClick={() => createMutation.mutate()}
           >
-            {createMutation.isPending ? 'Creando…' : 'Crear key'}
+            {createMutation.isPending ? t('account.apiKeys.creating') : t('account.apiKeys.createSubmit')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -416,6 +416,7 @@ function NewKeyDialog({
   keyData: ApiKeyCreated | null;
   onClose: () => void;
 }) {
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -423,7 +424,7 @@ function NewKeyDialog({
     if (!keyData) return;
     navigator.clipboard.writeText(keyData.api_key);
     setCopied(true);
-    toast.success('Key copiada al portapapeles');
+    toast.success(t('account.apiKeys.toastCopied'));
     setTimeout(() => setCopied(false), 2000);
   };
 
@@ -442,23 +443,22 @@ function NewKeyDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-green-700 dark:text-green-400" />
-            API key creada
+            {t('account.apiKeys.createdTitle')}
           </DialogTitle>
           <DialogDescription>
-            Esta es la única vez que verás la key completa. Cópiala ahora y
-            guárdala en un gestor seguro.
+            {t('account.apiKeys.createdDescription')}
           </DialogDescription>
         </DialogHeader>
 
         {keyData && (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label>Cliente</Label>
+              <Label>{t('account.apiKeys.clientLabel')}</Label>
               <div className="text-sm text-foreground font-medium">{keyData.client_name}</div>
             </div>
 
             <div className="space-y-1.5">
-              <Label>API key</Label>
+              <Label>{t('account.apiKeys.apiKeyLabel')}</Label>
               <div className="flex items-center gap-2">
                 <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-foreground/10 font-mono text-sm text-blue-600 dark:text-blue-300 break-all">
                   {visible ? keyData.api_key : '•'.repeat(Math.min(keyData.api_key.length, 40))}
@@ -467,11 +467,11 @@ function NewKeyDialog({
                   size="icon"
                   variant="outline"
                   onClick={() => setVisible((v) => !v)}
-                  title={visible ? 'Ocultar' : 'Mostrar'}
+                  title={visible ? t('account.apiKeys.hideTitle') : t('account.apiKeys.showTitle')}
                 >
                   {visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
-                <Button size="icon" onClick={handleCopy} title="Copiar">
+                <Button size="icon" onClick={handleCopy} title={t('account.apiKeys.copyTitle')}>
                   {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </Button>
               </div>
@@ -481,8 +481,7 @@ function NewKeyDialog({
               <CardContent className="p-3 flex items-start gap-2 text-xs text-amber-200/90">
                 <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  Una vez que cierres este diálogo, la key se ocultará para siempre.
-                  Solo podrás ver el prefix <code className="font-mono">{keyData.key_prefix}…</code>
+                  {t('account.apiKeys.createdWarningPre')}<code className="font-mono">{keyData.key_prefix}…</code>
                 </div>
               </CardContent>
             </Card>
@@ -498,7 +497,7 @@ function NewKeyDialog({
             }}
             disabled={!copied}
           >
-            {copied ? 'Listo' : 'Copia la key primero'}
+            {copied ? t('account.apiKeys.done') : t('account.apiKeys.copyFirst')}
           </Button>
         </DialogFooter>
       </DialogContent>

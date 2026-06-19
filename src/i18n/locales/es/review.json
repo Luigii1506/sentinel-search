@@ -1,0 +1,149 @@
+{
+  "review": {
+    "entityTypeFilter": {
+      "all": "Todos los tipos"
+    },
+    "filters": {
+      "searchByName": "Buscar por nombre...",
+      "type": "Tipo",
+      "sortBy": "Ordenar por",
+      "sort": {
+        "confidenceAsc": "Confianza (menor)",
+        "confidenceDesc": "Confianza (mayor)",
+        "sourcesDesc": "Más fuentes",
+        "recent": "Más recientes",
+        "nameAsc": "Nombre A-Z"
+      },
+      "advanced": "Avanzados",
+      "allMethods": "Todos los métodos",
+      "minSources": "Mín. fuentes",
+      "sourcesPlus": "{{count}}+ fuentes",
+      "filterBySource": "Filtrar por fuente...",
+      "minConfidencePct": "Confianza mín. %"
+    },
+    "table": {
+      "source": "Fuente",
+      "sources": "Fuentes",
+      "name": "Nombre",
+      "externalId": "ID externo",
+      "method": "Método",
+      "methods": "Métodos",
+      "confidence": "Confianza",
+      "date": "Fecha",
+      "canonicalName": "Nombre canónico",
+      "type": "Tipo",
+      "mappings": "Mapeos",
+      "minConf": "Conf. mín.",
+      "avgConf": "Conf. prom.",
+      "risk": "Riesgo"
+    },
+    "row": {
+      "moreNames": "+{{count}} nombres",
+      "mappings": "Mapeos",
+      "avgConfidence": "Confianza prom.",
+      "pepLabel": "PEP"
+    },
+    "pagination": {
+      "showing": "Mostrando {{start}}-{{end}} de {{total}} entidades",
+      "perPage": "{{size}} / página"
+    },
+    "detail": {
+      "loadError": "Error al cargar el detalle",
+      "type": "Tipo",
+      "countries": "Países",
+      "birth": "Nacimiento",
+      "pep": "PEP",
+      "allNames": "Todos los nombres ({{count}})",
+      "silverMapped": "Entidades Silver mapeadas ({{count}})",
+      "viewFullProfile": "Ver perfil completo"
+    },
+    "merge": {
+      "title": "Revisión de fusiones",
+      "description": "Auditar entidades Gold con múltiples fuentes fusionadas",
+      "serverResponseTime": "Tiempo de respuesta del servidor",
+      "cached": "(en caché)",
+      "stats": {
+        "totalMerges": "Total de fusiones",
+        "crossSource": "Cross-Source",
+        "entityResolution": "Resolución de entidades",
+        "deduplication": "Deduplicación"
+      },
+      "errorTitle": "Error al cargar los datos",
+      "errorUnknown": "Error desconocido",
+      "emptyTitle": "No hay fusiones con estos filtros",
+      "emptyDescription": "Ajusta los filtros para ver más resultados."
+    },
+    "resolver": {
+      "title": "Revisión de resolución",
+      "description": "Pares UNSURE generados por cruce de referencias. Decide si son la misma entidad o entidades distintas.",
+      "stats": {
+        "unsurePending": "UNSURE pendientes",
+        "positivePending": "Positivos pendientes",
+        "negative": "Negativos",
+        "canonicalGroups": "Grupos canónicos"
+      },
+      "loadError": "Error al cargar la cola de revisión",
+      "emptyTitle": "Cola vacía",
+      "emptyDescription": "No hay pares UNSURE pendientes de revisión.",
+      "sameEntityQuestion": "¿Son la misma entidad?",
+      "score": "Puntaje",
+      "sameEntity": "MISMA entidad (fusionar)",
+      "distinctEntities": "Entidades DISTINTAS",
+      "skip": "Saltar",
+      "viewProfile": "Ver perfil",
+      "sanction": "SANCIÓN",
+      "sources": "Fuentes",
+      "toast": {
+        "mergeMarked": "Fusión marcada — se aplicará en el próximo ciclo",
+        "markedDistinct": "Marcado como entidades distintas",
+        "decideError": "Error al decidir"
+      }
+    },
+    "validation": {
+      "title": "Cola de validación",
+      "description": "Alertas del motor de consenso que requieren revisión humana",
+      "stats": {
+        "openAlerts": "Alertas abiertas",
+        "resolved": "Resueltas",
+        "entitiesAudited": "Entidades auditadas",
+        "acceptedHighConf": "Aceptadas alta conf.",
+        "flaggedRejected": "Marcadas + rechazadas"
+      },
+      "tabs": {
+        "open": "Abiertas",
+        "resolved": "Resueltas"
+      },
+      "severity": {
+        "all": "Todas las severidades"
+      },
+      "alertCount": "{{count}} alerta",
+      "alertCount_other": "{{count}} alertas",
+      "alertsTitle": "Alertas",
+      "emptyTitle": "Sin alertas",
+      "emptyDescription": "No hay alertas que coincidan con los filtros actuales.",
+      "evidence": "Evidencia",
+      "viewEntity": "Ver entidad",
+      "selectAlertPrompt": "Selecciona una alerta para ver la evidencia",
+      "nonPep": "No PEP",
+      "selectedAlert": "Alerta seleccionada",
+      "evidenceHistory": "Historial de evidencia ({{count}})",
+      "noRole": "(sin rol)",
+      "supportContradict": "{{support}} a favor · {{contradict}} en contra",
+      "noEvidence": "No hay evidencia disponible",
+      "resolution": {
+        "accepted": "aceptada",
+        "dismissed": "descartada",
+        "quarantined": "en cuarentena"
+      },
+      "actions": {
+        "accept": "Aceptar",
+        "quarantine": "Cuarentena",
+        "dismiss": "Descartar"
+      },
+      "toast": {
+        "alertResolved": "Alerta {{resolution}}",
+        "resolveError": "Error al resolver la alerta"
+      }
+    }
+  }
+}

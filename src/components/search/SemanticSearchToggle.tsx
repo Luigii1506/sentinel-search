@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Brain, Search, Info } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -15,6 +16,7 @@ interface SemanticSearchToggleProps {
 }
 
 export function SemanticSearchToggle({ mode, onChange, className }: SemanticSearchToggleProps) {
+  const { t } = useTranslation();
   return (
     <TooltipProvider>
       <div className={cn('flex flex-col sm:flex-row sm:items-center gap-2', className)}>
@@ -31,7 +33,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
             )}
           >
             <Search className="w-4 h-4" />
-            <span className="hidden sm:inline">Tradicional</span>
+            <span className="hidden sm:inline">{t('components.search.semanticToggle.traditional')}</span>
           </button>
 
           {/* Semantic Button */}
@@ -45,7 +47,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
             )}
           >
             <Brain className="w-4 h-4" />
-            <span className="hidden sm:inline">Smart Search</span>
+            <span className="hidden sm:inline">{t('components.search.semanticToggle.smartSearch')}</span>
             <span className="ml-1 text-[10px] bg-foreground/20 px-1.5 py-0.5 rounded-full">v5.0</span>
           </button>
         </div>
@@ -60,12 +62,12 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
           <TooltipContent side="bottom" className="max-w-xs">
             <div className="space-y-2">
               <p className="font-medium">
-                {mode === 'semantic' ? '🧠 Búsqueda Semántica' : '🔤 Búsqueda Tradicional'}
+                {mode === 'semantic' ? t('components.search.semanticToggle.semanticTitle') : t('components.search.semanticToggle.traditionalTitle')}
               </p>
               <p className="text-sm text-muted-foreground">
                 {mode === 'semantic'
-                  ? 'Busca por significado, no solo por texto. Ideal para investigaciones y conceptos abstractos como "terrorismo financiero" o "lavado de dinero".'
-                  : 'Busca por coincidencia de texto. Ideal para nombres exactos y búsquedas literales.'}
+                  ? t('components.search.semanticToggle.semanticDesc')
+                  : t('components.search.semanticToggle.traditionalDesc')}
               </p>
             </div>
           </TooltipContent>
@@ -79,7 +81,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
             className="hidden md:flex items-center gap-1 text-xs text-muted-foreground"
           >
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span>526K embeddings</span>
+            <span>{t('components.search.semanticToggle.embeddings')}</span>
           </motion.div>
         )}
       </div>

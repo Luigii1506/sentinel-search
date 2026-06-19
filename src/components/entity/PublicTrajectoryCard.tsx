@@ -1,4 +1,5 @@
 import { ArrowRight, Landmark } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatDate } from '@/lib/utils';
 import type { CanonicalPepEntry, UnifiedCareerEntry } from '@/components/entity/entityProfileUtils';
@@ -17,15 +18,16 @@ export function PublicTrajectoryCard({
   pepStatus = 'non_pep',
   onOpenPepDetail,
 }: PublicTrajectoryCardProps) {
+  const { t } = useTranslation();
   if (unifiedCareerEntries.length === 0) return null;
 
   const pepBadgeLabel = pepStatus === 'current_pep'
-    ? 'PEP en cargo'
+    ? t('entity.trajectory.pepBadge.current')
     : pepStatus === 'former_pep_in_monitoring'
-      ? 'Ex-PEP en monitoreo'
+      ? t('entity.trajectory.pepBadge.monitoring')
       : pepStatus === 'ex_pep'
-        ? 'Ex-PEP'
-        : 'Sin registro PEP';
+        ? t('entity.trajectory.pepBadge.exPep')
+        : t('entity.trajectory.pepBadge.noRecord');
 
   const pepBadgeClass = pepStatus === 'current_pep'
     ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
@@ -38,7 +40,7 @@ export function PublicTrajectoryCard({
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
           <Landmark className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          Trayectoria pública
+          {t('entity.trajectory.title')}
         </h3>
         <div className="flex flex-wrap items-center gap-2">
           {canonicalPepEntries.length > 0 && (
@@ -47,7 +49,7 @@ export function PublicTrajectoryCard({
             </Badge>
           )}
           <Badge variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
-            {unifiedCareerEntries.length} cargo{unifiedCareerEntries.length !== 1 ? 's' : ''}
+            {t('entity.trajectory.positions', { count: unifiedCareerEntries.length })}
           </Badge>
         </div>
       </div>
@@ -65,7 +67,7 @@ export function PublicTrajectoryCard({
                     <span className="text-[10px] text-muted-foreground">{countryNames[entry.country] || entry.country}</span>
                   )}
                   {entry.start_date && (
-                    <span className="text-[10px] text-muted-foreground">{formatDate(entry.start_date)} — {entry.end_date ? formatDate(entry.end_date) : 'Presente'}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatDate(entry.start_date)} — {entry.end_date ? formatDate(entry.end_date) : t('entity.trajectory.present')}</span>
                   )}
                   {entry.source && (
                     <span className="text-[10px] text-muted-foreground">{formatSourceName(entry.source) || entry.source}</span>
@@ -77,7 +79,7 @@ export function PublicTrajectoryCard({
                   <Badge variant="outline" className="text-[10px] text-purple-600 dark:text-purple-300 border-purple-500/30 bg-purple-500/10">PEP</Badge>
                 )}
                 <Badge variant="outline" className={cn('text-[10px]', entry.is_current ? 'text-emerald-700 dark:text-emerald-300 border-emerald-500/30 bg-emerald-500/10' : 'text-muted-foreground')}>
-                  {entry.is_current ? 'Vigente' : 'Histórico'}
+                  {entry.is_current ? t('entity.trajectory.current') : t('entity.trajectory.historical')}
                 </Badge>
               </div>
             </div>
@@ -86,7 +88,7 @@ export function PublicTrajectoryCard({
         {(unifiedCareerEntries.length > 6 || canonicalPepEntries.length > 0) && canonicalPepEntries.length > 0 && (
           <div className="flex flex-wrap gap-3">
             <button onClick={onOpenPepDetail} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
-              Ver detalle PEP <ArrowRight className="w-3 h-3" />
+              {t('entity.trajectory.viewPepDetail')} <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         )}

@@ -1,4 +1,6 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -41,60 +43,28 @@ type MatchWithOrigin = FederatedMatch & {
 const ORIGIN_META: Record<
   SearchOrigin,
   {
-    label: string;
-    shortLabel: string;
     icon: typeof Database;
     badgeClassName: string;
-    description: string;
-    summary: string;
-    emptyMessage: string;
   }
 > = {
   local: {
-    label: 'Fuentes internas y regulatorias',
-    shortLabel: 'Local',
     icon: Database,
     badgeClassName: 'border-blue-500/30 bg-blue-500/10 text-blue-200',
-    description: 'Listas regulatorias, sanciones, PEPs y fuentes prioritarias ya integradas en la plataforma.',
-    summary: 'Valida exposición inmediata dentro de tus fuentes más críticas.',
-    emptyMessage: 'No hubo coincidencias en fuentes regulatorias o internas.',
   },
   leaks: {
-    label: 'Leaks e investigación periodística',
-    shortLabel: 'Leaks',
     icon: FileText,
     badgeClassName: 'border-rose-500/30 bg-rose-500/10 text-rose-200',
-    description: 'Consorcios periodísticos y bases tipo Panama, Paradise y Pandora Papers.',
-    summary: 'Útil para detectar exposición reputacional o estructuras offshore.',
-    emptyMessage: 'No hubo coincidencias en leaks investigativos.',
   },
   external: {
-    label: 'Cobertura externa ampliada',
-    shortLabel: 'Externo',
     icon: Globe,
     badgeClassName: 'border-violet-500/30 bg-violet-500/10 text-violet-200',
-    description: 'Catálogos externos como OpenSanctions y Wikidata para ampliar el contexto.',
-    summary: 'Ayuda a validar cobertura adicional fuera de tus fuentes base.',
-    emptyMessage: 'No hubo coincidencias en catálogos externos.',
   },
 };
 
 const THRESHOLD_PRESETS = [
-  {
-    value: 0.4,
-    label: 'Amplio',
-    hint: 'Mayor cobertura, más ruido.',
-  },
-  {
-    value: 0.5,
-    label: 'Balanceado',
-    hint: 'Buen punto de partida para analistas.',
-  },
-  {
-    value: 0.7,
-    label: 'Estricto',
-    hint: 'Menos ruido, prioriza precisión.',
-  },
+  { value: 0.4, key: 'broad' },
+  { value: 0.5, key: 'balanced' },
+  { value: 0.7, key: 'strict' },
 ] as const;
 
 function flattenResults(data: FederatedSearchResponse | null): MatchWithOrigin[] {
@@ -116,15 +86,15 @@ function formatScore(score: number): string {
   return `${Math.round(score * 100)}%`;
 }
 
-function formatDatasets(datasets: string[]): string {
-  if (datasets.length === 0) return 'Sin dataset visible';
+function formatDatasets(datasets: string[], t: TFunction): string {
+  if (datasets.length === 0) return t('workspace.federated.noDataset');
   if (datasets.length === 1) return datasets[0];
   return `${datasets[0]} +${datasets.length - 1}`;
 }
 
-function buildExecutiveSummary(matches: MatchWithOrigin[]): string {
+function buildExecutiveSummary(matches: MatchWithOrigin[], t: TFunction): string {
   if (matches.length === 0) {
-    return 'No se detectaron coincidencias en las fuentes consultadas para esta búsqueda.';
+    return t('workspace.federated.summary.none');
   }
 
   const hasSanctions = matches.some((match) => match.is_sanctioned);
@@ -132,31 +102,31 @@ function buildExecutiveSummary(matches: MatchWithOrigin[]): string {
   const hasLeaks = matches.some((match) => match.origin === 'leaks');
 
   if (hasSanctions) {
-    return 'Se detectaron coincidencias con exposición sensible. Prioriza revisión de sanciones y valida identidad antes de cerrar el caso.';
+    return t('workspace.federated.summary.sanctions');
   }
 
   if (hasPep && hasLeaks) {
-    return 'La búsqueda combina exposición política y señales reputacionales. Conviene revisar contexto, beneficiarios y vínculos relacionados.';
+    return t('workspace.federated.summary.pepAndLeaks');
   }
 
   if (hasPep) {
-    return 'Se identificaron coincidencias con perfil políticamente expuesto. Revisa relación, jurisdicción y vigencia del contexto.';
+    return t('workspace.federated.summary.pep');
   }
 
   if (hasLeaks) {
-    return 'Se detectó exposición en fuentes investigativas. Evalúa si el hallazgo cambia el riesgo reputacional o el nivel de debida diligencia.';
+    return t('workspace.federated.summary.leaks');
   }
 
-  return 'Hay coincidencias útiles para investigación, pero sin señales críticas inmediatas. Valida identidad y cobertura antes de descartar.';
+  return t('workspace.federated.summary.generic');
 }
 
-function buildCoverageLabel(data: FederatedSearchResponse): string {
+function buildCoverageLabel(data: FederatedSearchResponse, t: TFunction): string {
   const activeOrigins = (Object.entries(data.totals) as [SearchOrigin, number][]).filter(([, total]) => total > 0);
 
-  if (activeOrigins.length === 0) return 'Sin cobertura positiva';
-  if (activeOrigins.length === 3) return 'Cobertura en 3/3 fuentes';
+  if (activeOrigins.length === 0) return t('workspace.federated.coverage.none');
+  if (activeOrigins.length === 3) return t('workspace.federated.coverage.full');
 
-  return `Cobertura en ${activeOrigins.length}/3 fuentes`;
+  return t('workspace.federated.coverage.partial', { count: activeOrigins.length });
 }
 
 function normalizeThreshold(value: string | null): number {
@@ -166,6 +136,7 @@ function normalizeThreshold(value: string | null): number {
 }
 
 export function FederatedSearchPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -205,7 +176,7 @@ export function FederatedSearchPage() {
     : 0;
   const hasResults = Boolean(data);
   const hasMatches = allMatches.length > 0;
-  const errorMessage = error instanceof Error ? error.message : 'No fue posible ejecutar la búsqueda.';
+  const errorMessage = error instanceof Error ? error.message : t('workspace.federated.error');
 
   const syncSearchParams = (nextQuery: string, nextThreshold: number) => {
     const params = new URLSearchParams(searchParams);
@@ -231,8 +202,8 @@ export function FederatedSearchPage() {
   return (
     <AppPage>
       <PageHeader
-        title="Búsqueda ampliada"
-        description="Consulta una persona o empresa una sola vez y revisa cobertura interna, leaks e inteligencia externa con una lectura más accionable."
+        title={t('workspace.federated.title')}
+        description={t('workspace.federated.description')}
         icon={
           <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/15 via-blue-500/10 to-transparent p-3">
             <FileSearch className="h-6 w-6 text-cyan-700 dark:text-cyan-300" />
@@ -249,7 +220,7 @@ export function FederatedSearchPage() {
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={(event) => event.key === 'Enter' && runSearch()}
-                  placeholder="Busca una persona, empresa o beneficiario final"
+                  placeholder={t('workspace.federated.searchPlaceholder')}
                   className="border-foreground/10 bg-background/60 text-foreground"
                 />
               </div>
@@ -261,7 +232,7 @@ export function FederatedSearchPage() {
                   className="border-foreground/10 bg-transparent"
                 >
                   <SlidersHorizontal className="mr-2 h-4 w-4" />
-                  Ajustes
+                  {t('workspace.federated.settings')}
                 </Button>
                 <Button type="button" onClick={runSearch} disabled={isFetching || query.trim().length < 2}>
                   {isFetching ? (
@@ -269,7 +240,7 @@ export function FederatedSearchPage() {
                   ) : (
                     <Search className="mr-2 h-4 w-4" />
                   )}
-                  Buscar
+                  {t('workspace.federated.search')}
                 </Button>
               </div>
             </div>
@@ -287,8 +258,8 @@ export function FederatedSearchPage() {
                       : 'border-foreground/10 bg-background/40 text-muted-foreground hover:border-foreground/20 hover:text-foreground',
                   )}
                 >
-                  <div className="text-sm font-medium">{preset.label}</div>
-                  <div className="text-xs text-muted-foreground">{preset.hint}</div>
+                  <div className="text-sm font-medium">{t(`workspace.federated.thresholdPresets.${preset.key}.label`)}</div>
+                  <div className="text-xs text-muted-foreground">{t(`workspace.federated.thresholdPresets.${preset.key}.hint`)}</div>
                 </button>
               ))}
             </div>
@@ -297,7 +268,7 @@ export function FederatedSearchPage() {
               <div className="grid gap-4 rounded-xl border border-foreground/10 bg-background/40 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-                    <span>Sensibilidad de coincidencia</span>
+                    <span>{t('workspace.federated.matchSensitivity')}</span>
                     <span className="font-mono text-foreground">{threshold.toFixed(2)}</span>
                   </div>
                   <input
@@ -311,23 +282,23 @@ export function FederatedSearchPage() {
                   />
                 </div>
                 <div className="rounded-lg border border-foreground/10 bg-foreground/5 px-3 py-2 text-xs text-muted-foreground">
-                  Umbral actual: <span className="font-medium text-foreground">{threshold >= 0.7 ? 'estricto' : threshold <= 0.45 ? 'amplio' : 'balanceado'}</span>
+                  {t('workspace.federated.currentThreshold')} <span className="font-medium text-foreground">{threshold >= 0.7 ? t('workspace.federated.thresholdLevel.strict') : threshold <= 0.45 ? t('workspace.federated.thresholdLevel.broad') : t('workspace.federated.thresholdLevel.balanced')}</span>
                 </div>
               </div>
             )}
 
             <div className="grid gap-3 text-sm text-muted-foreground lg:grid-cols-3">
               <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-foreground">Cuándo usar esta vista</div>
-                <p>Cuando necesitas confirmar cobertura ampliada y no solo una coincidencia local.</p>
+                <div className="mb-1 font-medium text-foreground">{t('workspace.federated.info.whenTitle')}</div>
+                <p>{t('workspace.federated.info.whenBody')}</p>
               </div>
               <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-foreground">Qué devuelve</div>
-                <p>Resultados agrupados por tipo de fuente, con score unificado y señales críticas visibles.</p>
+                <div className="mb-1 font-medium text-foreground">{t('workspace.federated.info.returnsTitle')}</div>
+                <p>{t('workspace.federated.info.returnsBody')}</p>
               </div>
               <div className="rounded-xl border border-foreground/10 bg-background/30 p-3">
-                <div className="mb-1 font-medium text-foreground">Qué decisión habilita</div>
-                <p>Priorizar revisión manual, abrir expediente o descartar con mayor confianza.</p>
+                <div className="mb-1 font-medium text-foreground">{t('workspace.federated.info.decisionTitle')}</div>
+                <p>{t('workspace.federated.info.decisionBody')}</p>
               </div>
             </div>
           </CardContent>
@@ -344,8 +315,8 @@ export function FederatedSearchPage() {
       {isLoading && !data && (
         <EmptyState
           icon={Loader2}
-          title="Consultando cobertura ampliada"
-          description="La plataforma está comparando la búsqueda contra fuentes internas, leaks y catálogos externos."
+          title={t('workspace.federated.loading.title')}
+          description={t('workspace.federated.loading.description')}
           className="py-14"
         />
       )}
@@ -353,20 +324,20 @@ export function FederatedSearchPage() {
       {hasResults && (
         <>
           <Section
-            title="Resumen ejecutivo"
-            description="Lectura rápida de la búsqueda para decidir si vale la pena profundizar de inmediato."
+            title={t('workspace.federated.execSummary.title')}
+            description={t('workspace.federated.execSummary.description')}
           >
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <MetricCard label="Coincidencias totales" value={allMatches.length} icon={Search} />
-              <MetricCard label="Fuentes con hallazgos" value={activeOrigins} unit="/3" icon={Globe} />
+              <MetricCard label={t('workspace.federated.metrics.totalMatches')} value={allMatches.length} icon={Search} />
+              <MetricCard label={t('workspace.federated.metrics.sourcesWithFindings')} value={activeOrigins} unit="/3" icon={Globe} />
               <MetricCard
-                label="Señales de sanción"
+                label={t('workspace.federated.metrics.sanctionSignals')}
                 value={sanctionedCount}
                 icon={ShieldAlert}
                 accent={sanctionedCount > 0 ? 'red' : 'success'}
               />
               <MetricCard
-                label="Señales PEP"
+                label={t('workspace.federated.metrics.pepSignals')}
                 value={pepCount}
                 icon={UserCheck}
                 accent={pepCount > 0 ? 'amber' : 'success'}
@@ -375,29 +346,29 @@ export function FederatedSearchPage() {
           </Section>
 
           <Section
-            title="Lectura del resultado"
-            description="Esta vista sintetiza la cobertura detectada y resalta el hallazgo más relevante."
+            title={t('workspace.federated.reading.title')}
+            description={t('workspace.federated.reading.description')}
           >
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1.35fr)_minmax(280px,0.65fr)]">
-              <SectionCard title="Conclusión operativa" icon={Sparkles}>
+              <SectionCard title={t('workspace.federated.operationalConclusion')} icon={Sparkles}>
                 <div className="space-y-4">
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline" className="border-cyan-500/30 bg-cyan-500/10 text-cyan-200">
-                      {data ? buildCoverageLabel(data) : 'Sin datos'}
+                      {data ? buildCoverageLabel(data, t) : t('workspace.federated.noData')}
                     </Badge>
                     <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-muted-foreground">
-                      {data?.candidates_evaluated ?? 0} candidatos evaluados
+                      {t('workspace.federated.candidatesEvaluated', { count: data?.candidates_evaluated ?? 0 })}
                     </Badge>
                     <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-muted-foreground">
-                      Umbral {data?.threshold.toFixed(2) ?? submittedThreshold.toFixed(2)}
+                      {t('workspace.federated.thresholdBadge', { value: data?.threshold.toFixed(2) ?? submittedThreshold.toFixed(2) })}
                     </Badge>
                   </div>
-                  <p className="text-sm leading-6 text-muted-foreground">{buildExecutiveSummary(allMatches)}</p>
+                  <p className="text-sm leading-6 text-muted-foreground">{buildExecutiveSummary(allMatches, t)}</p>
                   {bestMatch ? (
                     <div className="rounded-xl border border-foreground/10 bg-background/40 p-4">
                       <div className="mb-3 flex items-start justify-between gap-3">
                         <div>
-                          <div className="text-xs uppercase tracking-wide text-muted-foreground">Hallazgo principal</div>
+                          <div className="text-xs uppercase tracking-wide text-muted-foreground">{t('workspace.federated.mainFinding')}</div>
                           <div className="mt-1 text-base font-semibold text-foreground">{bestMatch.caption}</div>
                         </div>
                         <Badge
@@ -407,43 +378,43 @@ export function FederatedSearchPage() {
                             ORIGIN_META[bestMatch.origin].badgeClassName,
                           )}
                         >
-                          {ORIGIN_META[bestMatch.origin].shortLabel}
+                          {t(`workspace.federated.origin.${bestMatch.origin}.shortLabel`)}
                         </Badge>
                       </div>
                       <div className="mb-3 flex flex-wrap gap-2">
                         <Badge variant="secondary">{bestMatch.schema}</Badge>
                         <Badge variant="outline" className="border-foreground/10 bg-foreground/5 text-foreground">
-                          Score {formatScore(bestMatch.score)}
+                          {t('workspace.federated.scoreBadge', { value: formatScore(bestMatch.score) })}
                         </Badge>
-                        {bestMatch.is_sanctioned && <Badge className="bg-red-500/15 text-red-200">Sanción</Badge>}
+                        {bestMatch.is_sanctioned && <Badge className="bg-red-500/15 text-red-200">{t('workspace.federated.sanction')}</Badge>}
                         {bestMatch.is_pep && <Badge className="bg-amber-500/15 text-amber-200">PEP</Badge>}
                       </div>
                       <p className="text-sm text-muted-foreground">
-                        Dataset destacado: <span className="text-foreground">{formatDatasets(bestMatch.datasets)}</span>
+                        {t('workspace.federated.featuredDataset')} <span className="text-foreground">{formatDatasets(bestMatch.datasets, t)}</span>
                       </p>
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Button type="button" onClick={() => navigate(`/entity/${bestMatch.id}`)}>
-                          Abrir perfil
+                          {t('workspace.federated.openProfile')}
                           <ExternalLink className="ml-2 h-4 w-4" />
                         </Button>
                         <Button type="button" variant="outline" onClick={() => navigate('/search')} className="border-foreground/10 bg-transparent">
-                          Ir a búsqueda principal
+                          {t('workspace.federated.goToMainSearch')}
                         </Button>
                       </div>
                     </div>
                   ) : (
                     <div className="rounded-xl border border-dashed border-foreground/10 bg-background/30 p-4 text-sm text-muted-foreground">
-                      No hubo un hallazgo principal porque ninguna fuente devolvió coincidencias por encima del umbral actual.
+                      {t('workspace.federated.noMainFinding')}
                     </div>
                   )}
                 </div>
               </SectionCard>
 
-              <SectionCard title="Cómo leer esta consulta" icon={ShieldCheck}>
+              <SectionCard title={t('workspace.federated.howToRead.title')} icon={ShieldCheck}>
                 <div className="space-y-3 text-sm text-muted-foreground">
-                  <p>La vista no sustituye la validación de identidad. Sirve para concentrar cobertura y señalar dónde revisar primero.</p>
-                  <p>Prioriza coincidencias con sanción o score alto. Después revisa leaks y contexto externo para riesgo reputacional.</p>
-                  <p>Si hay demasiados resultados, sube el umbral. Si falta cobertura, baja el umbral o complementa con la búsqueda principal.</p>
+                  <p>{t('workspace.federated.howToRead.p1')}</p>
+                  <p>{t('workspace.federated.howToRead.p2')}</p>
+                  <p>{t('workspace.federated.howToRead.p3')}</p>
                 </div>
               </SectionCard>
             </div>
@@ -451,8 +422,8 @@ export function FederatedSearchPage() {
 
           {hasMatches ? (
             <Section
-              title="Cobertura por fuente"
-              description="Cada bloque explica qué tipo de inteligencia se consultó y qué coincidencias devolvió."
+              title={t('workspace.federated.coverageBySource.title')}
+              description={t('workspace.federated.coverageBySource.description')}
             >
               <div className="grid gap-4 xl:grid-cols-3">
                 {(['local', 'leaks', 'external'] as const).map((origin) => (
@@ -468,12 +439,12 @@ export function FederatedSearchPage() {
           ) : (
             <EmptyState
               icon={Search}
-              title="Sin coincidencias por encima del umbral"
-              description="La consulta se ejecutó correctamente, pero ninguna fuente devolvió resultados suficientes con la sensibilidad actual."
+              title={t('workspace.federated.noMatches.title')}
+              description={t('workspace.federated.noMatches.description')}
               tone="success"
               action={
                 <Button type="button" variant="outline" onClick={() => setThreshold(0.4)} className="border-foreground/10 bg-transparent">
-                  Probar modo amplio
+                  {t('workspace.federated.tryBroadMode')}
                 </Button>
               }
             />
@@ -493,27 +464,28 @@ function OriginPanel({
   matches: FederatedMatch[];
   onOpenEntity: (entityId: string) => void;
 }) {
+  const { t } = useTranslation();
   const meta = ORIGIN_META[origin];
   const Icon = meta.icon;
 
   return (
-    <SectionCard title={meta.label} icon={Icon}>
+    <SectionCard title={t(`workspace.federated.origin.${origin}.label`)} icon={Icon}>
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Badge variant="outline" className={meta.badgeClassName}>
-            {matches.length} coincidencias
+            {t('workspace.federated.matchesCount', { count: matches.length })}
           </Badge>
-          <span className="text-xs text-muted-foreground">{meta.shortLabel}</span>
+          <span className="text-xs text-muted-foreground">{t(`workspace.federated.origin.${origin}.shortLabel`)}</span>
         </div>
 
         <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">{meta.description}</p>
-          <p className="text-xs text-muted-foreground">{meta.summary}</p>
+          <p className="text-sm text-muted-foreground">{t(`workspace.federated.origin.${origin}.description`)}</p>
+          <p className="text-xs text-muted-foreground">{t(`workspace.federated.origin.${origin}.summary`)}</p>
         </div>
 
         {matches.length === 0 ? (
           <div className="rounded-xl border border-dashed border-foreground/10 bg-background/30 p-4 text-sm text-muted-foreground">
-            {meta.emptyMessage}
+            {t(`workspace.federated.origin.${origin}.emptyMessage`)}
           </div>
         ) : (
           <div className="space-y-3">
@@ -529,7 +501,7 @@ function OriginPanel({
                     <div className="truncate text-sm font-medium text-foreground" title={match.caption}>
                       {match.caption}
                     </div>
-                    <div className="mt-1 text-xs text-muted-foreground">{formatDatasets(match.datasets)}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">{formatDatasets(match.datasets, t)}</div>
                   </div>
                   <Badge
                     variant="outline"
@@ -546,7 +518,7 @@ function OriginPanel({
 
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Badge variant="secondary">{match.schema}</Badge>
-                  {match.is_sanctioned && <Badge className="bg-red-500/15 text-red-200">Sanción</Badge>}
+                  {match.is_sanctioned && <Badge className="bg-red-500/15 text-red-200">{t('workspace.federated.sanction')}</Badge>}
                   {match.is_pep && <Badge className="bg-amber-500/15 text-amber-200">PEP</Badge>}
                 </div>
               </button>

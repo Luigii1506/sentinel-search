@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Activity, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import {
   Popover,
@@ -15,23 +16,18 @@ const STATUS_COLOR = {
   unknown: 'bg-gray-500',
 } as const;
 
-const STATUS_LABEL = {
-  healthy: 'Operativo',
-  degraded: 'Degradado',
-  unhealthy: 'Caído',
-  unknown: 'Sin datos',
-} as const;
-
 const SERVICE_LABELS: Record<string, string> = {
   api: 'API',
   database: 'PostgreSQL',
   redis: 'Redis',
   opensearch: 'OpenSearch',
-  celery_queues: 'Colas Celery',
 };
 
 function ServiceRow({ name, svc }: { name: string; svc: ServiceStatus | undefined }) {
+  const { t } = useTranslation();
   if (!svc) return null;
+  const serviceLabel = SERVICE_LABELS[name]
+    ?? (name === 'celery_queues' ? t('components.health.service.celeryQueues') : name);
   const dotColor =
     svc.status === 'ok'
       ? 'bg-green-500'
@@ -42,15 +38,15 @@ function ServiceRow({ name, svc }: { name: string; svc: ServiceStatus | undefine
     <div className="flex items-center justify-between gap-3 py-1.5">
       <div className="flex items-center gap-2 min-w-0">
         <span className={cn('w-2 h-2 rounded-full shrink-0', dotColor)} />
-        <span className="text-sm text-gray-200 truncate">{SERVICE_LABELS[name] ?? name}</span>
+        <span className="text-sm text-gray-200 truncate">{serviceLabel}</span>
       </div>
       <div className="text-xs text-muted-foreground shrink-0">
         {svc.status === 'ok' && typeof svc.latency_ms === 'number'
           ? `${svc.latency_ms}ms`
           : svc.status === 'unavailable'
-            ? 'no responde'
+            ? t('components.health.noResponse')
             : svc.status === 'error'
-              ? 'error'
+              ? t('components.health.error')
               : svc.status}
       </div>
     </div>
@@ -58,10 +54,12 @@ function ServiceRow({ name, svc }: { name: string; svc: ServiceStatus | undefine
 }
 
 export function HealthIndicator() {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const { data: health } = useHealthStatus(30_000);
 
   const overall = health?.status ?? 'unknown';
+  const overallLabel = t(`components.health.status.${overall}`);
   const Icon =
     overall === 'healthy'
       ? CheckCircle2
@@ -76,8 +74,8 @@ export function HealthIndicator() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={`Estado del sistema: ${STATUS_LABEL[overall]}`}
-          title={`Estado del sistema: ${STATUS_LABEL[overall]}`}
+          aria-label={t('components.health.label', { status: overallLabel })}
+          title={t('components.health.label', { status: overallLabel })}
           className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-foreground/5 transition-colors"
         >
           <Icon className="w-5 h-5 text-muted-foreground" />
@@ -94,7 +92,7 @@ export function HealthIndicator() {
           <div className="flex items-center gap-2">
             <span className={cn('w-2.5 h-2.5 rounded-full', STATUS_COLOR[overall])} />
             <span className="text-sm font-medium text-foreground">
-              {STATUS_LABEL[overall]}
+              {overallLabel}
             </span>
           </div>
           {health?.environment && (
@@ -111,14 +109,14 @@ export function HealthIndicator() {
               ))
             : (
               <p className="text-xs text-muted-foreground py-2">
-                No se pudo obtener el estado. Posiblemente la API no responde.
+                {t('components.health.unavailableMessage')}
               </p>
             )}
         </div>
 
         {health?.warnings && health.warnings.length > 0 && (
           <div className="border-t border-foreground/10 mt-3 pt-2">
-            <p className="text-[10px] uppercase text-muted-foreground mb-1.5">Avisos</p>
+            <p className="text-[10px] uppercase text-muted-foreground mb-1.5">{t('components.health.warnings')}</p>
             <ul className="space-y-1">
               {health.warnings.map((w, i) => (
                 <li key={i} className="text-xs text-amber-700 dark:text-amber-300/90 flex items-start gap-1.5">

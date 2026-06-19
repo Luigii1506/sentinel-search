@@ -7,6 +7,58 @@
       "dark": "Dark mode",
       "toLight": "Switch to light mode",
       "toDark": "Switch to dark mode"
+    },
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "close": "Close",
+      "delete": "Delete",
+      "edit": "Edit",
+      "create": "Create",
+      "add": "Add",
+      "remove": "Remove",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "retry": "Retry",
+      "refresh": "Refresh",
+      "loadMore": "Load more",
+      "viewAll": "View all",
+      "view": "View",
+      "export": "Export",
+      "download": "Download",
+      "submit": "Submit",
+      "filter": "Filter",
+      "filters": "Filters",
+      "clear": "Clear",
+      "apply": "Apply",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "states": {
+      "loading": "Loading…",
+      "noResults": "No results",
+      "error": "Error",
+      "empty": "No data",
+      "all": "All",
+      "none": "None",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "risk": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "unknown": "Unknown"
+    },
+    "entityType": {
+      "person": "Person",
+      "company": "Company",
+      "vessel": "Vessel",
+      "aircraft": "Aircraft",
+      "organization": "Organization"
     }
   },
   "nav": {

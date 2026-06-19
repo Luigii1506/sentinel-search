@@ -30,6 +30,7 @@
  */
 import type { ReactNode, SelectHTMLAttributes } from 'react';
 import { Search as SearchIcon, X as XIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface FilterBarProps {
@@ -70,10 +71,11 @@ interface SearchProps {
 function Search({
   value,
   onChange,
-  placeholder = 'Buscar…',
+  placeholder,
   clearable = true,
   className,
 }: SearchProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn('relative flex-1 min-w-[200px]', className)}>
       <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -81,7 +83,7 @@ function Search({
         type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('components.foundation.filterBar.searchPlaceholder')}
         className={cn(
           'w-full h-9 pl-8 pr-8 rounded-md bg-card border border-foreground/10',
           'text-sm text-foreground placeholder:text-muted-foreground',
@@ -92,7 +94,7 @@ function Search({
         <button
           type="button"
           onClick={() => onChange('')}
-          aria-label="Limpiar búsqueda"
+          aria-label={t('components.foundation.filterBar.clearSearch')}
           className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
         >
           <XIcon className="w-3.5 h-3.5" />
@@ -123,10 +125,12 @@ function Select({
   value,
   onChange,
   options,
-  placeholder = 'Todos',
+  placeholder,
   className,
   ...rest
 }: SelectProps) {
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder === undefined ? t('common.states.all') : placeholder;
   return (
     <label className={cn('flex flex-col gap-1', className)}>
       {label && <span className="text-[10px] uppercase tracking-wider text-muted-foreground hidden md:block">{label}</span>}
@@ -144,7 +148,7 @@ function Select({
         )}
         {...rest}
       >
-        {placeholder !== null && <option value="">{placeholder}</option>}
+        {resolvedPlaceholder !== null && <option value="">{resolvedPlaceholder}</option>}
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

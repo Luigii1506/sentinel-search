@@ -31,6 +31,7 @@
  *     handles the user-facing message. Closing on success only.
  */
 import { useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Loader2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -80,12 +81,6 @@ const VARIANT_CLASSES: Record<ConfirmVariant, { confirm: string; icon: ReactNode
   },
 };
 
-const DEFAULT_CONFIRM_LABEL: Record<ConfirmVariant, string> = {
-  destructive: 'Eliminar',
-  warning: 'Continuar',
-  neutral: 'Confirmar',
-};
-
 export function ConfirmAction({
   open,
   onOpenChange,
@@ -93,12 +88,14 @@ export function ConfirmAction({
   title,
   description,
   confirmLabel,
-  cancelLabel = 'Cancelar',
+  cancelLabel,
   onConfirm,
 }: ConfirmActionProps) {
+  const { t } = useTranslation();
   const [busy, setBusy] = useState(false);
   const v = VARIANT_CLASSES[variant];
-  const label = confirmLabel ?? DEFAULT_CONFIRM_LABEL[variant];
+  const label = confirmLabel ?? t(`components.foundation.confirmAction.${variant}`);
+  const resolvedCancelLabel = cancelLabel ?? t('common.actions.cancel');
 
   const handleConfirm = async () => {
     setBusy(true);
@@ -133,7 +130,7 @@ export function ConfirmAction({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={busy}>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel disabled={busy}>{resolvedCancelLabel}</AlertDialogCancel>
           <AlertDialogAction
             disabled={busy}
             onClick={(e) => {

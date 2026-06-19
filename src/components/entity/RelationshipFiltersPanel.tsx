@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronRight, Search, SlidersHorizontal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
@@ -31,13 +32,6 @@ type RelationshipFiltersPanelProps = {
   priorityFilterOptions: Array<FilterOption<RelationshipPriorityFilter>>;
 };
 
-const levelFilterOptions: Array<FilterOption<RelationshipLevelFilter>> = [
-  { key: undefined, label: 'Todos' },
-  { key: 'DIRECT', label: 'Directas' },
-  { key: 'AFFILIATION', label: 'Afiliacion' },
-  { key: 'INDIRECT', label: 'Indirectas' },
-];
-
 export function RelationshipFiltersPanel({
   referenceLike,
   showRelationshipFilters,
@@ -57,6 +51,13 @@ export function RelationshipFiltersPanel({
   contextFilterOptions,
   priorityFilterOptions,
 }: RelationshipFiltersPanelProps) {
+  const { t } = useTranslation();
+  const levelFilterOptions: Array<FilterOption<RelationshipLevelFilter>> = [
+    { key: undefined, label: t('entity.relationships.filters.level.all') },
+    { key: 'DIRECT', label: t('entity.relationships.filters.level.direct') },
+    { key: 'AFFILIATION', label: t('entity.relationships.filters.level.affiliation') },
+    { key: 'INDIRECT', label: t('entity.relationships.filters.level.indirect') },
+  ];
   return (
     <>
       <div className="glass rounded-xl border border-foreground/10">
@@ -67,7 +68,7 @@ export function RelationshipFiltersPanel({
         >
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <span className="text-sm font-medium text-foreground">Filtros de relaciones</span>
+            <span className="text-sm font-medium text-foreground">{t('entity.relationships.filters.title')}</span>
           </div>
           {showRelationshipFilters ? (
             <ChevronDown className="w-4 h-4 text-muted-foreground" />
@@ -81,15 +82,15 @@ export function RelationshipFiltersPanel({
             {!referenceLike && (
               <div className="flex items-start justify-between gap-4 pt-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-foreground">Incluir relaciones contextuales</p>
+                  <p className="text-sm font-medium text-foreground">{t('entity.relationships.filters.includeContextual')}</p>
                   <p className="text-xs text-muted-foreground">
-                    Muestra afiliaciones y vínculos biográficos que normalmente se ocultan en la vista AML priorizada.
+                    {t('entity.relationships.filters.includeContextualHint')}
                   </p>
                 </div>
                 <Switch
                   checked={includeContextualRelationships}
                   onCheckedChange={setIncludeContextualRelationships}
-                  aria-label="Incluir relaciones contextuales"
+                  aria-label={t('entity.relationships.filters.includeContextualAria')}
                 />
               </div>
             )}
@@ -151,7 +152,7 @@ export function RelationshipFiltersPanel({
       <div className="space-y-2">
         {!referenceLike && includeContextualRelationships && (
           <div className="rounded-lg border border-violet-500/20 bg-violet-500/10 px-3 py-2 text-xs text-violet-200">
-            Viendo relaciones AML + contextuales. Esta vista puede incluir afiliaciones y señales biográficas de menor prioridad.
+            {t('entity.relationships.filters.viewingMixed')}
           </div>
         )}
         <div className="relative max-w-md">
@@ -159,14 +160,14 @@ export function RelationshipFiltersPanel({
           <input
             value={relSearch}
             onChange={(e) => setRelSearch(e.target.value)}
-            placeholder="Buscar relaciones por nombre, tipo, país o fuente"
+            placeholder={t('entity.relationships.filters.searchPlaceholder')}
             className="w-full bg-foreground/5 border border-foreground/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
           />
         </div>
 
         {normalizedRelationshipSearch && (
           <p className="text-xs text-muted-foreground">
-            {filteredRelationshipsCount} coincidencia{filteredRelationshipsCount === 1 ? '' : 's'} para "{relSearch.trim()}"
+            {t('entity.relationships.filters.matches', { count: filteredRelationshipsCount, query: relSearch.trim() })}
           </p>
         )}
       </div>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Shield, Eye, EyeOff, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 
 function PasswordStrengthMeter({ password }: { password: string }) {
+  const { t } = useTranslation();
   // Lightweight heuristic — actual policy enforcement is on the backend.
   const score =
     (password.length >= 8 ? 1 : 0) +
@@ -25,9 +27,9 @@ function PasswordStrengthMeter({ password }: { password: string }) {
 
   const label =
     score === 0 ? '' :
-    score === 1 ? 'Débil' :
-    score === 2 ? 'Aceptable' :
-    score === 3 ? 'Fuerte' : 'Muy fuerte';
+    score === 1 ? t('account.auth.strengthWeak') :
+    score === 2 ? t('account.auth.strengthAcceptable') :
+    score === 3 ? t('account.auth.strengthStrong') : t('account.auth.strengthVeryStrong');
 
   const color =
     score <= 1 ? 'bg-red-500' :
@@ -52,6 +54,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
 
 export function SignUpPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { signup, isLoading } = useAuth();
 
   const [username, setUsername] = useState('');
@@ -67,15 +70,15 @@ export function SignUpPage() {
     setError('');
 
     if (username.length < 3) {
-      setError('El username debe tener al menos 3 caracteres.');
+      setError(t('account.auth.errorUsernameTooShort'));
       return;
     }
     if (!email.includes('@')) {
-      setError('Email inválido.');
+      setError(t('account.auth.errorInvalidEmail'));
       return;
     }
     if (password.length < 8) {
-      setError('La contraseña debe tener al menos 8 caracteres.');
+      setError(t('account.auth.errorPasswordTooShort'));
       return;
     }
 
@@ -116,17 +119,17 @@ export function SignUpPage() {
           >
             <Shield className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-white">Crea tu cuenta</h1>
+          <h1 className="text-2xl font-bold text-white">{t('account.auth.signUpTitle')}</h1>
           <p className="text-muted-foreground mt-2 text-sm">
-            10 búsquedas gratis al día. Sin tarjeta requerida.
+            {t('account.auth.signUpHeroSubtitle')}
           </p>
         </div>
 
         <Card className="bg-muted border-foreground/10 backdrop-blur-xl">
           <CardHeader className="pb-4">
-            <CardTitle className="text-foreground text-lg">Regístrate</CardTitle>
+            <CardTitle className="text-foreground text-lg">{t('account.auth.signUpCardTitle')}</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Empieza a buscar en segundos.
+              {t('account.auth.signUpCardDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -140,7 +143,7 @@ export function SignUpPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="first_name" className="text-muted-foreground text-xs">
-                    Nombre
+                    {t('account.auth.firstNameLabel')}
                   </Label>
                   <Input
                     id="first_name"
@@ -152,7 +155,7 @@ export function SignUpPage() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="last_name" className="text-muted-foreground text-xs">
-                    Apellido
+                    {t('account.auth.lastNameLabel')}
                   </Label>
                   <Input
                     id="last_name"
@@ -166,13 +169,13 @@ export function SignUpPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="username" className="text-muted-foreground text-xs">
-                  Username *
+                  {t('account.auth.usernameLabel')}
                 </Label>
                 <Input
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value.toLowerCase())}
-                  placeholder="ej. juan_perez"
+                  placeholder={t('account.auth.usernamePlaceholder')}
                   className="bg-foreground/5 border-foreground/10 text-white"
                   disabled={isLoading}
                   required
@@ -181,14 +184,14 @@ export function SignUpPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="email" className="text-muted-foreground text-xs">
-                  Email *
+                  {t('account.auth.emailLabel')}
                 </Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@empresa.com"
+                  placeholder={t('account.auth.emailPlaceholder')}
                   className="bg-foreground/5 border-foreground/10 text-white"
                   disabled={isLoading}
                   required
@@ -197,7 +200,7 @@ export function SignUpPage() {
 
               <div className="space-y-1.5">
                 <Label htmlFor="password" className="text-muted-foreground text-xs">
-                  Contraseña *
+                  {t('account.auth.signUpPasswordLabel')}
                 </Label>
                 <div className="relative">
                   <Input
@@ -205,7 +208,7 @@ export function SignUpPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Mínimo 8 caracteres"
+                    placeholder={t('account.auth.signUpPasswordPlaceholder')}
                     className="bg-foreground/5 border-foreground/10 text-white pr-10"
                     disabled={isLoading}
                     required
@@ -234,41 +237,41 @@ export function SignUpPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creando cuenta...
+                    {t('account.auth.creatingAccount')}
                   </>
                 ) : (
-                  'Crear cuenta gratis'
+                  t('account.auth.createFreeAccount')
                 )}
               </Button>
             </form>
 
             <div className="mt-5">
-              <GoogleSignInButton label="Registrarse con Google" />
+              <GoogleSignInButton label={t('account.auth.googleSignUp')} />
             </div>
 
             <div className="mt-5 pt-4 border-t border-foreground/10 space-y-3">
               <div className="text-xs text-muted-foreground space-y-1.5">
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
-                  <span>10 búsquedas diarias gratis</span>
+                  <span>{t('account.auth.benefitDailySearches')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
-                  <span>Acceso a OFAC, EU, UN, INTERPOL y más</span>
+                  <span>{t('account.auth.benefitSources')}</span>
                 </div>
                 <div className="flex items-start gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
-                  <span>Sin tarjeta de crédito</span>
+                  <span>{t('account.auth.benefitNoCard')}</span>
                 </div>
               </div>
 
               <p className="text-xs text-muted-foreground text-center pt-2 border-t border-foreground/5">
-                ¿Ya tienes cuenta?{' '}
+                {t('account.auth.haveAccount')}{' '}
                 <Link
                   to="/login"
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-300 font-medium"
                 >
-                  Inicia sesión
+                  {t('account.auth.signInLink')}
                 </Link>
               </p>
             </div>

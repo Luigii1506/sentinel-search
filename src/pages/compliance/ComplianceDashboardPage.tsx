@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -71,21 +72,13 @@ const statusColors: Record<string, string> = {
   archived: 'bg-gray-500/10 text-muted-foreground border-gray-500/20',
 };
 
-const statusLabels: Record<string, string> = {
-  open: 'Abierto',
-  in_review: 'En Revisión',
-  pending_decision: 'Pendiente',
-  escalated: 'Escalado',
-  closed: 'Cerrado',
-  archived: 'Archivado',
-};
-
 // ── Stat Card ──
 
 // ── Cases Tab ──
 
 function CasesTab() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['compliance-cases'],
     queryFn: () => complianceService.listCases({ limit: 50 }),
@@ -107,8 +100,8 @@ function CasesTab() {
     return (
       <EmptyState
         icon={FileText}
-        title="Sin Casos"
-        description="No hay casos de investigación registrados."
+        title={t('compliance.cases.empty.title')}
+        description={t('compliance.cases.empty.description')}
       />
     );
   }
@@ -133,7 +126,7 @@ function CasesTab() {
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs text-muted-foreground font-mono">{c.case_number}</span>
                 <Badge variant="outline" className={cn('text-[10px]', statusColors[c.status])}>
-                  {statusLabels[c.status] || c.status}
+                  {t(`compliance.caseStatus.${c.status}`, { defaultValue: c.status })}
                 </Badge>
                 <Badge variant="outline" className={cn('text-[10px]', priorityColors[c.priority])}>
                   {c.priority}
@@ -146,10 +139,10 @@ function CasesTab() {
               </div>
               <h4 className="text-foreground font-medium">{c.title}</h4>
               {c.entity_name && (
-                <p className="text-sm text-muted-foreground mt-1">Entidad: {c.entity_name}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('compliance.cases.entity')}: {c.entity_name}</p>
               )}
               {c.client_name && (
-                <p className="text-xs text-muted-foreground">Cliente: {c.client_name}</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.cases.client')}: {c.client_name}</p>
               )}
             </div>
             <div className="flex items-center gap-3">
@@ -159,7 +152,7 @@ function CasesTab() {
                 </p>
                 {c.alerts_count > 0 && (
                   <Badge className="mt-1 bg-orange-500/20 text-orange-700 dark:text-orange-400 text-[10px]">
-                    {c.alerts_count} alertas
+                    {t('compliance.cases.alertsCount', { count: c.alerts_count })}
                   </Badge>
                 )}
               </div>
@@ -184,6 +177,7 @@ function CasesTab() {
 // ── Alerts Tab ──
 
 function AlertsTab() {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ['compliance-alerts'],
     queryFn: () => complianceService.listAlerts({ limit: 50 }),
@@ -205,8 +199,8 @@ function AlertsTab() {
     return (
       <EmptyState
         icon={CheckCircle}
-        title="Sin Alertas"
-        description="No hay alertas pendientes de revisión."
+        title={t('compliance.alerts.empty.title')}
+        description={t('compliance.alerts.empty.description')}
         tone="success"
       />
     );
@@ -247,7 +241,7 @@ function AlertsTab() {
               </div>
               <p className="text-foreground font-medium">{alert.matched_entity_name}</p>
               <p className="text-sm text-muted-foreground">
-                Query: &quot;{alert.query_name}&quot; — Confianza: {Math.round(alert.match_confidence * 100)}%
+                {t('compliance.alerts.query')}: &quot;{alert.query_name}&quot; — {t('compliance.alerts.confidence')}: {Math.round(alert.match_confidence * 100)}%
               </p>
               {alert.matched_sources.length > 0 && (
                 <div className="flex gap-1 mt-1">
@@ -272,6 +266,7 @@ function AlertsTab() {
 // ── Whitelist Tab ──
 
 function WhitelistTab() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ['compliance-whitelist'],
@@ -282,9 +277,9 @@ function WhitelistTab() {
     mutationFn: (id: string) => complianceService.removeFromWhitelist(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-whitelist'] });
-      toast.success('Entrada eliminada del whitelist');
+      toast.success(t('compliance.whitelist.toast.removed'));
     },
-    onError: () => toast.error('Error al eliminar entrada'),
+    onError: () => toast.error(t('compliance.whitelist.toast.removeError')),
   });
 
   if (isLoading) {
@@ -303,8 +298,8 @@ function WhitelistTab() {
     return (
       <EmptyState
         icon={Shield}
-        title="Whitelist Vacío"
-        description="No hay entradas de supresión. Los falsos positivos marcados aparecerán aquí."
+        title={t('compliance.whitelist.empty.title')}
+        description={t('compliance.whitelist.empty.description')}
       />
     );
   }
@@ -312,7 +307,7 @@ function WhitelistTab() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground mb-2">
-        {data?.total || 0} entradas activas — Las búsquedas futuras omitirán estos matches.
+        {t('compliance.whitelist.activeSummary', { count: data?.total || 0 })}
       </p>
       {entries.map((entry: WhitelistEntry) => (
         <motion.div
@@ -325,19 +320,19 @@ function WhitelistTab() {
               <span className="text-foreground font-medium">{entry.suppressed_entity_name}</span>
               {entry.is_permanent && (
                 <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
-                  Permanente
+                  {t('compliance.whitelist.permanent')}
                 </Badge>
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              Query: &quot;{entry.query_name_normalized}&quot;
+              {t('compliance.alerts.query')}: &quot;{entry.query_name_normalized}&quot;
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              Razón: {entry.reason}
+              {t('compliance.whitelist.reason')}: {entry.reason}
             </p>
             {entry.expires_at && (
               <p className="text-xs text-muted-foreground">
-                Expira: {new Date(entry.expires_at).toLocaleDateString('es-MX')}
+                {t('compliance.whitelist.expires')}: {new Date(entry.expires_at).toLocaleDateString('es-MX')}
               </p>
             )}
           </div>
@@ -359,6 +354,7 @@ function WhitelistTab() {
 // ── Watchlist Tab ──
 
 function WatchlistTab() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ['compliance-watchlist'],
@@ -369,9 +365,9 @@ function WatchlistTab() {
     mutationFn: (id: string) => complianceService.removeFromWatchlist(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-watchlist'] });
-      toast.success('Entidad removida del monitoreo');
+      toast.success(t('compliance.watchlist.toast.removed'));
     },
-    onError: () => toast.error('Error al remover entidad'),
+    onError: () => toast.error(t('compliance.watchlist.toast.removeError')),
   });
 
   if (isLoading) {
@@ -390,17 +386,17 @@ function WatchlistTab() {
     return (
       <EmptyState
         icon={Eye}
-        title="Sin Monitoreo"
-        description="No hay entidades bajo monitoreo continuo."
+        title={t('compliance.watchlist.empty.title')}
+        description={t('compliance.watchlist.empty.description')}
       />
     );
   }
 
   const freqLabels: Record<string, string> = {
-    realtime: 'Tiempo real',
-    daily: 'Diario',
-    weekly: 'Semanal',
-    monthly: 'Mensual',
+    realtime: t('compliance.watchlist.frequency.realtime'),
+    daily: t('compliance.watchlist.frequency.daily'),
+    weekly: t('compliance.watchlist.frequency.weekly'),
+    monthly: t('compliance.watchlist.frequency.monthly'),
   };
 
   return (
@@ -419,7 +415,7 @@ function WatchlistTab() {
               </Badge>
               {entry.has_active_alerts && (
                 <Badge variant="outline" className="text-[10px] bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
-                  Alertas activas
+                  {t('compliance.watchlist.activeAlerts')}
                 </Badge>
               )}
               {entry.last_risk_level && (
@@ -433,13 +429,13 @@ function WatchlistTab() {
               )}
             </div>
             <div className="flex items-center gap-4 text-xs text-muted-foreground mt-1">
-              <span>Screenings: {entry.total_screenings}</span>
-              <span>Matches último: {entry.last_match_count}</span>
+              <span>{t('compliance.watchlist.screenings')}: {entry.total_screenings}</span>
+              <span>{t('compliance.watchlist.lastMatches')}: {entry.last_match_count}</span>
               {entry.last_screened_at && (
-                <span>Último: {new Date(entry.last_screened_at).toLocaleDateString('es-MX')}</span>
+                <span>{t('compliance.watchlist.last')}: {new Date(entry.last_screened_at).toLocaleDateString('es-MX')}</span>
               )}
               {entry.next_screen_at && (
-                <span>Próximo: {new Date(entry.next_screen_at).toLocaleDateString('es-MX')}</span>
+                <span>{t('compliance.watchlist.next')}: {new Date(entry.next_screen_at).toLocaleDateString('es-MX')}</span>
               )}
             </div>
           </div>
@@ -461,6 +457,7 @@ function WatchlistTab() {
 // ── Create Case Dialog ──
 
 function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState('');
   const [entityName, setEntityName] = useState('');
@@ -479,79 +476,79 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-cases'] });
       queryClient.invalidateQueries({ queryKey: ['compliance-dashboard'] });
-      toast.success('Caso creado exitosamente');
+      toast.success(t('compliance.createCase.toast.created'));
       onClose();
       setTitle(''); setEntityName(''); setPriority('medium'); setDescription(''); setTags('');
     },
-    onError: () => toast.error('Error al crear caso'),
+    onError: () => toast.error(t('compliance.createCase.toast.error')),
   });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
-          <DialogTitle>Crear Caso de Investigación</DialogTitle>
+          <DialogTitle>{t('compliance.createCase.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label className="text-muted-foreground">Título *</Label>
+            <Label className="text-muted-foreground">{t('compliance.createCase.fields.title')} *</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ej: Investigación coincidencia OFAC — Juan Pérez"
+              placeholder={t('compliance.createCase.placeholders.title')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Entidad</Label>
+            <Label className="text-muted-foreground">{t('compliance.createCase.fields.entity')}</Label>
             <Input
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
-              placeholder="Nombre de la entidad (opcional)"
+              placeholder={t('compliance.createCase.placeholders.entity')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Prioridad</Label>
+            <Label className="text-muted-foreground">{t('compliance.createCase.fields.priority')}</Label>
             <Select value={priority} onValueChange={setPriority}>
               <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-card border-foreground/10">
-                <SelectItem value="critical" className="text-red-600 dark:text-red-400">Critical</SelectItem>
-                <SelectItem value="high" className="text-orange-700 dark:text-orange-400">High</SelectItem>
-                <SelectItem value="medium" className="text-yellow-700 dark:text-yellow-400">Medium</SelectItem>
-                <SelectItem value="low" className="text-green-700 dark:text-green-400">Low</SelectItem>
+                <SelectItem value="critical" className="text-red-600 dark:text-red-400">{t('common.risk.critical')}</SelectItem>
+                <SelectItem value="high" className="text-orange-700 dark:text-orange-400">{t('common.risk.high')}</SelectItem>
+                <SelectItem value="medium" className="text-yellow-700 dark:text-yellow-400">{t('common.risk.medium')}</SelectItem>
+                <SelectItem value="low" className="text-green-700 dark:text-green-400">{t('common.risk.low')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">Descripción</Label>
+            <Label className="text-muted-foreground">{t('compliance.createCase.fields.description')}</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descripción del caso..."
+              placeholder={t('compliance.createCase.placeholders.description')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
               rows={3}
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Tags (separados por coma)</Label>
+            <Label className="text-muted-foreground">{t('compliance.createCase.fields.tags')}</Label>
             <Input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              placeholder="ej: pep, sanctions, high-risk"
+              placeholder={t('compliance.createCase.placeholders.tags')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">Cancelar</Button>
+            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">{t('common.actions.cancel')}</Button>
             <Button
               onClick={() => mutation.mutate()}
               disabled={title.length < 3 || mutation.isPending}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              {mutation.isPending ? 'Creando...' : 'Crear Caso'}
+              {mutation.isPending ? t('compliance.createCase.creating') : t('compliance.createCase.submit')}
             </Button>
           </div>
         </div>
@@ -563,6 +560,7 @@ function CreateCaseDialog({ open, onClose }: { open: boolean; onClose: () => voi
 // ── Add Watchlist Dialog ──
 
 function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [entityName, setEntityName] = useState('');
   const [entityType, setEntityType] = useState('');
@@ -581,59 +579,59 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-watchlist'] });
       queryClient.invalidateQueries({ queryKey: ['compliance-dashboard'] });
-      toast.success('Entidad agregada al monitoreo');
+      toast.success(t('compliance.addWatchlist.toast.added'));
       onClose();
       setEntityName(''); setEntityType(''); setFrequency('daily'); setMinConfidence('0.7'); setClientName('');
     },
-    onError: () => toast.error('Error al agregar al monitoreo'),
+    onError: () => toast.error(t('compliance.addWatchlist.toast.error')),
   });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
-          <DialogTitle>Agregar a Monitoreo Continuo</DialogTitle>
+          <DialogTitle>{t('compliance.addWatchlist.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label className="text-muted-foreground">Nombre de entidad *</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWatchlist.fields.entityName')} *</Label>
             <Input
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
-              placeholder="Nombre a monitorear"
+              placeholder={t('compliance.addWatchlist.placeholders.entityName')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Tipo de entidad</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWatchlist.fields.entityType')}</Label>
             <Select value={entityType} onValueChange={setEntityType}>
               <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
-                <SelectValue placeholder="Seleccionar..." />
+                <SelectValue placeholder={t('compliance.addWatchlist.placeholders.select')} />
               </SelectTrigger>
               <SelectContent className="bg-card border-foreground/10">
-                <SelectItem value="person" className="text-muted-foreground">Persona</SelectItem>
-                <SelectItem value="company" className="text-muted-foreground">Empresa</SelectItem>
-                <SelectItem value="vessel" className="text-muted-foreground">Embarcación</SelectItem>
-                <SelectItem value="organization" className="text-muted-foreground">Organización</SelectItem>
+                <SelectItem value="person" className="text-muted-foreground">{t('common.entityType.person')}</SelectItem>
+                <SelectItem value="company" className="text-muted-foreground">{t('common.entityType.company')}</SelectItem>
+                <SelectItem value="vessel" className="text-muted-foreground">{t('common.entityType.vessel')}</SelectItem>
+                <SelectItem value="organization" className="text-muted-foreground">{t('common.entityType.organization')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">Frecuencia de monitoreo</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWatchlist.fields.frequency')}</Label>
             <Select value={frequency} onValueChange={setFrequency}>
               <SelectTrigger className="bg-foreground/5 border-foreground/10 text-foreground mt-1">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-card border-foreground/10">
-                <SelectItem value="realtime" className="text-muted-foreground">Tiempo real</SelectItem>
-                <SelectItem value="daily" className="text-muted-foreground">Diario</SelectItem>
-                <SelectItem value="weekly" className="text-muted-foreground">Semanal</SelectItem>
-                <SelectItem value="monthly" className="text-muted-foreground">Mensual</SelectItem>
+                <SelectItem value="realtime" className="text-muted-foreground">{t('compliance.watchlist.frequency.realtime')}</SelectItem>
+                <SelectItem value="daily" className="text-muted-foreground">{t('compliance.watchlist.frequency.daily')}</SelectItem>
+                <SelectItem value="weekly" className="text-muted-foreground">{t('compliance.watchlist.frequency.weekly')}</SelectItem>
+                <SelectItem value="monthly" className="text-muted-foreground">{t('compliance.watchlist.frequency.monthly')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">Confianza mínima</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWatchlist.fields.minConfidence')}</Label>
             <Input
               type="number"
               step="0.1"
@@ -645,22 +643,22 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Cliente (opcional)</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWatchlist.fields.client')}</Label>
             <Input
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              placeholder="Nombre del cliente"
+              placeholder={t('compliance.addWatchlist.placeholders.client')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">Cancelar</Button>
+            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">{t('common.actions.cancel')}</Button>
             <Button
               onClick={() => mutation.mutate()}
               disabled={entityName.length < 2 || mutation.isPending}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              {mutation.isPending ? 'Agregando...' : 'Agregar a Monitoreo'}
+              {mutation.isPending ? t('compliance.addWatchlist.adding') : t('compliance.addWatchlist.submit')}
             </Button>
           </div>
         </div>
@@ -672,6 +670,7 @@ function AddWatchlistDialog({ open, onClose }: { open: boolean; onClose: () => v
 // ── Add Whitelist Dialog ──
 
 function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [queryName, setQueryName] = useState('');
   const [entityId, setEntityId] = useState('');
@@ -689,53 +688,53 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-whitelist'] });
-      toast.success('Entrada agregada al whitelist');
+      toast.success(t('compliance.addWhitelist.toast.added'));
       onClose();
       setQueryName(''); setEntityId(''); setEntityName(''); setReason(''); setIsPermanent(false);
     },
-    onError: () => toast.error('Error al agregar al whitelist'),
+    onError: () => toast.error(t('compliance.addWhitelist.toast.error')),
   });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
         <DialogHeader>
-          <DialogTitle>Agregar al Whitelist</DialogTitle>
+          <DialogTitle>{t('compliance.addWhitelist.title')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label className="text-muted-foreground">Nombre de búsqueda (query) *</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWhitelist.fields.queryName')} *</Label>
             <Input
               value={queryName}
               onChange={(e) => setQueryName(e.target.value)}
-              placeholder="Ej: JUAN PEREZ GARCIA"
+              placeholder={t('compliance.addWhitelist.placeholders.queryName')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">ID de entidad a suprimir *</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWhitelist.fields.entityId')} *</Label>
             <Input
               value={entityId}
               onChange={(e) => setEntityId(e.target.value)}
-              placeholder="UUID de la entidad"
+              placeholder={t('compliance.addWhitelist.placeholders.entityId')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Nombre de entidad *</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWhitelist.fields.entityName')} *</Label>
             <Input
               value={entityName}
               onChange={(e) => setEntityName(e.target.value)}
-              placeholder="Nombre de la entidad a suprimir"
+              placeholder={t('compliance.addWhitelist.placeholders.entityName')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
             />
           </div>
           <div>
-            <Label className="text-muted-foreground">Razón *</Label>
+            <Label className="text-muted-foreground">{t('compliance.addWhitelist.fields.reason')} *</Label>
             <Textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Razón para suprimir este match..."
+              placeholder={t('compliance.addWhitelist.placeholders.reason')}
               className="bg-foreground/5 border-foreground/10 text-foreground mt-1"
               rows={2}
             />
@@ -749,17 +748,17 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
               className="rounded bg-foreground/5 border-foreground/20"
             />
             <Label htmlFor="is-permanent" className="text-muted-foreground cursor-pointer">
-              Permanente (no expira)
+              {t('compliance.addWhitelist.permanent')}
             </Label>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">Cancelar</Button>
+            <Button variant="ghost" onClick={onClose} className="text-muted-foreground">{t('common.actions.cancel')}</Button>
             <Button
               onClick={() => mutation.mutate()}
               disabled={queryName.length < 2 || !entityId || !entityName || reason.length < 5 || mutation.isPending}
               className="bg-blue-600 hover:bg-blue-700"
             >
-              {mutation.isPending ? 'Agregando...' : 'Agregar al Whitelist'}
+              {mutation.isPending ? t('compliance.addWhitelist.adding') : t('compliance.addWhitelist.submit')}
             </Button>
           </div>
         </div>
@@ -771,6 +770,7 @@ function AddWhitelistDialog({ open, onClose }: { open: boolean; onClose: () => v
 // ── Main Page ──
 
 export function ComplianceDashboardPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [showCreateCase, setShowCreateCase] = useState(false);
   const [showAddWatchlist, setShowAddWatchlist] = useState(false);
@@ -785,8 +785,8 @@ export function ComplianceDashboardPage() {
   return (
     <AppPage>
         <PageHeader
-          title="Compliance Dashboard"
-          description="Gestión de casos, alertas, whitelist y monitoreo continuo."
+          title={t('compliance.dashboard.title')}
+          description={t('compliance.dashboard.description')}
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
               <Shield className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
@@ -799,7 +799,7 @@ export function ComplianceDashboardPage() {
               className="gap-1"
             >
               <Plus className="w-4 h-4" />
-              Nuevo Caso
+              {t('compliance.dashboard.newCase')}
             </Button>
           }
         />
@@ -820,27 +820,27 @@ export function ComplianceDashboardPage() {
           ) : (
             <>
               <MetricCard
-                label="Casos Abiertos"
+                label={t('compliance.dashboard.metrics.openCases')}
                 value={dashboard?.cases?.open_cases ?? 0}
                 icon={FileText}
                 className="glass rounded-xl"
               />
               <MetricCard
-                label="Alertas Pendientes"
+                label={t('compliance.dashboard.metrics.pendingAlerts')}
                 value={dashboard?.cases?.by_status?.open ?? 0}
                 icon={AlertTriangle}
                 accent="amber"
                 className="glass rounded-xl"
               />
               <MetricCard
-                label="Tasa FP"
+                label={t('compliance.dashboard.metrics.fpRate')}
                 value={`${dashboard?.false_positives?.fp_rate ?? 0}%`}
                 icon={XCircle}
                 accent="red"
                 className="glass rounded-xl"
               />
               <MetricCard
-                label="Entidades Monitoreadas"
+                label={t('compliance.dashboard.metrics.monitoredEntities')}
                 value={dashboard?.monitoring?.total_watched ?? 0}
                 icon={Eye}
                 className="glass rounded-xl"
@@ -858,33 +858,33 @@ export function ComplianceDashboardPage() {
           >
             <h3 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
-              Decisiones últimos {dashboard.false_positives.period_days} días
+              {t('compliance.dashboard.decisions.title', { count: dashboard.false_positives.period_days })}
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div>
                 <p className="text-2xl font-bold text-foreground">{dashboard.false_positives.total_decisions}</p>
-                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.dashboard.decisions.total')}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-green-700 dark:text-green-400">{dashboard.false_positives.true_positives}</p>
-                <p className="text-xs text-muted-foreground">Verdaderos Positivos</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.dashboard.decisions.truePositives')}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-red-600 dark:text-red-400">{dashboard.false_positives.false_positives}</p>
-                <p className="text-xs text-muted-foreground">Falsos Positivos</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.dashboard.decisions.falsePositives')}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">{dashboard.false_positives.fp_rate}%</p>
-                <p className="text-xs text-muted-foreground">Tasa FP</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.dashboard.metrics.fpRate')}</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{dashboard.false_positives.active_whitelist_entries}</p>
-                <p className="text-xs text-muted-foreground">Whitelist Activos</p>
+                <p className="text-xs text-muted-foreground">{t('compliance.dashboard.decisions.activeWhitelist')}</p>
               </div>
             </div>
             {dashboard.false_positives.top_fp_entities.length > 0 && (
               <div className="mt-4 pt-4 border-t border-foreground/5">
-                <p className="text-xs text-muted-foreground mb-2">Top entidades con más FP:</p>
+                <p className="text-xs text-muted-foreground mb-2">{t('compliance.dashboard.decisions.topFp')}</p>
                 <div className="flex flex-wrap gap-2">
                   {dashboard.false_positives.top_fp_entities.slice(0, 5).map((e) => (
                     <Badge key={e.entity_name} variant="outline" className="text-xs bg-foreground/5 text-muted-foreground">
@@ -903,19 +903,19 @@ export function ComplianceDashboardPage() {
             <TabsList className="bg-foreground/5 border border-foreground/10 p-1">
               <TabsTrigger value="overview" className="data-[state=active]:bg-foreground/10">
                 <FileText className="w-4 h-4 mr-2" />
-                Casos
+                {t('compliance.tabs.cases')}
               </TabsTrigger>
               <TabsTrigger value="alerts" className="data-[state=active]:bg-foreground/10">
                 <AlertTriangle className="w-4 h-4 mr-2" />
-                Alertas
+                {t('compliance.tabs.alerts')}
               </TabsTrigger>
               <TabsTrigger value="whitelist" className="data-[state=active]:bg-foreground/10">
                 <Shield className="w-4 h-4 mr-2" />
-                Whitelist
+                {t('compliance.tabs.whitelist')}
               </TabsTrigger>
               <TabsTrigger value="watchlist" className="data-[state=active]:bg-foreground/10">
                 <Eye className="w-4 h-4 mr-2" />
-                Monitoreo
+                {t('compliance.tabs.watchlist')}
               </TabsTrigger>
             </TabsList>
 
@@ -927,7 +927,7 @@ export function ComplianceDashboardPage() {
                 onClick={() => setShowAddWatchlist(true)}
                 className="gap-1 text-muted-foreground border-foreground/10 hover:bg-foreground/5 w-full sm:w-auto"
               >
-                <Plus className="w-3 h-3" /> Agregar
+                <Plus className="w-3 h-3" /> {t('common.actions.add')}
               </Button>
             )}
             {activeTab === 'whitelist' && (
@@ -937,7 +937,7 @@ export function ComplianceDashboardPage() {
                 onClick={() => setShowAddWhitelist(true)}
                 className="gap-1 text-muted-foreground border-foreground/10 hover:bg-foreground/5 w-full sm:w-auto"
               >
-                <Plus className="w-3 h-3" /> Agregar
+                <Plus className="w-3 h-3" /> {t('common.actions.add')}
               </Button>
             )}
           </div>

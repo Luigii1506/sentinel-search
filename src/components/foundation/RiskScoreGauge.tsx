@@ -20,6 +20,7 @@
  * Pure SVG; no chart dependency. Animates the arc stroke on mount.
  */
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { RiskBadge, levelFromScore, type RiskLevel } from './RiskBadge';
 
@@ -167,13 +168,16 @@ export function RiskScoreGauge({
   caption,
   className,
 }: RiskScoreGaugeProps) {
+  const { t } = useTranslation();
   const resolvedLevel = level ?? levelFromScore(score);
   const size = variant === 'hero' ? 160 : 88;
 
   return (
     <div
       role="status"
-      aria-label={`Risk score: ${score ?? 'unknown'} out of 100`}
+      aria-label={t('components.foundation.riskScoreGauge.aria', {
+        score: score ?? t('components.foundation.riskScoreGauge.scoreUnknown'),
+      })}
       className={cn(
         'flex gap-5',
         variant === 'hero' ? 'flex-col md:flex-row md:items-start' : 'flex-col items-center',
@@ -195,7 +199,7 @@ export function RiskScoreGauge({
       {factors && factors.length > 0 && (
         <div className="flex-1 min-w-0 space-y-3 max-w-md">
           <div className="text-[11px] uppercase tracking-wider text-muted-foreground">
-            Factores de riesgo
+            {t('components.foundation.riskScoreGauge.factorsTitle')}
           </div>
           <div className="space-y-3">
             {factors.map((f, i) => (

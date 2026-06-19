@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Shield, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ import { GoogleSignInButton } from '@/components/auth/GoogleSignInButton';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { login, isLoading } = useAuth();
 
   const [identifier, setIdentifier] = useState('');
@@ -26,7 +28,7 @@ export function LoginPage() {
     setError('');
 
     if (!identifier || !password) {
-      setError('Por favor ingresa tu correo o usuario y tu contraseña');
+      setError(t('account.auth.errorMissingCredentials'));
       return;
     }
 
@@ -34,7 +36,7 @@ export function LoginPage() {
       await login({ email: identifier, password });
       navigate(from, { replace: true });
     } catch {
-      setError('Credenciales inválidas');
+      setError(t('account.auth.errorInvalidCredentials'));
     }
   };
 
@@ -60,34 +62,34 @@ export function LoginPage() {
           >
             <Shield className="w-8 h-8 text-white" />
           </motion.div>
-          <h1 className="text-2xl font-bold text-white">Sentinel PLD</h1>
-          <p className="text-muted-foreground mt-2">Sistema de Cumplimiento PLD/FT</p>
+          <h1 className="text-2xl font-bold text-white">{t('account.auth.appName')}</h1>
+          <p className="text-muted-foreground mt-2">{t('account.auth.appTagline')}</p>
         </div>
 
         <Card className="bg-muted border-foreground/10 backdrop-blur-xl">
           <CardHeader>
-            <CardTitle className="text-foreground">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-foreground">{t('account.auth.loginTitle')}</CardTitle>
             <CardDescription className="text-muted-foreground">
-              Ingresa tus credenciales para acceder al sistema
+              {t('account.auth.loginDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="identifier" className="text-muted-foreground">Correo o usuario</Label>
+                <Label htmlFor="identifier" className="text-muted-foreground">{t('account.auth.identifierLabel')}</Label>
                 <Input
                   id="identifier"
                   type="text"
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="tu@empresa.com o tu_usuario"
+                  placeholder={t('account.auth.identifierPlaceholder')}
                   className="bg-foreground/5 border-foreground/10 text-white placeholder:text-muted-foreground"
                   disabled={isLoading}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-muted-foreground">Contraseña</Label>
+                <Label htmlFor="password" className="text-muted-foreground">{t('account.auth.passwordLabel')}</Label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -126,30 +128,30 @@ export function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Ingresando...
+                    {t('account.auth.signingIn')}
                   </>
                 ) : (
-                  'Ingresar'
+                  t('account.auth.signIn')
                 )}
               </Button>
             </form>
 
             <div className="mt-6">
-              <GoogleSignInButton label="Iniciar sesión con Google" />
+              <GoogleSignInButton label={t('account.auth.googleSignIn')} />
             </div>
 
             <div className="mt-6 pt-6 border-t border-foreground/10 space-y-3">
               <p className="text-sm text-muted-foreground text-center">
-                ¿No tienes cuenta?{' '}
+                {t('account.auth.noAccount')}{' '}
                 <Link
                   to="/signup"
                   className="text-blue-600 dark:text-blue-400 hover:text-blue-300 font-medium"
                 >
-                  Regístrate gratis
+                  {t('account.auth.signUpFree')}
                 </Link>
               </p>
               <p className="text-xs text-muted-foreground text-center">
-                10 búsquedas/día gratis. Sin tarjeta requerida.
+                {t('account.auth.freeTierNote')}
               </p>
             </div>
           </CardContent>

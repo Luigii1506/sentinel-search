@@ -1,0 +1,424 @@
+{
+  "compliance": {
+    "dashboard": {
+      "title": "Panel de Cumplimiento",
+      "description": "Gestión de casos, alertas, lista blanca y monitoreo continuo.",
+      "newCase": "Nuevo Caso",
+      "metrics": {
+        "openCases": "Casos Abiertos",
+        "pendingAlerts": "Alertas Pendientes",
+        "fpRate": "Tasa de Falsos Positivos",
+        "monitoredEntities": "Entidades Monitoreadas"
+      },
+      "decisions": {
+        "title": "Decisiones de los últimos {{count}} días",
+        "total": "Total",
+        "truePositives": "Verdaderos Positivos",
+        "falsePositives": "Falsos Positivos",
+        "activeWhitelist": "Lista Blanca Activa",
+        "topFp": "Entidades con más falsos positivos:"
+      }
+    },
+    "tabs": {
+      "cases": "Casos",
+      "alerts": "Alertas",
+      "whitelist": "Lista Blanca",
+      "watchlist": "Monitoreo"
+    },
+    "caseStatus": {
+      "open": "Abierto",
+      "in_review": "En Revisión",
+      "pending_decision": "Pendiente",
+      "escalated": "Escalado",
+      "closed": "Cerrado",
+      "archived": "Archivado"
+    },
+    "cases": {
+      "empty": {
+        "title": "Sin Casos",
+        "description": "No hay casos de investigación registrados."
+      },
+      "entity": "Entidad",
+      "client": "Cliente",
+      "alertsCount": "{{count}} alertas"
+    },
+    "alerts": {
+      "empty": {
+        "title": "Sin Alertas",
+        "description": "No hay alertas pendientes de revisión."
+      },
+      "query": "Búsqueda",
+      "confidence": "Confianza"
+    },
+    "whitelist": {
+      "empty": {
+        "title": "Lista Blanca Vacía",
+        "description": "No hay entradas de supresión. Los falsos positivos marcados aparecerán aquí."
+      },
+      "activeSummary": "{{count}} entradas activas — las búsquedas futuras omitirán estas coincidencias.",
+      "permanent": "Permanente",
+      "reason": "Razón",
+      "expires": "Expira",
+      "toast": {
+        "removed": "Entrada eliminada de la lista blanca",
+        "removeError": "Error al eliminar la entrada"
+      }
+    },
+    "watchlist": {
+      "empty": {
+        "title": "Sin Monitoreo",
+        "description": "No hay entidades bajo monitoreo continuo."
+      },
+      "activeAlerts": "Alertas activas",
+      "screenings": "Análisis",
+      "lastMatches": "Coincidencias del último",
+      "last": "Último",
+      "next": "Próximo",
+      "frequency": {
+        "realtime": "Tiempo real",
+        "daily": "Diario",
+        "weekly": "Semanal",
+        "monthly": "Mensual"
+      },
+      "toast": {
+        "removed": "Entidad removida del monitoreo",
+        "removeError": "Error al remover la entidad"
+      }
+    },
+    "createCase": {
+      "title": "Crear Caso de Investigación",
+      "fields": {
+        "title": "Título",
+        "entity": "Entidad",
+        "priority": "Prioridad",
+        "description": "Descripción",
+        "tags": "Etiquetas (separadas por coma)"
+      },
+      "placeholders": {
+        "title": "Ej: Investigación de coincidencia OFAC — Juan Pérez",
+        "entity": "Nombre de la entidad (opcional)",
+        "description": "Descripción del caso...",
+        "tags": "ej: pep, sanciones, alto-riesgo"
+      },
+      "creating": "Creando...",
+      "submit": "Crear Caso",
+      "toast": {
+        "created": "Caso creado correctamente",
+        "error": "Error al crear el caso"
+      }
+    },
+    "addWatchlist": {
+      "title": "Agregar a Monitoreo Continuo",
+      "fields": {
+        "entityName": "Nombre de entidad",
+        "entityType": "Tipo de entidad",
+        "frequency": "Frecuencia de monitoreo",
+        "minConfidence": "Confianza mínima",
+        "client": "Cliente (opcional)"
+      },
+      "placeholders": {
+        "entityName": "Nombre a monitorear",
+        "select": "Seleccionar...",
+        "client": "Nombre del cliente"
+      },
+      "adding": "Agregando...",
+      "submit": "Agregar a Monitoreo",
+      "toast": {
+        "added": "Entidad agregada al monitoreo",
+        "error": "Error al agregar al monitoreo"
+      }
+    },
+    "addWhitelist": {
+      "title": "Agregar a la Lista Blanca",
+      "fields": {
+        "queryName": "Nombre de búsqueda (consulta)",
+        "entityId": "ID de entidad a suprimir",
+        "entityName": "Nombre de entidad",
+        "reason": "Razón"
+      },
+      "placeholders": {
+        "queryName": "Ej: JUAN PEREZ GARCIA",
+        "entityId": "UUID de la entidad",
+        "entityName": "Nombre de la entidad a suprimir",
+        "reason": "Razón para suprimir esta coincidencia..."
+      },
+      "permanent": "Permanente (no expira)",
+      "adding": "Agregando...",
+      "submit": "Agregar a la Lista Blanca",
+      "toast": {
+        "added": "Entrada agregada a la lista blanca",
+        "error": "Error al agregar a la lista blanca"
+      }
+    },
+    "adverseMedia": {
+      "title": "Adverse Media",
+      "description": "Monitoreo continuo de noticias PLD/FT.",
+      "reclassify": "Reclasificar",
+      "reclassifyAria": "Reclasificar noticias",
+      "toast": {
+        "reclassified": "Reclasificados: {{reclassified}} artículos ({{adverse}} adversos)",
+        "reclassifyError": "Error al reclasificar"
+      },
+      "metrics": {
+        "totalArticles": "Total de Artículos",
+        "adverseMedia": "Adverse Media",
+        "activeSources": "Fuentes Activas",
+        "entityLinks": "Vínculos de Entidad",
+        "aiClassification": "Clasificación con IA"
+      },
+      "tabs": {
+        "articles": "Artículos",
+        "sources": "Fuentes",
+        "analytics": "Análisis"
+      },
+      "category": {
+        "terrorism": "Terrorismo",
+        "sanctions_evasion": "Evasión de Sanciones",
+        "wanted": "Buscados",
+        "crime": "Crimen",
+        "human_rights": "Derechos Humanos",
+        "financial_crime": "Crimen Financiero",
+        "corruption": "Corrupción",
+        "offshore": "Offshore",
+        "regulatory": "Regulatorio"
+      },
+      "method": {
+        "moonshot_ai": "Moonshot AI",
+        "claude_ai": "Claude AI",
+        "keyword": "Palabras clave",
+        "unknown": "Sin clasificar"
+      },
+      "time": {
+        "lessThanHour": "Hace menos de 1h",
+        "hoursAgo": "Hace {{count}}h",
+        "daysAgo": "Hace {{count}}d"
+      },
+      "articles": {
+        "searchPlaceholder": "Buscar en títulos...",
+        "categoryPlaceholder": "Categoría",
+        "minSeverity": "Severidad mínima",
+        "resultsCount": "{{count}} artículos encontrados",
+        "empty": "No se encontraron artículos con los filtros aplicados.",
+        "confShort": "{{count}}% conf.",
+        "range": {
+          "today": "Hoy",
+          "days7": "7 días",
+          "days30": "30 días",
+          "days90": "90 días",
+          "year1": "1 año"
+        }
+      },
+      "sources": {
+        "active": "Activas",
+        "inactive": "Inactivas",
+        "totalArticles": "Total de Artículos",
+        "accumulatedErrors": "Errores Acumulados",
+        "activeSources": "Fuentes Activas ({{count}})",
+        "inactiveSources": "Fuentes Inactivas ({{count}})",
+        "runCrawl": "Ejecutar Rastreo",
+        "columns": {
+          "source": "Fuente",
+          "type": "Tipo",
+          "articles": "Artículos",
+          "quality": "Calidad",
+          "errors": "Errores",
+          "lastCrawl": "Último Rastreo"
+        },
+        "toast": {
+          "crawlStarted": "Rastreo iniciado para {{name}}",
+          "crawlError": "Error al iniciar el rastreo"
+        }
+      },
+      "analytics": {
+        "recentActivity": "Actividad reciente de adverse media",
+        "categoryDistribution": "Distribución por Categoría",
+        "classificationMethod": "Método de Clasificación",
+        "noCategoryData": "Sin datos de categorías",
+        "noMethodData": "Sin datos de métodos",
+        "adverseRate": "Tasa de Adverse Media",
+        "adverseOfTotal": "{{adverse}} de {{total}} artículos",
+        "linkedEntities": "{{count}} entidades vinculadas",
+        "unclassified": "Sin Clasificar",
+        "classifiedCount": "{{count}} clasificados"
+      },
+      "detail": {
+        "srDescription": "Detalle del artículo de adverse media",
+        "severity": "Severidad",
+        "confidence": "Confianza",
+        "viewSource": "Ver fuente",
+        "excerpt": "Extracto",
+        "summary": "Resumen",
+        "extractedEntities": "Entidades Extraídas ({{count}})",
+        "linkedEntities": "Entidades Vinculadas ({{count}})",
+        "primarySubject": "Sujeto principal",
+        "viewProfile": "Ver perfil",
+        "createCase": "Crear Caso",
+        "unlinkedTitle": "Entidades detectadas sin vincular a Gold",
+        "unlinkedDescription": "Las entidades extraídas aún no están vinculadas a entidades del sistema. Usa la búsqueda para vincularlas manualmente.",
+        "notFound": "Artículo no encontrado",
+        "toast": {
+          "caseCreated": "Caso {{name}} creado",
+          "caseError": "Error al crear el caso"
+        }
+      }
+    },
+    "case": {
+      "backToCases": "Casos",
+      "viewEntity": "Ver Entidad",
+      "slaBreached": "SLA Vencido",
+      "matchesDetected": "Coincidencias detectadas",
+      "analystReason": "Razón del analista",
+      "decide": "Decidir",
+      "reviewProgress": "Progreso de revisión",
+      "allReviewed": "Todas las alertas revisadas — el caso se cerrará automáticamente",
+      "history": "Historial",
+      "alertsReviewed": "{{reviewed}}/{{total}} revisadas",
+      "notFound": {
+        "title": "Caso no encontrado",
+        "description": "El caso que buscas no existe o ya no está disponible."
+      },
+      "noAlerts": {
+        "title": "Sin alertas vinculadas",
+        "description": "Este caso no tiene coincidencias registradas en este momento."
+      },
+      "fields": {
+        "risk": "Riesgo",
+        "alerts": "Alertas",
+        "created": "Creado",
+        "closed": "Cerrado",
+        "sla": "SLA",
+        "query": "Búsqueda",
+        "confidence": "Confianza",
+        "reason": "Razón",
+        "priority": "Prioridad",
+        "type": "Tipo",
+        "client": "Cliente",
+        "status": "Estado",
+        "resolution": "Resolución"
+      },
+      "priority": {
+        "critical": "Crítico",
+        "high": "Alto",
+        "medium": "Medio",
+        "low": "Bajo"
+      },
+      "status": {
+        "open": "Abierto",
+        "in_review": "En Revisión",
+        "escalated": "Escalado",
+        "closed_tp": "Confirmado",
+        "closed_fp": "Descartado",
+        "closed_inconclusive": "Inconcluso",
+        "sar_filed": "SAR Presentado"
+      },
+      "decision": {
+        "true_positive": {
+          "label": "Verdadero Positivo",
+          "description": "La persona coincide con la lista — requiere acción regulatoria"
+        },
+        "false_positive": {
+          "label": "Falso Positivo",
+          "description": "No es la misma persona — descartado y agregado a la lista blanca"
+        },
+        "escalate": {
+          "label": "Escalado",
+          "description": "Requiere revisión de un supervisor o MLRO"
+        },
+        "inconclusive": {
+          "label": "Inconcluso",
+          "description": "Información insuficiente para determinar"
+        }
+      },
+      "event": {
+        "created": "Caso creado",
+        "status_changed": "Estado actualizado",
+        "decision_made": "Decisión registrada",
+        "note_added": "Nota agregada",
+        "alert_linked": "Alerta vinculada",
+        "assigned": "Caso asignado",
+        "escalated": "Caso escalado"
+      },
+      "time": {
+        "justNow": "Hace un momento",
+        "minutesAgo": "Hace {{count}} min",
+        "hoursAgo": "Hace {{count}}h",
+        "daysAgo": "Hace {{count}}d"
+      },
+      "sla": {
+        "breached": "Vencido",
+        "withinTime": "Dentro de plazo"
+      },
+      "sar": {
+        "pendingAction": "Acción pendiente: Presentar Reporte de Operación Sospechosa (SAR/ROS)",
+        "viewReport": "Ver Reporte",
+        "fileSar": "Presentar SAR",
+        "filedWithRegulator": "SAR/ROS presentado ante el regulador"
+      },
+      "notes": {
+        "title": "Notas",
+        "placeholder": "Agregar una nota al caso...",
+        "saving": "Guardando...",
+        "add": "Agregar nota",
+        "empty": {
+          "title": "Sin notas aún",
+          "description": "Agrega contexto operativo o el razonamiento del analista para el historial del caso."
+        }
+      },
+      "decisionDialog": {
+        "title": "Tomar decisión",
+        "confidenceSuffix": "{{count}}% de confianza",
+        "decisionLabel": "Decisión",
+        "tpHint": "Coincide con la entidad; requiere acción",
+        "fpHint": "No corresponde a la entidad evaluada",
+        "escalate": "Escalar",
+        "escalateHint": "Requiere supervisor",
+        "inconclusiveHint": "Información insuficiente",
+        "justification": "Justificación (requerida)",
+        "justificationPlaceholder": "Describe la razón de esta decisión...",
+        "fpWarning": "Se creará una lista blanca automáticamente para suprimir futuras alertas de esta coincidencia.",
+        "tpWarning": "El caso se cerrará como confirmado. Deberás evaluar si se requiere presentar un SAR/ROS al regulador.",
+        "escalateWarning": "El caso se marcará como escalado. Un supervisor deberá tomar la decisión final.",
+        "validationError": "Selecciona una decisión y agrega una justificación de al menos 5 caracteres",
+        "confirm": "Confirmar decisión"
+      },
+      "sarReport": {
+        "title": "Reporte de Actividad Sospechosa (SAR/ROS)",
+        "reportLabel": "Reporte SAR/ROS",
+        "generated": "Generado",
+        "reference": "Referencia",
+        "subject": "Sujeto Investigado",
+        "summary": "Resumen",
+        "truePositives": "Verdaderos Positivos",
+        "sources": "Fuentes",
+        "sourcesWhereFound": "Listas y Fuentes donde aparece",
+        "alertsDetail": "Detalle de Alertas",
+        "formalDecisions": "Decisiones Formales",
+        "role": "Rol",
+        "chronology": "Cronología",
+        "caseInfo": "Información del Caso",
+        "downloaded": "Reporte descargado",
+        "generateError": "No se pudo generar el reporte"
+      },
+      "fileSar": {
+        "title": "Registrar SAR/ROS",
+        "intro": "Ingresa el número de referencia del Reporte de Operación Sospechosa presentado ante la autoridad reguladora (UIF/FinCEN).",
+        "referenceLabel": "Número de referencia SAR/ROS",
+        "referencePlaceholder": "Ej: ROS-2026-00145 o SAR-20260314-001",
+        "irreversibleTitle": "Esta acción es irreversible",
+        "irreversibleBody": "El caso se marcará como \"SAR Presentado\" y se registrará en el historial de auditoría con fecha y referencia.",
+        "validationError": "Ingresa un número de referencia válido (mín. 3 caracteres)",
+        "filing": "Registrando...",
+        "confirm": "Confirmar Presentación"
+      },
+      "toast": {
+        "noteAdded": "Nota agregada",
+        "noteError": "Error al agregar la nota",
+        "whitelistCreated": "Lista blanca creada; futuras alertas de esta coincidencia serán suprimidas",
+        "decisionRecorded": "Decisión registrada",
+        "decisionError": "Error al registrar la decisión",
+        "sarFiled": "SAR/ROS registrado correctamente",
+        "sarError": "Error al registrar el SAR"
+      }
+    }
+  }
+}

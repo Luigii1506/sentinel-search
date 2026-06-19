@@ -1,0 +1,424 @@
+{
+  "compliance": {
+    "dashboard": {
+      "title": "Compliance Dashboard",
+      "description": "Manage cases, alerts, whitelist, and continuous monitoring.",
+      "newCase": "New Case",
+      "metrics": {
+        "openCases": "Open Cases",
+        "pendingAlerts": "Pending Alerts",
+        "fpRate": "False Positive Rate",
+        "monitoredEntities": "Monitored Entities"
+      },
+      "decisions": {
+        "title": "Decisions in the last {{count}} days",
+        "total": "Total",
+        "truePositives": "True Positives",
+        "falsePositives": "False Positives",
+        "activeWhitelist": "Active Whitelist",
+        "topFp": "Entities with the most false positives:"
+      }
+    },
+    "tabs": {
+      "cases": "Cases",
+      "alerts": "Alerts",
+      "whitelist": "Whitelist",
+      "watchlist": "Monitoring"
+    },
+    "caseStatus": {
+      "open": "Open",
+      "in_review": "In Review",
+      "pending_decision": "Pending",
+      "escalated": "Escalated",
+      "closed": "Closed",
+      "archived": "Archived"
+    },
+    "cases": {
+      "empty": {
+        "title": "No Cases",
+        "description": "There are no investigation cases on record."
+      },
+      "entity": "Entity",
+      "client": "Client",
+      "alertsCount": "{{count}} alerts"
+    },
+    "alerts": {
+      "empty": {
+        "title": "No Alerts",
+        "description": "There are no alerts pending review."
+      },
+      "query": "Query",
+      "confidence": "Confidence"
+    },
+    "whitelist": {
+      "empty": {
+        "title": "Whitelist Empty",
+        "description": "There are no suppression entries. Flagged false positives will appear here."
+      },
+      "activeSummary": "{{count}} active entries — future searches will skip these matches.",
+      "permanent": "Permanent",
+      "reason": "Reason",
+      "expires": "Expires",
+      "toast": {
+        "removed": "Entry removed from whitelist",
+        "removeError": "Failed to remove entry"
+      }
+    },
+    "watchlist": {
+      "empty": {
+        "title": "No Monitoring",
+        "description": "There are no entities under continuous monitoring."
+      },
+      "activeAlerts": "Active alerts",
+      "screenings": "Screenings",
+      "lastMatches": "Latest matches",
+      "last": "Last",
+      "next": "Next",
+      "frequency": {
+        "realtime": "Real time",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly"
+      },
+      "toast": {
+        "removed": "Entity removed from monitoring",
+        "removeError": "Failed to remove entity"
+      }
+    },
+    "createCase": {
+      "title": "Create Investigation Case",
+      "fields": {
+        "title": "Title",
+        "entity": "Entity",
+        "priority": "Priority",
+        "description": "Description",
+        "tags": "Tags (comma-separated)"
+      },
+      "placeholders": {
+        "title": "e.g.: OFAC match investigation — John Doe",
+        "entity": "Entity name (optional)",
+        "description": "Case description...",
+        "tags": "e.g.: pep, sanctions, high-risk"
+      },
+      "creating": "Creating...",
+      "submit": "Create Case",
+      "toast": {
+        "created": "Case created successfully",
+        "error": "Failed to create case"
+      }
+    },
+    "addWatchlist": {
+      "title": "Add to Continuous Monitoring",
+      "fields": {
+        "entityName": "Entity name",
+        "entityType": "Entity type",
+        "frequency": "Monitoring frequency",
+        "minConfidence": "Minimum confidence",
+        "client": "Client (optional)"
+      },
+      "placeholders": {
+        "entityName": "Name to monitor",
+        "select": "Select...",
+        "client": "Client name"
+      },
+      "adding": "Adding...",
+      "submit": "Add to Monitoring",
+      "toast": {
+        "added": "Entity added to monitoring",
+        "error": "Failed to add to monitoring"
+      }
+    },
+    "addWhitelist": {
+      "title": "Add to Whitelist",
+      "fields": {
+        "queryName": "Query name",
+        "entityId": "Entity ID to suppress",
+        "entityName": "Entity name",
+        "reason": "Reason"
+      },
+      "placeholders": {
+        "queryName": "e.g.: JOHN DOE SMITH",
+        "entityId": "Entity UUID",
+        "entityName": "Name of the entity to suppress",
+        "reason": "Reason to suppress this match..."
+      },
+      "permanent": "Permanent (never expires)",
+      "adding": "Adding...",
+      "submit": "Add to Whitelist",
+      "toast": {
+        "added": "Entry added to whitelist",
+        "error": "Failed to add to whitelist"
+      }
+    },
+    "adverseMedia": {
+      "title": "Adverse Media",
+      "description": "Continuous AML/CFT news monitoring.",
+      "reclassify": "Reclassify",
+      "reclassifyAria": "Reclassify news",
+      "toast": {
+        "reclassified": "Reclassified: {{reclassified}} articles ({{adverse}} adverse)",
+        "reclassifyError": "Failed to reclassify"
+      },
+      "metrics": {
+        "totalArticles": "Total Articles",
+        "adverseMedia": "Adverse Media",
+        "activeSources": "Active Sources",
+        "entityLinks": "Entity Links",
+        "aiClassification": "AI Classification"
+      },
+      "tabs": {
+        "articles": "Articles",
+        "sources": "Sources",
+        "analytics": "Analytics"
+      },
+      "category": {
+        "terrorism": "Terrorism",
+        "sanctions_evasion": "Sanctions Evasion",
+        "wanted": "Wanted",
+        "crime": "Crime",
+        "human_rights": "Human Rights",
+        "financial_crime": "Financial Crime",
+        "corruption": "Corruption",
+        "offshore": "Offshore",
+        "regulatory": "Regulatory"
+      },
+      "method": {
+        "moonshot_ai": "Moonshot AI",
+        "claude_ai": "Claude AI",
+        "keyword": "Keywords",
+        "unknown": "Unclassified"
+      },
+      "time": {
+        "lessThanHour": "Less than 1h ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "articles": {
+        "searchPlaceholder": "Search in titles...",
+        "categoryPlaceholder": "Category",
+        "minSeverity": "Minimum severity",
+        "resultsCount": "{{count}} articles found",
+        "empty": "No articles found with the applied filters.",
+        "confShort": "{{count}}% conf.",
+        "range": {
+          "today": "Today",
+          "days7": "7 days",
+          "days30": "30 days",
+          "days90": "90 days",
+          "year1": "1 year"
+        }
+      },
+      "sources": {
+        "active": "Active",
+        "inactive": "Inactive",
+        "totalArticles": "Total Articles",
+        "accumulatedErrors": "Accumulated Errors",
+        "activeSources": "Active Sources ({{count}})",
+        "inactiveSources": "Inactive Sources ({{count}})",
+        "runCrawl": "Run Crawl",
+        "columns": {
+          "source": "Source",
+          "type": "Type",
+          "articles": "Articles",
+          "quality": "Quality",
+          "errors": "Errors",
+          "lastCrawl": "Last Crawl"
+        },
+        "toast": {
+          "crawlStarted": "Crawl started for {{name}}",
+          "crawlError": "Failed to start crawl"
+        }
+      },
+      "analytics": {
+        "recentActivity": "Recent adverse media activity",
+        "categoryDistribution": "Distribution by Category",
+        "classificationMethod": "Classification Method",
+        "noCategoryData": "No category data",
+        "noMethodData": "No method data",
+        "adverseRate": "Adverse Media Rate",
+        "adverseOfTotal": "{{adverse}} of {{total}} articles",
+        "linkedEntities": "{{count}} linked entities",
+        "unclassified": "Unclassified",
+        "classifiedCount": "{{count}} classified"
+      },
+      "detail": {
+        "srDescription": "Adverse media article detail",
+        "severity": "Severity",
+        "confidence": "Confidence",
+        "viewSource": "View source",
+        "excerpt": "Excerpt",
+        "summary": "Summary",
+        "extractedEntities": "Extracted Entities ({{count}})",
+        "linkedEntities": "Linked Entities ({{count}})",
+        "primarySubject": "Primary subject",
+        "viewProfile": "View profile",
+        "createCase": "Create Case",
+        "unlinkedTitle": "Detected entities not linked to Gold",
+        "unlinkedDescription": "The extracted entities are not yet linked to system entities. Use search to link them manually.",
+        "notFound": "Article not found",
+        "toast": {
+          "caseCreated": "Case {{name}} created",
+          "caseError": "Failed to create case"
+        }
+      }
+    },
+    "case": {
+      "backToCases": "Cases",
+      "viewEntity": "View Entity",
+      "slaBreached": "SLA Breached",
+      "matchesDetected": "Detected matches",
+      "analystReason": "Analyst's reason",
+      "decide": "Decide",
+      "reviewProgress": "Review progress",
+      "allReviewed": "All alerts reviewed — the case will close automatically",
+      "history": "History",
+      "alertsReviewed": "{{reviewed}}/{{total}} reviewed",
+      "notFound": {
+        "title": "Case not found",
+        "description": "The case you are looking for does not exist or is no longer available."
+      },
+      "noAlerts": {
+        "title": "No linked alerts",
+        "description": "This case has no matches on record at this time."
+      },
+      "fields": {
+        "risk": "Risk",
+        "alerts": "Alerts",
+        "created": "Created",
+        "closed": "Closed",
+        "sla": "SLA",
+        "query": "Query",
+        "confidence": "Confidence",
+        "reason": "Reason",
+        "priority": "Priority",
+        "type": "Type",
+        "client": "Client",
+        "status": "Status",
+        "resolution": "Resolution"
+      },
+      "priority": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "status": {
+        "open": "Open",
+        "in_review": "In Review",
+        "escalated": "Escalated",
+        "closed_tp": "Confirmed",
+        "closed_fp": "Dismissed",
+        "closed_inconclusive": "Inconclusive",
+        "sar_filed": "SAR Filed"
+      },
+      "decision": {
+        "true_positive": {
+          "label": "True Positive",
+          "description": "The person matches the list — regulatory action required"
+        },
+        "false_positive": {
+          "label": "False Positive",
+          "description": "Not the same person — dismissed and added to whitelist"
+        },
+        "escalate": {
+          "label": "Escalated",
+          "description": "Requires review by a supervisor or MLRO"
+        },
+        "inconclusive": {
+          "label": "Inconclusive",
+          "description": "Insufficient information to determine"
+        }
+      },
+      "event": {
+        "created": "Case created",
+        "status_changed": "Status updated",
+        "decision_made": "Decision recorded",
+        "note_added": "Note added",
+        "alert_linked": "Alert linked",
+        "assigned": "Case assigned",
+        "escalated": "Case escalated"
+      },
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{{count}} min ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago"
+      },
+      "sla": {
+        "breached": "Breached",
+        "withinTime": "Within deadline"
+      },
+      "sar": {
+        "pendingAction": "Pending action: File a Suspicious Activity Report (SAR/STR)",
+        "viewReport": "View Report",
+        "fileSar": "File SAR",
+        "filedWithRegulator": "SAR/STR filed with the regulator"
+      },
+      "notes": {
+        "title": "Notes",
+        "placeholder": "Add a note to the case...",
+        "saving": "Saving...",
+        "add": "Add note",
+        "empty": {
+          "title": "No notes yet",
+          "description": "Add operational context or analyst rationale for the case record."
+        }
+      },
+      "decisionDialog": {
+        "title": "Make a decision",
+        "confidenceSuffix": "{{count}}% confidence",
+        "decisionLabel": "Decision",
+        "tpHint": "Matches the entity; action required",
+        "fpHint": "Does not correspond to the evaluated entity",
+        "escalate": "Escalate",
+        "escalateHint": "Requires supervisor",
+        "inconclusiveHint": "Insufficient information",
+        "justification": "Justification (required)",
+        "justificationPlaceholder": "Describe the reason for this decision...",
+        "fpWarning": "A whitelist entry will be created automatically to suppress future alerts for this match.",
+        "tpWarning": "The case will be closed as confirmed. You will need to assess whether a SAR/STR must be filed with the regulator.",
+        "escalateWarning": "The case will be marked as escalated. A supervisor must make the final decision.",
+        "validationError": "Select a decision and add a justification of at least 5 characters",
+        "confirm": "Confirm decision"
+      },
+      "sarReport": {
+        "title": "Suspicious Activity Report (SAR/STR)",
+        "reportLabel": "SAR/STR Report",
+        "generated": "Generated",
+        "reference": "Reference",
+        "subject": "Subject Under Investigation",
+        "summary": "Summary",
+        "truePositives": "True Positives",
+        "sources": "Sources",
+        "sourcesWhereFound": "Lists and Sources where it appears",
+        "alertsDetail": "Alert Detail",
+        "formalDecisions": "Formal Decisions",
+        "role": "Role",
+        "chronology": "Chronology",
+        "caseInfo": "Case Information",
+        "downloaded": "Report downloaded",
+        "generateError": "Could not generate the report"
+      },
+      "fileSar": {
+        "title": "File SAR/STR",
+        "intro": "Enter the reference number of the Suspicious Activity Report filed with the regulatory authority (FIU/FinCEN).",
+        "referenceLabel": "SAR/STR reference number",
+        "referencePlaceholder": "e.g.: STR-2026-00145 or SAR-20260314-001",
+        "irreversibleTitle": "This action is irreversible",
+        "irreversibleBody": "The case will be marked as \"SAR Filed\" and recorded in the audit trail with date and reference.",
+        "validationError": "Enter a valid reference number (min. 3 characters)",
+        "filing": "Filing...",
+        "confirm": "Confirm Filing"
+      },
+      "toast": {
+        "noteAdded": "Note added",
+        "noteError": "Failed to add note",
+        "whitelistCreated": "Whitelist entry created; future alerts for this match will be suppressed",
+        "decisionRecorded": "Decision recorded",
+        "decisionError": "Failed to record decision",
+        "sarFiled": "SAR/STR filed successfully",
+        "sarError": "Failed to file SAR"
+      }
+    }
+  }
+}

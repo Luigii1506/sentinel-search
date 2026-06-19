@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -106,76 +108,61 @@ const LazyEntityNetworkTab = lazy(() =>
   }))
 );
 
-const entityTypeLabels = {
-  person: 'Persona',
-  company: 'Empresa',
-  vessel: 'Embarcación',
-  aircraft: 'Aeronave',
-  organization: 'Organización',
-};
-
-const riskLevelLabels = {
-  critical: 'Crítico',
-  high: 'Alto',
-  medium: 'Medio',
-  low: 'Bajo',
-  none: 'Ninguno',
-};
-
-function summarizeEntityExposure(entity: APIEntity, profile?: EntityProfile, pepEntries: CanonicalPepEntry[] = entity.pep_entries): string {
+function summarizeEntityExposure(t: TFunction, entity: APIEntity, profile?: EntityProfile, pepEntries: CanonicalPepEntry[] = entity.pep_entries): string {
   const activeSanctions = entity.sanctions.filter((item) => item.status === 'active').length;
   const pepState = profile?.overview.pep_status || entity.pep_status || (
     entity.is_current_pep ? 'current_pep' : pepEntries.length > 0 ? 'ex_pep' : 'non_pep'
   );
   const pepStatus =
     pepState === 'current_pep'
-      ? 'PEP en cargo'
+      ? t('entity.exposure.statusCurrentPep')
       : pepState === 'former_pep_in_monitoring'
-        ? 'Ex-PEP en monitoreo AML'
+        ? t('entity.exposure.statusFormerPepMonitoring')
         : pepState === 'ex_pep'
-          ? 'Ex-PEP'
+          ? t('entity.exposure.statusExPep')
           : null;
   const adverseMediaCount = entity.adverse_media?.length || 0;
   const relationshipCount = profile?.connections?.aml_visible_relationships || 0;
   const contextualCount = profile?.connections?.contextual_relationships || 0;
+  const pepSuffix = entity.pep_category ? ` (${entity.pep_category})` : '';
 
   if (activeSanctions > 0 && pepState === 'current_pep') {
-    return `Entidad de alto interés AML: ${activeSanctions} sanción${activeSanctions !== 1 ? 'es' : ''} activa${activeSanctions !== 1 ? 's' : ''} y condición PEP vigente.`;
+    return t('entity.exposure.highInterest', { count: activeSanctions });
   }
   if (activeSanctions > 0) {
-    return `Entidad sancionada con ${activeSanctions} registro${activeSanctions !== 1 ? 's' : ''} activo${activeSanctions !== 1 ? 's' : ''} en fuentes primarias.`;
+    return t('entity.exposure.sanctioned', { count: activeSanctions });
   }
   if (pepState === 'current_pep') {
-    return `Entidad con exposición política vigente${entity.pep_category ? ` (${entity.pep_category})` : ''}.`;
+    return t('entity.exposure.currentPep', { suffix: pepSuffix });
   }
   if (pepState === 'former_pep_in_monitoring') {
-    return `Entidad sin sanciones activas, pero en ventana reforzada de monitoreo AML por antecedente PEP${entity.pep_category ? ` (${entity.pep_category})` : ''}.`;
+    return t('entity.exposure.monitoringPep', { suffix: pepSuffix });
   }
   if (adverseMediaCount > 0) {
-    return `Entidad sin sanciones activas, pero con ${adverseMediaCount} señal${adverseMediaCount !== 1 ? 'es' : ''} de adverse media para análisis.`;
+    return t('entity.exposure.adverseMedia', { count: adverseMediaCount });
   }
   if (relationshipCount > 0) {
-    return `Entidad sin alertas directas críticas, pero con ${relationshipCount} relacion${relationshipCount !== 1 ? 'es' : ''} disponibles para análisis contextual.`;
+    return t('entity.exposure.relationships', { count: relationshipCount });
   }
   if (contextualCount > 0) {
-    return `Entidad sin relaciones AML visibles, pero con ${contextualCount} vínculo${contextualCount !== 1 ? 's' : ''} contextuales disponibles para perfil enriquecido.`;
+    return t('entity.exposure.contextual', { count: contextualCount });
   }
   if (pepStatus) {
-    return `Entidad con ${pepStatus} y sin sanciones activas registradas.`;
+    return t('entity.exposure.pepStatusOnly', { status: pepStatus });
   }
-  return 'Entidad sin alertas directas críticas en la vista actual; el valor principal está en cobertura de fuentes y trazabilidad.';
+  return t('entity.exposure.default');
 }
 
-function getRelationshipSignalSummary(profile?: EntityProfile): Array<{ label: string; value: number }> {
+function getRelationshipSignalSummary(t: TFunction, profile?: EntityProfile): Array<{ label: string; value: number }> {
   if (!profile?.connections) return [];
 
   const counts = profile.connections.relationship_counts || {};
   const summary = [
-    { label: 'Familiares', value: counts.family || 0 },
-    { label: 'Asociados', value: counts.associate || 0 },
-    { label: 'Corporativo', value: (counts.corporate || 0) + (counts.beneficial_ownership || 0) },
-    { label: 'Político', value: counts.political || 0 },
-    { label: 'Sancionatorio', value: counts.sanction || 0 },
+    { label: t('entity.relationships.type.family'), value: counts.family || 0 },
+    { label: t('entity.relationships.type.associate'), value: counts.associate || 0 },
+    { label: t('entity.relationships.type.corporate'), value: (counts.corporate || 0) + (counts.beneficial_ownership || 0) },
+    { label: t('entity.relationships.type.political'), value: counts.political || 0 },
+    { label: t('entity.relationships.type.sanction'), value: counts.sanction || 0 },
   ];
 
   return summary.filter((item) => item.value > 0);
@@ -198,14 +185,14 @@ function formatAddressValue(address: {
   return parts.join(', ');
 }
 
-function getAliasTypeLabel(type: string): string {
+function getAliasTypeLabel(t: TFunction, type: string): string {
   const labels: Record<string, string> = {
-    primary: 'Principal',
-    alias: 'Alias',
-    also_known_as: 'AKA',
-    former_name: 'Nombre previo',
-    maiden_name: 'Apellido de soltera',
-    trading_as: 'Nombre comercial',
+    primary: t('entity.aliasType.primary'),
+    alias: t('entity.aliasType.alias'),
+    also_known_as: t('entity.aliasType.aka'),
+    former_name: t('entity.aliasType.formerName'),
+    maiden_name: t('entity.aliasType.maidenName'),
+    trading_as: t('entity.aliasType.tradingAs'),
   };
   return labels[type] || type;
 }
@@ -244,16 +231,17 @@ function EntityProfileSkeleton() {
 // Not Found State
 function EntityNotFound() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <AppPage width="wide">
       <EmptyState
         icon={AlertTriangle}
-        title="Entidad no encontrada"
-        description="La entidad que buscas no existe o ya no está disponible."
+        title={t('entity.notFound.title')}
+        description={t('entity.notFound.description')}
         action={
           <Button onClick={() => navigate('/search')} className="btn-primary">
-            Volver a Búsqueda
+            {t('entity.notFound.backToSearch')}
           </Button>
         }
         tone="warning"
@@ -264,6 +252,7 @@ function EntityNotFound() {
 
 // Risk Score Gauge
 function RiskScoreGauge({ score, level }: { score: number; level: RiskLevel }) {
+  const { t } = useTranslation();
   const circumference = 2 * Math.PI * 56;
   const strokeDashoffset = circumference - (score / 100) * circumference;
   const color = getRiskColor(level);
@@ -297,7 +286,7 @@ function RiskScoreGauge({ score, level }: { score: number; level: RiskLevel }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold text-foreground">{score}</span>
-        <span className="text-xs text-muted-foreground uppercase">Riesgo</span>
+        <span className="text-xs text-muted-foreground uppercase">{t('entity.gauge.risk')}</span>
       </div>
     </div>
   );
@@ -355,6 +344,7 @@ function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
   icon?: React.ComponentType<{className?: string}>;
   maxVisible?: number;
 }) {
+  const { t } = useTranslation();
   if (!items) return null;
   const rawList = Array.isArray(items) ? items : [items];
   // Normalize each item to string (defensive against objects)
@@ -383,7 +373,7 @@ function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
           ))}
         </ul>
         {remaining > 0 && (
-          <p className="text-xs text-muted-foreground mt-1">+{remaining} más</p>
+          <p className="text-xs text-muted-foreground mt-1">{t('entity.list.more', { count: remaining })}</p>
         )}
       </div>
     </div>
@@ -403,6 +393,7 @@ function ReferenceLinksList({
   onOpenReference: (item: WikidataLink) => void;
   maxVisible?: number;
 }) {
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   if (!items || items.length === 0) return null;
 
@@ -434,7 +425,7 @@ function ReferenceLinksList({
             onClick={() => setIsExpanded((value) => !value)}
             className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 mt-1"
           >
-            {isExpanded ? 'Mostrar menos' : `Ver ${remaining} más`}
+            {isExpanded ? t('entity.list.showLess') : t('entity.list.showMore', { count: remaining })}
           </button>
         )}
       </div>
@@ -463,6 +454,7 @@ function getRiskBadgeClasses(riesgo?: string): string {
 
 // Sanction Entry Card (enriched)
 function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
+  const { t } = useTranslation();
   const details = entry.details;
   const borderColor = details?.riesgo ? getRiskBorderColor(details.riesgo) : 'border-red-500';
 
@@ -483,7 +475,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
             'text-xs',
             entry.status === 'active' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 'bg-gray-500/10 text-muted-foreground'
           )}>
-            {entry.status === 'active' ? 'Activo' : entry.status}
+            {entry.status === 'active' ? t('entity.sanctions.statusActive') : entry.status}
           </Badge>
         </div>
       </div>
@@ -495,43 +487,43 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
           <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {details.rfc && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">RFC</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.rfc')}</p>
                 <p className="text-sm text-foreground font-mono break-all">{details.rfc}</p>
               </div>
             )}
             {details.dataset_label && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Dataset</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.dataset')}</p>
                 <p className="text-sm text-foreground break-words">{details.dataset_label}</p>
               </div>
             )}
             {details.supuesto && (
               <div className="col-span-2 md:col-span-1">
-                <p className="text-[10px] text-muted-foreground uppercase">Supuesto</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.supuesto')}</p>
                 <p className="text-sm text-foreground break-words">{details.supuesto}</p>
               </div>
             )}
             {details.monto && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Monto</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.amount')}</p>
                 <p className="text-sm text-foreground break-words">{details.monto}</p>
               </div>
             )}
             {details.entidad_federativa && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Entidad Federativa</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.federalEntity')}</p>
                 <p className="text-sm text-foreground break-words">{details.entidad_federativa}</p>
               </div>
             )}
             {details.tipo_persona && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Tipo Persona</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.personType')}</p>
                 <p className="text-sm text-foreground break-words">{details.tipo_persona}</p>
               </div>
             )}
             {details.fecha_publicacion && (
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase">Fecha Publicacion</p>
+                <p className="text-[10px] text-muted-foreground uppercase">{t('entity.sanctions.details.publicationDate')}</p>
                 <p className="text-sm text-foreground break-words">{details.fecha_publicacion}</p>
               </div>
             )}
@@ -541,7 +533,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
           {details.datasets && Array.isArray(details.datasets) && details.datasets.length > 1 && (
             <div className="mt-3 pt-3 border-t border-foreground/5">
               <p className="text-xs text-muted-foreground mb-2">
-                Aparece en {details.dataset_count || details.datasets.length} datasets:
+                {t('entity.sanctions.appearsInDatasets', { count: details.dataset_count || details.datasets.length })}
               </p>
               <div className="space-y-2">
                 {details.datasets.map((ds, idx) => {
@@ -562,7 +554,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground mt-2">Listado: {formatDate(entry.listing_date)}</p>
+      <p className="text-xs text-muted-foreground mt-2">{t('entity.sanctions.listing', { date: formatDate(entry.listing_date) })}</p>
     </div>
   );
 }
@@ -572,6 +564,7 @@ function TabPanelFallback({ lines = 4 }: { lines?: number }) {
 }
 
 export function EntityProfilePage() {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -616,13 +609,13 @@ export function EntityProfilePage() {
       }
 
       if (resolved.reference_tier === 'suppress') {
-        toast.message(`"${item.name}" solo se conserva como contexto y no tiene ficha propia`);
+        toast.message(t('entity.reference.suppressNotice', { name: item.name }));
         return;
       }
 
-      toast.message(`No existe aún un perfil local para "${item.name}"`);
+      toast.message(t('entity.reference.noLocalProfile', { name: item.name }));
     } catch {
-      toast.error('No se pudo resolver la referencia');
+      toast.error(t('entity.reference.resolveError'));
     }
   };
 
@@ -657,7 +650,7 @@ export function EntityProfilePage() {
   });
 
   const validAddresses = useMemo(() => entity?.addresses?.filter((address) => formatAddressValue(address)) || [], [entity?.addresses]);
-  const relationshipSignals = useMemo(() => getRelationshipSignalSummary(profile), [profile]);
+  const relationshipSignals = useMemo(() => getRelationshipSignalSummary(t, profile), [profile, t]);
 const overviewFamilyRelationships = useMemo(() => [...(familyRelationships?.relationships || [])].sort((a, b) => {
   if (referenceLikeForQueries) {
     return getReferenceRelationshipSortScore(b) - getReferenceRelationshipSortScore(a)
@@ -672,13 +665,13 @@ const overviewStructuredFamily = useMemo(() => {
   if (!family) return [];
 
   return [
-    family.father ? { ...family.father, relationship_label: 'Padre' } : null,
-    family.mother ? { ...family.mother, relationship_label: 'Madre' } : null,
-    ...family.spouses.map((link) => ({ ...link, relationship_label: 'Cónyuge' })),
-    ...family.children.map((link) => ({ ...link, relationship_label: 'Hijo/a' })),
-    ...family.siblings.map((link) => ({ ...link, relationship_label: 'Hermano/a' })),
+    family.father ? { ...family.father, relationship_label: t('entity.relationships.family.father') } : null,
+    family.mother ? { ...family.mother, relationship_label: t('entity.relationships.family.mother') } : null,
+    ...family.spouses.map((link) => ({ ...link, relationship_label: t('entity.relationships.family.spouse') })),
+    ...family.children.map((link) => ({ ...link, relationship_label: t('entity.relationships.family.child') })),
+    ...family.siblings.map((link) => ({ ...link, relationship_label: t('entity.relationships.family.sibling') })),
   ].filter((link): link is WikidataLink & { relationship_label: string } => Boolean(link?.name));
-}, [profile?.connections?.family]);
+}, [profile?.connections?.family, t]);
 const canonicalPepEntries = useMemo(() => buildCanonicalPepEntries(entity, profile), [entity, profile]);
 const unifiedCareerEntries = useMemo(() => buildUnifiedCareerEntries(profile, canonicalPepEntries), [profile, canonicalPepEntries]);
 const pepStatus = profile?.overview.pep_status || entity?.pep_status || 'non_pep';
@@ -728,20 +721,20 @@ const hasSanctions =
   const effectiveRelationshipsList = relationshipsList ?? profileRelationshipsPreview;
   const availableTabs = useMemo<Array<{ id: EntityTabId; label: string; count?: number; icon?: typeof Newspaper }>>(() => {
     const tabs: Array<{ id: EntityTabId; label: string; count?: number; icon?: typeof Newspaper }> = [
-      { id: 'overview', label: referenceLike ? 'Contexto' : 'General' },
+      { id: 'overview', label: referenceLike ? t('entity.tabs.context') : t('entity.tabs.overview') },
     ];
 
-    if (hasSanctions) tabs.push({ id: 'sanctions', label: 'Sanciones', count: entity?.sanctions?.length });
-    if (hasPep) tabs.push({ id: 'pep', label: 'PEP', count: canonicalPepEntries.length || undefined });
-    if (hasMedia && !referenceLike) tabs.push({ id: 'media', label: 'Medios', icon: Newspaper });
+    if (hasSanctions) tabs.push({ id: 'sanctions', label: t('entity.tabs.sanctions'), count: entity?.sanctions?.length });
+    if (hasPep) tabs.push({ id: 'pep', label: t('entity.tabs.pep'), count: canonicalPepEntries.length || undefined });
+    if (hasMedia && !referenceLike) tabs.push({ id: 'media', label: t('entity.tabs.media'), icon: Newspaper });
     if (shouldShowRelationshipsTab) {
-      tabs.push({ id: 'relationships', label: 'Relaciones', count: relationshipsTabCount });
+      tabs.push({ id: 'relationships', label: t('entity.tabs.relationships'), count: relationshipsTabCount });
     }
-    if (showNetwork) tabs.push({ id: 'network', label: 'Grafo' });
-    if (showNetworkRisk) tabs.push({ id: 'network-risk', label: 'Riesgo Red', icon: Network });
-    if (showUBO) tabs.push({ id: 'ubo', label: 'UBO', icon: Landmark });
+    if (showNetwork) tabs.push({ id: 'network', label: t('entity.tabs.network') });
+    if (showNetworkRisk) tabs.push({ id: 'network-risk', label: t('entity.tabs.networkRisk'), icon: Network });
+    if (showUBO) tabs.push({ id: 'ubo', label: t('entity.tabs.ubo'), icon: Landmark });
     // Provenance siempre disponible (motor nuevo, FtM-shaped)
-    tabs.push({ id: 'provenance', label: 'Provenance', icon: Database });
+    tabs.push({ id: 'provenance', label: t('entity.tabs.provenance'), icon: Database });
 
     return tabs;
   }, [
@@ -763,6 +756,7 @@ const hasSanctions =
     showUBO,
     totalDetectedRelationships,
     totalRelationships,
+    t,
   ]);
 
   useEffect(() => {
@@ -800,6 +794,20 @@ const hasSanctions =
 
   const Icon = entityTypeIcons[entity.entity_type] || User;
   const riskColor = getRiskColor(entity.risk_level);
+  const entityTypeLabels: Record<string, string> = {
+    person: t('common.entityType.person'),
+    company: t('common.entityType.company'),
+    vessel: t('common.entityType.vessel'),
+    aircraft: t('common.entityType.aircraft'),
+    organization: t('common.entityType.organization'),
+  };
+  const riskLevelLabels: Record<string, string> = {
+    critical: t('common.risk.critical'),
+    high: t('common.risk.high'),
+    medium: t('common.risk.medium'),
+    low: t('common.risk.low'),
+    none: t('common.states.none'),
+  };
 
   return (
     <AppPage width="wide">
@@ -822,7 +830,7 @@ const hasSanctions =
               className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
-              Volver
+              {t('entity.header.back')}
             </Button>
             <Button
               variant="ghost"
@@ -831,7 +839,7 @@ const hasSanctions =
               className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <RefreshCw className="w-4 h-4" />
-              <span className="hidden sm:inline">Actualizar</span>
+              <span className="hidden sm:inline">{t('entity.header.refresh')}</span>
             </Button>
             <Button
               variant="ghost"
@@ -839,7 +847,7 @@ const hasSanctions =
               className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <Share2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Compartir</span>
+              <span className="hidden sm:inline">{t('entity.header.share')}</span>
             </Button>
             <Button
               variant="ghost"
@@ -875,15 +883,15 @@ const hasSanctions =
                     </Badge>
                     {referenceLike ? (
                       <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30">
-                        Referencia contextual
+                        {t('entity.badges.contextualReference')}
                       </Badge>
                     ) : hasRelationships && !hasSanctions && !hasPep ? (
                       <Badge variant="outline" className="bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-500/30">
-                        Entidad relacionada
+                        {t('entity.badges.relatedEntity')}
                       </Badge>
                     ) : (
                       <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
-                        Sujeto principal
+                        {t('entity.badges.mainSubject')}
                       </Badge>
                     )}
                     {referenceLike && profile?.header.reference_tier ? (
@@ -898,10 +906,10 @@ const hasSanctions =
                         title={profile.header.reference_tier_reason || undefined}
                       >
                         {profile.header.reference_tier === 'premium'
-                          ? 'Referencia premium'
+                          ? t('entity.badges.premiumReference')
                           : profile.header.reference_tier === 'graph_only'
-                            ? 'Solo contexto'
-                            : 'Bajo valor'}
+                            ? t('entity.badges.contextOnly')
+                            : t('entity.badges.lowValue')}
                       </Badge>
                     ) : null}
                     <Badge
@@ -911,7 +919,7 @@ const hasSanctions =
                         borderColor: `${riskColor}40`,
                       }}
                     >
-                      Riesgo {riskLevelLabels[entity.risk_level]}
+                      {t('entity.header.riskLabel', { level: riskLevelLabels[entity.risk_level] })}
                     </Badge>
                     {/* Topics */}
                     {entity.topics?.map((topic: string) => {
@@ -939,37 +947,37 @@ const hasSanctions =
               {/* Quick Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-6 min-w-0">
                 {entity.country && (
-                  <InfoItem label="País" value={countryNames[entity.country] || entity.country} icon={Globe} />
+                  <InfoItem label={t('entity.fields.country')} value={countryNames[entity.country] || entity.country} icon={Globe} />
                 )}
                 {taxIdentification && (
                   <InfoItem
-                    label={taxIdentification.label || 'RFC'}
+                    label={taxIdentification.label || t('entity.fields.rfc')}
                     value={taxIdentification.number}
                     icon={CreditCard}
                   />
                 )}
                 {(entity.birth_date || entity.date_of_birth) && (
-                  <InfoItem label="Fecha de Nacimiento" value={formatDate(entity.birth_date || entity.date_of_birth || '')} icon={Calendar} />
+                  <InfoItem label={t('entity.fields.birthDate')} value={formatDate(entity.birth_date || entity.date_of_birth || '')} icon={Calendar} />
                 )}
                 {entity.gender && (
-                  <InfoItem label="Género" value={entity.gender === 'male' ? 'Masculino' : entity.gender === 'female' ? 'Femenino' : entity.gender} icon={User} />
+                  <InfoItem label={t('entity.fields.gender')} value={entity.gender === 'male' ? t('entity.fields.genderMale') : entity.gender === 'female' ? t('entity.fields.genderFemale') : entity.gender} icon={User} />
                 )}
                 {(profile?.overview.birth_place || entity.place_of_birth) && (
-                  <InfoItem label="Lugar de Nacimiento" value={profile?.overview.birth_place || entity.place_of_birth} icon={MapPin} />
+                  <InfoItem label={t('entity.fields.birthPlace')} value={profile?.overview.birth_place || entity.place_of_birth} icon={MapPin} />
                 )}
                 {validAddresses.length === 1 && (
-                  <InfoItem label="Ubicación principal" value={formatAddressValue(validAddresses[0]) || undefined} icon={MapPin} />
+                  <InfoItem label={t('entity.fields.mainLocation')} value={formatAddressValue(validAddresses[0]) || undefined} icon={MapPin} />
                 )}
                 {(profile?.overview.nationalities?.length || (entity.nationalities && entity.nationalities.length > 0)) && (
                   <InfoItem
-                    label="Nacionalidades"
+                    label={t('entity.fields.nationalities')}
                     value={profile?.overview.nationalities?.map(n => n.name).join(', ') || entity.nationalities?.map((n: string) => countryNames[n] || n).join(', ')}
                     icon={Globe}
                   />
                 )}
                 {profile?.career.education?.length ? (
                   <ReferenceLinksList
-                    label="Educación"
+                    label={t('entity.fields.education')}
                     items={profile.career.education}
                     icon={FileText}
                     onOpenReference={handleOpenReference}
@@ -977,7 +985,7 @@ const hasSanctions =
                   />
                 ) : (
                   <ListInfoItem
-                    label="Educación"
+                    label={t('entity.fields.education')}
                     items={entity.education}
                     icon={FileText}
                     maxVisible={5}
@@ -985,32 +993,32 @@ const hasSanctions =
                 )}
                 {profile?.career.political?.length ? (
                   <ReferenceLinksList
-                    label="Asociación Política"
+                    label={t('entity.fields.politicalAssociation')}
                     items={profile.career.political}
                     icon={Landmark}
                     onOpenReference={handleOpenReference}
                   />
                 ) : (
                   <ListInfoItem
-                    label="Asociación Política"
+                    label={t('entity.fields.politicalAssociation')}
                     items={entity.political}
                     icon={Landmark}
                   />
                 )}
-                <InfoItem label="Religión" value={profile?.personal.religion || (Array.isArray(entity.religion) ? entity.religion[0] : entity.religion)} icon={Tag} />
-                <InfoItem label="Etnicidad" value={profile?.personal.ethnicity || (Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity)} icon={Tag} />
+                <InfoItem label={t('entity.fields.religion')} value={profile?.personal.religion || (Array.isArray(entity.religion) ? entity.religion[0] : entity.religion)} icon={Tag} />
+                <InfoItem label={t('entity.fields.ethnicity')} value={profile?.personal.ethnicity || (Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity)} icon={Tag} />
                 {entity.incorporation_date && (
-                  <InfoItem label="Fecha de Constitución" value={formatDate(entity.incorporation_date)} icon={Calendar} />
+                  <InfoItem label={t('entity.fields.incorporationDate')} value={formatDate(entity.incorporation_date)} icon={Calendar} />
                 )}
                 {entity.incorporation_country && (
-                  <InfoItem label="País de Constitución" value={entity.incorporation_country} icon={MapPin} />
+                  <InfoItem label={t('entity.fields.incorporationCountry')} value={entity.incorporation_country} icon={MapPin} />
                 )}
               </div>
 
               {/* Data Sources */}
               <div className="mt-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
-                  <p className="text-xs text-muted-foreground uppercase">Fuentes de Datos</p>
+                  <p className="text-xs text-muted-foreground uppercase">{t('entity.header.dataSources')}</p>
                   <SourceLevelSelector value={sourceLevel} onChange={handleSourceLevelChange} size="sm" />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1031,7 +1039,7 @@ const hasSanctions =
             {/* Right: Risk Score */}
             <div className="flex flex-col items-center justify-center">
               <RiskScoreGauge score={entity.overall_risk_score} level={entity.risk_level} />
-              <p className="text-sm text-muted-foreground mt-4">Score de Riesgo</p>
+              <p className="text-sm text-muted-foreground mt-4">{t('entity.header.riskScore')}</p>
             </div>
           </div>
         </motion.div>
@@ -1071,7 +1079,7 @@ const hasSanctions =
     canonicalPepCount={canonicalPepEntries.length}
     amlVisibleRelationships={amlVisibleRelationships}
     relationshipSignals={relationshipSignals}
-    summaryText={summarizeEntityExposure(entity, profile, canonicalPepEntries)}
+    summaryText={summarizeEntityExposure(t, entity, profile, canonicalPepEntries)}
   />
 
   {/* Row 2: AML Evidence Summary */}
@@ -1083,7 +1091,7 @@ const hasSanctions =
                   <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
                       <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
-                      Sanciones
+                      {t('entity.sanctions.title')}
                     </h3>
                     <Badge className="w-fit bg-red-500/20 text-red-600 dark:text-red-400 text-xs">{entity.sanctions.length}</Badge>
                   </div>
@@ -1104,13 +1112,13 @@ const hasSanctions =
                           <Badge variant="outline" className={cn('text-[10px]',
                             s.status === 'active' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 'bg-gray-500/10 text-muted-foreground'
                           )}>
-                            {s.status === 'active' ? 'Activa' : s.status === 'removed' ? 'Removida' : s.status}
+                            {s.status === 'active' ? t('entity.sanctions.statusActiveFem') : s.status === 'removed' ? t('entity.sanctions.statusRemoved') : s.status}
                           </Badge>
                         </div>
                         <p className="text-xs text-muted-foreground break-words">{s.program}</p>
                         {s.reason && <p className="text-xs text-muted-foreground mt-1 break-words line-clamp-2">{s.reason}</p>}
                         <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
-                          <p className="text-[10px] text-muted-foreground">Listado: {formatDate(s.listing_date)}</p>
+                          <p className="text-[10px] text-muted-foreground">{t('entity.sanctions.listing', { date: formatDate(s.listing_date) })}</p>
                           {s.source_url && (
                             <a
                               href={s.source_url}
@@ -1119,7 +1127,7 @@ const hasSanctions =
                               onClick={(e) => e.stopPropagation()}
                               className="inline-flex items-center gap-0.5 text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-300"
                             >
-                              Fuente oficial <ExternalLink className="w-2.5 h-2.5" />
+                              {t('entity.sanctions.officialSource')} <ExternalLink className="w-2.5 h-2.5" />
                             </a>
                           )}
                         </div>
@@ -1128,7 +1136,7 @@ const hasSanctions =
                     {entity.sanctions.length > 5 && (
                       <button onClick={() => setActiveTab('sanctions')}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
-                        Ver {entity.sanctions.length - 5} más <ArrowRight className="w-3 h-3" />
+                        {t('entity.sanctions.viewMore', { count: entity.sanctions.length - 5 })} <ArrowRight className="w-3 h-3" />
                       </button>
                     )}
                   </div>
@@ -1173,7 +1181,7 @@ const hasSanctions =
   setShowAllAliases={setShowAllAliases}
   countryNames={countryNames}
   formatAddressValue={formatAddressValue}
-  getAliasTypeLabel={getAliasTypeLabel}
+  getAliasTypeLabel={(type) => getAliasTypeLabel(t, type)}
 />
 
 {/* Row 5: Source records */}
@@ -1190,8 +1198,8 @@ const hasSanctions =
             {entity.sanctions.length === 0 ? (
               <div className="glass rounded-xl p-12 text-center">
                 <CheckCircle className="w-16 h-16 text-green-700 dark:text-green-500 mx-auto mb-4" />
-                <h3 className="text-xl font-medium text-foreground mb-2">Sin Sanciones</h3>
-                <p className="text-muted-foreground">Esta entidad no aparece en listas de sanciones.</p>
+                <h3 className="text-xl font-medium text-foreground mb-2">{t('entity.sanctions.empty.title')}</h3>
+                <p className="text-muted-foreground">{t('entity.sanctions.empty.description')}</p>
               </div>
             ) : (
               <div className="space-y-4">

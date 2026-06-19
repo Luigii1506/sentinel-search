@@ -4,6 +4,7 @@
  * Lista de razones que el backend computó (sancionado, PEP, network risk, etc.),
  * cada una con icono apropiado. Defensible para auditoría.
  */
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface MatchExplanationProps {
@@ -19,12 +20,13 @@ export function MatchExplanation({
   networkRisk,
   className,
 }: MatchExplanationProps) {
+  const { t } = useTranslation();
   if (!reasons || reasons.length === 0) return null;
 
   return (
     <div className={cn('mt-2 space-y-1', className)}>
       <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
-        Razones del match
+        {t('components.search.matchExplanation.title')}
       </p>
       <ul className="space-y-0.5">
         {reasons.map((r, i) => (
@@ -34,12 +36,12 @@ export function MatchExplanation({
         ))}
         {networkRisk != null && networkRisk > 0 && (
           <li className="text-xs text-muted-foreground">
-            Network risk score: <span className="font-mono">{(networkRisk * 100).toFixed(0)}%</span>
+            {t('components.search.matchExplanation.networkRisk')} <span className="font-mono">{(networkRisk * 100).toFixed(0)}%</span>
           </li>
         )}
         {riskScore != null && (
           <li className="text-xs text-muted-foreground">
-            Risk score total: <span className="font-mono">{riskScore.toFixed(0)}/100</span>
+            {t('components.search.matchExplanation.riskScore')} <span className="font-mono">{riskScore.toFixed(0)}/100</span>
           </li>
         )}
       </ul>

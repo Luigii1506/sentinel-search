@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import i18n from '@/i18n';
 import { cn } from '@/lib/utils';
 
 interface CategoryBadgeProps {
@@ -7,28 +8,21 @@ interface CategoryBadgeProps {
   className?: string;
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  SANCTIONS: 'Sanciones',
+/** i18n key suffix (under components.foundation.categoryBadge) per category. */
+const CATEGORY_LABEL_KEYS: Record<string, string> = {
+  SANCTIONS: 'SANCTIONS',
   PEP: 'PEP',
-  DEBARMENT: 'Inhabilitados',
-  REGULATORY: 'Regulatorio',
-  LAW_ENFORCEMENT: 'Fuerza Publica',
-  TAX: 'Fiscal',
-  OTHER: 'Otros',
-  TERRORISM: 'Terrorismo',
-  FINANCIAL_DISCLOSURE: 'Divulgacion',
-  CORPORATE: 'Corporativo',
+  DEBARMENT: 'DEBARMENT',
+  REGULATORY: 'REGULATORY',
+  LAW_ENFORCEMENT: 'LAW_ENFORCEMENT',
+  TAX: 'TAX',
+  OTHER: 'OTHER',
+  TERRORISM: 'TERRORISM',
+  FINANCIAL_DISCLOSURE: 'FINANCIAL_DISCLOSURE',
+  CORPORATE: 'CORPORATE',
   UBO: 'UBO',
-  LEGAL: 'Legal',
-  MEDIA: 'Media',
-  sanctions: 'Sanciones',
-  pep: 'PEP',
-  debarment: 'Inhabilitados',
-  regulatory: 'Regulatorio',
-  law_enforcement: 'Fuerza Publica',
-  tax: 'Fiscal',
-  other: 'Otros',
-  terrorism: 'Terrorismo',
+  LEGAL: 'LEGAL',
+  MEDIA: 'MEDIA',
 };
 
 const CATEGORY_STYLES: Record<string, string> = {
@@ -56,7 +50,8 @@ const CATEGORY_STYLES: Record<string, string> = {
 };
 
 export function categoryLabel(category: string): string {
-  return CATEGORY_LABELS[category] || category;
+  const key = CATEGORY_LABEL_KEYS[category.toUpperCase()];
+  return key ? i18n.t(`components.foundation.categoryBadge.${key}`) : category;
 }
 
 export function CategoryBadge({

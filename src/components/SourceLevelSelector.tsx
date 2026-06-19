@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import {
   Tooltip,
@@ -7,11 +8,11 @@ import {
 } from '@/components/ui/tooltip';
 
 const SOURCE_LEVELS = [
-  { level: 1 as const, label: 'Crítico', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
-  { level: 2 as const, label: 'Sanciones', desc: '+ Sanciones, Terrorismo, Law Enforcement restantes' },
-  { level: 3 as const, label: 'PEP & Compliance', desc: '+ PEP, Inhabilitaciones, Regulatorio, Fiscal' },
-  { level: 4 as const, label: 'Completo', desc: 'Todas las fuentes oficiales (Corporate, Media, Otros)' },
-  { level: 5 as const, label: 'Interés', desc: '+ Personas de interés (Wikidata: familiares, asociados)' },
+  { level: 1 as const, labelKey: 'critical', descKey: 'criticalDesc' },
+  { level: 2 as const, labelKey: 'sanctions', descKey: 'sanctionsDesc' },
+  { level: 3 as const, labelKey: 'pepCompliance', descKey: 'pepComplianceDesc' },
+  { level: 4 as const, labelKey: 'complete', descKey: 'completeDesc' },
+  { level: 5 as const, labelKey: 'interest', descKey: 'interestDesc' },
 ] as const;
 
 interface SourceLevelSelectorProps {
@@ -22,11 +23,12 @@ interface SourceLevelSelectorProps {
 }
 
 export function SourceLevelSelector({ value, onChange, className, size = 'md' }: SourceLevelSelectorProps) {
+  const { t } = useTranslation();
   return (
     <div className={cn("space-y-2", className)}>
-      <span className={cn("block text-muted-foreground", size === 'sm' ? 'text-[10px]' : 'text-xs')}>Nivel de cobertura</span>
+      <span className={cn("block text-muted-foreground", size === 'sm' ? 'text-[10px]' : 'text-xs')}>{t('components.sourceLevel.label')}</span>
       <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
-      {SOURCE_LEVELS.map(({ level, label, desc }) => (
+      {SOURCE_LEVELS.map(({ level, labelKey, descKey }) => (
         <TooltipProvider key={level}>
           <Tooltip>
             <TooltipTrigger asChild>
@@ -40,11 +42,11 @@ export function SourceLevelSelector({ value, onChange, className, size = 'md' }:
                     : "bg-foreground/5 text-muted-foreground border-foreground/10 hover:border-foreground/20 hover:text-muted-foreground"
                 )}
               >
-                {label}
+                {t(`components.sourceLevel.${labelKey}`)}
               </button>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">{desc}</p>
+              <p className="text-xs">{t(`components.sourceLevel.${descKey}`)}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

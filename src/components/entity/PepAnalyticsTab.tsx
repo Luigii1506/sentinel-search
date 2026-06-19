@@ -1,4 +1,5 @@
 import { Building2, Calendar, Globe, Landmark, MapPin, Tag } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { cn, formatDate } from '@/lib/utils';
 import type { CanonicalPepEntry } from '@/components/entity/entityProfileUtils';
@@ -11,10 +12,11 @@ type PepAnalyticsTabProps = {
 };
 
 export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pepMonitoringUntil }: PepAnalyticsTabProps) {
+  const { t } = useTranslation();
   const pepSourceSummary = (() => {
     const counts = new Map<string, number>();
     canonicalPepEntries.forEach((entry) => {
-      const key = formatSourceName(entry.source || entry.source_dataset || '') || 'Fuente no especificada';
+      const key = formatSourceName(entry.source || entry.source_dataset || '') || t('entity.pep.sourceFallback');
       counts.set(key, (counts.get(key) || 0) + 1);
     });
     return [...counts.entries()]
@@ -31,12 +33,12 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
   )];
   const statusLabel =
     pepStatus === 'current_pep'
-      ? 'PEP en cargo'
+      ? t('entity.pep.status.current')
       : pepStatus === 'former_pep_in_monitoring'
-        ? 'Ex-PEP en monitoreo'
+        ? t('entity.pep.status.monitoring')
         : pepStatus === 'ex_pep'
-          ? 'Ex-PEP'
-          : 'Sin registro PEP';
+          ? t('entity.pep.status.exPep')
+          : t('entity.pep.status.noRecord');
   const statusClass =
     pepStatus === 'current_pep'
       ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
@@ -48,8 +50,8 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
     return (
       <div className="glass rounded-xl p-12 text-center">
         <Landmark className="w-16 h-16 text-green-700 dark:text-green-500 mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-foreground mb-2">Sin exposición PEP registrada</h3>
-        <p className="text-muted-foreground">No hay cargos PEP consolidados para esta entidad en la vista actual.</p>
+        <h3 className="text-xl font-medium text-foreground mb-2">{t('entity.pep.empty.title')}</h3>
+        <p className="text-muted-foreground">{t('entity.pep.empty.description')}</p>
       </div>
     );
   }
@@ -59,7 +61,7 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
           <Landmark className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-          Exposición política consolidada
+          {t('entity.pep.title')}
         </h3>
         <Badge className={statusClass}>
           {statusLabel}
@@ -69,33 +71,33 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
       {pepStatus === 'former_pep_in_monitoring' && pepMonitoringUntil ? (
         <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 px-4 py-3">
           <p className="text-sm text-amber-200">
-            Monitoreo AML reforzado hasta {formatDate(pepMonitoringUntil)}.
+            {t('entity.pep.monitoringUntil', { date: formatDate(pepMonitoringUntil) })}
           </p>
         </div>
       ) : null}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
         <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Cargos PEP</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('entity.pep.stat.positions')}</p>
           <p className="text-2xl font-bold text-foreground mt-1">{canonicalPepEntries.length}</p>
         </div>
         <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Vigentes</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('entity.pep.stat.current')}</p>
           <p className="text-2xl font-bold text-foreground mt-1">{currentPepEntries.length}</p>
         </div>
         <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Históricos</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('entity.pep.stat.historical')}</p>
           <p className="text-2xl font-bold text-foreground mt-1">{historicalPepEntries}</p>
         </div>
         <div className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
-          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">Jurisdicciones</p>
-          <p className="text-sm font-semibold text-foreground mt-2 break-words">{pepJurisdictions.join(', ') || 'No especificadas'}</p>
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wide">{t('entity.pep.stat.jurisdictions')}</p>
+          <p className="text-sm font-semibold text-foreground mt-2 break-words">{pepJurisdictions.join(', ') || t('entity.pep.noJurisdictions')}</p>
         </div>
       </div>
 
       {pepSourceSummary.length > 0 && (
         <div className="glass rounded-xl p-4 border border-foreground/5">
-          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Cobertura por fuente</p>
+          <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">{t('entity.pep.coverageBySource')}</p>
           <div className="flex flex-wrap gap-2">
             {pepSourceSummary.map((item) => (
               <Badge key={item.label} variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
@@ -151,14 +153,14 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
                       <span className="text-sm text-muted-foreground">
                         {pep.start_date ? formatDate(pep.start_date) : '?'}
                         {' — '}
-                        {pep.end_date ? formatDate(pep.end_date) : 'Presente'}
+                        {pep.end_date ? formatDate(pep.end_date) : t('entity.pep.present')}
                       </span>
                     </div>
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
                   <Badge className={cn('text-xs', pep.is_current ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400' : 'bg-gray-500/20 text-muted-foreground')}>
-                    {pep.is_current ? 'En Cargo' : 'Histórico'}
+                    {pep.is_current ? t('entity.pep.inOffice') : t('entity.pep.historical')}
                   </Badge>
                   {pep.category && pep.category !== 'PEP' && (
                     <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{pep.category.replace(/_/g, ' ')}</span>

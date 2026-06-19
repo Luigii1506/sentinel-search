@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
+  const { t } = useTranslation();
   const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
@@ -29,9 +31,9 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Acceso Denegado</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-2">{t('components.protectedRoute.deniedTitle')}</h1>
           <p className="text-muted-foreground">
-            No tienes permisos para acceder a esta sección.
+            {t('components.protectedRoute.deniedMessage')}
           </p>
         </div>
       </div>

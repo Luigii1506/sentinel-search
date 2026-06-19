@@ -8,6 +8,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 /**
@@ -38,40 +39,33 @@ export type StatusKind =
 
 const VARIANTS: Record<
   StatusKind,
-  { defaultLabel: string; icon: LucideIcon; color: string; spin?: boolean }
+  { icon: LucideIcon; color: string; spin?: boolean }
 > = {
   success: {
-    defaultLabel: 'Completado',
     icon: CheckCircle2,
     color: 'bg-green-500/15 text-green-200 border-green-500/40',
   },
   warning: {
-    defaultLabel: 'Atención',
     icon: AlertTriangle,
     color: 'bg-amber-500/15 text-amber-200 border-amber-500/40',
   },
   error: {
-    defaultLabel: 'Error',
     icon: XCircle,
     color: 'bg-red-500/15 text-red-200 border-red-500/40',
   },
   info: {
-    defaultLabel: 'Información',
     icon: Info,
     color: 'bg-electric-500/15 text-electric-200 border-electric-500/40',
   },
   neutral: {
-    defaultLabel: 'Inactivo',
     icon: CircleDashed,
     color: 'bg-secondary text-muted-foreground border-border',
   },
   pending: {
-    defaultLabel: 'Pendiente',
     icon: Clock,
     color: 'bg-blue-500/15 text-blue-200 border-blue-500/40',
   },
   running: {
-    defaultLabel: 'En progreso',
     icon: Loader2,
     color: 'bg-electric-500/15 text-electric-200 border-electric-500/40',
     spin: true,
@@ -112,13 +106,14 @@ export function StatusPill({
   title,
   className,
 }: StatusPillProps) {
+  const { t } = useTranslation();
   const v = VARIANTS[kind];
   const Icon = v.icon;
-  const text = label ?? v.defaultLabel;
+  const text = label ?? t(`components.foundation.statusPill.${kind}`);
   return (
     <span
       role="status"
-      aria-label={`Estado: ${text}`}
+      aria-label={t('components.foundation.statusPill.aria', { label: text })}
       title={title}
       className={cn(
         'inline-flex items-center font-medium rounded-full border whitespace-nowrap',

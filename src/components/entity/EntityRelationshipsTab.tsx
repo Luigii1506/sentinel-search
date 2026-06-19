@@ -1,5 +1,6 @@
 import { useDeferredValue, useMemo } from 'react';
 import { Building2, FileText, Landmark, Network, RefreshCw, Search, Share2, Shield, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { RelationshipSummaryHeader } from '@/components/entity/RelationshipSummaryHeader';
 import { RelationshipFiltersPanel } from '@/components/entity/RelationshipFiltersPanel';
@@ -76,6 +77,7 @@ export function EntityRelationshipsTab({
   onNavigateEntity,
   hasDetectedOrContextualRelationships,
 }: EntityRelationshipsTabProps) {
+  const { t } = useTranslation();
   const deferredRelSearch = useDeferredValue(relSearch);
 
   const sectionConfig = useMemo<RelationshipSectionConfig[]>(() => (
@@ -83,21 +85,21 @@ export function EntityRelationshipsTab({
       ? [
           {
             key: 'people',
-            label: 'Personas vinculadas',
+            label: t('entity.relationships.sections.people'),
             icon: Users,
             types: [],
             color: 'text-blue-600 dark:text-blue-400',
           },
           {
             key: 'organizations',
-            label: 'Organizaciones vinculadas',
+            label: t('entity.relationships.sections.organizations'),
             icon: Building2,
             types: [],
             color: 'text-cyan-700 dark:text-cyan-400',
           },
           {
             key: 'other',
-            label: 'Otras conexiones',
+            label: t('entity.relationships.sections.other'),
             icon: Share2,
             types: [],
             color: 'text-muted-foreground',
@@ -106,55 +108,55 @@ export function EntityRelationshipsTab({
       : [
           {
             key: 'family',
-            label: 'Familiares',
+            label: t('entity.relationships.sections.family'),
             icon: Users,
             types: ['family'],
             color: 'text-purple-600 dark:text-purple-400',
           },
           {
             key: 'associates',
-            label: 'Asociados',
+            label: t('entity.relationships.sections.associates'),
             icon: Network,
             types: ['associate'],
             color: 'text-blue-600 dark:text-blue-400',
           },
           {
             key: 'corporate',
-            label: 'Propiedad y Corporativo',
+            label: t('entity.relationships.sections.corporate'),
             icon: Building2,
             types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
             color: 'text-cyan-700 dark:text-cyan-400',
           },
           {
             key: 'political',
-            label: 'Política y Representación',
+            label: t('entity.relationships.sections.political'),
             icon: Landmark,
             types: ['political', 'representation', 'occupancy'],
             color: 'text-amber-700 dark:text-amber-400',
           },
           {
             key: 'sanctions',
-            label: 'Sanciones',
+            label: t('entity.relationships.sections.sanctions'),
             icon: Shield,
             types: ['sanction'],
             color: 'text-red-600 dark:text-red-400',
           },
           {
             key: 'profile',
-            label: 'Perfil',
+            label: t('entity.relationships.sections.profile'),
             icon: FileText,
             types: ['professional'],
             color: 'text-violet-600 dark:text-violet-400',
           },
           {
             key: 'other',
-            label: 'Otras Relaciones',
+            label: t('entity.relationships.sections.otherRelations'),
             icon: Share2,
             types: [],
             color: 'text-muted-foreground',
           },
         ]
-  ), [referenceLike]);
+  ), [referenceLike, t]);
 
   const {
     normalizedRelationshipSearch,
@@ -179,7 +181,7 @@ export function EntityRelationshipsTab({
     return (
       <div className="glass rounded-xl p-12 text-center">
         <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground">Cargando relaciones...</p>
+        <p className="text-muted-foreground">{t('entity.relationships.loading')}</p>
       </div>
     );
   }
@@ -188,16 +190,16 @@ export function EntityRelationshipsTab({
     return (
       <div className="glass rounded-xl p-12 text-center">
         <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-xl font-medium text-foreground mb-2">Sin Relaciones</h3>
+        <h3 className="text-xl font-medium text-foreground mb-2">{t('entity.relationships.empty.title')}</h3>
         <p className="text-muted-foreground">
           {hasDetectedOrContextualRelationships
-            ? 'Las relaciones detectadas para esta entidad son contextuales y quedaron ocultas por la vista AML priorizada.'
-            : 'No se encontraron relaciones para esta entidad.'}
+            ? t('entity.relationships.empty.contextualHidden')
+            : t('entity.relationships.empty.none')}
         </p>
         {hasDetectedOrContextualRelationships ? (
           <div className="mt-3 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Se detectaron {totalDetectedRelationships} vínculos en total, pero no hay relaciones priorizadas para esta vista.
+              {t('entity.relationships.empty.detectedTotal', { count: totalDetectedRelationships })}
             </p>
             {!referenceLike && !includeContextualRelationships ? (
               <Button
@@ -205,7 +207,7 @@ export function EntityRelationshipsTab({
                 onClick={() => setIncludeContextualRelationships(true)}
                 className="border-foreground/10 bg-foreground/5 text-foreground hover:bg-foreground/10"
               >
-                Mostrar relaciones contextuales
+                {t('entity.relationships.empty.showContextual')}
               </Button>
             ) : null}
           </div>
@@ -252,8 +254,8 @@ export function EntityRelationshipsTab({
       {filteredRelationships.length === 0 ? (
         <div className="glass rounded-xl p-8 text-center">
           <Search className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-lg font-medium text-foreground mb-2">Sin coincidencias</h3>
-          <p className="text-muted-foreground">No hay relaciones que coincidan con ese filtro de búsqueda.</p>
+          <h3 className="text-lg font-medium text-foreground mb-2">{t('entity.relationships.noMatches.title')}</h3>
+          <p className="text-muted-foreground">{t('entity.relationships.noMatches.description')}</p>
         </div>
       ) : null}
 

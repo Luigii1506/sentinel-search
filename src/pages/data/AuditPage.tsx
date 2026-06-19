@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   ClipboardList,
@@ -56,14 +57,16 @@ function formatDate(dateStr?: string | null): string {
   });
 }
 
-function freshnessLabel(lastSync?: string | null): { text: string; color: string } {
-  if (!lastSync) return { text: 'Sin datos', color: 'text-muted-foreground' };
+type TFunc = (key: string, options?: Record<string, unknown>) => string;
+
+function freshnessLabel(t: TFunc, lastSync?: string | null): { text: string; color: string } {
+  if (!lastSync) return { text: t('data.audit.freshness.noData'), color: 'text-muted-foreground' };
   const diffMs = Date.now() - new Date(lastSync).getTime();
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(hours / 24);
   if (hours < 1) return { text: '<1h', color: 'text-green-700 dark:text-green-400' };
   if (hours < 24) return { text: `${hours}h`, color: 'text-green-700 dark:text-green-400' };
-  if (days <= 1) return { text: 'Hoy', color: 'text-green-700 dark:text-green-400' };
+  if (days <= 1) return { text: t('data.audit.freshness.today'), color: 'text-green-700 dark:text-green-400' };
   if (days <= 7) return { text: `${days}d`, color: 'text-green-700 dark:text-green-400' };
   if (days <= 14) return { text: `${days}d`, color: 'text-yellow-700 dark:text-yellow-400' };
   if (days <= 30) return { text: `${days}d`, color: 'text-orange-700 dark:text-orange-400' };
@@ -89,17 +92,18 @@ function HealthScoreBadge({ score, status }: { score?: number; status?: string }
 // Combina freshness + failures + assertions con contexto real (no marca "error"
 // por un fallo aislado si después se recuperó).
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation();
   // health_status is its own enum (healthy/warning/critical/inactive),
   // not a generic backend status — so we map it explicitly to a StatusPill
   // kind here instead of using statusKindFromString.
-  const map: Record<string, { kind: Parameters<typeof StatusPill>[0]['kind']; label: string }> = {
-    healthy:  { kind: 'success', label: 'Saludable' },
-    warning:  { kind: 'warning', label: 'Atención' },
-    critical: { kind: 'error',   label: 'Crítico' },
-    inactive: { kind: 'neutral', label: 'Inactiva' },
+  const map: Record<string, { kind: Parameters<typeof StatusPill>[0]['kind']; labelKey: string }> = {
+    healthy:  { kind: 'success', labelKey: 'data.audit.status.healthy' },
+    warning:  { kind: 'warning', labelKey: 'data.audit.status.warning' },
+    critical: { kind: 'error',   labelKey: 'data.audit.status.critical' },
+    inactive: { kind: 'neutral', labelKey: 'data.audit.status.inactive' },
   };
   const c = map[status] || map.inactive;
-  return <StatusPill kind={c.kind} label={c.label} size="sm" />;
+  return <StatusPill kind={c.kind} label={t(c.labelKey)} size="sm" />;
 }
 
 type AuditSourceRow = SourceInfo & {
@@ -119,6 +123,7 @@ function deriveAuditLastSync(source: SourceInfo): string | null | undefined {
 }
 
 export function AuditPage() {
+  const { t } = useTranslation();
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<'source_id' | 'last_sync' | 'bronze_count' | 'status'>('status');
@@ -236,8 +241,8 @@ export function AuditPage() {
   return (
     <AppPage>
       <PageHeader
-        title="Auditoría de Datos"
-        description="Frescura, estado y confiabilidad de las fuentes de datos"
+        title={t('data.audit.title')}
+        description={t('data.audit.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <ClipboardList className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -246,7 +251,7 @@ export function AuditPage() {
         actions={
           <Button variant="outline" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 mr-2" />
-            Actualizar
+            {t('common.actions.refresh')}
           </Button>
         }
       />
@@ -262,21 +267,20 @@ export function AuditPage() {
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
                 <h3 className="text-sm font-semibold text-red-600 dark:text-red-300">
-                  {healthOverview.zombie_jobs.length} jobs zombie detectados
+                  {t('data.audit.zombie.title', { count: healthOverview.zombie_jobs.length })}
                 </h3>
                 <p className="text-xs text-red-200/80 mt-1">
-                  Marcados como "running" en DB pero sin worker ejecutándolos.
-                  El cleanup automático los corrige en menos de 5 min.
+                  {t('data.audit.zombie.description')}
                 </p>
                 <div className="mt-2 space-y-1">
                   {healthOverview.zombie_jobs.slice(0, 3).map((z) => (
                     <p key={z.job_id} className="text-xs text-red-200/90">
-                      • <span className="font-mono">{z.source}</span> ({z.job_type || 'job'}) — hace {z.age_hours?.toFixed(1) || '?'}h
+                      • <span className="font-mono">{z.source}</span> ({z.job_type || t('data.audit.zombie.jobFallback')}) — {t('data.audit.zombie.age', { hours: z.age_hours?.toFixed(1) || '?' })}
                     </p>
                   ))}
                   {healthOverview.zombie_jobs.length > 3 && (
                     <p className="text-xs text-red-200/70">
-                      ...y {healthOverview.zombie_jobs.length - 3} más
+                      {t('data.audit.zombie.moreItems', { count: healthOverview.zombie_jobs.length - 3 })}
                     </p>
                   )}
                 </div>
@@ -296,7 +300,7 @@ export function AuditPage() {
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wide">Cobertura últimas 24h</span>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">{t('data.audit.coverage.label')}</span>
                   <span className={`text-xs font-medium ${
                     healthOverview.coverage_24h.coverage_pct >= 80 ? 'text-green-700 dark:text-green-400' :
                     healthOverview.coverage_24h.coverage_pct >= 50 ? 'text-amber-700 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
@@ -317,7 +321,7 @@ export function AuditPage() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  fuentes activas sincronizadas en 24h
+                  {t('data.audit.coverage.caption')}
                 </p>
               </CardContent>
             </Card>
@@ -325,23 +329,23 @@ export function AuditPage() {
             {/* Health buckets */}
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">Estado de salud</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">{t('data.audit.health.label')}</span>
                 <div className="grid grid-cols-4 gap-2 mt-2">
                   <div className="text-center">
                     <div className="text-xl font-bold text-green-700 dark:text-green-400">{healthOverview.health_buckets.healthy}</div>
-                    <p className="text-[10px] text-muted-foreground uppercase">healthy</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{t('data.audit.status.healthy')}</p>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold text-amber-700 dark:text-amber-400">{healthOverview.health_buckets.warning}</div>
-                    <p className="text-[10px] text-muted-foreground uppercase">warning</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{t('data.audit.status.warning')}</p>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold text-red-600 dark:text-red-400">{healthOverview.health_buckets.critical}</div>
-                    <p className="text-[10px] text-muted-foreground uppercase">critical</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{t('data.audit.status.critical')}</p>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold text-muted-foreground">{healthOverview.health_buckets.inactive}</div>
-                    <p className="text-[10px] text-muted-foreground uppercase">inactive</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{t('data.audit.status.inactive')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -350,7 +354,7 @@ export function AuditPage() {
             {/* Próximos syncs */}
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
-                <span className="text-xs text-muted-foreground uppercase tracking-wide">Próximos syncs</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">{t('data.audit.upcoming.label')}</span>
                 <div className="mt-2 space-y-1.5 max-h-[120px] overflow-y-auto">
                   {healthOverview.upcoming_syncs.slice(0, 4).map((u) => (
                     <div key={u.source_id} className="flex items-center justify-between text-xs">
@@ -365,8 +369,8 @@ export function AuditPage() {
                   {healthOverview.upcoming_syncs.length === 0 && (
                     <EmptyState
                       icon={Clock}
-                      title="Sin syncs próximos"
-                      description="No hay ejecuciones programadas en el corto plazo."
+                      title={t('data.audit.upcoming.emptyTitle')}
+                      description={t('data.audit.upcoming.emptyDescription')}
                       className="p-5 sm:p-5"
                     />
                   )}
@@ -383,40 +387,40 @@ export function AuditPage() {
           className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 mb-8"
         >
           <MetricCard
-            label="Catalogo"
+            label={t('data.audit.metrics.catalog')}
             value={sourcesData?.total_registered || 0}
             icon={Database}
             className="bg-card border-foreground/5"
           />
           <MetricCard
-            label="Monitoreadas"
+            label={t('data.audit.metrics.monitored')}
             value={monitoredSources}
             icon={ShieldCheck}
             className="bg-card border-foreground/5"
           />
           <MetricCard
-            label="Saludables"
+            label={t('data.audit.metrics.healthy')}
             value={byStatus.healthy || 0}
             icon={CheckCircle2}
             accent="success"
             className="bg-card border-foreground/5"
           />
           <MetricCard
-            label="En atención"
+            label={t('data.audit.metrics.warning')}
             value={byStatus.warning || 0}
             icon={AlertTriangle}
             accent="amber"
             className="bg-card border-foreground/5"
           />
           <MetricCard
-            label="Críticas"
+            label={t('data.audit.metrics.critical')}
             value={byStatus.critical || 0}
             icon={XCircle}
             accent="red"
             className="bg-card border-foreground/5"
           />
           <MetricCard
-            label="Inactivas"
+            label={t('data.audit.metrics.inactive')}
             value={byStatus.inactive || inactiveSources}
             icon={Clock}
             className="bg-card border-foreground/5"
@@ -432,7 +436,7 @@ export function AuditPage() {
           >
             <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
-              Jobs Fallidos Recientes
+              {t('data.audit.failedJobs.title')}
               <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">{recentFailed.length}</Badge>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -442,7 +446,7 @@ export function AuditPage() {
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-foreground">{job.source}</span>
                       <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
-                        Fallido
+                        {t('data.audit.failedJobs.badge')}
                       </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">{formatDate(job.started_at)}</p>
@@ -465,7 +469,7 @@ export function AuditPage() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Buscar por fuente, nombre o pais..."
+              placeholder={t('data.audit.filters.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 bg-card border-foreground/10 text-foreground"
@@ -475,14 +479,14 @@ export function AuditPage() {
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full md:w-[200px] bg-card border-foreground/10 text-foreground">
               <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder="Filtrar por estado" />
+              <SelectValue placeholder={t('data.audit.filters.statusPlaceholder')} />
             </SelectTrigger>
             <SelectContent className="bg-card border-foreground/10">
-              <SelectItem value="all">Todos los estados</SelectItem>
-              <SelectItem value="critical">Crítico</SelectItem>
-              <SelectItem value="warning">Atención</SelectItem>
-              <SelectItem value="healthy">Saludable</SelectItem>
-              <SelectItem value="inactive">Inactiva</SelectItem>
+              <SelectItem value="all">{t('data.audit.filters.allStatuses')}</SelectItem>
+              <SelectItem value="critical">{t('data.audit.status.critical')}</SelectItem>
+              <SelectItem value="warning">{t('data.audit.status.warning')}</SelectItem>
+              <SelectItem value="healthy">{t('data.audit.status.healthy')}</SelectItem>
+              <SelectItem value="inactive">{t('data.audit.status.inactive')}</SelectItem>
             </SelectContent>
           </Select>
         </motion.div>
@@ -495,7 +499,7 @@ export function AuditPage() {
           >
             <Card className="bg-card border-foreground/5">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold text-foreground mb-3">Fuentes Desaparecidas</h2>
+                <h2 className="text-base font-semibold text-foreground mb-3">{t('data.audit.disappeared.title')}</h2>
                 <div className="space-y-2">
                   {disappearedMarked.length > 0 ? disappearedMarked.slice(0, 6).map((item: any) => (
                     <div key={item.source_id} className="rounded-lg bg-foreground/5 p-3">
@@ -513,8 +517,8 @@ export function AuditPage() {
                   )) : (
                     <EmptyState
                       icon={CheckCircle2}
-                      title="Sin fuentes desaparecidas"
-                      description="No hay fuentes marcadas como desaparecidas en este momento."
+                      title={t('data.audit.disappeared.emptyTitle')}
+                      description={t('data.audit.disappeared.emptyDescription')}
                       tone="success"
                       className="p-6 sm:p-6"
                     />
@@ -525,7 +529,7 @@ export function AuditPage() {
 
             <Card className="bg-card border-foreground/5">
               <CardContent className="p-4">
-                <h2 className="text-base font-semibold text-foreground mb-3">Eventos de Lifecycle</h2>
+                <h2 className="text-base font-semibold text-foreground mb-3">{t('data.audit.lifecycle.title')}</h2>
                 <div className="space-y-2">
                   {lifecycleEvents.length > 0 ? lifecycleEvents.slice(0, 6).map((event: any) => (
                     <div key={event.id} className="rounded-lg bg-foreground/5 p-3">
@@ -537,7 +541,7 @@ export function AuditPage() {
                           </p>
                         </div>
                         <Badge variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
-                          {event.entity_source_id || 'source'}
+                          {event.entity_source_id || t('data.audit.lifecycle.sourceFallback')}
                         </Badge>
                       </div>
                       {event.reason && (
@@ -547,8 +551,8 @@ export function AuditPage() {
                   )) : (
                     <EmptyState
                       icon={ClipboardList}
-                      title="Sin eventos recientes"
-                      description="No hubo cambios recientes en el lifecycle de fuentes."
+                      title={t('data.audit.lifecycle.emptyTitle')}
+                      description={t('data.audit.lifecycle.emptyDescription')}
                       className="p-6 sm:p-6"
                     />
                   )}
@@ -566,14 +570,14 @@ export function AuditPage() {
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-muted-foreground" />
-              Fuentes de Datos
+              {t('data.audit.table.title')}
               <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">{sources.length}</Badge>
             </h2>
           </div>
 
           <div className="space-y-3 md:hidden">
             {sources.map((source, index) => {
-              const freshness = freshnessLabel(source.audit_last_sync);
+              const freshness = freshnessLabel(t, source.audit_last_sync);
               return (
                 <motion.div
                   key={source.source_id}
@@ -598,19 +602,19 @@ export function AuditPage() {
                       )}
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Categoria</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('data.audit.table.category')}</p>
                           <CategoryBadge category={source.category || 'OTHER'} />
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Records</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('data.audit.table.records')}</p>
                           <p className="text-muted-foreground font-mono">{source.bronze_count.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Ultimo Sync</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('data.audit.table.lastSync')}</p>
                           <p className="text-muted-foreground">{formatDate(source.audit_last_sync)}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Frescura</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('data.audit.table.freshness')}</p>
                           <p className={`font-medium ${freshness.color}`}>{freshness.text}</p>
                         </div>
                       </div>
@@ -638,43 +642,43 @@ export function AuditPage() {
                       className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('source_id')}
                     >
-                      Fuente <SortIcon field="source_id" />
+                      {t('data.audit.table.source')} <SortIcon field="source_id" />
                     </th>
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                      Categoria
+                      {t('data.audit.table.category')}
                     </th>
                     <th
                       className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('status')}
                     >
-                      Estado <SortIcon field="status" />
+                      {t('data.audit.table.status')} <SortIcon field="status" />
                     </th>
                     <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                      Salud
+                      {t('data.audit.table.health')}
                     </th>
                     <th
                       className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('bronze_count')}
                     >
-                      Records <SortIcon field="bronze_count" />
+                      {t('data.audit.table.records')} <SortIcon field="bronze_count" />
                     </th>
                     <th
                       className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('last_sync')}
                     >
-                      Ultimo Sync <SortIcon field="last_sync" />
+                      {t('data.audit.table.lastSync')} <SortIcon field="last_sync" />
                     </th>
                     <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                      Frescura
+                      {t('data.audit.table.freshness')}
                     </th>
                     <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
-                      Acciones
+                      {t('data.audit.table.actions')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-foreground/5">
                   {sources.map((source, index) => {
-                    const freshness = freshnessLabel(source.audit_last_sync);
+                    const freshness = freshnessLabel(t, source.audit_last_sync);
                     return (
                       <motion.tr
                         key={source.source_id}
@@ -738,8 +742,8 @@ export function AuditPage() {
             {sources.length === 0 && (
               <EmptyState
                 icon={ClipboardList}
-                title="Sin resultados"
-                description="No se encontraron fuentes con los filtros aplicados."
+                title={t('data.audit.table.emptyTitle')}
+                description={t('data.audit.table.emptyDescription')}
                 className="rounded-none border-0 bg-transparent p-12 shadow-none"
               />
             )}

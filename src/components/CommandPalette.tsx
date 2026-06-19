@@ -11,6 +11,7 @@
  */
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Search,
   LayoutDashboard,
@@ -65,6 +66,7 @@ interface CommandPaletteProps {
 
 export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { logout } = useAuth();
   const { atLeast } = usePermissions();
   const [query, setQuery] = useState('');
@@ -74,41 +76,41 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   // route there, mirror it here so users can reach it via ⌘K too.
   const allActions: PaletteAction[] = [
     // Workspace
-    { id: 'p-home',        label: 'Home',              icon: LayoutDashboard, group: 'pages', to: '/' },
-    { id: 'p-search',      label: 'Búsqueda',          icon: Search,          group: 'pages', to: '/search',         shortcut: 'G S' },
-    { id: 'p-bulk',        label: 'Screening masivo',    icon: Upload,          group: 'pages', to: '/screening/bulk', shortcut: 'G B', minRole: 'analyst' },
-    { id: 'p-federated',   label: 'Busqueda federada',  icon: Globe,           group: 'pages', to: '/federated',      shortcut: 'G F' },
+    { id: 'p-home',        label: t('nav.home'),            icon: LayoutDashboard, group: 'pages', to: '/' },
+    { id: 'p-search',      label: t('nav.search'),          icon: Search,          group: 'pages', to: '/search',         shortcut: 'G S' },
+    { id: 'p-bulk',        label: t('nav.bulkScreening'),   icon: Upload,          group: 'pages', to: '/screening/bulk', shortcut: 'G B', minRole: 'analyst' },
+    { id: 'p-federated',   label: t('nav.federatedSearch'), icon: Globe,           group: 'pages', to: '/federated',      shortcut: 'G F' },
 
     // Compliance (analyst+)
-    { id: 'p-compliance',  label: 'Cases & Watchlist', icon: Shield,    group: 'pages', to: '/compliance',      shortcut: 'G C', minRole: 'analyst' },
-    { id: 'p-adverse',     label: 'Adverse Media',     icon: Newspaper, group: 'pages', to: '/adverse-media',                    minRole: 'analyst' },
+    { id: 'p-compliance',  label: t('nav.casesWatchlist'),  icon: Shield,    group: 'pages', to: '/compliance',      shortcut: 'G C', minRole: 'analyst' },
+    { id: 'p-adverse',     label: t('nav.adverseMedia'),    icon: Newspaper, group: 'pages', to: '/adverse-media',                    minRole: 'analyst' },
 
     // Insights (reviewer+)
-    { id: 'p-operations',  label: 'Operaciones',  icon: Activity,       group: 'pages', to: '/operations',         minRole: 'reviewer' },
-    { id: 'p-activity',    label: 'Registro de actividad', icon: ClipboardList,  group: 'pages', to: '/admin/activity-log', minRole: 'admin' },
-    { id: 'p-monitoring',  label: 'Monitoring',   icon: Activity,       group: 'pages', to: '/monitoring',         minRole: 'reviewer' },
-    { id: 'p-reports',     label: 'Reportes',     icon: BarChart3,      group: 'pages', to: '/reports',            minRole: 'reviewer' },
+    { id: 'p-operations',  label: t('nav.operations'),  icon: Activity,       group: 'pages', to: '/operations',         minRole: 'reviewer' },
+    { id: 'p-activity',    label: t('nav.activityLog'), icon: ClipboardList,  group: 'pages', to: '/admin/activity-log', minRole: 'admin' },
+    { id: 'p-monitoring',  label: t('nav.monitoring'),  icon: Activity,       group: 'pages', to: '/monitoring',         minRole: 'reviewer' },
+    { id: 'p-reports',     label: t('nav.reports'),     icon: BarChart3,      group: 'pages', to: '/reports',            minRole: 'reviewer' },
 
     // Data Review (reviewer+)
-    { id: 'p-merges',      label: 'Merge Review',      icon: GitMerge,       group: 'pages', to: '/admin/merges',             minRole: 'reviewer' },
-    { id: 'p-resolver',    label: 'Revision de resolucion',   icon: GitBranchPlus,  group: 'pages', to: '/admin/resolver-review',    minRole: 'reviewer' },
-    { id: 'p-validation',  label: 'Validation Review', icon: ShieldCheck,    group: 'pages', to: '/admin/validation-review',  minRole: 'reviewer' },
+    { id: 'p-merges',      label: t('nav.mergeReview'),      icon: GitMerge,       group: 'pages', to: '/admin/merges',             minRole: 'reviewer' },
+    { id: 'p-resolver',    label: t('nav.resolverReview'),   icon: GitBranchPlus,  group: 'pages', to: '/admin/resolver-review',    minRole: 'reviewer' },
+    { id: 'p-validation',  label: t('nav.validationReview'), icon: ShieldCheck,    group: 'pages', to: '/admin/validation-review',  minRole: 'reviewer' },
 
     // Data Management (admin)
-    { id: 'p-sources',     label: 'Sources Dashboard', icon: Database,   group: 'pages', to: '/admin/sources',        minRole: 'admin' },
-    { id: 'p-audit',       label: 'Sources Audit',     icon: FileSearch, group: 'pages', to: '/admin/audit',          minRole: 'admin' },
-    { id: 'p-yente',       label: 'Catalogo Yente',     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
+    { id: 'p-sources',     label: t('nav.sourcesDashboard'), icon: Database,   group: 'pages', to: '/admin/sources',        minRole: 'admin' },
+    { id: 'p-audit',       label: t('nav.sourcesAudit'),     icon: FileSearch, group: 'pages', to: '/admin/audit',          minRole: 'admin' },
+    { id: 'p-yente',       label: t('nav.yenteCatalog'),     icon: Server,     group: 'pages', to: '/data/yente-catalog',   minRole: 'admin' },
 
     // System (admin)
-    { id: 'p-users',       label: 'Users',     icon: UsersIcon, group: 'pages', to: '/admin/users',    shortcut: 'G U', minRole: 'admin' },
-    { id: 'p-api-keys',    label: 'API Keys',  icon: Key,       group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
-    { id: 'p-webhooks',    label: 'Webhooks',  icon: Webhook,   group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
+    { id: 'p-users',       label: t('nav.users'),    icon: UsersIcon, group: 'pages', to: '/admin/users',    shortcut: 'G U', minRole: 'admin' },
+    { id: 'p-api-keys',    label: t('nav.apiKeys'),  icon: Key,       group: 'pages', to: '/admin/api-keys', shortcut: 'G K', minRole: 'admin' },
+    { id: 'p-webhooks',    label: t('nav.webhooks'), icon: Webhook,   group: 'pages', to: '/admin/webhooks',                  minRole: 'admin' },
 
     // Actions (role-gated)
-    { id: 'a-new-user',    label: 'Crear nuevo usuario', icon: Plus,   group: 'actions', to: '/admin/users',    minRole: 'admin' },
-    { id: 'a-new-key',     label: 'Crear nueva API Key', icon: Plus,   group: 'actions', to: '/admin/api-keys', minRole: 'admin' },
-    { id: 'a-new-webhook', label: 'Crear nuevo Webhook', icon: Plus,   group: 'actions', to: '/admin/webhooks', minRole: 'admin' },
-    { id: 'a-logout',      label: 'Cerrar sesión',       icon: LogOut, group: 'actions', run: () => logout() },
+    { id: 'a-new-user',    label: t('components.commandPalette.newUser'),    icon: Plus,   group: 'actions', to: '/admin/users',    minRole: 'admin' },
+    { id: 'a-new-key',     label: t('components.commandPalette.newKey'),     icon: Plus,   group: 'actions', to: '/admin/api-keys', minRole: 'admin' },
+    { id: 'a-new-webhook', label: t('components.commandPalette.newWebhook'), icon: Plus,   group: 'actions', to: '/admin/webhooks', minRole: 'admin' },
+    { id: 'a-logout',      label: t('components.commandPalette.logout'),     icon: LogOut, group: 'actions', run: () => logout() },
   ];
 
   const visible = allActions.filter((a) => !a.minRole || atLeast(a.minRole));
@@ -132,16 +134,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   return (
     <CommandDialog open={open} onOpenChange={onOpenChange}>
       <CommandInput
-        placeholder="Buscar páginas, entidades o acciones…"
+        placeholder={t('components.commandPalette.placeholder')}
         value={query}
         onValueChange={setQuery}
       />
       <CommandList>
-        <CommandEmpty>Sin resultados.</CommandEmpty>
+        <CommandEmpty>{t('components.commandPalette.empty')}</CommandEmpty>
 
         {showSearchShortcut && (
           <>
-            <CommandGroup heading="Búsqueda">
+            <CommandGroup heading={t('components.commandPalette.searchGroup')}>
               <CommandItem
                 value={`__search__${trimmed}`}
                 onSelect={() => {
@@ -151,7 +153,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                 }}
               >
                 <Search className="mr-2 h-4 w-4 text-electric-700 dark:text-electric-400" />
-                <span>Buscar “{trimmed}” en sanciones</span>
+                <span>{t('components.commandPalette.searchPrompt', { query: trimmed })}</span>
                 <ArrowRight className="ml-auto h-3.5 w-3.5 text-muted-foreground" />
               </CommandItem>
             </CommandGroup>
@@ -159,7 +161,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           </>
         )}
 
-        <CommandGroup heading="Páginas">
+        <CommandGroup heading={t('components.commandPalette.pagesGroup')}>
           {pages.map((a) => {
             const Icon = a.icon;
             return (
@@ -183,7 +185,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
         {actions.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Acciones">
+            <CommandGroup heading={t('components.commandPalette.actionsGroup')}>
               {actions.map((a) => {
                 const Icon = a.icon;
                 return (

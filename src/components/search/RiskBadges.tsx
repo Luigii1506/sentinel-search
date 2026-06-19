@@ -10,6 +10,7 @@
  * Cada badge tiene tooltip explicando qué significa.
  */
 import { AlertTriangle, Crown, Link2, Users } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 interface RiskBadgesProps {
@@ -50,6 +51,7 @@ export function RiskBadges({
   size = 'sm',
   className,
 }: RiskBadgesProps) {
+  const { t } = useTranslation();
   const sz = SIZE_CLASSES[size];
   const isz = ICON_SIZE[size];
 
@@ -62,9 +64,9 @@ export function RiskBadges({
             'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
             sz,
           )}
-          title="Sancionado directamente — en lista oficial de sanciones (OFAC, UN, EU, etc.)"
+          title={t('components.search.riskBadges.sanctionedTitle')}
         >
-          <AlertTriangle className={isz} /> SANCIONADO
+          <AlertTriangle className={isz} /> {t('components.search.riskBadges.sanctioned')}
         </span>
       )}
       {sanctionLinked && !isSanctioned && (
@@ -74,9 +76,9 @@ export function RiskBadges({
             'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30',
             sz,
           )}
-          title="Vinculado a sancionado — relacionado con persona/entidad sancionada, pero no sancionado él/ella directamente"
+          title={t('components.search.riskBadges.sanctionLinkedTitle')}
         >
-          <Link2 className={isz} /> LINK SANC.
+          <Link2 className={isz} /> {t('components.search.riskBadges.sanctionLinked')}
         </span>
       )}
       {isPep && (
@@ -86,7 +88,9 @@ export function RiskBadges({
             'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30',
             sz,
           )}
-          title={`Politically Exposed Person${pepCategory ? ` — ${formatCategory(pepCategory)}` : ''}`}
+          title={pepCategory
+            ? t('components.search.riskBadges.pepTitleWithCategory', { category: formatCategory(pepCategory) })
+            : t('components.search.riskBadges.pepTitle')}
         >
           <Crown className={isz} /> PEP
           {pepCategory && (
@@ -103,7 +107,9 @@ export function RiskBadges({
             'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/30',
             sz,
           )}
-          title={`Relative or Close Associate — familiar/socio de PEP${pepCategory ? ` (${formatCategory(pepCategory)})` : ''}`}
+          title={pepCategory
+            ? t('components.search.riskBadges.rcaTitleWithCategory', { category: formatCategory(pepCategory) })
+            : t('components.search.riskBadges.rcaTitle')}
         >
           <Users className={isz} /> RCA
           {pepCategory && (

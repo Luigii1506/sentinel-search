@@ -1,0 +1,591 @@
+{
+  "entity": {
+    "notFound": {
+      "title": "Entity not found",
+      "description": "The entity you are looking for does not exist or is no longer available.",
+      "backToSearch": "Back to Search"
+    },
+    "header": {
+      "back": "Back",
+      "refresh": "Refresh",
+      "share": "Share",
+      "riskScore": "Risk Score",
+      "riskLabel": "{{level}} risk",
+      "dataSources": "Data Sources"
+    },
+    "gauge": {
+      "risk": "Risk"
+    },
+    "badges": {
+      "contextualReference": "Contextual reference",
+      "relatedEntity": "Related entity",
+      "mainSubject": "Primary subject",
+      "premiumReference": "Premium reference",
+      "contextOnly": "Context only",
+      "lowValue": "Low value"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "context": "Context",
+      "sanctions": "Sanctions",
+      "pep": "PEP",
+      "media": "Media",
+      "relationships": "Relationships",
+      "network": "Graph",
+      "networkRisk": "Network Risk",
+      "ubo": "UBO",
+      "provenance": "Provenance"
+    },
+    "fields": {
+      "country": "Country",
+      "rfc": "Tax ID",
+      "birthDate": "Date of Birth",
+      "gender": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "birthPlace": "Place of Birth",
+      "mainLocation": "Primary location",
+      "nationalities": "Nationalities",
+      "education": "Education",
+      "politicalAssociation": "Political Affiliation",
+      "religion": "Religion",
+      "ethnicity": "Ethnicity",
+      "incorporationDate": "Incorporation Date",
+      "incorporationCountry": "Incorporation Country"
+    },
+    "list": {
+      "more": "+{{count}} more",
+      "showLess": "Show less",
+      "showMore": "Show {{count}} more"
+    },
+    "aliasType": {
+      "primary": "Primary",
+      "alias": "Alias",
+      "aka": "AKA",
+      "formerName": "Former name",
+      "maidenName": "Maiden name",
+      "tradingAs": "Trading name"
+    },
+    "reference": {
+      "suppressNotice": "\"{{name}}\" is only kept as context and has no profile of its own",
+      "noLocalProfile": "There is no local profile yet for \"{{name}}\"",
+      "resolveError": "Could not resolve the reference"
+    },
+    "sanctions": {
+      "title": "Sanctions",
+      "statusActive": "Active",
+      "statusActiveFem": "Active",
+      "statusRemoved": "Removed",
+      "listing": "Listed: {{date}}",
+      "officialSource": "Official source",
+      "officialDocument": "View official document",
+      "appearsInDatasets": "Appears in {{count}} datasets:",
+      "viewMore": "View {{count}} more",
+      "details": {
+        "rfc": "Tax ID",
+        "dataset": "Dataset",
+        "supuesto": "Provision",
+        "amount": "Amount",
+        "federalEntity": "State",
+        "personType": "Person Type",
+        "publicationDate": "Publication Date"
+      },
+      "empty": {
+        "title": "No Sanctions",
+        "description": "This entity does not appear on any sanctions lists."
+      },
+      "labels": {
+        "listingDate": "Listing Date:",
+        "validFrom": "Effective from:",
+        "until": "Until:",
+        "provision": "Provision:",
+        "reference": "Reference:",
+        "programLabel": "{{program}} Program",
+        "sanctionLabel": "Sanction"
+      }
+    },
+    "overview": {
+      "noActiveAlerts": "No active alerts",
+      "noActiveAlertsDescription": "This entity has no sanctions, PEP records, or adverse media. Present in {{count}} source.",
+      "noActiveAlertsDescription_other": "This entity has no sanctions, PEP records, or adverse media. Present in {{count}} sources.",
+      "alertSummary": "Alert Summary",
+      "activeSanctions": "{{count}} active sanction",
+      "activeSanctions_other": "{{count}} active sanctions",
+      "exPepMonitoring": "Former PEP under monitoring",
+      "pepPerson": "Politically Exposed Person",
+      "adverseMedia": "Adverse media",
+      "executiveReading": "Executive Summary",
+      "riskLabel": "{{level}} risk",
+      "stat": {
+        "activeSanctions": "Active sanctions",
+        "pepStatus": "PEP status",
+        "adverseMedia": "Adverse media",
+        "relationships": "Relationships"
+      },
+      "pepState": {
+        "current": "In office",
+        "monitoring": "Under monitoring",
+        "exPep": "Former PEP",
+        "historical": "Historical",
+        "notRegistered": "Not registered"
+      },
+      "coverage": "Coverage and Traceability",
+      "activeSources": "Active sources",
+      "datasets": "Datasets",
+      "firstSeen": "First seen",
+      "lastUpdated": "Last updated",
+      "relationalSignals": "Relational signals",
+      "riskFactor": {
+        "sanctions": "Sanctions",
+        "pep": "PEP",
+        "adverse_media": "Adverse Media",
+        "geographic": "Geographic",
+        "network": "Network",
+        "transactional": "Transactional"
+      }
+    },
+    "exposure": {
+      "highInterest": "High AML-interest entity: {{count}} active sanction and current PEP status.",
+      "highInterest_other": "High AML-interest entity: {{count}} active sanctions and current PEP status.",
+      "sanctioned": "Sanctioned entity with {{count}} active record in primary sources.",
+      "sanctioned_other": "Sanctioned entity with {{count}} active records in primary sources.",
+      "currentPep": "Entity with current political exposure{{suffix}}.",
+      "monitoringPep": "Entity with no active sanctions, but in an enhanced AML monitoring window due to a PEP background{{suffix}}.",
+      "adverseMedia": "Entity with no active sanctions, but with {{count}} adverse media signal to review.",
+      "adverseMedia_other": "Entity with no active sanctions, but with {{count}} adverse media signals to review.",
+      "relationships": "Entity with no critical direct alerts, but with {{count}} relationship available for contextual analysis.",
+      "relationships_other": "Entity with no critical direct alerts, but with {{count}} relationships available for contextual analysis.",
+      "contextual": "Entity with no visible AML relationships, but with {{count}} contextual link available for an enriched profile.",
+      "contextual_other": "Entity with no visible AML relationships, but with {{count}} contextual links available for an enriched profile.",
+      "pepStatusOnly": "Entity with {{status}} and no registered active sanctions.",
+      "default": "Entity with no critical direct alerts in the current view; its main value lies in source coverage and traceability.",
+      "statusCurrentPep": "current PEP",
+      "statusFormerPepMonitoring": "former PEP under AML monitoring",
+      "statusExPep": "former PEP"
+    },
+    "details": {
+      "identifications": "Identifications",
+      "namesAndAliases": "Names and Aliases",
+      "addresses": "Addresses",
+      "currentAddress": "Current",
+      "showAllAliases": "Show all aliases ({{count}})",
+      "showLess": "Show less",
+      "moreAddresses": "+{{count}} more"
+    },
+    "sourceRecords": {
+      "title": "Records by Source",
+      "sourcesCount": "{{count}} sources",
+      "category": {
+        "sanctions": "Sanctions",
+        "lawEnforcement": "Law Enforcement",
+        "pep": "PEP",
+        "regulatory": "Regulatory",
+        "tax": "Tax",
+        "debarment": "Debarment"
+      }
+    },
+    "trajectory": {
+      "title": "Public career",
+      "positions": "{{count}} position",
+      "positions_other": "{{count}} positions",
+      "present": "Present",
+      "current": "Current",
+      "historical": "Historical",
+      "viewPepDetail": "View PEP detail",
+      "pepBadge": {
+        "current": "Current PEP",
+        "monitoring": "Former PEP under monitoring",
+        "exPep": "Former PEP",
+        "noRecord": "No PEP record"
+      }
+    },
+    "relationships": {
+      "context": {
+        "title": "Relational Context",
+        "viewRelationships": "View relationships",
+        "relevantFamily": "Relevant family members detected",
+        "moreFamily": "+{{count}} more family members in the relationships tab",
+        "moreFamilyStructured": "+{{count}} more family members available from structured context.",
+        "referenceDetected": "{{count}} relationships were identified for this contextual entity.",
+        "referenceHint": "To speed up opening references, the overview does not load the full relationship detail. Use the relationships tab to view linked people and organizations.",
+        "amlVisible": "{{visible}} visible AML relationships were identified out of {{total}} detected relationships.",
+        "contextualExtra": "There are {{count}} additional context/profile links outside the main AML view.",
+        "noResolvedFamily": "No resolved family members appeared in this quick view; the main context is in corporate, associate, or political links.",
+        "current": "Current"
+      },
+      "type": {
+        "family": "Family",
+        "associate": "Associate",
+        "corporate": "Corporate",
+        "beneficial_ownership": "Beneficial Owner",
+        "membership": "Member",
+        "political": "Political",
+        "sanction": "Sanction",
+        "unknown": "Other"
+      },
+      "family": {
+        "father": "Father",
+        "mother": "Mother",
+        "spouse": "Spouse",
+        "child": "Child",
+        "sibling": "Sibling"
+      },
+      "summary": {
+        "title": "Relationships summary",
+        "subtitle": "{{visible}} AML-visible out of {{total}} detected in total.",
+        "resolved": "Resolved {{count}}",
+        "unresolved": "Unresolved {{count}}",
+        "contextual": "Contextual {{count}}",
+        "hiddenContext": "Hidden context: {{count}}"
+      },
+      "summaryType": {
+        "beneficial_ownership": "Beneficial Owner",
+        "associate": "Associate",
+        "membership": "Member",
+        "family": "Family",
+        "political": "Political"
+      },
+      "filters": {
+        "title": "Relationship filters",
+        "includeContextual": "Include contextual relationships",
+        "includeContextualHint": "Shows affiliations and biographical links that are normally hidden in the prioritized AML view.",
+        "includeContextualAria": "Include contextual relationships",
+        "level": {
+          "all": "All",
+          "direct": "Direct",
+          "affiliation": "Affiliation",
+          "indirect": "Indirect"
+        },
+        "viewingMixed": "Viewing AML + contextual relationships. This view may include lower-priority affiliations and biographical signals.",
+        "searchPlaceholder": "Search relationships by name, type, country, or source",
+        "matches": "{{count}} match for \"{{query}}\"",
+        "matches_other": "{{count}} matches for \"{{query}}\""
+      },
+      "loading": "Loading relationships...",
+      "empty": {
+        "title": "No Relationships",
+        "contextualHidden": "The relationships detected for this entity are contextual and were hidden by the prioritized AML view.",
+        "none": "No relationships were found for this entity.",
+        "detectedTotal": "{{count}} links were detected in total, but there are no prioritized relationships for this view.",
+        "showContextual": "Show contextual relationships"
+      },
+      "noMatches": {
+        "title": "No matches",
+        "description": "No relationships match that search filter."
+      },
+      "sections": {
+        "people": "Linked people",
+        "organizations": "Linked organizations",
+        "other": "Other connections",
+        "family": "Family",
+        "associates": "Associates",
+        "corporate": "Ownership and Corporate",
+        "political": "Politics and Representation",
+        "sanctions": "Sanctions",
+        "profile": "Profile",
+        "otherRelations": "Other Relationships"
+      },
+      "card": {
+        "resolved": "Resolved",
+        "unresolved": "Unresolved",
+        "contextual": "Contextual",
+        "requiresResolution": "Requires resolution",
+        "sources": "{{count}} sources",
+        "from": "From {{date}}",
+        "until": "Until {{date}}",
+        "fallback": {
+          "contextualLink": "Contextual link",
+          "family": "Family",
+          "associate": "Associate",
+          "corporate": "Corporate relationship",
+          "political": "Political relationship",
+          "sanction": "Sanction relationship",
+          "profile": "Profile context",
+          "related": "Related"
+        },
+        "context": {
+          "amlCore": "AML Core",
+          "affiliation": "Affiliation",
+          "profile": "Profile",
+          "context": "Context"
+        },
+        "level": {
+          "direct": "Direct",
+          "affiliation": "Affiliation",
+          "indirect": "Indirect"
+        },
+        "risk": {
+          "critical": "Critical",
+          "high": "High",
+          "medium": "Medium"
+        }
+      }
+    },
+    "network": {
+      "loading": "Loading relationship network...",
+      "empty": {
+        "title": "No Relationships",
+        "description": "No relationships were found for this entity."
+      }
+    },
+    "networkRisk": {
+      "empty": {
+        "title": "No network risk data",
+        "description": "No network risk analysis was found for this entity."
+      },
+      "title": "Network-Propagated Risk",
+      "directRisk": "Direct Risk",
+      "propagatedRisk": "Propagated Risk",
+      "level": "Level",
+      "riskyConnections": "Risky Connections",
+      "riskNeighbors": "Risk Neighbors ({{count}})",
+      "distance": "Dist: {{value}}",
+      "sanctioned": "Sanctioned",
+      "propagates": "propagates {{value}}",
+      "formula": "Propagated risk is calculated as: risk = neighbor_risk * 0.5^distance * weight. Entities directly connected to sanctions or PEPs contribute more to the risk.",
+      "type": {
+        "beneficial_ownership": "Ownership",
+        "corporate": "Corporate",
+        "family": "Family",
+        "political": "Political",
+        "associate": "Associate",
+        "membership": "Membership"
+      }
+    },
+    "ubo": {
+      "empty": {
+        "title": "No UBO analysis",
+        "description": "No ultimate beneficial owner analysis was found for this entity."
+      },
+      "emptyContent": {
+        "title": "No ownership data",
+        "description": "No ownership, control, or risk links were found for this entity."
+      },
+      "controlTitle": "Control and Exposure Analysis",
+      "uboTitle": "Ultimate Beneficial Owner (UBO)",
+      "stat": {
+        "identifiedUbos": "Identified UBOs",
+        "ubosAbove25": "UBOs >25%",
+        "controlledEntities": "Controlled Entities",
+        "controlledSanctioned": "Sanctioned Controlled",
+        "riskLinks": "Risk Links",
+        "alert": "Alert",
+        "uboRisk": "UBO RISK"
+      },
+      "owners": "Ultimate Beneficial Owners",
+      "effectiveOwnership": "{{pct}}% effective",
+      "sanctioned": "Sanctioned",
+      "fatfThreshold": ">25% FATF",
+      "risk": "Risk",
+      "controlled": "Controlled Entities",
+      "controlledHint": "Companies and entities over which there is ownership or directorship",
+      "keyRelationships": "Risk Links",
+      "keyRelationshipsHint": "Family, political, and association links with medium-to-high risk entities",
+      "footnote": "Analysis based on FATF Recommendation 24/25. An Ultimate Beneficial Owner is any natural person with direct or indirect ownership of ≥25% or effective control. For individuals, controlled entities and risk links by exposure are shown.",
+      "type": {
+        "beneficial_ownership": "Ownership",
+        "corporate": "Corporate",
+        "family": "Family",
+        "associate": "Associate",
+        "political": "Political",
+        "membership": "Membership"
+      }
+    },
+    "pep": {
+      "empty": {
+        "title": "No registered PEP exposure",
+        "description": "There are no consolidated PEP positions for this entity in the current view."
+      },
+      "title": "Consolidated political exposure",
+      "status": {
+        "current": "Current PEP",
+        "monitoring": "Former PEP under monitoring",
+        "exPep": "Former PEP",
+        "noRecord": "No PEP record"
+      },
+      "monitoringUntil": "Enhanced AML monitoring until {{date}}.",
+      "stat": {
+        "positions": "PEP positions",
+        "current": "Current",
+        "historical": "Historical",
+        "jurisdictions": "Jurisdictions"
+      },
+      "noJurisdictions": "Not specified",
+      "coverageBySource": "Coverage by source",
+      "sourceFallback": "Unspecified source",
+      "present": "Present",
+      "inOffice": "In Office",
+      "historical": "Historical"
+    },
+    "adverseMedia": {
+      "empty": {
+        "title": "No adverse media",
+        "description": "No adverse news was found about this entity."
+      },
+      "structuredCategories": "Structured Categories (Sources)",
+      "newsArticles": "News Articles ({{count}})",
+      "viewDashboard": "View full dashboard",
+      "articles": "Articles",
+      "recent30d": "Last 30d",
+      "maxSeverity": "Max Severity",
+      "verified": "Verified",
+      "match": "{{pct}}% match",
+      "readArticle": "Read article",
+      "category": {
+        "terrorism": "Terrorism",
+        "sanctions_evasion": "Sanctions Evasion",
+        "wanted": "Wanted",
+        "crime": "Crime",
+        "human_rights": "Human Rights",
+        "financial_crime": "Financial Crime",
+        "corruption": "Corruption",
+        "offshore": "Offshore",
+        "regulatory": "Regulatory"
+      },
+      "severity": {
+        "critical": "Critical",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low",
+        "minimal": "Minimal"
+      },
+      "method": {
+        "keywords": "Keywords"
+      }
+    },
+    "provenance": {
+      "timeTravel": "Time-travel",
+      "stateAtDate": "State as of date",
+      "viewState": "View state",
+      "backToCurrent": "Back to current",
+      "showingStateAt": "Showing state as of {{date}}",
+      "summary": "Summary",
+      "schema": "Schema",
+      "statements": "Statements",
+      "datasets": "Datasets",
+      "conflicts": "Conflicts",
+      "conflict": "Conflict",
+      "noValue": "(no value)",
+      "statementCount": "{{count}} statements",
+      "conflictValues": "Conflict values: {{values}}",
+      "fetchError": "Error fetching provenance",
+      "policy": {
+        "union": "Union (multi-value)",
+        "sourcePriority": "Source priority",
+        "firstSeen": "First seen",
+        "unionDefault": "Union (default)",
+        "empty": "Empty"
+      },
+      "table": {
+        "value": "Value",
+        "dataset": "Dataset",
+        "authority": "Authority",
+        "firstSeen": "First seen",
+        "lastSeen": "Last seen"
+      }
+    },
+    "riskHeader": {
+      "alsoKnownAs": "Also Known As",
+      "incorporatedShort": "Inc.",
+      "more": "+{{count}} more",
+      "dataSources": "Data Sources",
+      "sanction": "{{count}} Sanction",
+      "sanction_other": "{{count}} Sanctions",
+      "mediaAlert": "{{count}} Media Alert",
+      "mediaAlert_other": "{{count}} Media Alerts",
+      "lastUpdated": "Last updated: {{date}}",
+      "startInvestigation": "Start Investigation",
+      "exportReport": "Export Report",
+      "monitor": "Monitor",
+      "addNote": "Add Note"
+    },
+    "infoTabs": {
+      "tabs": {
+        "identity": "Identity",
+        "sanctions": "Sanctions",
+        "pep": "PEP",
+        "media": "Adverse Media",
+        "related": "Related",
+        "history": "History"
+      },
+      "personalInfo": "Personal Information",
+      "gender": "Gender",
+      "dateOfBirth": "Date of Birth",
+      "placeOfBirth": "Place of Birth",
+      "nationality": "Nationality",
+      "companyInfo": "Company Information",
+      "incorporationDate": "Incorporation Date",
+      "incorporationCountry": "Incorporation Country",
+      "companyType": "Company Type",
+      "status": "Status",
+      "addresses": "Addresses ({{count}})",
+      "current": "Current",
+      "identifications": "Identifications ({{count}})",
+      "type": "Type",
+      "number": "Number",
+      "country": "Country",
+      "source": "Source",
+      "sanctions": {
+        "empty": {
+          "title": "No sanctions",
+          "description": "This entity has no known sanctions listings."
+        },
+        "programLabel": "{{program}} Program",
+        "sanctionLabel": "Sanction",
+        "listingDate": "Listing Date:",
+        "validFrom": "Effective from:",
+        "until": "Until:",
+        "provision": "Provision:",
+        "reference": "Reference:",
+        "officialDocument": "View official document"
+      },
+      "pep": {
+        "empty": {
+          "title": "No PEP status",
+          "description": "This entity is not identified as a Politically Exposed Person."
+        },
+        "current": "Current",
+        "former": "Former",
+        "country": "Country:",
+        "category": "Category:",
+        "from": "From:",
+        "to": "To:"
+      },
+      "media": {
+        "empty": {
+          "title": "No adverse media",
+          "description": "No negative coverage was found for this entity."
+        }
+      },
+      "relationships": {
+        "empty": {
+          "title": "No relationships",
+          "description": "No known relationships were found for this entity."
+        },
+        "detected": "Detected relationships",
+        "detectedHint": "Consolidated view of known links.",
+        "current": "Current relationships",
+        "currentHint": "Marked as active in the available data.",
+        "highConfidence": "High confidence",
+        "highConfidenceHint": "Links with a score of 85% or higher.",
+        "mainTypes": "Main types",
+        "currentBadge": "Current",
+        "historicalBadge": "Historical",
+        "confidence": "Confidence {{value}}%",
+        "noDescription": "Relationship recorded with no additional description.",
+        "start": "Start",
+        "startUnavailable": "Not available",
+        "end": "End",
+        "endUnavailable": "No close recorded"
+      },
+      "audit": {
+        "title": "Activity History",
+        "firstSeen": "Entity First Seen",
+        "dataUpdated": "Data Updated",
+        "system": "System",
+        "note": "Note: {{type}}",
+        "by": "by {{user}}"
+      }
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import {
   Activity,
@@ -46,6 +47,7 @@ function formatNumber(n: number): string {
 const MonitoringJobsSection = lazy(() => import('@/components/monitoring/MonitoringJobsSection'));
 
 export function MonitoringPage() {
+  const { t } = useTranslation();
   const { data: overview, isLoading: jobsLoading, error: jobsError, refetch: refetchJobs } = useQuery<MonitoringOverviewResponse>({
     queryKey: ['admin', 'monitoring', 'overview'],
     queryFn: () => adminService.getMonitoringOverview(),
@@ -64,11 +66,11 @@ export function MonitoringPage() {
       <AppPage>
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-600 dark:text-red-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-foreground mb-2">Error al cargar monitoreo</h2>
-          <p className="text-muted-foreground mb-4">No se pudieron obtener los datos de los jobs</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">{t('insights.monitoring.error.title')}</h2>
+          <p className="text-muted-foreground mb-4">{t('insights.monitoring.error.description')}</p>
           <Button onClick={() => refetchJobs()} variant="outline">
             <RefreshCw className="w-4 h-4 mr-2" />
-            Reintentar
+            {t('common.actions.retry')}
           </Button>
         </div>
       </AppPage>
@@ -118,37 +120,37 @@ export function MonitoringPage() {
   ] : [];
 
   const jobMetricCards = [
-    { label: 'Corriendo', value: running, icon: Play, iconClassName: 'text-blue-600 dark:text-blue-400' },
-    { label: 'Exitosos', value: success, icon: CheckCircle2, iconClassName: 'text-green-700 dark:text-green-400' },
-    { label: 'Fallidos', value: failed, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
-    { label: 'Total jobs', value: totalJobs, icon: TrendingUp, iconClassName: 'text-purple-600 dark:text-purple-400' },
+    { label: t('insights.monitoring.jobs.running'), value: running, icon: Play, iconClassName: 'text-blue-600 dark:text-blue-400' },
+    { label: t('insights.monitoring.jobs.success'), value: success, icon: CheckCircle2, iconClassName: 'text-green-700 dark:text-green-400' },
+    { label: t('insights.monitoring.jobs.failed'), value: failed, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: t('insights.monitoring.jobs.totalJobs'), value: totalJobs, icon: TrendingUp, iconClassName: 'text-purple-600 dark:text-purple-400' },
   ];
 
   const operationalMetricCards = [
-    { label: 'SLO rotos', value: freshnessBreached, icon: AlertCircle, iconClassName: 'text-orange-700 dark:text-orange-400' },
-    { label: 'Nunca sync', value: freshnessNeverSynced, icon: Clock, iconClassName: 'text-muted-foreground' },
-    { label: 'Coverage', value: `${Math.round(mappingCoverage * 100)}%`, icon: Database, iconClassName: 'text-green-700 dark:text-green-400' },
-    { label: 'Dedup gold', value: `${Math.round(goldDedup * 100)}%`, icon: Layers, iconClassName: 'text-yellow-700 dark:text-yellow-400' },
-    { label: 'DLQ tasks', value: taskDeadLetters, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
-    { label: 'Disappeared', value: disappearedMarked, icon: AlertCircle, iconClassName: 'text-fuchsia-600 dark:text-fuchsia-400' },
-    { label: 'Runtime', value: runtimeTracked, icon: Server, iconClassName: 'text-cyan-700 dark:text-cyan-400' },
-    { label: 'Alertando', value: runtimeAlerting, icon: AlertCircle, iconClassName: 'text-red-600 dark:text-red-400' },
-    { label: 'Cambio pendiente', value: changedNotMaterialized, icon: RefreshCw, iconClassName: 'text-amber-700 dark:text-amber-400' },
+    { label: t('insights.monitoring.operational.sloBreached'), value: freshnessBreached, icon: AlertCircle, iconClassName: 'text-orange-700 dark:text-orange-400' },
+    { label: t('insights.monitoring.operational.neverSynced'), value: freshnessNeverSynced, icon: Clock, iconClassName: 'text-muted-foreground' },
+    { label: t('insights.monitoring.operational.coverage'), value: `${Math.round(mappingCoverage * 100)}%`, icon: Database, iconClassName: 'text-green-700 dark:text-green-400' },
+    { label: t('insights.monitoring.operational.dedupGold'), value: `${Math.round(goldDedup * 100)}%`, icon: Layers, iconClassName: 'text-yellow-700 dark:text-yellow-400' },
+    { label: t('insights.monitoring.operational.dlqTasks'), value: taskDeadLetters, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: t('insights.monitoring.operational.disappeared'), value: disappearedMarked, icon: AlertCircle, iconClassName: 'text-fuchsia-600 dark:text-fuchsia-400' },
+    { label: t('insights.monitoring.operational.runtime'), value: runtimeTracked, icon: Server, iconClassName: 'text-cyan-700 dark:text-cyan-400' },
+    { label: t('insights.monitoring.operational.alerting'), value: runtimeAlerting, icon: AlertCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: t('insights.monitoring.operational.pendingChange'), value: changedNotMaterialized, icon: RefreshCw, iconClassName: 'text-amber-700 dark:text-amber-400' },
   ];
 
   const formatRelativeAge = (seconds: number | null | undefined): string => {
-    if (seconds == null) return 'sin datos';
-    if (seconds < 60) return `hace ${seconds}s`;
-    if (seconds < 3600) return `hace ${Math.floor(seconds / 60)} min`;
-    if (seconds < 86400) return `hace ${Math.floor(seconds / 3600)} h`;
-    return `hace ${Math.floor(seconds / 86400)} d`;
+    if (seconds == null) return t('insights.monitoring.relativeAge.noData');
+    if (seconds < 60) return t('insights.monitoring.relativeAge.seconds', { count: seconds });
+    if (seconds < 3600) return t('insights.monitoring.relativeAge.minutes', { count: Math.floor(seconds / 60) });
+    if (seconds < 86400) return t('insights.monitoring.relativeAge.hours', { count: Math.floor(seconds / 3600) });
+    return t('insights.monitoring.relativeAge.days', { count: Math.floor(seconds / 86400) });
   };
 
   return (
     <AppPage>
       <PageHeader
-        title="Monitoreo del Sistema"
-        description="Estado de servicios, pipelines y jobs de ingestion"
+        title={t('insights.monitoring.title')}
+        description={t('insights.monitoring.description')}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
             <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
@@ -165,7 +167,7 @@ export function MonitoringPage() {
                       ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
                       : 'border-foreground/10 bg-foreground/5 text-muted-foreground'
                 }`}
-                title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
+                title={dataQualitySnapshot.computed_at ? t('insights.monitoring.snapshotAt', { date: dataQualitySnapshot.computed_at }) : t('insights.monitoring.noSnapshot')}
               >
                 <div className={`w-1.5 h-1.5 rounded-full ${
                   dataQualitySnapshot.is_critical
@@ -174,25 +176,25 @@ export function MonitoringPage() {
                       ? 'bg-amber-400'
                       : 'bg-green-400'
                 }`} />
-                <span>Datos: {formatRelativeAge(dataQualityAgeSeconds)}</span>
+                <span>{t('insights.monitoring.dataLabel')} {formatRelativeAge(dataQualityAgeSeconds)}</span>
               </div>
             )}
             <Button variant="outline" onClick={() => refetchJobs()}>
               <RefreshCw className="w-4 h-4 mr-2" />
-              Actualizar
+              {t('common.actions.refresh')}
             </Button>
           </>
         }
       />
 
         {services && (
-          <Section title={<span className="flex items-center gap-2"><Server className="w-5 h-5 text-muted-foreground" />Servicios</span>} className="mb-8">
+          <Section title={<span className="flex items-center gap-2"><Server className="w-5 h-5 text-muted-foreground" />{t('insights.monitoring.sections.services')}</span>} className="mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4"
             >
-              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.api?.status} label="API" icon={Server} detail={services.api?.status === 'ok' ? 'Operativo' : 'Error'} variant="card" /></CardContent></Card>
+              <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.api?.status} label="API" icon={Server} detail={services.api?.status === 'ok' ? t('insights.monitoring.services.operational') : t('common.states.error')} variant="card" /></CardContent></Card>
               <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.database?.status} label="PostgreSQL" icon={HardDrive} detail={`${services.database?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
               <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.redis?.status} label="Redis" icon={Wifi} detail={`${services.redis?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
               <Card className="bg-card border-foreground/5"><CardContent className="p-4 flex items-center gap-3"><HealthDot status={services.opensearch?.status} label="OpenSearch" icon={Search} detail={`${services.opensearch?.latency_ms ?? '-'}ms`} variant="card" /></CardContent></Card>
@@ -200,7 +202,7 @@ export function MonitoringPage() {
           </Section>
         )}
 
-        <Section title="Volumen y jobs" className="mb-8">
+        <Section title={t('insights.monitoring.sections.volumeAndJobs')} className="mb-8">
           <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
             {entityMetricCards.map((item) => (
               <motion.div key={item.label} variants={fadeUpItem}>
@@ -215,7 +217,7 @@ export function MonitoringPage() {
           </motion.div>
         </Section>
 
-        <Section title="Señales operativas" description={snapshotsCritical > 0 ? `${snapshotsCritical} snapshots críticos` : snapshotsStale > 0 ? `${snapshotsStale} snapshots stale` : 'Snapshots saludables'} className="mb-8">
+        <Section title={t('insights.monitoring.sections.operationalSignals')} description={snapshotsCritical > 0 ? t('insights.monitoring.snapshots.critical', { count: snapshotsCritical }) : snapshotsStale > 0 ? t('insights.monitoring.snapshots.stale', { count: snapshotsStale }) : t('insights.monitoring.snapshots.healthy')} className="mb-8">
           <motion.div variants={staggerContainer} initial="hidden" animate="show" className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10">
             {operationalMetricCards.map((item) => (
               <motion.div key={item.label} variants={fadeUpItem}>
@@ -224,7 +226,7 @@ export function MonitoringPage() {
             ))}
             <motion.div variants={fadeUpItem}>
               <MetricCard
-                label="Snapshots"
+                label={t('insights.monitoring.operational.snapshots')}
                 value={`${(snapshotsHealth?.total_snapshots || 0) - snapshotsStale}/${snapshotsHealth?.total_snapshots || 0}`}
                 icon={HardDrive}
                 className={snapshotsCritical > 0 ? 'bg-card border-red-500/30' : snapshotsStale > 0 ? 'bg-card border-amber-500/30' : 'bg-card border-foreground/5'}
@@ -234,24 +236,24 @@ export function MonitoringPage() {
         </Section>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <SectionCard title="Freshness y riesgo operativo" className="h-full">
+          <SectionCard title={t('insights.monitoring.freshness.title')} className="h-full">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Fuentes evaluadas</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('insights.monitoring.freshness.evaluatedSources')}</p>
                   <p className="text-xl font-bold text-foreground">{freshness?.total_sources || 0}</p>
                 </div>
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Redis durability</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('insights.monitoring.freshness.redisDurability')}</p>
                   <p className="text-sm font-medium text-foreground">
                     {redisDurability?.connected
                       ? `${redisDurability.aof_enabled ? 'AOF on' : 'AOF off'} / ${redisDurability.rdb_enabled ? 'RDB on' : 'RDB off'}`
-                      : 'Sin datos'}
+                      : t('insights.monitoring.relativeAge.noData')}
                   </p>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground mb-3">Top violaciones SLO</p>
+                <p className="text-sm font-medium text-foreground mb-3">{t('insights.monitoring.freshness.topSloViolations')}</p>
                 <div className="space-y-2">
                   {topViolations.length > 0 ? topViolations.map((item) => (
                     <div key={item.source_id} className="rounded-lg bg-foreground/5 p-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -268,8 +270,8 @@ export function MonitoringPage() {
                   )) : (
                     <EmptyState
                       icon={CheckCircle2}
-                      title="Sin violaciones SLO"
-                      description="No hay violaciones activas de frescura u operación."
+                      title={t('insights.monitoring.freshness.emptyTitle')}
+                      description={t('insights.monitoring.freshness.emptyDescription')}
                       tone="success"
                       className="p-6 sm:p-6"
                     />
@@ -279,20 +281,20 @@ export function MonitoringPage() {
             </div>
           </SectionCard>
 
-          <SectionCard title="DLQ y calidad" className="h-full">
+          <SectionCard title={t('insights.monitoring.dlq.title')} className="h-full">
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Silver unmapped</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('insights.monitoring.dlq.silverUnmapped')}</p>
                   <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.silver_unmapped || 0)}</p>
                 </div>
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-muted-foreground mb-1">Gold screenable</p>
+                  <p className="text-xs text-muted-foreground mb-1">{t('insights.monitoring.dlq.goldScreenable')}</p>
                   <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.gold_screenable || 0)}</p>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground mb-3">Top dead letters</p>
+                <p className="text-sm font-medium text-foreground mb-3">{t('insights.monitoring.dlq.topDeadLetters')}</p>
                 <div className="space-y-2">
                   {topDlq.length > 0 ? topDlq.map((item) => (
                     <div key={item.id} className="rounded-lg bg-foreground/5 p-3">
@@ -312,8 +314,8 @@ export function MonitoringPage() {
                   )) : (
                     <EmptyState
                       icon={CheckCircle2}
-                      title="Sin dead letters abiertos"
-                      description="No hay tareas atrapadas en la cola de errores."
+                      title={t('insights.monitoring.dlq.emptyTitle')}
+                      description={t('insights.monitoring.dlq.emptyDescription')}
                       tone="success"
                       className="p-6 sm:p-6"
                     />

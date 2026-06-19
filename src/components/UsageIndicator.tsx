@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { Zap, ArrowUpRight } from 'lucide-react';
 import { useUsage } from '@/hooks/useUsage';
 import {
@@ -8,26 +10,22 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-const PLAN_LABEL = {
-  free: 'Gratis',
-  starter: 'Starter',
-  pro: 'Pro',
-  enterprise: 'Enterprise',
-} as const;
+type PlanKind = 'free' | 'starter' | 'pro' | 'enterprise';
 
-function formatResetTime(iso: string | null): string {
+function formatResetTime(t: TFunction, iso: string | null): string {
   if (!iso) return '';
   const reset = new Date(iso);
   const now = new Date();
   const diffMs = reset.getTime() - now.getTime();
-  if (diffMs <= 0) return 'pronto';
+  if (diffMs <= 0) return t('components.usage.soon');
   const hours = Math.floor(diffMs / 3_600_000);
   const minutes = Math.floor((diffMs % 3_600_000) / 60_000);
-  if (hours >= 1) return `en ${hours}h ${minutes}m`;
-  return `en ${minutes}m`;
+  if (hours >= 1) return t('components.usage.inHoursMinutes', { hours, minutes });
+  return t('components.usage.inMinutes', { minutes });
 }
 
 export function UsageIndicator() {
+  const { t } = useTranslation();
   const { data: usage } = useUsage();
 
   if (!usage || usage.daily_limit === null) {
@@ -54,7 +52,7 @@ export function UsageIndicator() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={`Búsquedas: ${used_today}/${daily_limit}`}
+          aria-label={t('components.usage.aria', { used: used_today, limit: daily_limit })}
           className={cn(
             'hidden sm:flex items-center gap-2 px-2.5 h-9 rounded-lg',
             'hover:bg-foreground/5 transition-colors group',
@@ -74,8 +72,8 @@ export function UsageIndicator() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72 p-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-foreground">Plan {PLAN_LABEL[plan ?? 'free']}</span>
-          <span className="text-xs text-muted-foreground">{used_today} / {daily_limit} hoy</span>
+          <span className="text-sm font-medium text-foreground">{t('components.usage.planLabel', { plan: t(`components.usage.plan.${(plan ?? 'free') as PlanKind}`) })}</span>
+          <span className="text-xs text-muted-foreground">{t('components.usage.todayCount', { used: used_today, limit: daily_limit })}</span>
         </div>
 
         <div className="w-full h-1.5 rounded-full bg-foreground/10 overflow-hidden mb-3">
@@ -87,15 +85,15 @@ export function UsageIndicator() {
 
         <p className="text-xs text-muted-foreground mb-3">
           {remaining === 0
-            ? 'Has alcanzado el límite diario.'
+            ? t('components.usage.limitReached')
             : remaining === 1
-              ? 'Te queda 1 búsqueda hoy.'
-              : `Te quedan ${remaining} búsquedas hoy.`}
+              ? t('components.usage.oneLeft')
+              : t('components.usage.remaining', { count: remaining })}
         </p>
 
         {resets_at && (
           <p className="text-[11px] text-muted-foreground mb-3">
-            El contador se reinicia {formatResetTime(resets_at)}.
+            {t('components.usage.resets', { time: formatResetTime(t, resets_at) })}
           </p>
         )}
 
@@ -109,7 +107,7 @@ export function UsageIndicator() {
               'hover:from-blue-500/30 hover:to-purple-500/30 transition-colors',
             )}
           >
-            <span>Upgrade para más búsquedas</span>
+            <span>{t('components.usage.upgrade')}</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </Link>
         )}

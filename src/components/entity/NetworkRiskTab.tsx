@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { Network } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { EmptyState, PanelSkeleton } from '@/components/foundation';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -12,6 +13,7 @@ interface NetworkRiskTabProps {
 }
 
 export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
+  const { t } = useTranslation();
   const { data, isLoading, error } = useQuery({
     queryKey: ['network-risk', entityId],
     queryFn: () => complianceService.getNetworkRisk(entityId),
@@ -30,8 +32,8 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
     return (
       <EmptyState
         icon={Network}
-        title="Sin datos de riesgo de red"
-        description="No se encontró análisis de riesgo de red para esta entidad."
+        title={t('entity.networkRisk.empty.title')}
+        description={t('entity.networkRisk.empty.description')}
       />
     );
   }
@@ -51,21 +53,21 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
       <motion.div {...fadeUp} className="glass rounded-xl p-6">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <Network className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          Riesgo Propagado por Red
+          {t('entity.networkRisk.title')}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-xs text-muted-foreground">Riesgo Directo</p>
+            <p className="text-xs text-muted-foreground">{t('entity.networkRisk.directRisk')}</p>
             <p className="text-2xl font-bold text-foreground">{networkRisk.direct_risk_score ?? '-'}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Riesgo Propagado</p>
+            <p className="text-xs text-muted-foreground">{t('entity.networkRisk.propagatedRisk')}</p>
             <p className="text-2xl font-bold" style={{ color: riskColor }}>
               {networkRisk.propagated_risk_score ?? '-'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Nivel</p>
+            <p className="text-xs text-muted-foreground">{t('entity.networkRisk.level')}</p>
             <Badge
               variant="outline"
               className="mt-1"
@@ -75,7 +77,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
             </Badge>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Conexiones Riesgosas</p>
+            <p className="text-xs text-muted-foreground">{t('entity.networkRisk.riskyConnections')}</p>
             <p className="text-2xl font-bold text-foreground">{networkRisk.risky_connections ?? 0}</p>
           </div>
         </div>
@@ -84,7 +86,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
       {networkRisk.risk_neighbors && networkRisk.risk_neighbors.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.1 }} className="glass rounded-xl p-6">
           <h3 className="text-lg font-medium text-foreground mb-4">
-            Vecinos de Riesgo ({networkRisk.risk_neighbors.length})
+            {t('entity.networkRisk.riskNeighbors', { count: networkRisk.risk_neighbors.length })}
           </h3>
           <div className="space-y-2">
             {networkRisk.risk_neighbors.map((neighbor: any, index: number) => {
@@ -97,12 +99,12 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
                       ? 'text-yellow-700 dark:text-yellow-400'
                       : 'text-green-700 dark:text-green-400';
               const relationshipLabels: Record<string, string> = {
-                beneficial_ownership: 'Propiedad',
-                corporate: 'Corporativo',
-                family: 'Familiar',
-                political: 'Político',
-                associate: 'Asociado',
-                membership: 'Membresía',
+                beneficial_ownership: t('entity.networkRisk.type.beneficial_ownership'),
+                corporate: t('entity.networkRisk.type.corporate'),
+                family: t('entity.networkRisk.type.family'),
+                political: t('entity.networkRisk.type.political'),
+                associate: t('entity.networkRisk.type.associate'),
+                membership: t('entity.networkRisk.type.membership'),
               };
 
               return (
@@ -127,7 +129,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
                           {relationshipLabels[neighbor.relationship_type] || neighbor.relationship_type}
                           {neighbor.relationship_subtype ? ` · ${neighbor.relationship_subtype}` : ''}
                         </span>
-                        <span className="text-xs text-muted-foreground">Dist: {neighbor.distance}</span>
+                        <span className="text-xs text-muted-foreground">{t('entity.networkRisk.distance', { value: neighbor.distance })}</span>
                         {neighbor.is_pep && (
                           <Badge variant="outline" className="text-[10px] py-0 bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
                             PEP
@@ -135,7 +137,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
                         )}
                         {neighbor.is_sanctioned && (
                           <Badge variant="outline" className="text-[10px] py-0 bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
-                            Sancionado
+                            {t('entity.networkRisk.sanctioned')}
                           </Badge>
                         )}
                       </div>
@@ -143,7 +145,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
                   </div>
                   <div className="text-left sm:text-right flex-shrink-0 sm:ml-3">
                     <p className={cn('text-sm font-bold', neighborColor)}>{neighbor.risk_score}</p>
-                    <p className="text-[10px] text-muted-foreground">propaga {neighbor.propagated_risk}</p>
+                    <p className="text-[10px] text-muted-foreground">{t('entity.networkRisk.propagates', { value: neighbor.propagated_risk })}</p>
                   </div>
                 </div>
               );
@@ -154,8 +156,7 @@ export function NetworkRiskTab({ entityId }: NetworkRiskTabProps) {
 
       <div className="glass rounded-xl p-4">
         <p className="text-xs text-muted-foreground">
-          El riesgo propagado se calcula como: risk = neighbor_risk * 0.5^distance * weight.
-          Entidades directamente conectadas a sanciones o PEP contribuyen más al riesgo.
+          {t('entity.networkRisk.formula')}
         </p>
       </div>
     </div>

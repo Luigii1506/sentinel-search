@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Shield, AlertCircle } from 'lucide-react';
 import { usePermissions, type Role } from '@/hooks/usePermissions';
 import { useAuth } from '@/contexts/AuthContext';
@@ -49,21 +50,22 @@ export function RoleGate({
 }
 
 function ForbiddenPanel({ reason }: { reason?: 'login_required' }) {
+  const { t } = useTranslation();
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-8">
       <div className="glass rounded-xl p-8 max-w-md text-center">
         <Shield className="w-12 h-12 text-amber-700 dark:text-amber-400 mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-foreground mb-2">
-          {reason === 'login_required' ? 'Inicia sesión' : 'Acceso restringido'}
+          {reason === 'login_required' ? t('components.roleGate.loginTitle') : t('components.roleGate.deniedTitle')}
         </h2>
         <p className="text-sm text-muted-foreground mb-2">
           {reason === 'login_required'
-            ? 'Esta vista requiere una sesión activa.'
-            : 'Tu rol actual no permite ver esta sección.'}
+            ? t('components.roleGate.loginMessage')
+            : t('components.roleGate.deniedMessage')}
         </p>
         <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
-          Contacta a un administrador si crees que es un error.
+          {t('components.roleGate.contactAdmin')}
         </p>
       </div>
     </div>

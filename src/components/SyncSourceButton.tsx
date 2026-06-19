@@ -3,6 +3,7 @@
  * manual de una fuente. Incluye loading state + toast feedback.
  */
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Loader2, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -31,14 +32,15 @@ export function SyncSourceButton({
   iconOnly = false,
   onDispatched,
 }: SyncSourceButtonProps) {
+  const { t } = useTranslation();
   const qc = useQueryClient();
   const [confirming, setConfirming] = useState(false);
 
   const mut = useMutation({
     mutationFn: () => adminService.triggerSourceSync(sourceId, { force: true }),
     onSuccess: (data) => {
-      toast.success(`Sync dispatched: ${sourceId}`, {
-        description: `Queue: ${data.queue || 'default'} · task: ${(data.task_id || '').slice(0, 12)}…`,
+      toast.success(t('components.syncSource.dispatched', { source: sourceId }), {
+        description: t('components.syncSource.dispatchedDescription', { queue: data.queue || 'default', task: (data.task_id || '').slice(0, 12) }),
       });
       // Triple invalidación para minimizar latencia visual:
       //   - inmediata: el endpoint de activity puede ya verlo
@@ -54,8 +56,8 @@ export function SyncSourceButton({
       setConfirming(false);
     },
     onError: (err: any) => {
-      const msg = err?.response?.data?.detail || err?.message || 'Error desconocido';
-      toast.error(`No se pudo sincronizar ${sourceId}`, { description: msg });
+      const msg = err?.response?.data?.detail || err?.message || t('components.syncSource.unknownError');
+      toast.error(t('components.syncSource.failed', { source: sourceId }), { description: msg });
       setConfirming(false);
     },
   });
@@ -64,7 +66,7 @@ export function SyncSourceButton({
     return (
       <Button size={size} variant={variant} disabled className="h-7 gap-1 text-xs">
         <Loader2 className="w-3 h-3 animate-spin" />
-        {!iconOnly && 'Encolando…'}
+        {!iconOnly && t('components.syncSource.queuing')}
       </Button>
     );
   }
@@ -79,7 +81,7 @@ export function SyncSourceButton({
           onClick={() => mut.mutate()}
         >
           <Play className="w-3 h-3 mr-1" />
-          {iconOnly ? '' : 'Confirmar'}
+          {iconOnly ? '' : t('components.syncSource.confirm')}
         </Button>
         <Button
           size={size}
@@ -102,10 +104,10 @@ export function SyncSourceButton({
         e.stopPropagation();
         setConfirming(true);
       }}
-      title={`Disparar sync manual de ${sourceId}`}
+      title={t('components.syncSource.triggerTitle', { source: sourceId })}
     >
       <Play className="w-3 h-3 mr-1" />
-      {iconOnly ? '' : (label || 'Sync')}
+      {iconOnly ? '' : (label || t('components.syncSource.sync'))}
     </Button>
   );
 }

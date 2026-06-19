@@ -1,5 +1,7 @@
 import { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -50,63 +52,66 @@ import type { ComplianceAlert } from '@/services/compliance';
 
 // ── Mappings ──
 
-const priorityConfig: Record<string, { label: string; color: string }> = {
-  critical: { label: 'Critico', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' },
-  high: { label: 'Alto', color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30' },
-  medium: { label: 'Medio', color: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30' },
-  low: { label: 'Bajo', color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30' },
+type TFn = TFunction;
+
+// Visual config only. Labels/descriptions are localized via i18n keys:
+//   compliance.case.priority.<key>, compliance.case.status.<key>,
+//   compliance.case.decision.<key>.{label,description}, compliance.case.event.<key>
+const priorityConfig: Record<string, { color: string }> = {
+  critical: { color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' },
+  high: { color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30' },
+  medium: { color: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30' },
+  low: { color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30' },
 };
 
-const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-  open: { label: 'Abierto', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: CircleDot },
-  in_review: { label: 'En Revision', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30', icon: Scale },
-  escalated: { label: 'Escalado', color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30', icon: ArrowUpRight },
-  closed_tp: { label: 'Confirmado', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30', icon: AlertTriangle },
-  closed_fp: { label: 'Descartado', color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30', icon: CheckCircle },
-  closed_inconclusive: { label: 'Inconcluso', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: HelpCircle },
-  sar_filed: { label: 'SAR Presentado', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: FileWarning },
+const statusConfig: Record<string, { color: string; icon: typeof Clock }> = {
+  open: { color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: CircleDot },
+  in_review: { color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30', icon: Scale },
+  escalated: { color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30', icon: ArrowUpRight },
+  closed_tp: { color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30', icon: AlertTriangle },
+  closed_fp: { color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30', icon: CheckCircle },
+  closed_inconclusive: { color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: HelpCircle },
+  sar_filed: { color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: FileWarning },
 };
 
-const decisionConfig: Record<string, { label: string; description: string; color: string; bgColor: string; icon: typeof Clock }> = {
+const decisionConfig: Record<string, { color: string; bgColor: string; icon: typeof Clock }> = {
   true_positive: {
-    label: 'Verdadero Positivo',
-    description: 'La persona coincide con la lista — requiere accion regulatoria',
     color: 'text-red-600 dark:text-red-400',
     bgColor: 'bg-red-500/10 border-red-500/20',
     icon: AlertTriangle,
   },
   false_positive: {
-    label: 'Falso Positivo',
-    description: 'No es la misma persona — descartado y agregado a whitelist',
     color: 'text-green-700 dark:text-green-400',
     bgColor: 'bg-green-500/10 border-green-500/20',
     icon: CheckCircle,
   },
   escalate: {
-    label: 'Escalado',
-    description: 'Requiere revision de un supervisor o MLRO',
     color: 'text-orange-700 dark:text-orange-400',
     bgColor: 'bg-orange-500/10 border-orange-500/20',
     icon: ArrowUpRight,
   },
   inconclusive: {
-    label: 'Inconcluso',
-    description: 'Informacion insuficiente para determinar',
     color: 'text-muted-foreground',
     bgColor: 'bg-gray-500/10 border-gray-500/20',
     icon: HelpCircle,
   },
 };
 
-const eventTypeConfig: Record<string, { label: string; icon: typeof Clock }> = {
-  created: { label: 'Caso creado', icon: FileText },
-  status_changed: { label: 'Estado actualizado', icon: RefreshCw },
-  decision_made: { label: 'Decision registrada', icon: Gavel },
-  note_added: { label: 'Nota agregada', icon: MessageSquare },
-  alert_linked: { label: 'Alerta vinculada', icon: AlertTriangle },
-  assigned: { label: 'Caso asignado', icon: User },
-  escalated: { label: 'Caso escalado', icon: TrendingUp },
+const eventTypeConfig: Record<string, { icon: typeof Clock }> = {
+  created: { icon: FileText },
+  status_changed: { icon: RefreshCw },
+  decision_made: { icon: Gavel },
+  note_added: { icon: MessageSquare },
+  alert_linked: { icon: AlertTriangle },
+  assigned: { icon: User },
+  escalated: { icon: TrendingUp },
 };
+
+const priorityLabel = (t: TFn, key: string) => t(`compliance.case.priority.${key}`, { defaultValue: key });
+const statusLabel = (t: TFn, key: string) => t(`compliance.case.status.${key}`, { defaultValue: key });
+const decisionLabel = (t: TFn, key: string) => t(`compliance.case.decision.${key}.label`, { defaultValue: key });
+const decisionDescription = (t: TFn, key: string) => t(`compliance.case.decision.${key}.description`, { defaultValue: '' });
+const eventLabel = (t: TFn, key: string) => t(`compliance.case.event.${key}`, { defaultValue: key });
 
 function formatDateTime(dateStr?: string | null): string {
   if (!dateStr) return '-';
@@ -116,22 +121,23 @@ function formatDateTime(dateStr?: string | null): string {
   });
 }
 
-function formatRelativeTime(dateStr: string): string {
+function formatRelativeTime(dateStr: string, t: TFn): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'Hace un momento';
-  if (diffMin < 60) return `Hace ${diffMin} min`;
+  if (diffMin < 1) return t('compliance.case.time.justNow');
+  if (diffMin < 60) return t('compliance.case.time.minutesAgo', { count: diffMin });
   const diffHrs = Math.floor(diffMin / 60);
-  if (diffHrs < 24) return `Hace ${diffHrs}h`;
+  if (diffHrs < 24) return t('compliance.case.time.hoursAgo', { count: diffHrs });
   const diffDays = Math.floor(diffHrs / 24);
-  return `Hace ${diffDays}d`;
+  return t('compliance.case.time.daysAgo', { count: diffDays });
 }
 
 // ── Component ──
 
 export function CaseDetailPage() {
+  const { t } = useTranslation();
   const { caseId } = useParams<{ caseId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -154,10 +160,10 @@ export function CaseDetailPage() {
     mutationFn: (content: string) => complianceService.addNote(caseId!, content),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-case', caseId] });
-      toast.success('Nota agregada');
+      toast.success(t('compliance.case.toast.noteAdded'));
       setNoteContent('');
     },
-    onError: () => toast.error('Error al agregar nota'),
+    onError: () => toast.error(t('compliance.case.toast.noteError')),
   });
 
   const decisionMutation = useMutation({
@@ -168,16 +174,16 @@ export function CaseDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['compliance-cases'] });
       queryClient.invalidateQueries({ queryKey: ['compliance-alerts'] });
       if (result.whitelist_created) {
-        toast.success('Lista blanca creada; futuras alertas de esta coincidencia seran suprimidas');
+        toast.success(t('compliance.case.toast.whitelistCreated'));
         queryClient.invalidateQueries({ queryKey: ['compliance-whitelist'] });
       } else {
-        toast.success('Decision registrada');
+        toast.success(t('compliance.case.toast.decisionRecorded'));
       }
       setDecisionDialog(null);
       setDecisionType('');
       setDecisionReason('');
     },
-    onError: () => toast.error('Error al registrar decision'),
+    onError: () => toast.error(t('compliance.case.toast.decisionError')),
   });
 
   // SAR Report
@@ -191,11 +197,11 @@ export function CaseDetailPage() {
     mutationFn: (reference: string) => complianceService.fileSAR(caseId!, reference),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-case', caseId] });
-      toast.success('SAR/ROS registrado exitosamente');
+      toast.success(t('compliance.case.toast.sarFiled'));
       setShowFileSarDialog(false);
       setSarReference('');
     },
-    onError: () => toast.error('Error al registrar SAR'),
+    onError: () => toast.error(t('compliance.case.toast.sarError')),
   });
   // Loading state
   if (isLoading) {
@@ -208,11 +214,11 @@ export function CaseDetailPage() {
       <AppPage width="default">
         <EmptyState
           icon={XCircle}
-          title="Caso no encontrado"
-          description="El caso que buscas no existe o ya no está disponible."
+          title={t('compliance.case.notFound.title')}
+          description={t('compliance.case.notFound.description')}
           action={
             <Button variant="ghost" onClick={() => navigate('/compliance')} className="text-muted-foreground">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Volver
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t('common.actions.back')}
             </Button>
           }
         />
@@ -254,7 +260,7 @@ export function CaseDetailPage() {
               onClick={() => navigate('/compliance')}
               className="text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" /> Casos
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t('compliance.case.backToCases')}
             </Button>
             {caseData.entity_id && (
               <Button
@@ -264,7 +270,7 @@ export function CaseDetailPage() {
                 className="w-full sm:w-auto text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                Ver Entidad
+                {t('compliance.case.viewEntity')}
               </Button>
             )}
           </>
@@ -290,22 +296,22 @@ export function CaseDetailPage() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
                   <h2 className={cn('text-lg font-semibold', primaryDecisionConfig.color)}>
-                    {primaryDecisionConfig.label}
+                    {decisionLabel(t, String(primaryDecision?.decision))}
                   </h2>
                   {caseData.closed_at && (
                     <span className="text-xs text-muted-foreground">
-                      {formatRelativeTime(caseData.closed_at)}
+                      {formatRelativeTime(caseData.closed_at, t)}
                     </span>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground mb-3">
-                  {String(primaryDecisionConfig.description)}
+                  {decisionDescription(t, String(primaryDecision?.decision))}
                 </p>
 
                 {/* Decision reason */}
                 {!!primaryDecision?.reason && (
                   <div className="bg-black/20 rounded-lg p-3 mb-3">
-                    <p className="text-xs text-muted-foreground mb-1">Razon del analista:</p>
+                    <p className="text-xs text-muted-foreground mb-1">{t('compliance.case.analystReason')}:</p>
                     <p className="text-sm text-muted-foreground">{String(primaryDecision.reason)}</p>
                   </div>
                 )}
@@ -316,7 +322,7 @@ export function CaseDetailPage() {
                     <div className="flex items-start gap-3">
                       <FileWarning className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0" />
                       <span className="text-sm text-amber-700 dark:text-amber-400">
-                        Accion pendiente: Presentar Reporte de Operacion Sospechosa (SAR/ROS)
+                        {t('compliance.case.sar.pendingAction')}
                       </span>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full sm:w-auto">
@@ -327,7 +333,7 @@ export function CaseDetailPage() {
                         className="text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
                       >
                         <FileText className="w-3.5 h-3.5 mr-1.5" />
-                        Ver Reporte
+                        {t('compliance.case.sar.viewReport')}
                       </Button>
                       <Button
                         size="sm"
@@ -335,7 +341,7 @@ export function CaseDetailPage() {
                         className="bg-amber-600 hover:bg-amber-700 text-white"
                       >
                         <Send className="w-3.5 h-3.5 mr-1.5" />
-                        Presentar SAR
+                        {t('compliance.case.sar.fileSar')}
                       </Button>
                     </div>
                   </div>
@@ -344,7 +350,7 @@ export function CaseDetailPage() {
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-foreground/5">
                     <div className="flex items-start gap-3">
                       <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                      <span className="text-sm text-blue-600 dark:text-blue-400">SAR/ROS presentado ante el regulador</span>
+                      <span className="text-sm text-blue-600 dark:text-blue-400">{t('compliance.case.sar.filedWithRegulator')}</span>
                     </div>
                     <Button
                       size="sm"
@@ -353,7 +359,7 @@ export function CaseDetailPage() {
                       className="text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
                     >
                       <FileText className="w-3.5 h-3.5 mr-1.5" />
-                      Ver Reporte
+                      {t('compliance.case.sar.viewReport')}
                     </Button>
                   </div>
                 )}
@@ -375,14 +381,14 @@ export function CaseDetailPage() {
               <span className="text-sm text-muted-foreground font-mono">{caseData.case_number}</span>
               <Badge variant="outline" className={cn('text-xs gap-1', status.color)}>
                 <StatusIcon className="w-3 h-3" />
-                {status.label}
+                {statusLabel(t, caseData.status)}
               </Badge>
               <Badge variant="outline" className={cn('text-xs', priority.color)}>
-                {priority.label}
+                {priorityLabel(t, caseData.priority)}
               </Badge>
               {caseData.sla_breached && (
                 <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 animate-pulse">
-                  SLA Vencido
+                  {t('compliance.case.slaBreached')}
                 </Badge>
               )}
             </div>
@@ -393,11 +399,11 @@ export function CaseDetailPage() {
           )}
 
           <DetailList className="pt-4 border-t border-foreground/5">
-            <DetailRow label="Riesgo" value={`${Math.round(caseData.risk_score || 0)}/100`} mono />
-            <DetailRow label="Alertas" value={`${decidedAlerts.length}/${alerts.length} revisadas`} />
-            <DetailRow label="Creado" value={formatDateTime(caseData.created_at)} />
+            <DetailRow label={t('compliance.case.fields.risk')} value={`${Math.round(caseData.risk_score || 0)}/100`} mono />
+            <DetailRow label={t('compliance.case.fields.alerts')} value={t('compliance.case.alertsReviewed', { reviewed: decidedAlerts.length, total: alerts.length })} />
+            <DetailRow label={t('compliance.case.fields.created')} value={formatDateTime(caseData.created_at)} />
             <DetailRow
-              label={isClosed ? 'Cerrado' : 'SLA'}
+              label={isClosed ? t('compliance.case.fields.closed') : t('compliance.case.fields.sla')}
               value={
                 isClosed
                   ? formatDateTime(caseData.closed_at)
@@ -419,15 +425,15 @@ export function CaseDetailPage() {
         >
           <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            Coincidencias detectadas
+            {t('compliance.case.matchesDetected')}
             <span className="text-xs text-muted-foreground font-normal">({alerts.length})</span>
           </h2>
 
           {alerts.length === 0 ? (
             <EmptyState
               icon={CheckCircle}
-              title="Sin alertas vinculadas"
-              description="Este caso no tiene coincidencias registradas en este momento."
+              title={t('compliance.case.noAlerts.title')}
+              description={t('compliance.case.noAlerts.description')}
               tone="success"
             />
           ) : (
@@ -443,7 +449,7 @@ export function CaseDetailPage() {
                       <div className={cn('px-5 py-2.5 flex items-center gap-2 border-b border-foreground/5', alertDecision.bgColor)}>
                         <AlertDecisionIcon className={cn('w-4 h-4', alertDecision.color)} />
                         <span className={cn('text-sm font-medium', alertDecision.color)}>
-                          {alertDecision.label}
+                          {decisionLabel(t, alert.decision!)}
                         </span>
                         {alert.decided_at && (
                           <span className="text-xs text-muted-foreground ml-auto">
@@ -464,19 +470,19 @@ export function CaseDetailPage() {
                               alert.severity === 'high' ? 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30' :
                               'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30'
                             )}>
-                              {alert.severity === 'critical' ? 'Critico' :
-                               alert.severity === 'high' ? 'Alto' : 'Medio'}
+                              {alert.severity === 'critical' ? t('common.risk.critical') :
+                               alert.severity === 'high' ? t('common.risk.high') : t('common.risk.medium')}
                             </Badge>
                           </div>
 
                           {/* Match details — clean layout */}
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-sm mb-3">
                             <div>
-                              <span className="text-muted-foreground">Busqueda: </span>
+                              <span className="text-muted-foreground">{t('compliance.case.fields.query')}: </span>
                               <span className="text-muted-foreground">"{alert.query_name}"</span>
                             </div>
                             <div>
-                              <span className="text-muted-foreground">Confianza: </span>
+                              <span className="text-muted-foreground">{t('compliance.case.fields.confidence')}: </span>
                               <span className={cn('font-mono',
                                 alert.match_confidence >= 0.9 ? 'text-red-600 dark:text-red-400' :
                                 alert.match_confidence >= 0.7 ? 'text-orange-700 dark:text-orange-400' : 'text-yellow-700 dark:text-yellow-400'
@@ -486,7 +492,7 @@ export function CaseDetailPage() {
                             </div>
                             {alert.entity_risk_score != null && (
                               <div>
-                                <span className="text-muted-foreground">Riesgo: </span>
+                                <span className="text-muted-foreground">{t('compliance.case.fields.risk')}: </span>
                                 <span className="text-muted-foreground font-mono">{alert.entity_risk_score}</span>
                               </div>
                             )}
@@ -509,7 +515,7 @@ export function CaseDetailPage() {
                           {/* Decision reason inline */}
                           {alert.decision_reason && (
                             <div className="mt-3 p-3 rounded-lg bg-foreground/[0.03] border border-foreground/5">
-                              <p className="text-xs text-muted-foreground mb-1">Razon:</p>
+                              <p className="text-xs text-muted-foreground mb-1">{t('compliance.case.fields.reason')}:</p>
                               <p className="text-sm text-muted-foreground">{alert.decision_reason}</p>
                             </div>
                           )}
@@ -524,7 +530,7 @@ export function CaseDetailPage() {
                               className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
                             >
                               <Gavel className="w-3.5 h-3.5 mr-1.5" />
-                              Decidir
+                              {t('compliance.case.decide')}
                             </Button>
                           </div>
                         )}
@@ -540,7 +546,7 @@ export function CaseDetailPage() {
           {alerts.length > 0 && !isClosed && (
             <div className="mt-4 glass rounded-lg p-4">
               <div className="flex items-start justify-between gap-3 mb-2">
-                <span className="text-xs text-muted-foreground">Progreso de revision</span>
+                <span className="text-xs text-muted-foreground">{t('compliance.case.reviewProgress')}</span>
                 <span className="text-xs text-muted-foreground">{decidedAlerts.length}/{alerts.length}</span>
               </div>
               <div className="h-1.5 bg-card rounded-full overflow-hidden">
@@ -552,7 +558,7 @@ export function CaseDetailPage() {
               {pendingAlerts.length === 0 && decidedAlerts.length > 0 && (
                 <p className="text-xs text-green-700 dark:text-green-400 mt-2 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
-                  Todas las alertas revisadas — el caso se cerrara automaticamente
+                  {t('compliance.case.allReviewed')}
                 </p>
               )}
             </div>
@@ -570,7 +576,7 @@ export function CaseDetailPage() {
           >
             <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
               <Clock className="w-4 h-4 text-muted-foreground" />
-              Historial
+              {t('compliance.case.history')}
             </h2>
             <div className="glass rounded-xl p-5">
               <div className="relative">
@@ -578,19 +584,18 @@ export function CaseDetailPage() {
                 <div className="space-y-0">
                   {timeline.map((event, i) => {
                     const eventType = String(event.event_type || 'created');
-                    const config = eventTypeConfig[eventType] || { label: eventType, icon: Clock };
+                    const config = eventTypeConfig[eventType] || { icon: Clock };
                     const EventIcon = config.icon;
                     const details = event.details as Record<string, unknown> | null;
 
                     // Build a human-readable description
                     let description = '';
                     if (eventType === 'decision_made' && details?.decision) {
-                      const dc = decisionConfig[String(details.decision)];
-                      description = dc ? dc.label : String(details.decision);
+                      description = decisionLabel(t, String(details.decision));
                     } else if (eventType === 'status_changed' && details?.reason) {
                       description = String(details.reason);
                     } else if (eventType === 'created' && details?.priority) {
-                      description = `Prioridad: ${priorityConfig[String(details.priority)]?.label || details.priority}`;
+                      description = `${t('compliance.case.fields.priority')}: ${priorityLabel(t, String(details.priority))}`;
                     }
 
                     return (
@@ -603,7 +608,7 @@ export function CaseDetailPage() {
                         </div>
                         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                           <div className="min-w-0">
-                            <span className="text-sm text-muted-foreground break-words">{config.label}</span>
+                            <span className="text-sm text-muted-foreground break-words">{eventLabel(t, eventType)}</span>
                             {description && (
                               <span className="text-sm text-muted-foreground block sm:inline sm:ml-2">— {String(description)}</span>
                             )}
@@ -615,11 +620,11 @@ export function CaseDetailPage() {
                         {event.old_value != null && event.new_value != null && (
                           <div className="flex items-center gap-2 mt-1 text-xs">
                             <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-muted-foreground">
-                              {statusConfig[String(event.old_value)]?.label || String(event.old_value)}
+                              {statusLabel(t, String(event.old_value))}
                             </span>
                             <ChevronRight className="w-3 h-3 text-muted-foreground" />
                             <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-foreground">
-                              {statusConfig[String(event.new_value)]?.label || String(event.new_value)}
+                              {statusLabel(t, String(event.new_value))}
                             </span>
                           </div>
                         )}
@@ -642,7 +647,7 @@ export function CaseDetailPage() {
         >
           <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-muted-foreground" />
-            Notas
+            {t('compliance.case.notes.title')}
             {notes.length > 0 && (
               <span className="text-xs text-muted-foreground font-normal">({notes.length})</span>
             )}
@@ -654,7 +659,7 @@ export function CaseDetailPage() {
               <Textarea
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
-                placeholder="Agregar una nota al caso..."
+                placeholder={t('compliance.case.notes.placeholder')}
                 className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground mb-3 min-h-[80px]"
                 rows={2}
               />
@@ -666,7 +671,7 @@ export function CaseDetailPage() {
                   className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700"
                 >
                   <Send className="w-3 h-3 mr-2" />
-                  {noteMutation.isPending ? 'Guardando...' : 'Agregar nota'}
+                  {noteMutation.isPending ? t('compliance.case.notes.saving') : t('compliance.case.notes.add')}
                 </Button>
               </div>
             </div>
@@ -675,8 +680,8 @@ export function CaseDetailPage() {
           {notes.length === 0 && isClosed ? null : notes.length === 0 ? (
             <EmptyState
               icon={MessageSquare}
-              title="Sin notas aún"
-              description="Agrega contexto operativo o razonamiento del analista para el historial del caso."
+              title={t('compliance.case.notes.empty.title')}
+              description={t('compliance.case.notes.empty.description')}
             />
           ) : (
             <div className="space-y-2">
@@ -706,7 +711,7 @@ export function CaseDetailPage() {
       <Dialog open={!!decisionDialog} onOpenChange={(open) => !open && setDecisionDialog(null)}>
         <DialogContent className="bg-card border-foreground/10 text-foreground max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg">Tomar decision</DialogTitle>
+            <DialogTitle className="text-lg">{t('compliance.case.decisionDialog.title')}</DialogTitle>
           </DialogHeader>
           {decisionDialog && (
             <div className="space-y-5">
@@ -714,13 +719,13 @@ export function CaseDetailPage() {
               <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/5">
                 <p className="text-foreground font-medium mb-1">{decisionDialog.matched_entity_name}</p>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 text-sm text-muted-foreground">
-                  <span>Busqueda: "{decisionDialog.query_name}"</span>
+                  <span>{t('compliance.case.fields.query')}: "{decisionDialog.query_name}"</span>
                   <span className="hidden sm:inline text-muted-foreground">|</span>
                   <span className={cn('font-mono',
                     decisionDialog.match_confidence >= 0.9 ? 'text-red-600 dark:text-red-400' :
                     decisionDialog.match_confidence >= 0.7 ? 'text-orange-700 dark:text-orange-400' : 'text-yellow-700 dark:text-yellow-400'
                   )}>
-                    {Math.round(decisionDialog.match_confidence * 100)}% confianza
+                    {t('compliance.case.decisionDialog.confidenceSuffix', { count: Math.round(decisionDialog.match_confidence * 100) })}
                   </span>
                 </div>
                 {decisionDialog.matched_sources.length > 0 && (
@@ -736,7 +741,7 @@ export function CaseDetailPage() {
 
               {/* Primary decisions */}
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Decision</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">{t('compliance.case.decisionDialog.decisionLabel')}</p>
                 <div className="grid grid-cols-2 gap-2">
                   {/* True Positive */}
                   <button
@@ -751,9 +756,9 @@ export function CaseDetailPage() {
                     <AlertTriangle className={cn('w-5 h-5 mb-2',
                       decisionType === 'true_positive' ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
                     )} />
-                    <span className="text-sm font-medium block">Verdadero Positivo</span>
+                    <span className="text-sm font-medium block">{t('compliance.case.decision.true_positive.label')}</span>
                     <span className="text-[11px] text-muted-foreground block mt-0.5">
-                      Coincide con la entidad; requiere accion
+                      {t('compliance.case.decisionDialog.tpHint')}
                     </span>
                   </button>
 
@@ -770,9 +775,9 @@ export function CaseDetailPage() {
                     <CheckCircle className={cn('w-5 h-5 mb-2',
                       decisionType === 'false_positive' ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'
                     )} />
-                    <span className="text-sm font-medium block">Falso Positivo</span>
+                    <span className="text-sm font-medium block">{t('compliance.case.decision.false_positive.label')}</span>
                     <span className="text-[11px] text-muted-foreground block mt-0.5">
-                      No corresponde a la entidad evaluada
+                      {t('compliance.case.decisionDialog.fpHint')}
                     </span>
                   </button>
                 </div>
@@ -788,8 +793,8 @@ export function CaseDetailPage() {
                         : 'border-foreground/10 text-muted-foreground hover:bg-orange-500/5 hover:border-orange-500/20'
                     )}
                   >
-                    <span className="text-sm font-medium">Escalar</span>
-                    <span className="text-[11px] text-muted-foreground block">Requiere supervisor</span>
+                    <span className="text-sm font-medium">{t('compliance.case.decisionDialog.escalate')}</span>
+                    <span className="text-[11px] text-muted-foreground block">{t('compliance.case.decisionDialog.escalateHint')}</span>
                   </button>
                   <button
                     onClick={() => setDecisionType('inconclusive')}
@@ -800,8 +805,8 @@ export function CaseDetailPage() {
                         : 'border-foreground/10 text-muted-foreground hover:bg-gray-500/5 hover:border-gray-500/20'
                     )}
                   >
-                    <span className="text-sm font-medium">Inconcluso</span>
-                    <span className="text-[11px] text-muted-foreground block">Informacion insuficiente</span>
+                    <span className="text-sm font-medium">{t('compliance.case.decision.inconclusive.label')}</span>
+                    <span className="text-[11px] text-muted-foreground block">{t('compliance.case.decisionDialog.inconclusiveHint')}</span>
                   </button>
                 </div>
               </div>
@@ -809,12 +814,12 @@ export function CaseDetailPage() {
               {/* Reason */}
               <div>
                 <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
-                  Justificacion (requerida)
+                  {t('compliance.case.decisionDialog.justification')}
                 </label>
                 <Textarea
                   value={decisionReason}
                   onChange={(e) => setDecisionReason(e.target.value)}
-                  placeholder="Describe la razon de esta decision..."
+                  placeholder={t('compliance.case.decisionDialog.justificationPlaceholder')}
                   className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground"
                   rows={3}
                 />
@@ -825,7 +830,7 @@ export function CaseDetailPage() {
                 <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/15 flex items-start gap-2">
                   <Shield className="w-4 h-4 text-green-700 dark:text-green-400 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-green-700 dark:text-green-400/80">
-                    Se creara una lista blanca automaticamente para suprimir futuras alertas de esta coincidencia.
+                    {t('compliance.case.decisionDialog.fpWarning')}
                   </p>
                 </div>
               )}
@@ -833,7 +838,7 @@ export function CaseDetailPage() {
                 <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/15 flex items-start gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-red-600 dark:text-red-400/80">
-                    El caso se cerrara como confirmado. Deberas evaluar si se requiere presentar un SAR/ROS al regulador.
+                    {t('compliance.case.decisionDialog.tpWarning')}
                   </p>
                 </div>
               )}
@@ -841,7 +846,7 @@ export function CaseDetailPage() {
                 <div className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/15 flex items-start gap-2">
                   <ArrowUpRight className="w-4 h-4 text-orange-700 dark:text-orange-400 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-orange-700 dark:text-orange-400/80">
-                    El caso se marcara como escalado. Un supervisor debera tomar la decision final.
+                    {t('compliance.case.decisionDialog.escalateWarning')}
                   </p>
                 </div>
               )}
@@ -853,12 +858,12 @@ export function CaseDetailPage() {
                   onClick={() => setDecisionDialog(null)}
                   className="w-full sm:w-auto text-muted-foreground"
                 >
-                  Cancelar
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button
                   onClick={() => {
                     if (!decisionType || decisionReason.length < 5) {
-                      toast.error('Selecciona una decision y agrega una justificacion de al menos 5 caracteres');
+                      toast.error(t('compliance.case.decisionDialog.validationError'));
                       return;
                     }
                     decisionMutation.mutate({
@@ -876,7 +881,7 @@ export function CaseDetailPage() {
                     'bg-blue-600 hover:bg-blue-700'
                   )}
                 >
-                  {decisionMutation.isPending ? 'Guardando...' : 'Confirmar decision'}
+                  {decisionMutation.isPending ? t('compliance.case.notes.saving') : t('compliance.case.decisionDialog.confirm')}
                 </Button>
               </div>
             </div>
@@ -893,7 +898,7 @@ export function CaseDetailPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <DialogTitle className="text-lg flex items-center gap-2">
                 <FileWarning className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-                Reporte de Actividad Sospechosa (SAR/ROS)
+                {t('compliance.case.sarReport.title')}
               </DialogTitle>
             </div>
           </DialogHeader>
@@ -910,13 +915,13 @@ export function CaseDetailPage() {
               <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Reporte SAR/ROS</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">{t('compliance.case.sarReport.reportLabel')}</p>
                     <p className="text-lg font-semibold text-foreground mt-1">
                       {(sarReport as any).sar_report?.case?.case_number || caseData.case_number}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-muted-foreground">Generado</p>
+                    <p className="text-xs text-muted-foreground">{t('compliance.case.sarReport.generated')}</p>
                     <p className="text-sm text-muted-foreground">
                       {formatDateTime((sarReport as any).sar_report?.generated_at)}
                     </p>
@@ -926,7 +931,7 @@ export function CaseDetailPage() {
                   <div className="flex items-center gap-2 pt-2 border-t border-amber-500/10">
                     <Hash className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
                     <span className="text-sm text-amber-700 dark:text-amber-400">
-                      Referencia: {(sarReport as any).sar_report.case.sar_reference}
+                      {t('compliance.case.sarReport.reference')}: {(sarReport as any).sar_report.case.sar_reference}
                     </span>
                   </div>
                 )}
@@ -936,7 +941,7 @@ export function CaseDetailPage() {
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <User className="w-4 h-4" />
-                  Sujeto Investigado
+                  {t('compliance.case.sarReport.subject')}
                 </h3>
                 <div className="glass rounded-xl p-4">
                   <p className="text-foreground font-medium text-lg mb-2">
@@ -945,18 +950,18 @@ export function CaseDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     {(sarReport as any).sar_report?.subject?.entity_type && (
                       <div>
-                        <span className="text-muted-foreground">Tipo: </span>
+                        <span className="text-muted-foreground">{t('compliance.case.fields.type')}: </span>
                         <span className="text-muted-foreground">{(sarReport as any).sar_report.subject.entity_type}</span>
                       </div>
                     )}
                     {(sarReport as any).sar_report?.subject?.client_name && (
                       <div>
-                        <span className="text-muted-foreground">Cliente: </span>
+                        <span className="text-muted-foreground">{t('compliance.case.fields.client')}: </span>
                         <span className="text-muted-foreground">{(sarReport as any).sar_report.subject.client_name}</span>
                       </div>
                     )}
                     <div>
-                      <span className="text-muted-foreground">Riesgo: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.risk')}: </span>
                       <span className={cn('font-mono',
                         ((sarReport as any).sar_report?.case?.risk_score || 0) >= 70 ? 'text-red-600 dark:text-red-400' : 'text-yellow-700 dark:text-yellow-400'
                       )}>
@@ -965,9 +970,9 @@ export function CaseDetailPage() {
                       </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Prioridad: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.priority')}: </span>
                       <span className="text-muted-foreground">
-                        {priorityConfig[(sarReport as any).sar_report?.case?.priority]?.label || caseData.priority}
+                        {priorityLabel(t, (sarReport as any).sar_report?.case?.priority || caseData.priority)}
                       </span>
                     </div>
                   </div>
@@ -978,26 +983,26 @@ export function CaseDetailPage() {
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <ListChecks className="w-4 h-4" />
-                  Resumen
+                  {t('compliance.case.sarReport.summary')}
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="glass rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold text-foreground">
                       {(sarReport as any).sar_report?.summary?.total_alerts || 0}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">Alertas</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('compliance.case.fields.alerts')}</p>
                   </div>
                   <div className="glass rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {(sarReport as any).sar_report?.summary?.true_positives || 0}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">Verdaderos Positivos</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('compliance.case.sarReport.truePositives')}</p>
                   </div>
                   <div className="glass rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {((sarReport as any).sar_report?.summary?.sources_involved || []).length}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">Fuentes</p>
+                    <p className="text-xs text-muted-foreground mt-1">{t('compliance.case.sarReport.sources')}</p>
                   </div>
                 </div>
               </div>
@@ -1007,7 +1012,7 @@ export function CaseDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <Globe className="w-4 h-4" />
-                    Listas y Fuentes donde aparece
+                    {t('compliance.case.sarReport.sourcesWhereFound')}
                   </h3>
                   <div className="glass rounded-xl p-4">
                     <div className="flex flex-wrap gap-2">
@@ -1029,7 +1034,7 @@ export function CaseDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4" />
-                    Detalle de Alertas
+                    {t('compliance.case.sarReport.alertsDetail')}
                   </h3>
                   <div className="space-y-2">
                     {((sarReport as any).sar_report?.alerts || []).map((alert: any, i: number) => (
@@ -1041,20 +1046,20 @@ export function CaseDetailPage() {
                               decisionConfig[alert.decision]?.bgColor || ''
                             )}>
                               <span className={decisionConfig[alert.decision]?.color}>
-                                {decisionConfig[alert.decision]?.label || alert.decision}
+                                {decisionLabel(t, alert.decision)}
                               </span>
                             </Badge>
                           )}
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
-                          <div>Busqueda: "{alert.query_name}"</div>
-                          <div>Confianza: <span className="font-mono text-foreground">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
-                          <div>Riesgo: <span className="font-mono text-foreground">{alert.risk_score}</span></div>
-                          <div>Tipo: {alert.alert_type}</div>
+                          <div>{t('compliance.case.fields.query')}: "{alert.query_name}"</div>
+                          <div>{t('compliance.case.fields.confidence')}: <span className="font-mono text-foreground">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
+                          <div>{t('compliance.case.fields.risk')}: <span className="font-mono text-foreground">{alert.risk_score}</span></div>
+                          <div>{t('compliance.case.fields.type')}: {alert.alert_type}</div>
                         </div>
                         {alert.decision_reason && (
                           <div className="mt-2 p-2 rounded bg-foreground/[0.03] text-sm text-muted-foreground">
-                            <span className="text-muted-foreground">Razon: </span>{alert.decision_reason}
+                            <span className="text-muted-foreground">{t('compliance.case.fields.reason')}: </span>{alert.decision_reason}
                           </div>
                         )}
                       </div>
@@ -1068,20 +1073,20 @@ export function CaseDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <Gavel className="w-4 h-4" />
-                    Decisiones Formales
+                    {t('compliance.case.sarReport.formalDecisions')}
                   </h3>
                   <div className="space-y-2">
                     {((sarReport as any).sar_report?.decisions || []).map((dec: any, i: number) => (
                       <div key={i} className="glass rounded-xl p-4">
                         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-1">
                           <span className={cn('font-medium', decisionConfig[dec.decision]?.color || 'text-white')}>
-                            {decisionConfig[dec.decision]?.label || dec.decision}
+                            {decisionLabel(t, dec.decision)}
                           </span>
                           <span className="text-xs text-muted-foreground">{formatDateTime(dec.created_at)}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">{dec.reason}</p>
                         {dec.analyst_role && (
-                          <p className="text-xs text-muted-foreground mt-1">Rol: {dec.analyst_role}</p>
+                          <p className="text-xs text-muted-foreground mt-1">{t('compliance.case.sarReport.role')}: {dec.analyst_role}</p>
                         )}
                       </div>
                     ))}
@@ -1094,14 +1099,14 @@ export function CaseDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <CalendarDays className="w-4 h-4" />
-                    Cronologia
+                    {t('compliance.case.sarReport.chronology')}
                   </h3>
                   <div className="glass rounded-xl p-4">
                     <div className="space-y-2">
                       {((sarReport as any).sar_report?.timeline || []).map((event: any, i: number) => (
                         <div key={i} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm py-1 border-b border-foreground/5 last:border-0">
                           <span className="text-muted-foreground break-words">
-                            {eventTypeConfig[event.event]?.label || event.event}
+                            {eventLabel(t, event.event)}
                           </span>
                           <span className="text-xs text-muted-foreground">{formatDateTime(event.timestamp)}</span>
                         </div>
@@ -1116,7 +1121,7 @@ export function CaseDetailPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" />
-                    Notas
+                    {t('compliance.case.notes.title')}
                   </h3>
                   <div className="glass rounded-xl p-4 space-y-3">
                     {((sarReport as any).sar_report?.notes || []).map((note: any, i: number) => (
@@ -1133,34 +1138,34 @@ export function CaseDetailPage() {
               <div>
                 <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
-                  Informacion del Caso
+                  {t('compliance.case.sarReport.caseInfo')}
                 </h3>
                 <div className="glass rounded-xl p-4">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-muted-foreground">Estado: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.status')}: </span>
                       <span className="text-muted-foreground">
-                        {statusConfig[(sarReport as any).sar_report?.case?.status]?.label || (sarReport as any).sar_report?.case?.status}
+                        {statusLabel(t, (sarReport as any).sar_report?.case?.status)}
                       </span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Resolucion: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.resolution')}: </span>
                       <span className="text-muted-foreground">{(sarReport as any).sar_report?.case?.resolution || '-'}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Creado: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.created')}: </span>
                       <span className="text-muted-foreground">{formatDateTime((sarReport as any).sar_report?.case?.created_at)}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">Cerrado: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.closed')}: </span>
                       <span className="text-muted-foreground">{formatDateTime((sarReport as any).sar_report?.case?.closed_at)}</span>
                     </div>
                     <div>
-                      <span className="text-muted-foreground">SLA: </span>
+                      <span className="text-muted-foreground">{t('compliance.case.fields.sla')}: </span>
                       <span className={cn('text-muted-foreground',
                         (sarReport as any).sar_report?.case?.sla_breached ? 'text-red-600 dark:text-red-400' : ''
                       )}>
-                        {(sarReport as any).sar_report?.case?.sla_breached ? 'Vencido' : 'Dentro de plazo'}
+                        {(sarReport as any).sar_report?.case?.sla_breached ? t('compliance.case.sla.breached') : t('compliance.case.sla.withinTime')}
                       </span>
                     </div>
                   </div>
@@ -1181,7 +1186,7 @@ export function CaseDetailPage() {
                       a.download = `SAR_${caseData.case_number}_${new Date().toISOString().slice(0,10)}.json`;
                       a.click();
                       URL.revokeObjectURL(url);
-                      toast.success('Reporte descargado');
+                      toast.success(t('compliance.case.sarReport.downloaded'));
                     }}
                     className="text-muted-foreground border-foreground/10 hover:bg-foreground/5"
                   >
@@ -1196,7 +1201,7 @@ export function CaseDetailPage() {
                     onClick={() => setShowSarReport(false)}
                     className="text-muted-foreground"
                   >
-                    Cerrar
+                    {t('common.actions.close')}
                   </Button>
                   {!caseData.sar_filed && (
                     <Button
@@ -1204,7 +1209,7 @@ export function CaseDetailPage() {
                       className="bg-amber-600 hover:bg-amber-700 text-white"
                     >
                       <Send className="w-3.5 h-3.5 mr-1.5" />
-                      Presentar SAR
+                      {t('compliance.case.sar.fileSar')}
                     </Button>
                   )}
                 </div>
@@ -1213,7 +1218,7 @@ export function CaseDetailPage() {
           ) : (
             <div className="py-8 text-center">
               <XCircle className="w-12 h-12 text-red-600 dark:text-red-400/50 mx-auto mb-3" />
-              <p className="text-muted-foreground">No se pudo generar el reporte</p>
+              <p className="text-muted-foreground">{t('compliance.case.sarReport.generateError')}</p>
             </div>
           )}
         </DialogContent>
@@ -1227,23 +1232,22 @@ export function CaseDetailPage() {
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
               <FileWarning className="w-5 h-5 text-amber-700 dark:text-amber-400" />
-              Registrar SAR/ROS
+              {t('compliance.case.fileSar.title')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <p className="text-sm text-muted-foreground">
-              Ingresa el numero de referencia del Reporte de Operacion Sospechosa
-              presentado ante la autoridad reguladora (UIF/FinCEN).
+              {t('compliance.case.fileSar.intro')}
             </p>
 
             <div>
               <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
-                Numero de referencia SAR/ROS
+                {t('compliance.case.fileSar.referenceLabel')}
               </label>
               <Input
                 value={sarReference}
                 onChange={(e) => setSarReference(e.target.value)}
-                placeholder="Ej: ROS-2026-00145 o SAR-20260314-001"
+                placeholder={t('compliance.case.fileSar.referencePlaceholder')}
                 className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground"
               />
             </div>
@@ -1251,9 +1255,8 @@ export function CaseDetailPage() {
             <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/15 flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" />
               <div className="text-xs text-amber-700 dark:text-amber-400/80">
-                <p className="font-medium mb-1">Esta accion es irreversible</p>
-                <p>El caso se marcara como "SAR Presentado" y se registrara
-                  en el historial de auditoria con fecha y referencia.</p>
+                <p className="font-medium mb-1">{t('compliance.case.fileSar.irreversibleTitle')}</p>
+                <p>{t('compliance.case.fileSar.irreversibleBody')}</p>
               </div>
             </div>
 
@@ -1263,12 +1266,12 @@ export function CaseDetailPage() {
                 onClick={() => setShowFileSarDialog(false)}
                 className="text-muted-foreground"
               >
-                Cancelar
+                {t('common.actions.cancel')}
               </Button>
               <Button
                 onClick={() => {
                   if (sarReference.trim().length < 3) {
-                    toast.error('Ingresa un numero de referencia valido (min. 3 caracteres)');
+                    toast.error(t('compliance.case.fileSar.validationError'));
                     return;
                   }
                   fileSarMutation.mutate(sarReference.trim());
@@ -1276,7 +1279,7 @@ export function CaseDetailPage() {
                 disabled={sarReference.trim().length < 3 || fileSarMutation.isPending}
                 className="bg-amber-600 hover:bg-amber-700 text-white"
               >
-                {fileSarMutation.isPending ? 'Registrando...' : 'Confirmar Presentacion'}
+                {fileSarMutation.isPending ? t('compliance.case.fileSar.filing') : t('compliance.case.fileSar.confirm')}
               </Button>
             </div>
           </div>

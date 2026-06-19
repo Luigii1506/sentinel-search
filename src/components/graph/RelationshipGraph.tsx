@@ -15,6 +15,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import {
   Maximize2,
   Minimize2,
@@ -56,6 +57,7 @@ const nodeIcons: Record<string, React.ComponentType<{className?: string}>> = {
 };
 
 function EntityNode({ data, selected }: { data: Record<string, unknown>; selected?: boolean }) {
+  const { t } = useTranslation();
   const nodeData = data as unknown as EntityNodeData;
   const { entity, isCenter } = nodeData;
   const Icon = nodeIcons[entity.entity_type?.toLowerCase()] || Users;
@@ -114,7 +116,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
             </Badge>
             {entity.source_count && (
               <span className="text-xs text-muted-foreground">
-                {entity.source_count} fuentes
+                {t('components.graph.sourcesCount', { count: entity.source_count })}
               </span>
             )}
           </div>
@@ -142,19 +144,20 @@ const nodeTypes: NodeTypes = {
   entity: EntityNode,
 };
 
-// Edge styles by relationship type
-const edgeStyles: Record<string, { color: string; label: string }> = {
-  ownership: { color: '#3b82f6', label: 'Propiedad' },
-  beneficial_ownership: { color: '#3b82f6', label: 'Beneficiario' },
-  corporate: { color: '#06b6d4', label: 'Corporativo' },
-  family: { color: '#8b5cf6', label: 'Familiar' },
-  directorship: { color: '#06b6d4', label: 'Directivo' },
-  associate: { color: '#eab308', label: 'Asociado' },
-  political: { color: '#f97316', label: 'Político' },
-  sanction: { color: '#ef4444', label: 'Sanción' },
-  membership: { color: '#f97316', label: 'Miembro' },
-  representation: { color: '#22c55e', label: 'Representante' },
-  unknownlink: { color: '#6a6a6a', label: 'Otro' },
+// Edge styles by relationship type. `labelKey` resolves under
+// components.graph.edge.* at render time (i18n).
+const edgeStyles: Record<string, { color: string; labelKey: string }> = {
+  ownership: { color: '#3b82f6', labelKey: 'ownership' },
+  beneficial_ownership: { color: '#3b82f6', labelKey: 'beneficialOwnership' },
+  corporate: { color: '#06b6d4', labelKey: 'corporate' },
+  family: { color: '#8b5cf6', labelKey: 'family' },
+  directorship: { color: '#06b6d4', labelKey: 'directorship' },
+  associate: { color: '#eab308', labelKey: 'associate' },
+  political: { color: '#f97316', labelKey: 'political' },
+  sanction: { color: '#ef4444', labelKey: 'sanction' },
+  membership: { color: '#f97316', labelKey: 'membership' },
+  representation: { color: '#22c55e', labelKey: 'representation' },
+  unknownlink: { color: '#6a6a6a', labelKey: 'other' },
 };
 
 interface RelationshipGraphProps {
@@ -186,6 +189,7 @@ export function RelationshipGraph({
   totalNodes,
   totalEdges,
 }: RelationshipGraphProps) {
+  const { t } = useTranslation();
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [filterTypes, setFilterTypes] = useState<string[]>([]);
   const [minStrength, setMinStrength] = useState(0);
@@ -273,7 +277,9 @@ export function RelationshipGraph({
   // Create ReactFlow edges from filtered network edges
   const initialEdges: Edge[] = useMemo(() => {
     return filteredEdges.map((edge, index) => {
-      const style = edgeStyles[edge.type] || { color: '#6a6a6a', label: edge.type };
+      const style = edgeStyles[edge.type];
+      const styleLabel = style ? t(`components.graph.edge.${style.labelKey}`) : edge.type;
+      const styleColor = style?.color ?? '#6a6a6a';
       return {
         id: `edge-${index}`,
         source: edge.source,
@@ -281,11 +287,11 @@ export function RelationshipGraph({
         type: 'smoothstep',
         animated: edge.type === 'ownership',
         style: {
-          stroke: style.color,
+          stroke: styleColor,
           strokeWidth: 2,
           strokeDasharray: edge.dashed ? '5,5' : undefined,
         },
-        label: edge.label || edge.subtype || style.label,
+        label: edge.label || edge.subtype || styleLabel,
         labelStyle: {
           fill: '#a0a0a0',
           fontSize: 11,
@@ -298,7 +304,7 @@ export function RelationshipGraph({
         labelBgBorderRadius: 4,
       };
     });
-  }, [filteredEdges]);
+  }, [filteredEdges, t]);
 
   const [flowNodes, setFlowNodes, onNodesChange] = useNodesState(initialNodes);
   const [flowEdges, setFlowEdges, onEdgesChange] = useEdgesState(initialEdges);
@@ -356,8 +362,8 @@ export function RelationshipGraph({
         <div className="h-full p-6">
           <EmptyState
             icon={Users}
-            title="Sin relaciones disponibles"
-            description="No hay datos de relaciones disponibles para esta entidad."
+            title={t('components.graph.emptyTitle')}
+            description={t('components.graph.emptyDescription')}
           />
         </div>
       </div>
@@ -452,7 +458,7 @@ export function RelationshipGraph({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Layers className="w-3.5 h-3.5" />
-                  <span>Profundidad</span>
+                  <span>{t('components.graph.depth')}</span>
                 </div>
                 <div className="flex gap-1.5">
                   {[1, 2, 3].map((d) => (
@@ -478,7 +484,7 @@ export function RelationshipGraph({
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Activity className="w-3.5 h-3.5" />
-                  <span>Fuerza min.</span>
+                  <span>{t('components.graph.minStrength')}</span>
                 </div>
                 <span className="text-xs text-muted-foreground">{minStrength}%</span>
               </div>
@@ -506,12 +512,14 @@ export function RelationshipGraph({
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Filter className="w-3.5 h-3.5" />
-                  <span>Tipo</span>
+                  <span>{t('components.graph.type')}</span>
                   <span className="text-muted-foreground">({filteredEdges.length})</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {availableTypes.map((type) => {
-                    const style = edgeStyles[type] || { color: '#6a6a6a', label: type };
+                    const style = edgeStyles[type];
+                    const styleColor = style?.color ?? '#6a6a6a';
+                    const styleLabel = style ? t(`components.graph.edge.${style.labelKey}`) : type;
                     const isActive = filterTypes.length === 0 || filterTypes.includes(type);
                     return (
                       <button
@@ -522,12 +530,12 @@ export function RelationshipGraph({
                           isActive ? 'opacity-100' : 'opacity-40 hover:opacity-70'
                         )}
                         style={{
-                          backgroundColor: `${style.color}20`,
-                          color: style.color,
-                          border: `1px solid ${style.color}40`,
+                          backgroundColor: `${styleColor}20`,
+                          color: styleColor,
+                          border: `1px solid ${styleColor}40`,
                         }}
                       >
-                        {style.label}
+                        {styleLabel}
                       </button>
                     );
                   })}
@@ -537,9 +545,9 @@ export function RelationshipGraph({
 
             {/* Stats */}
             <div className="flex items-center gap-3 pt-1 border-t border-foreground/5 text-xs text-muted-foreground">
-              <span>{visibleNodeIds.size}{totalNodes && totalNodes !== visibleNodeIds.size ? `/${totalNodes}` : ''} nodos</span>
+              <span>{t('components.graph.nodes', { count: `${visibleNodeIds.size}${totalNodes && totalNodes !== visibleNodeIds.size ? `/${totalNodes}` : ''}` })}</span>
               <span className="text-muted-foreground">·</span>
-              <span>{filteredEdges.length}{totalEdges && totalEdges !== filteredEdges.length ? `/${totalEdges}` : ''} relaciones</span>
+              <span>{t('components.graph.relationships', { count: `${filteredEdges.length}${totalEdges && totalEdges !== filteredEdges.length ? `/${totalEdges}` : ''}` })}</span>
             </div>
           </div>
         </Panel>
@@ -547,7 +555,7 @@ export function RelationshipGraph({
         {/* Legend Panel */}
         <Panel position="bottom-left" className="m-4">
           <div className="glass rounded-xl p-3">
-            <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Tipos de Entidad</div>
+            <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">{t('components.graph.entityTypes')}</div>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(nodeIcons).slice(0, 4).map(([type, Icon]) => (
                 <div key={type} className="flex items-center gap-2">
@@ -560,7 +568,7 @@ export function RelationshipGraph({
             {onNavigate && (
               <div className="mt-3 pt-3 border-t border-foreground/10">
                 <p className="text-[10px] text-muted-foreground">
-                  Doble clic en un nodo para navegar
+                  {t('components.graph.doubleClickHint')}
                 </p>
               </div>
             )}
