@@ -84,6 +84,24 @@
       "welcomeNamed": "Bienvenido, {{name}}",
       "signupFailed": "No se pudo crear la cuenta",
       "or": "o"
+    },
+    "riskLevel": {
+      "critical": "Riesgo crítico",
+      "high": "Riesgo alto",
+      "medium": "Riesgo medio",
+      "low": "Riesgo bajo",
+      "none": "Sin riesgo"
+    },
+    "relationshipType": {
+      "ownership": "Propiedad",
+      "family": "Relación familiar",
+      "employment": "Empleo",
+      "partnership": "Asociación comercial",
+      "transaction": "Vínculo transaccional",
+      "shared_address": "Domicilio compartido",
+      "shared_contact": "Contacto compartido",
+      "legal_rep": "Representante legal",
+      "beneficial_owner": "Beneficiario final"
     }
   },
   "nav": {
@@ -124,7 +142,9 @@
     "expand": "Expandir sidebar",
     "collapse": "Contraer sidebar",
     "openMenu": "Abrir menú",
-    "nav": "Navegación"
+    "nav": "Navegación",
+    "mainNav": "Navegación principal",
+    "openSearch": "Abrir búsqueda"
   },
   "search": {
     "placeholder": "Buscar personas, empresas, o identificadores...",
@@ -151,26 +171,82 @@
       "title": "Evaluación integral de riesgo",
       "subtitle": "Nuestra plataforma combina múltiples fuentes de datos y análisis impulsado por IA para entregar perfiles de riesgo completos en tiempo real.",
       "items": {
-        "international": { "title": "Listas internacionales", "description": "Verificación contra OFAC, ONU, UE, Reino Unido y otras listas de sanciones globales." },
-        "sat69b": { "title": "Lista 69-B SAT", "description": "Cumplimiento con requisitos regulatorios mexicanos. Lista de contribuyentes incumplidos." },
-        "pep": { "title": "PEP México", "description": "Identificación de Personas Políticamente Expuestas según normativa CNBV y UIF." },
-        "relationships": { "title": "Mapeo de relaciones", "description": "Visualiza redes complejas y descubre conexiones ocultas entre entidades." },
-        "scoring": { "title": "Scoring de riesgo", "description": "Evaluación de riesgo impulsada por IA combinando sanciones, PEP y factores geográficos." },
-        "audit": { "title": "Audit trail", "description": "Historial completo de investigaciones con registros detallados para cumplimiento regulatorio." }
+        "international": {
+          "title": "Listas internacionales",
+          "description": "Verificación contra OFAC, ONU, UE, Reino Unido y otras listas de sanciones globales."
+        },
+        "sat69b": {
+          "title": "Lista 69-B SAT",
+          "description": "Cumplimiento con requisitos regulatorios mexicanos. Lista de contribuyentes incumplidos."
+        },
+        "pep": {
+          "title": "PEP México",
+          "description": "Identificación de Personas Políticamente Expuestas según normativa CNBV y UIF."
+        },
+        "relationships": {
+          "title": "Mapeo de relaciones",
+          "description": "Visualiza redes complejas y descubre conexiones ocultas entre entidades."
+        },
+        "scoring": {
+          "title": "Scoring de riesgo",
+          "description": "Evaluación de riesgo impulsada por IA combinando sanciones, PEP y factores geográficos."
+        },
+        "audit": {
+          "title": "Audit trail",
+          "description": "Historial completo de investigaciones con registros detallados para cumplimiento regulatorio."
+        }
       }
     },
     "risk": {
       "badge": "Clasificación de riesgo",
       "title": "Sistema de clasificación PLD/FT",
       "subtitle": "Clasificación de riesgo de cuatro niveles para priorizar investigaciones y asignar recursos efectivamente según normativa UIF.",
-      "critical": { "level": "Crítico", "title": "Riesgo crítico", "description": "Atención inmediata requerida. Entidades con coincidencias confirmadas en listas de sanciones OFAC/ONU.", "examples": ["Coincidencia exacta OFAC", "Lista 69-B SAT", "Alertas UIF"] },
-      "high": { "level": "Alto", "title": "Riesgo alto", "description": "Monitoreo cercano recomendado. PEPs, sus asociados cercanos, o entidades con exposición geográfica de riesgo.", "examples": ["PEP nivel federal", "Asociados cercanos", "Jurisdicciones de riesgo"] },
-      "medium": { "level": "Medio", "title": "Riesgo medio", "description": "Monitoreo estándar. Entidades con coincidencias parciales o conexiones menores.", "examples": ["Coincidencia fonética", "PEP local", "Vínculos indirectos"] }
+      "critical": {
+        "level": "Crítico",
+        "title": "Riesgo crítico",
+        "description": "Atención inmediata requerida. Entidades con coincidencias confirmadas en listas de sanciones OFAC/ONU.",
+        "examples": [
+          "Coincidencia exacta OFAC",
+          "Lista 69-B SAT",
+          "Alertas UIF"
+        ]
+      },
+      "high": {
+        "level": "Alto",
+        "title": "Riesgo alto",
+        "description": "Monitoreo cercano recomendado. PEPs, sus asociados cercanos, o entidades con exposición geográfica de riesgo.",
+        "examples": [
+          "PEP nivel federal",
+          "Asociados cercanos",
+          "Jurisdicciones de riesgo"
+        ]
+      },
+      "medium": {
+        "level": "Medio",
+        "title": "Riesgo medio",
+        "description": "Monitoreo estándar. Entidades con coincidencias parciales o conexiones menores.",
+        "examples": [
+          "Coincidencia fonética",
+          "PEP local",
+          "Vínculos indirectos"
+        ]
+      }
     },
     "sources": {
       "title": "Fuentes de datos verificadas",
       "subtitle": "Agregamos datos de proveedores líderes globales y locales para asegurar cobertura completa del marco regulatorio mexicano.",
-      "items": ["OFAC SDN", "ONU Consolidada", "EU Sanctions", "UK HMT", "Lista 69-B SAT", "UIF México", "PEP CNBV", "World-Check", "Adverse Media", "Interno"]
+      "items": [
+        "OFAC SDN",
+        "ONU Consolidada",
+        "EU Sanctions",
+        "UK HMT",
+        "Lista 69-B SAT",
+        "UIF México",
+        "PEP CNBV",
+        "World-Check",
+        "Adverse Media",
+        "Interno"
+      ]
     },
     "cta": {
       "title": "¿Listo para fortalecer tu cumplimiento?",
@@ -184,10 +260,31 @@
       "resources": "Recursos",
       "regulation": "Regulación",
       "links": {
-        "product": ["Búsqueda", "Monitoreo", "API", "Integraciones"],
-        "legal": ["Términos de uso", "Privacidad", "Cookies", "CNBV", "UIF"],
-        "resources": ["Documentación", "Soporte", "Status", "Seguridad"],
-        "regulation": ["Ley Anti-Lavado", "Circular 32/2013", "Circular 40/2014", "Criterios UIF"]
+        "product": [
+          "Búsqueda",
+          "Monitoreo",
+          "API",
+          "Integraciones"
+        ],
+        "legal": [
+          "Términos de uso",
+          "Privacidad",
+          "Cookies",
+          "CNBV",
+          "UIF"
+        ],
+        "resources": [
+          "Documentación",
+          "Soporte",
+          "Status",
+          "Seguridad"
+        ],
+        "regulation": [
+          "Ley Anti-Lavado",
+          "Circular 32/2013",
+          "Circular 40/2014",
+          "Criterios UIF"
+        ]
       },
       "rights": "© 2024 Sentinel PLD. Sistema de cumplimiento PLD/FT."
     }

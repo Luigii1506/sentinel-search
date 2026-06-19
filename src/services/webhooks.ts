@@ -6,27 +6,13 @@ export type WebhookEvent =
   | 'source.sync_complete'
   | 'source.sync_failed';
 
-export const ALL_EVENTS: { id: WebhookEvent; label: string; description: string }[] = [
-  {
-    id: 'screening.critical_match',
-    label: 'Match crítico',
-    description: 'Una búsqueda devolvió al menos un match con risk_level=critical.',
-  },
-  {
-    id: 'screening.high_match',
-    label: 'Match alto',
-    description: 'Una búsqueda devolvió al menos un match con risk_level=high.',
-  },
-  {
-    id: 'source.sync_complete',
-    label: 'Source sync OK',
-    description: 'Una fuente terminó de sincronizar exitosamente.',
-  },
-  {
-    id: 'source.sync_failed',
-    label: 'Source sync falló',
-    description: 'Una fuente falló durante la sincronización.',
-  },
+// Event ids only — display label/description are localized in the UI via
+// i18n (account.webhooks.events.<id with dots → underscores>).
+export const ALL_EVENTS: { id: WebhookEvent }[] = [
+  { id: 'screening.critical_match' },
+  { id: 'screening.high_match' },
+  { id: 'source.sync_complete' },
+  { id: 'source.sync_failed' },
 ];
 
 export interface Webhook {

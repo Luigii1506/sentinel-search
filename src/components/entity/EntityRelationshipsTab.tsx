@@ -15,7 +15,7 @@ import {
   type RelationshipSectionConfig,
 } from '@/components/entity/relationshipViewModel';
 import {
-  entityTypeLabelExtended,
+  getEntityTypeLabelExtended,
   getReferenceRelationshipSection,
   getReferenceRelationshipSortScore,
   getReferenceRelationshipSummary,
@@ -269,7 +269,7 @@ export function EntityRelationshipsTab({
         getRelationshipSubgroupPriority={getRelationshipSubgroupPriority}
         getReferenceRelationshipSummary={getReferenceRelationshipSummary}
         translateSubtype={translateSubtype}
-        entityTypeLabelExtended={entityTypeLabelExtended}
+        getEntityTypeLabelExtended={getEntityTypeLabelExtended}
         countryNames={countryNames}
         onNavigateEntity={onNavigateEntity}
       />

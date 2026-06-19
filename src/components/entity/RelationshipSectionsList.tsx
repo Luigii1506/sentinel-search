@@ -18,10 +18,10 @@ type RelationshipSectionsListProps = {
   collapsedRelationshipSections: Record<string, boolean>;
   setCollapsedRelationshipSections: (value: Record<string, boolean> | ((value: Record<string, boolean>) => Record<string, boolean>)) => void;
   getRelationshipSubgroup: (rel: any, sectionKey: string, referenceLike: boolean) => string;
-  getRelationshipSubgroupPriority: (sectionKey: string, subgroupLabel: string, referenceLike: boolean) => number;
+  getRelationshipSubgroupPriority: (sectionKey: string, subgroupKey: string, referenceLike: boolean) => number;
   getReferenceRelationshipSummary: (rel: any) => string | null;
   translateSubtype: (subtype?: string | null) => string;
-  entityTypeLabelExtended: Record<string, string>;
+  getEntityTypeLabelExtended: (type?: string | null) => string;
   countryNames: Record<string, string>;
   onNavigateEntity: (entityId: string) => void;
 };
@@ -43,7 +43,7 @@ export function RelationshipSectionsList({
   getRelationshipSubgroupPriority,
   getReferenceRelationshipSummary,
   translateSubtype,
-  entityTypeLabelExtended,
+  getEntityTypeLabelExtended,
   countryNames,
   onNavigateEntity,
 }: RelationshipSectionsListProps) {
@@ -55,24 +55,25 @@ export function RelationshipSectionsList({
         if (!rels || rels.length === 0) return null;
         const SectionIcon = section.icon;
         const subgroupMap = rels.reduce<Record<string, typeof rels>>((acc, rel) => {
-          const subgroup = getRelationshipSubgroup(rel, section.key, referenceLike);
-          acc[subgroup] = acc[subgroup] || [];
-          acc[subgroup].push(rel);
+          const subgroupKey = getRelationshipSubgroup(rel, section.key, referenceLike);
+          acc[subgroupKey] = acc[subgroupKey] || [];
+          acc[subgroupKey].push(rel);
           return acc;
         }, {});
         const subgroupEntries = Object.entries(subgroupMap);
         const showSubgroups = subgroupEntries.length > 1;
-        const relationshipGroups: Array<{ label: string; items: typeof rels }> = showSubgroups
+        // `key` es una llave estable de subgrupo; el texto visible se traduce abajo.
+        const relationshipGroups: Array<{ key: string; items: typeof rels }> = showSubgroups
           ? subgroupEntries
-              .map(([label, items]) => ({ label, items }))
+              .map(([key, items]) => ({ key, items }))
               .sort((a, b) => {
                 const priorityDiff =
-                  getRelationshipSubgroupPriority(section.key, a.label, referenceLike) -
-                  getRelationshipSubgroupPriority(section.key, b.label, referenceLike);
+                  getRelationshipSubgroupPriority(section.key, a.key, referenceLike) -
+                  getRelationshipSubgroupPriority(section.key, b.key, referenceLike);
                 if (priorityDiff !== 0) return priorityDiff;
-                return a.label.localeCompare(b.label);
+                return a.key.localeCompare(b.key);
               })
-          : [{ label: '', items: rels }];
+          : [{ key: '', items: rels }];
 
         return (
           <div key={section.key} className="space-y-3">
@@ -99,12 +100,12 @@ export function RelationshipSectionsList({
 
             {!collapsedRelationshipSections[section.key] && (
               <div className="space-y-4">
-                {relationshipGroups.map(({ label: subgroupLabel, items: subgroupRels }) => (
-                  <div key={`${section.key}-${subgroupLabel || 'all'}`} className="space-y-3">
+                {relationshipGroups.map(({ key: subgroupKey, items: subgroupRels }) => (
+                  <div key={`${section.key}-${subgroupKey || 'all'}`} className="space-y-3">
                     {showSubgroups && (
                       <div className="flex items-center gap-3">
                         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                          {subgroupLabel}
+                          {t(`entity.relationships.subgroup.${subgroupKey}`)}
                         </span>
                         <div className="h-px flex-1 bg-foreground/10" />
                       </div>
@@ -128,7 +129,7 @@ export function RelationshipSectionsList({
                                 ? 'bg-yellow-500/10 border-yellow-500/20'
                                 : 'bg-gray-500/10 border-gray-500/20';
                         const entityTypeKey = (rel.related_entity_type || '').toLowerCase();
-                        const entityTypeLabel = entityTypeLabelExtended[entityTypeKey] || null;
+                        const entityTypeLabel = entityTypeKey ? getEntityTypeLabelExtended(entityTypeKey) : null;
                         const relCountries = (rel.related_entity_countries || []).slice(0, 3);
                         const sourceName = rel.source ? formatSourceName(rel.source) : null;
                         const referenceSummary = referenceLike ? getReferenceRelationshipSummary(rel) : null;

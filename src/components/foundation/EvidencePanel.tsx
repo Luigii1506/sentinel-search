@@ -29,6 +29,7 @@
  * focus trap correctly.
  */
 import { useEffect, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ export function EvidencePanel({
   children,
   className,
 }: EvidencePanelProps) {
+  const { t } = useTranslation();
   // Esc to close on desktop. (Sheet handles it on mobile.)
   useEffect(() => {
     if (!open) return;
@@ -121,7 +123,7 @@ export function EvidencePanel({
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                aria-label="Cerrar panel de evidencia"
+                aria-label={t('components.foundation.evidenceClose')}
                 className="-mt-1 -mr-2 shrink-0 h-8 w-8"
               >
                 <X className="w-4 h-4" />

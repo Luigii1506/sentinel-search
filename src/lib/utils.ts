@@ -1,9 +1,31 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import i18n from '@/i18n';
+import i18n, { currentLang } from '@/i18n';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
+}
+
+const ISO_REGION_RE = /^[A-Za-z]{2}$/;
+
+/**
+ * Localized country name for an ISO 3166-1 alpha-2 code, using the native
+ * Intl.DisplayNames API (es / en follow the active UI language).
+ *
+ * - Non-ISO inputs (already-resolved names, multi-letter blocks like "EU",
+ *   "INT") are returned as-is when Intl cannot resolve them.
+ * - Falls back to the original input if the code does not resolve.
+ */
+export function getCountryName(code?: string | null): string {
+  const value = (code || '').trim();
+  if (!value) return '';
+  if (!ISO_REGION_RE.test(value)) return value;
+  try {
+    const display = new Intl.DisplayNames([currentLang()], { type: 'region' });
+    return display.of(value.toUpperCase()) || value;
+  } catch {
+    return value;
+  }
 }
 
 function isDateOnlyString(value: string): boolean {
@@ -123,18 +145,8 @@ export function getRiskBgColor(riskLevel: string): string {
 
 // Get risk label
 export function getRiskLabel(riskLevel: string): string {
-  switch (riskLevel) {
-    case 'critical':
-      return 'Critical Risk';
-    case 'high':
-      return 'High Risk';
-    case 'medium':
-      return 'Medium Risk';
-    case 'low':
-      return 'Low Risk';
-    default:
-      return 'No Risk';
-  }
+  const known = new Set(['critical', 'high', 'medium', 'low']);
+  return i18n.t(`common.riskLevel.${known.has(riskLevel) ? riskLevel : 'none'}`);
 }
 
 // Get entity type icon
@@ -163,18 +175,11 @@ export function getSourceBadgeClass(source: string): string {
 
 // Get relationship type label
 export function getRelationshipTypeLabel(type: string): string {
-  const labels: Record<string, string> = {
-    ownership: 'Propiedad',
-    family: 'Relacion familiar',
-    employment: 'Empleo',
-    partnership: 'Asociacion comercial',
-    transaction: 'Vinculo transaccional',
-    shared_address: 'Domicilio compartido',
-    shared_contact: 'Contacto compartido',
-    legal_rep: 'Representante legal',
-    beneficial_owner: 'Beneficiario final',
-  };
-  return labels[type] || type.replace('_', ' ');
+  const known = new Set([
+    'ownership', 'family', 'employment', 'partnership', 'transaction',
+    'shared_address', 'shared_contact', 'legal_rep', 'beneficial_owner',
+  ]);
+  return known.has(type) ? i18n.t(`common.relationshipType.${type}`) : type.replace('_', ' ');
 }
 
 // Get investigation status label

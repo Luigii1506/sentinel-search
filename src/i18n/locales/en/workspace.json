@@ -1,4 +1,38 @@
 {
+  "search": {
+    "title": "Entity Search",
+    "description": "Screening against sanctions lists, PEPs, debarments and adverse media.",
+    "filtersTitle": "Filters",
+    "entityTypeLabel": "Entity Type",
+    "riskLevelLabel": "Risk Level",
+    "dataSourceLabel": "Data Source",
+    "engineLabel": "Engine:",
+    "engineClassic": "Classic",
+    "engineClassicTooltip": "Classic search: fuzzy BM25 over names + phonetics",
+    "engineIntelligent": "✨ Intelligent (ML)",
+    "engineIntelligentTooltip": "Intelligent (default): hybrid ML scoring + multi-script (Latin↔Cyrillic↔Chinese↔Arabic) + per-property provenance",
+    "engineMlBadgeTooltip": "This search uses nomenklatura.DefaultAlgorithm + BM25 hybrid + ICU transliteration",
+    "searching": "Searching...",
+    "semanticResultsCount": "{{count}} semantic results",
+    "resultsCount": "{{count}} results",
+    "queryContext": "for \"{{query}}\" • {{mode}} mode",
+    "modeSemantic": "semantic",
+    "modeTraditional": "traditional",
+    "emptyTitle": "No results found",
+    "emptyDescription": "Try other search terms or adjust the filters.",
+    "newSearch": "New search",
+    "suggestedTitle": "Suggested Searches",
+    "alertCreated": "Alert created: {{caseNumber}}",
+    "alertError": "Failed to create alert",
+    "suggestions": {
+      "ofac": "OFAC sanctions lists",
+      "pep": "Politically Exposed Persons",
+      "company": "Companies on watch lists",
+      "vessel": "Sanctioned vessels",
+      "offshore": "Companies in tax havens",
+      "terrorism": "Linked to terrorist activities"
+    }
+  },
   "bulk": {
     "title": "Bulk screening",
     "description": "Bulk screening of names against the database.",

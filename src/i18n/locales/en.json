@@ -84,6 +84,24 @@
       "welcomeNamed": "Welcome, {{name}}",
       "signupFailed": "Couldn't create the account",
       "or": "or"
+    },
+    "riskLevel": {
+      "critical": "Critical risk",
+      "high": "High risk",
+      "medium": "Medium risk",
+      "low": "Low risk",
+      "none": "No risk"
+    },
+    "relationshipType": {
+      "ownership": "Ownership",
+      "family": "Family relationship",
+      "employment": "Employment",
+      "partnership": "Business partnership",
+      "transaction": "Transactional link",
+      "shared_address": "Shared address",
+      "shared_contact": "Shared contact",
+      "legal_rep": "Legal representative",
+      "beneficial_owner": "Beneficial owner"
     }
   },
   "nav": {
@@ -124,7 +142,9 @@
     "expand": "Expand sidebar",
     "collapse": "Collapse sidebar",
     "openMenu": "Open menu",
-    "nav": "Navigation"
+    "nav": "Navigation",
+    "mainNav": "Main navigation",
+    "openSearch": "Open search"
   },
   "search": {
     "placeholder": "Search people, companies, or identifiers...",
@@ -151,26 +171,82 @@
       "title": "Comprehensive risk assessment",
       "subtitle": "Our platform combines multiple data sources with AI-driven analysis to deliver complete risk profiles in real time.",
       "items": {
-        "international": { "title": "International lists", "description": "Screening against OFAC, UN, EU, UK and other global sanctions lists." },
-        "sat69b": { "title": "SAT 69-B List", "description": "Compliance with Mexican regulatory requirements. List of non-compliant taxpayers." },
-        "pep": { "title": "Mexico PEP", "description": "Identification of Politically Exposed Persons per CNBV and UIF regulations." },
-        "relationships": { "title": "Relationship mapping", "description": "Visualize complex networks and uncover hidden connections between entities." },
-        "scoring": { "title": "Risk scoring", "description": "AI-driven risk assessment combining sanctions, PEP and geographic factors." },
-        "audit": { "title": "Audit trail", "description": "Complete investigation history with detailed logs for regulatory compliance." }
+        "international": {
+          "title": "International lists",
+          "description": "Screening against OFAC, UN, EU, UK and other global sanctions lists."
+        },
+        "sat69b": {
+          "title": "SAT 69-B List",
+          "description": "Compliance with Mexican regulatory requirements. List of non-compliant taxpayers."
+        },
+        "pep": {
+          "title": "Mexico PEP",
+          "description": "Identification of Politically Exposed Persons per CNBV and UIF regulations."
+        },
+        "relationships": {
+          "title": "Relationship mapping",
+          "description": "Visualize complex networks and uncover hidden connections between entities."
+        },
+        "scoring": {
+          "title": "Risk scoring",
+          "description": "AI-driven risk assessment combining sanctions, PEP and geographic factors."
+        },
+        "audit": {
+          "title": "Audit trail",
+          "description": "Complete investigation history with detailed logs for regulatory compliance."
+        }
       }
     },
     "risk": {
       "badge": "Risk classification",
       "title": "AML/CFT classification system",
       "subtitle": "Four-tier risk classification to prioritize investigations and allocate resources effectively per UIF regulations.",
-      "critical": { "level": "Critical", "title": "Critical risk", "description": "Immediate attention required. Entities with confirmed matches on OFAC/UN sanctions lists.", "examples": ["Exact OFAC match", "SAT 69-B List", "UIF alerts"] },
-      "high": { "level": "High", "title": "High risk", "description": "Close monitoring recommended. PEPs, their close associates, or entities with risky geographic exposure.", "examples": ["Federal-level PEP", "Close associates", "High-risk jurisdictions"] },
-      "medium": { "level": "Medium", "title": "Medium risk", "description": "Standard monitoring. Entities with partial matches or minor connections.", "examples": ["Phonetic match", "Local PEP", "Indirect links"] }
+      "critical": {
+        "level": "Critical",
+        "title": "Critical risk",
+        "description": "Immediate attention required. Entities with confirmed matches on OFAC/UN sanctions lists.",
+        "examples": [
+          "Exact OFAC match",
+          "SAT 69-B List",
+          "UIF alerts"
+        ]
+      },
+      "high": {
+        "level": "High",
+        "title": "High risk",
+        "description": "Close monitoring recommended. PEPs, their close associates, or entities with risky geographic exposure.",
+        "examples": [
+          "Federal-level PEP",
+          "Close associates",
+          "High-risk jurisdictions"
+        ]
+      },
+      "medium": {
+        "level": "Medium",
+        "title": "Medium risk",
+        "description": "Standard monitoring. Entities with partial matches or minor connections.",
+        "examples": [
+          "Phonetic match",
+          "Local PEP",
+          "Indirect links"
+        ]
+      }
     },
     "sources": {
       "title": "Verified data sources",
       "subtitle": "We aggregate data from leading global and local providers to ensure full coverage of the Mexican regulatory framework.",
-      "items": ["OFAC SDN", "UN Consolidated", "EU Sanctions", "UK HMT", "SAT 69-B List", "UIF México", "PEP CNBV", "World-Check", "Adverse Media", "Internal"]
+      "items": [
+        "OFAC SDN",
+        "UN Consolidated",
+        "EU Sanctions",
+        "UK HMT",
+        "SAT 69-B List",
+        "UIF México",
+        "PEP CNBV",
+        "World-Check",
+        "Adverse Media",
+        "Internal"
+      ]
     },
     "cta": {
       "title": "Ready to strengthen your compliance?",
@@ -184,10 +260,31 @@
       "resources": "Resources",
       "regulation": "Regulation",
       "links": {
-        "product": ["Search", "Monitoring", "API", "Integrations"],
-        "legal": ["Terms of Use", "Privacy", "Cookies", "CNBV", "UIF"],
-        "resources": ["Documentation", "Support", "Status", "Security"],
-        "regulation": ["Anti-Money Laundering Law", "Circular 32/2013", "Circular 40/2014", "UIF Criteria"]
+        "product": [
+          "Search",
+          "Monitoring",
+          "API",
+          "Integrations"
+        ],
+        "legal": [
+          "Terms of Use",
+          "Privacy",
+          "Cookies",
+          "CNBV",
+          "UIF"
+        ],
+        "resources": [
+          "Documentation",
+          "Support",
+          "Status",
+          "Security"
+        ],
+        "regulation": [
+          "Anti-Money Laundering Law",
+          "Circular 32/2013",
+          "Circular 40/2014",
+          "UIF Criteria"
+        ]
       },
       "rights": "© 2024 Sentinel PLD. AML/CFT compliance system."
     }

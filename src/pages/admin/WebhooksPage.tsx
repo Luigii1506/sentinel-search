@@ -349,7 +349,9 @@ function CreateWebhookDialog({
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm text-foreground font-medium font-mono">{ev.id}</div>
-                    <div className="text-xs text-muted-foreground">{ev.description}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {t(`account.webhooks.events.${ev.id.replace(/\./g, '_')}.description`)}
+                    </div>
                   </div>
                 </label>
               ))}

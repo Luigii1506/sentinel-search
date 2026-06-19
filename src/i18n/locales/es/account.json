@@ -216,6 +216,24 @@
     "copyTitle": "Copiar",
     "validateNote": "Para validar el origen del request en tu endpoint:",
     "done": "Listo",
-    "copyFirst": "Copia el secret primero"
+    "copyFirst": "Copia el secret primero",
+    "events": {
+      "screening_critical_match": {
+        "label": "Match crítico",
+        "description": "Una búsqueda devolvió al menos un match con risk_level=critical."
+      },
+      "screening_high_match": {
+        "label": "Match alto",
+        "description": "Una búsqueda devolvió al menos un match con risk_level=high."
+      },
+      "source_sync_complete": {
+        "label": "Source sync OK",
+        "description": "Una fuente terminó de sincronizar exitosamente."
+      },
+      "source_sync_failed": {
+        "label": "Source sync falló",
+        "description": "Una fuente falló durante la sincronización."
+      }
+    }
   }
 }

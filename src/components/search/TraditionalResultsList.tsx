@@ -32,7 +32,7 @@ import {
 import { ProvenanceTooltip } from "@/components/search/ProvenanceTooltip";
 import { RiskBadges } from "@/components/search/RiskBadges";
 import { MatchExplanation } from "@/components/search/MatchExplanation";
-import { cn, getRiskColor, getEntityTypeLabel, humanizeEntityName } from "@/lib/utils";
+import { cn, getRiskColor, getEntityTypeLabel, getCountryName, humanizeEntityName } from "@/lib/utils";
 import type { EntityType } from "@/types";
 import type { ScreeningMatch } from "@/types/api";
 
@@ -226,44 +226,6 @@ const COUNTRY_FLAGS: Record<string, string> = {
   AU: "\u{1F1E6}\u{1F1FA}",
   JP: "\u{1F1EF}\u{1F1F5}",
   IN: "\u{1F1EE}\u{1F1F3}",
-};
-
-const COUNTRY_NAMES: Record<string, string> = {
-  MX: "México",
-  US: "EE.UU.",
-  BR: "Brasil",
-  CO: "Colombia",
-  UY: "Uruguay",
-  AR: "Argentina",
-  CL: "Chile",
-  PE: "Perú",
-  VE: "Venezuela",
-  PA: "Panamá",
-  GB: "Reino Unido",
-  ES: "España",
-  FR: "Francia",
-  DE: "Alemania",
-  IT: "Italia",
-  RU: "Rusia",
-  CN: "China",
-  JP: "Japón",
-  IN: "India",
-  CA: "Canadá",
-  AU: "Australia",
-  CU: "Cuba",
-  BO: "Bolivia",
-  PY: "Paraguay",
-  EC: "Ecuador",
-  IR: "Irán",
-  KP: "Corea del Norte",
-  SY: "Siria",
-  AF: "Afganistán",
-  TR: "Turquía",
-  UA: "Ucrania",
-  NG: "Nigeria",
-  ZA: "Sudáfrica",
-  NL: "Países Bajos",
-  EU: "Unión Europea",
 };
 
 const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
@@ -596,7 +558,7 @@ function SearchResultCard({
                     {entity.nationalities_display && entity.nationalities_display.length > 0 ? (
                       <>{countryFlag} {entity.nationalities_display.join(", ")}</>
                     ) : country ? (
-                      <>{countryFlag} {COUNTRY_NAMES[country] || country}</>
+                      <>{countryFlag} {getCountryName(country)}</>
                     ) : "—"}
                   </p>
                 </div>
@@ -620,7 +582,7 @@ function SearchResultCard({
                     <div className="bg-card px-3 py-2.5 col-span-2">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{t("components.search.card.nationalities")}</p>
                       <p className="text-sm text-foreground font-medium mt-0.5">
-                        {entity.nationalities.map((n: string) => `${COUNTRY_FLAGS[n] || ""} ${COUNTRY_NAMES[n] || n}`).join("  ·  ")}
+                        {entity.nationalities.map((n: string) => `${COUNTRY_FLAGS[n] || ""} ${getCountryName(n)}`).join("  ·  ")}
                       </p>
                     </div>
                   )}

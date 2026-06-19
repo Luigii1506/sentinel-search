@@ -1,90 +1,124 @@
-export const entityTypeLabelExtended: Record<string, string> = {
-  person: 'Persona',
-  individual: 'Persona',
-  legalentity: 'Entidad legal',
-  legal_entity: 'Entidad legal',
-  company: 'Empresa',
-  organization: 'Organización',
-  vehicle: 'Vehículo',
-  vessel: 'Embarcación',
-  aircraft: 'Aeronave',
-  asset: 'Activo',
-  security: 'Valor',
-  contract: 'Contrato',
-  publicbody: 'Organismo público',
-  public_body: 'Organismo público',
-  event: 'Evento',
-  unknown: 'Relacionado',
-};
+import i18n from '@/i18n';
 
-const relationshipSubtypeLabels: Record<string, string> = {
-  associate: 'Asociado',
-  associateof: 'Asociado',
-  family: 'Familiar',
-  familymember: 'Familiar',
-  spouse: 'Cónyuge',
-  wife: 'Esposa',
-  husband: 'Esposo',
-  child: 'Hijo o hija',
-  son: 'Hijo',
-  daughter: 'Hija',
-  parent: 'Padre o madre',
-  father: 'Padre',
-  mother: 'Madre',
-  sibling: 'Hermano o hermana',
-  brother: 'Hermano',
-  sister: 'Hermana',
-  cousin: 'Primo o prima',
-  uncle: 'Tío',
-  aunt: 'Tía',
-  partner: 'Socio o pareja',
-  colleague: 'Colaborador',
-  coworker: 'Colaborador',
-  employee: 'Empleado',
-  employer: 'Empleador',
-  owner: 'Propietario',
-  director: 'Director',
-  shareholder: 'Accionista',
-  member: 'Miembro',
-  founder: 'Fundador',
-  successor: 'Sucesor',
-  predecessor: 'Predecesor',
-  subordinate: 'Subordinado',
-  superior: 'Superior jerárquico',
-  political: 'Vínculo político',
-  politicalally: 'Aliado político',
-  ally: 'Aliado',
-  allyof: 'Aliado',
-  associatepolitical: 'Asociado político',
-  organization: 'Relación organizacional',
-  affiliation: 'Afiliación',
-  ownership: 'Propiedad',
-  controller: 'Controlador',
-  representative: 'Representante',
-  sanctions: 'Relación sancionatoria',
-  profile: 'Contexto de perfil',
-  profilecontext: 'Contexto de perfil',
-};
+/**
+ * Llaves estables de tipo de entidad extendido. La traducción visible se
+ * resuelve vía i18n (`entity.typeExtended.<type>`); estas llaves no contienen
+ * texto traducido.
+ */
+const EXTENDED_ENTITY_TYPE_KEYS = new Set([
+  'person',
+  'individual',
+  'legalentity',
+  'legal_entity',
+  'company',
+  'organization',
+  'vehicle',
+  'vessel',
+  'aircraft',
+  'asset',
+  'security',
+  'contract',
+  'publicbody',
+  'public_body',
+  'event',
+  'unknown',
+]);
+
+/**
+ * Etiqueta localizada para un tipo de entidad extendido.
+ * Cae a "Relacionado" (entity.relationships.subtype.related) cuando el tipo
+ * no está reconocido o no tiene traducción específica.
+ */
+export function getEntityTypeLabelExtended(type?: string | null): string {
+  const key = (type || '').toLowerCase();
+  const fallback = i18n.t('entity.relationships.subtype.related', { defaultValue: 'Relacionado' });
+  if (!EXTENDED_ENTITY_TYPE_KEYS.has(key)) return fallback;
+  return i18n.t(`entity.typeExtended.${key}`, { defaultValue: fallback });
+}
+
+/**
+ * Llaves estables de subtipo de relación (desacopladas de la traducción).
+ * El subtipo entrante se normaliza a una de estas llaves; el texto visible
+ * sale de `entity.relationships.subtype.<key>`.
+ */
+const RELATIONSHIP_SUBTYPE_KEYS = new Set([
+  'associate',
+  'associateof',
+  'family',
+  'familymember',
+  'spouse',
+  'wife',
+  'husband',
+  'child',
+  'son',
+  'daughter',
+  'parent',
+  'father',
+  'mother',
+  'sibling',
+  'brother',
+  'sister',
+  'cousin',
+  'uncle',
+  'aunt',
+  'partner',
+  'colleague',
+  'coworker',
+  'employee',
+  'employer',
+  'owner',
+  'director',
+  'shareholder',
+  'member',
+  'founder',
+  'successor',
+  'predecessor',
+  'subordinate',
+  'superior',
+  'political',
+  'politicalally',
+  'ally',
+  'allyof',
+  'associatepolitical',
+  'organization',
+  'affiliation',
+  'ownership',
+  'controller',
+  'representative',
+  'sanctions',
+  'profile',
+  'profilecontext',
+]);
 
 export function translateSubtype(subtype?: string | null): string {
-  if (!subtype) return 'Relacionado';
+  if (!subtype) return i18n.t('entity.relationships.subtype.related', { defaultValue: 'Relacionado' });
 
   const normalized = subtype
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[̀-ͯ]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
   const compact = normalized.replace(/\s+/g, '');
 
-  if (relationshipSubtypeLabels[compact]) return relationshipSubtypeLabels[compact];
-  if (relationshipSubtypeLabels[normalized]) return relationshipSubtypeLabels[normalized];
-
-  return normalized
+  // Fallback: capitaliza palabras desconocidas (comportamiento previo).
+  const capitalizedFallback = normalized
     .split(' ')
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+
+  const matchedKey = RELATIONSHIP_SUBTYPE_KEYS.has(compact)
+    ? compact
+    : RELATIONSHIP_SUBTYPE_KEYS.has(normalized)
+      ? normalized
+      : null;
+
+  if (matchedKey) {
+    return i18n.t(`entity.relationships.subtype.${matchedKey}`, { defaultValue: capitalizedFallback });
+  }
+
+  return capitalizedFallback;
 }
 
 export function getReferenceRelationshipSection(rel: {
@@ -97,6 +131,10 @@ export function getReferenceRelationshipSection(rel: {
   return 'other';
 }
 
+/**
+ * Resumen localizado de una relación de referencia (o null si no aplica).
+ * Devuelve una llave estable resuelta vía `entity.relationships.summary.<key>`.
+ */
 export function getReferenceRelationshipSummary(rel: {
   type: string;
   subtype?: string;
@@ -104,16 +142,23 @@ export function getReferenceRelationshipSummary(rel: {
   const type = rel.type?.toLowerCase();
   const subtype = rel.subtype?.toLowerCase();
 
-  if (type === 'membership' && subtype === 'education') return 'Estudió en esta institución';
-  if (type === 'political' && subtype === 'member') return 'Miembro de este partido';
-  if (type === 'membership' && subtype === 'member') return 'Miembro de esta organización';
-  if (type === 'professional') return 'Vínculo profesional con esta entidad';
-  if (type === 'representation') return 'Representación vinculada a esta entidad';
-  if (type === 'sanction') return 'Relación sancionatoria con esta entidad';
+  let key: string | null = null;
+  if (type === 'membership' && subtype === 'education') key = 'education';
+  else if (type === 'political' && subtype === 'member') key = 'partyMember';
+  else if (type === 'membership' && subtype === 'member') key = 'orgMember';
+  else if (type === 'professional') key = 'professional';
+  else if (type === 'representation') key = 'representation';
+  else if (type === 'sanction') key = 'sanction';
 
-  return null;
+  if (!key) return null;
+  return i18n.t(`entity.relationships.summary.${key}`);
 }
 
+/**
+ * Devuelve una LLAVE ESTABLE de subgrupo (no texto traducido). El componente
+ * que renderiza resuelve la etiqueta visible vía
+ * `entity.relationships.subgroup.<key>`.
+ */
 export function getRelationshipSubgroup(
   rel: { type: string; subtype?: string; related_entity_type?: string },
   sectionKey: string,
@@ -125,97 +170,97 @@ export function getRelationshipSubgroup(
   const has = (...values: string[]): boolean => values.some((value) => subtype.includes(value));
 
   if (referenceLike) {
-    if (type === 'membership' && subtype === 'education') return 'Educación';
-    if (type === 'political' || (type === 'membership' && subtype === 'member')) return 'Afiliación y membresía';
-    if (type === 'representation') return 'Representación';
-    if (type === 'directorship' || type === 'occupancy' || type === 'professional' || type === 'employment') return 'Cargos y funciones';
-    if (relatedType === 'individual' || relatedType === 'person') return 'Personas vinculadas';
-    if (relatedType === 'organization' || relatedType === 'company' || relatedType === 'legalentity') return 'Organizaciones vinculadas';
-    return 'Otras conexiones';
+    if (type === 'membership' && subtype === 'education') return 'education';
+    if (type === 'political' || (type === 'membership' && subtype === 'member')) return 'affiliation';
+    if (type === 'representation') return 'representation';
+    if (type === 'directorship' || type === 'occupancy' || type === 'professional' || type === 'employment') return 'positions';
+    if (relatedType === 'individual' || relatedType === 'person') return 'linkedPeople';
+    if (relatedType === 'organization' || relatedType === 'company' || relatedType === 'legalentity') return 'linkedOrgs';
+    return 'other';
   }
 
   switch (sectionKey) {
     case 'family':
-      if (has('wife', 'husband', 'spouse', 'partner', 'significant other', 'fiance', 'fiancé', 'fiancée', 'cohabitant')) return 'Pareja';
-      if (has('son', 'daughter', 'child', 'stepson', 'stepdaughter', 'godson', 'goddaughter')) return 'Hijos';
-      if (has('father', 'mother', 'parent', 'stepfather', 'stepmother', 'godfather', 'godmother', 'godparent')) return 'Padres';
-      if (has('brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'stepbrother', 'stepsister')) return 'Hermanos';
-      if (has('grand', 'uncle', 'aunt', 'nephew', 'niece', 'cousin', 'in-law')) return 'Familia extendida';
-      return 'Otros familiares';
+      if (has('wife', 'husband', 'spouse', 'partner', 'significant other', 'fiance', 'fiancé', 'fiancée', 'cohabitant')) return 'partner';
+      if (has('son', 'daughter', 'child', 'stepson', 'stepdaughter', 'godson', 'goddaughter')) return 'children';
+      if (has('father', 'mother', 'parent', 'stepfather', 'stepmother', 'godfather', 'godmother', 'godparent')) return 'parents';
+      if (has('brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'stepbrother', 'stepsister')) return 'siblings';
+      if (has('grand', 'uncle', 'aunt', 'nephew', 'niece', 'cousin', 'in-law')) return 'extendedFamily';
+      return 'otherFamily';
     case 'associates':
-      if (has('business partner', 'partner')) return 'Socios';
-      if (has('advisor', 'agent', 'representative', 'nominee', 'appointee')) return 'Operadores y representantes';
-      return 'Asociados';
+      if (has('business partner', 'partner')) return 'partners';
+      if (has('advisor', 'agent', 'representative', 'nominee', 'appointee')) return 'operators';
+      return 'associates';
     case 'corporate':
-      if (type === 'beneficial_ownership' || has('owner', 'shareholder', 'beneficiary', 'founder', 'parent_company', 'subsidiary')) return 'Propiedad y control';
-      if (type === 'directorship' || has('director', 'board_member', 'chairman', 'ceo', 'cfo', 'coo', 'secretary', 'treasurer')) return 'Dirección y consejo';
-      if (type === 'employment' || has('employee', 'manager')) return 'Empleo';
-      if (type === 'membership' || has('member')) return 'Membresías';
-      return 'Otras corporativas';
+      if (type === 'beneficial_ownership' || has('owner', 'shareholder', 'beneficiary', 'founder', 'parent_company', 'subsidiary')) return 'ownership';
+      if (type === 'directorship' || has('director', 'board_member', 'chairman', 'ceo', 'cfo', 'coo', 'secretary', 'treasurer')) return 'board';
+      if (type === 'employment' || has('employee', 'manager')) return 'employment';
+      if (type === 'membership' || has('member')) return 'memberships';
+      return 'otherCorporate';
     case 'political':
-      if (type === 'political' || has('member')) return 'Partidos y militancia';
-      if (type === 'representation' || has('representative', 'agent', 'nominee', 'appointee')) return 'Representación';
-      if (type === 'occupancy' || has('advisor')) return 'Cargos y función pública';
-      return 'Otras políticas';
+      if (type === 'political' || has('member')) return 'parties';
+      if (type === 'representation' || has('representative', 'agent', 'nominee', 'appointee')) return 'representation';
+      if (type === 'occupancy' || has('advisor')) return 'publicOffice';
+      return 'otherPolitical';
     case 'sanctions':
-      return 'Vínculos sancionatorios';
+      return 'sanctions';
     case 'profile':
-      if (has('education')) return 'Educación';
-      return 'Perfil y trayectoria';
+      if (has('education')) return 'education';
+      return 'profileTrajectory';
     default:
-      return 'Vínculos adicionales';
+      return 'other';
   }
 }
 
-export function getRelationshipSubgroupPriority(sectionKey: string, subgroupLabel: string, referenceLike: boolean): number {
+export function getRelationshipSubgroupPriority(sectionKey: string, subgroupKey: string, referenceLike: boolean): number {
   const referencePriority: Record<string, number> = {
-    'Personas vinculadas': 10,
-    'Educación': 20,
-    'Afiliación y membresía': 30,
-    'Cargos y funciones': 40,
-    'Representación': 50,
-    'Organizaciones vinculadas': 60,
-    'Otras conexiones': 90,
+    linkedPeople: 10,
+    education: 20,
+    affiliation: 30,
+    positions: 40,
+    representation: 50,
+    linkedOrgs: 60,
+    other: 90,
   };
 
   const sectionPriority: Record<string, Record<string, number>> = {
     family: {
-      'Pareja': 10,
-      'Hijos': 20,
-      'Padres': 30,
-      'Hermanos': 40,
-      'Familia extendida': 50,
-      'Otros familiares': 90,
+      partner: 10,
+      children: 20,
+      parents: 30,
+      siblings: 40,
+      extendedFamily: 50,
+      otherFamily: 90,
     },
     associates: {
-      'Socios': 10,
-      'Operadores y representantes': 20,
-      'Asociados': 90,
+      partners: 10,
+      operators: 20,
+      associates: 90,
     },
     corporate: {
-      'Propiedad y control': 10,
-      'Dirección y consejo': 20,
-      'Empleo': 30,
-      'Membresías': 40,
-      'Otras corporativas': 90,
+      ownership: 10,
+      board: 20,
+      employment: 30,
+      memberships: 40,
+      otherCorporate: 90,
     },
     political: {
-      'Cargos y función pública': 10,
-      'Representación': 20,
-      'Partidos y militancia': 30,
-      'Otras políticas': 90,
+      publicOffice: 10,
+      representation: 20,
+      parties: 30,
+      otherPolitical: 90,
     },
     sanctions: {
-      'Vínculos sancionatorios': 10,
+      sanctions: 10,
     },
     profile: {
-      'Educación': 10,
-      'Perfil y trayectoria': 90,
+      education: 10,
+      profileTrajectory: 90,
     },
   };
 
-  if (referenceLike) return referencePriority[subgroupLabel] ?? 999;
-  return sectionPriority[sectionKey]?.[subgroupLabel] ?? 999;
+  if (referenceLike) return referencePriority[subgroupKey] ?? 999;
+  return sectionPriority[sectionKey]?.[subgroupKey] ?? 999;
 }
 
 export function getReferenceRelationshipSortScore(rel: {

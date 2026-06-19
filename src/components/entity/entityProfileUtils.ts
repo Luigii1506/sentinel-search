@@ -1,22 +1,19 @@
 import type { EntityProfile } from '@/services/entities';
 import type { APIEntity, APIPepEntry } from '@/types/api';
+import { getCountryName } from '@/lib/utils';
 
-export const countryNames: Record<string, string> = {
-  MX: 'México', US: 'Estados Unidos', BR: 'Brasil', CO: 'Colombia', UY: 'Uruguay',
-  AR: 'Argentina', CL: 'Chile', PE: 'Perú', VE: 'Venezuela', PA: 'Panamá',
-  GB: 'Reino Unido', ES: 'España', FR: 'Francia', DE: 'Alemania', IT: 'Italia',
-  RU: 'Rusia', CN: 'China', JP: 'Japón', KR: 'Corea del Sur', IN: 'India',
-  CA: 'Canadá', AU: 'Australia', CU: 'Cuba', NI: 'Nicaragua', BO: 'Bolivia',
-  PY: 'Paraguay', EC: 'Ecuador', GT: 'Guatemala', HN: 'Honduras', SV: 'El Salvador',
-  CR: 'Costa Rica', DO: 'Rep. Dominicana', HT: 'Haití', JM: 'Jamaica',
-  AE: 'Emiratos Árabes', SA: 'Arabia Saudita', IR: 'Irán', IQ: 'Irak',
-  SY: 'Siria', LB: 'Líbano', IL: 'Israel', TR: 'Turquía', UA: 'Ucrania',
-  BY: 'Bielorrusia', KP: 'Corea del Norte', MM: 'Myanmar', AF: 'Afganistán',
-  PK: 'Pakistán', NG: 'Nigeria', ZA: 'Sudáfrica', KE: 'Kenia', ET: 'Etiopía',
-  CD: 'RD Congo', SD: 'Sudán', LY: 'Libia', SO: 'Somalia', YE: 'Yemen',
-  NL: 'Países Bajos', BE: 'Bélgica', CH: 'Suiza', AT: 'Austria', PT: 'Portugal',
-  SE: 'Suecia', NO: 'Noruega', PL: 'Polonia', CZ: 'Chequia', RO: 'Rumania',
-};
+/**
+ * Localized código→nombre de país, resuelto en tiempo real vía Intl.DisplayNames
+ * (sigue el idioma activo de la UI). Se expone como un objeto indexable para
+ * mantener compatibilidad con los consumidores existentes (`countryNames[code]`),
+ * pero NO contiene un mapa hardcodeado en español.
+ */
+export const countryNames: Record<string, string> = new Proxy(
+  {},
+  {
+    get: (_target, prop: string | symbol) => (typeof prop === 'string' ? getCountryName(prop) : undefined),
+  }
+) as Record<string, string>;
 
 const sourceDisplayNames: Record<string, string> = {
   OS_DEFAULT: 'Wikidata',

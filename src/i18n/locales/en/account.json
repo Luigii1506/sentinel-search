@@ -216,6 +216,24 @@
     "copyTitle": "Copy",
     "validateNote": "To validate the origin of the request at your endpoint:",
     "done": "Done",
-    "copyFirst": "Copy the secret first"
+    "copyFirst": "Copy the secret first",
+    "events": {
+      "screening_critical_match": {
+        "label": "Critical match",
+        "description": "A search returned at least one match with risk_level=critical."
+      },
+      "screening_high_match": {
+        "label": "High match",
+        "description": "A search returned at least one match with risk_level=high."
+      },
+      "source_sync_complete": {
+        "label": "Source sync OK",
+        "description": "A source finished syncing successfully."
+      },
+      "source_sync_failed": {
+        "label": "Source sync failed",
+        "description": "A source failed during sync."
+      }
+    }
   }
 }

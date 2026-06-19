@@ -1,4 +1,38 @@
 {
+  "search": {
+    "title": "Búsqueda de Entidades",
+    "description": "Screening contra listas de sanciones, PEPs, debarments y adverse media.",
+    "filtersTitle": "Filtros",
+    "entityTypeLabel": "Tipo de Entidad",
+    "riskLevelLabel": "Nivel de Riesgo",
+    "dataSourceLabel": "Fuente de Datos",
+    "engineLabel": "Motor:",
+    "engineClassic": "Clásico",
+    "engineClassicTooltip": "Búsqueda clásica: BM25 fuzzy sobre nombres + fonética",
+    "engineIntelligent": "✨ Inteligente (ML)",
+    "engineIntelligentTooltip": "Inteligente (default): scoring ML híbrido + multi-script (Latín↔Cirílico↔Chino↔Árabe) + provenance per-propiedad",
+    "engineMlBadgeTooltip": "Esta búsqueda usa nomenklatura.DefaultAlgorithm + BM25 hybrid + transliteración ICU",
+    "searching": "Buscando...",
+    "semanticResultsCount": "{{count}} resultados semánticos",
+    "resultsCount": "{{count}} resultados",
+    "queryContext": "para \"{{query}}\" • modo {{mode}}",
+    "modeSemantic": "semántico",
+    "modeTraditional": "tradicional",
+    "emptyTitle": "No se encontraron resultados",
+    "emptyDescription": "Intenta con otros términos de búsqueda o ajusta los filtros.",
+    "newSearch": "Nueva búsqueda",
+    "suggestedTitle": "Búsquedas Sugeridas",
+    "alertCreated": "Alerta creada: {{caseNumber}}",
+    "alertError": "Error al crear alerta",
+    "suggestions": {
+      "ofac": "Listas de sanciones OFAC",
+      "pep": "Personas Políticamente Expuestas",
+      "company": "Empresas en listas de control",
+      "vessel": "Embarcaciones sancionadas",
+      "offshore": "Empresas en paraísos fiscales",
+      "terrorism": "Vinculados a actividades terroristas"
+    }
+  },
   "bulk": {
     "title": "Screening masivo",
     "description": "Screening masivo de nombres contra la base de datos.",

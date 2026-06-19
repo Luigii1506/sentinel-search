@@ -435,7 +435,7 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
         'transition-[width] duration-200',
         collapsed ? 'w-[60px]' : 'w-[240px]',
       )}
-      aria-label="Navegación principal"
+      aria-label={t('sidebar.mainNav')}
     >
       <SidebarBody collapsed={collapsed} onToggleCommand={onToggleCommand} />
 
@@ -506,7 +506,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
         variant="ghost"
         size="icon"
         onClick={onToggleCommand}
-        aria-label="Abrir búsqueda"
+        aria-label={t('sidebar.openSearch')}
       >
         <Search className="w-4.5 h-4.5" />
       </Button>

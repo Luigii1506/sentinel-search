@@ -46,7 +46,8 @@
         "UBO": "UBO",
         "LEGAL": "Legal",
         "MEDIA": "Media"
-      }
+      },
+      "evidenceClose": "Close evidence panel"
     },
     "search": {
       "placeholder": "Search a person, company or concept...",

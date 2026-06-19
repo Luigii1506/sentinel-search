@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -74,6 +75,7 @@ function FilterPanel({
     sources: string[];
   }) => void;
 }) {
+  const { t } = useTranslation();
   const entityTypes: EntityType[] = [
     "person",
     "company",
@@ -126,7 +128,7 @@ function FilterPanel({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
           <Filter className="w-4 h-4" />
-          Filtros
+          {t("workspace.search.filtersTitle")}
         </h3>
         {hasFilters && (
           <Button
@@ -135,7 +137,7 @@ function FilterPanel({
             onClick={clearFilters}
             className="text-xs text-muted-foreground hover:text-foreground"
           >
-            Limpiar
+            {t("common.actions.clear")}
           </Button>
         )}
       </div>
@@ -143,7 +145,7 @@ function FilterPanel({
       {/* Entity Types */}
       <div>
         <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
-          Tipo de Entidad
+          {t("workspace.search.entityTypeLabel")}
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {entityTypes.map((type) => {
@@ -173,7 +175,7 @@ function FilterPanel({
       {/* Risk Levels */}
       <div>
         <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
-          Nivel de Riesgo
+          {t("workspace.search.riskLevelLabel")}
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {riskLevels.map((level) => {
@@ -197,13 +199,7 @@ function FilterPanel({
                   className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-600 dark:text-blue-500 focus:ring-blue-500/20"
                 />
                 <span className={cn("text-xs sm:text-sm capitalize", colors[level])}>
-                  {level === "critical"
-                    ? "Crítico"
-                    : level === "high"
-                      ? "Alto"
-                      : level === "medium"
-                        ? "Medio"
-                        : "Bajo"}
+                  {t(`common.risk.${level}`)}
                 </span>
               </motion.label>
             );
@@ -214,7 +210,7 @@ function FilterPanel({
       {/* Sources */}
       <div>
         <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
-          Fuente de Datos
+          {t("workspace.search.dataSourceLabel")}
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {sources.map((source) => (
@@ -239,6 +235,7 @@ function FilterPanel({
 }
 
 export function SearchPage() {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialQuery = searchParams.get("q") || "";
@@ -339,13 +336,13 @@ export function SearchPage() {
         risk_score: result.risk_score ?? 50,
         sources: result.sources || [],
       });
-      alert(`Alerta creada: ${resp.case_number}`);
+      alert(t("workspace.search.alertCreated", { caseNumber: resp.case_number }));
     } catch (err: unknown) {
       const msg =
         err && typeof err === "object" && "response" in err
           ? (err as { response?: { data?: { detail?: string } } }).response
-              ?.data?.detail || "Error al crear alerta"
-          : "Error al crear alerta";
+              ?.data?.detail || t("workspace.search.alertError")
+          : t("workspace.search.alertError");
       alert(msg);
     } finally {
       setAlertCreating(null);
@@ -365,8 +362,8 @@ export function SearchPage() {
   return (
     <AppPage>
         <PageHeader
-          title="Búsqueda de Entidades"
-          description="Screening contra listas de sanciones, PEPs, debarments y adverse media."
+          title={t("workspace.search.title")}
+          description={t("workspace.search.description")}
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
               <SearchIcon className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
@@ -401,7 +398,7 @@ export function SearchPage() {
           />
           {/* Engine toggle: v1 legacy hybrid vs v2 nomenklatura ML multi-script */}
           <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
-            <span>Motor:</span>
+            <span>{t("workspace.search.engineLabel")}</span>
             <button
               type="button"
               onClick={() => {
@@ -418,9 +415,9 @@ export function SearchPage() {
                   ? "bg-blue-500/20 border-blue-400 text-blue-200"
                   : "border-foreground/10 text-muted-foreground hover:bg-foreground/5",
               )}
-              title="Búsqueda clásica: BM25 fuzzy sobre nombres + fonética"
+              title={t("workspace.search.engineClassicTooltip")}
             >
-              Clásico
+              {t("workspace.search.engineClassic")}
             </button>
             <button
               type="button"
@@ -437,14 +434,14 @@ export function SearchPage() {
                   ? "bg-purple-500/20 border-purple-400 text-purple-200"
                   : "border-foreground/10 text-muted-foreground hover:bg-foreground/5",
               )}
-              title="Inteligente (default): scoring ML híbrido + multi-script (Latín↔Cirílico↔Chino↔Árabe) + provenance per-propiedad"
+              title={t("workspace.search.engineIntelligentTooltip")}
             >
-              ✨ Inteligente (ML)
+              {t("workspace.search.engineIntelligent")}
             </button>
             {engine === "v2" && (
               <span
                 className="ml-2 px-2 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-200 text-[10px] uppercase tracking-wide"
-                title="Esta búsqueda usa nomenklatura.DefaultAlgorithm + BM25 hybrid + transliteración ICU"
+                title={t("workspace.search.engineMlBadgeTooltip")}
               >
                 ML
               </span>
@@ -470,7 +467,7 @@ export function SearchPage() {
                     className="w-full gap-2 border-foreground/10"
                   >
                     <Filter className="w-4 h-4" />
-                    Filtros
+                    {t("workspace.search.filtersTitle")}
                     {activeFilterCount > 0 && (
                       <Badge className="bg-blue-500 text-white ml-2">
                         {activeFilterCount}
@@ -501,17 +498,24 @@ export function SearchPage() {
                   <div>
                     <h2 className="text-lg font-medium text-foreground">
                       {isLoading
-                        ? "Buscando..."
+                        ? t("workspace.search.searching")
                         : searchMode === "semantic"
-                          ? `${results.length} resultados semánticos`
-                          : `${results.length} resultados`}
+                          ? t("workspace.search.semanticResultsCount", {
+                              count: results.length,
+                            })
+                          : t("workspace.search.resultsCount", {
+                              count: results.length,
+                            })}
                     </h2>
                     {query && (
                       <p className="text-sm text-muted-foreground">
-                        para &quot;{query}&quot; • modo{" "}
-                        {searchMode === "semantic"
-                          ? "semántico"
-                          : "tradicional"}
+                        {t("workspace.search.queryContext", {
+                          query,
+                          mode:
+                            searchMode === "semantic"
+                              ? t("workspace.search.modeSemantic")
+                              : t("workspace.search.modeTraditional"),
+                        })}
                       </p>
                     )}
                   </div>
@@ -524,7 +528,7 @@ export function SearchPage() {
                       className="text-muted-foreground hover:text-foreground"
                     >
                       <X className="w-4 h-4 mr-1" />
-                      Limpiar
+                      {t("common.actions.clear")}
                     </Button>
                   )}
                 </div>
@@ -591,15 +595,15 @@ export function SearchPage() {
                     <motion.div {...fadeUp}>
                       <EmptyState
                         icon={FileSearch}
-                        title="No se encontraron resultados"
-                        description="Intenta con otros términos de búsqueda o ajusta los filtros."
+                        title={t("workspace.search.emptyTitle")}
+                        description={t("workspace.search.emptyDescription")}
                         action={
                           <Button
                             onClick={clearSearch}
                             variant="outline"
                             className="border-foreground/10"
                           >
-                            Nueva búsqueda
+                            {t("workspace.search.newSearch")}
                           </Button>
                         }
                       />
@@ -618,38 +622,38 @@ export function SearchPage() {
             className="mt-12"
           >
             <h2 className="text-lg font-medium text-foreground mb-6">
-              Búsquedas Sugeridas
+              {t("workspace.search.suggestedTitle")}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {[
                 {
                   query: "OFAC",
-                  description: "Listas de sanciones OFAC",
+                  description: t("workspace.search.suggestions.ofac"),
                   icon: Shield,
                 },
                 {
                   query: "PEP",
-                  description: "Personas Políticamente Expuestas",
+                  description: t("workspace.search.suggestions.pep"),
                   icon: Flag,
                 },
                 {
                   query: "empresa",
-                  description: "Empresas en listas de control",
+                  description: t("workspace.search.suggestions.company"),
                   icon: Building2,
                 },
                 {
                   query: "buque",
-                  description: "Embarcaciones sancionadas",
+                  description: t("workspace.search.suggestions.vessel"),
                   icon: Ship,
                 },
                 {
                   query: "offshore",
-                  description: "Empresas en paraísos fiscales",
+                  description: t("workspace.search.suggestions.offshore"),
                   icon: AlertCircle,
                 },
                 {
                   query: "terrorismo",
-                  description: "Vinculados a actividades terroristas",
+                  description: t("workspace.search.suggestions.terrorism"),
                   icon: AlertCircle,
                 },
               ].map((item, index) => (
