@@ -133,7 +133,7 @@ function FilterPanel({
             variant="ghost"
             size="sm"
             onClick={clearFilters}
-            className="text-xs text-gray-400 hover:text-foreground"
+            className="text-xs text-muted-foreground hover:text-foreground"
           >
             Limpiar
           </Button>
@@ -142,7 +142,7 @@ function FilterPanel({
 
       {/* Entity Types */}
       <div>
-        <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+        <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
           Tipo de Entidad
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
@@ -158,10 +158,10 @@ function FilterPanel({
                   type="checkbox"
                   checked={filters.entityTypes.includes(type)}
                   onChange={() => toggleEntityType(type)}
-                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
+                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-600 dark:text-blue-500 focus:ring-blue-500/20"
                 />
-                <EIcon className="w-4 h-4 text-gray-500" />
-                <span className="text-xs sm:text-sm text-gray-300 capitalize">
+                <EIcon className="w-4 h-4 text-muted-foreground" />
+                <span className="text-xs sm:text-sm text-muted-foreground capitalize">
                   {getEntityTypeLabel(type)}
                 </span>
               </motion.label>
@@ -172,17 +172,17 @@ function FilterPanel({
 
       {/* Risk Levels */}
       <div>
-        <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+        <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
           Nivel de Riesgo
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
           {riskLevels.map((level) => {
             const colors: Record<string, string> = {
-              critical: "text-red-400",
-              high: "text-orange-400",
-              medium: "text-yellow-400",
-              low: "text-green-400",
-              none: "text-gray-400",
+              critical: "text-red-600 dark:text-red-400",
+              high: "text-orange-700 dark:text-orange-400",
+              medium: "text-yellow-700 dark:text-yellow-400",
+              low: "text-green-700 dark:text-green-400",
+              none: "text-muted-foreground",
             };
             return (
               <motion.label
@@ -194,7 +194,7 @@ function FilterPanel({
                   type="checkbox"
                   checked={filters.riskLevels.includes(level)}
                   onChange={() => toggleRiskLevel(level)}
-                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
+                  className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-600 dark:text-blue-500 focus:ring-blue-500/20"
                 />
                 <span className={cn("text-xs sm:text-sm capitalize", colors[level])}>
                   {level === "critical"
@@ -213,7 +213,7 @@ function FilterPanel({
 
       {/* Sources */}
       <div>
-        <h4 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+        <h4 className="text-xs text-muted-foreground uppercase tracking-wider mb-3">
           Fuente de Datos
         </h4>
         <div className="grid grid-cols-2 gap-2 sm:space-y-2 sm:block">
@@ -227,9 +227,9 @@ function FilterPanel({
                 type="checkbox"
                 checked={filters.sources.includes(source)}
                 onChange={() => toggleSource(source)}
-                className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-500 focus:ring-blue-500/20"
+                className="w-4 h-4 rounded border-foreground/20 bg-foreground/5 text-blue-600 dark:text-blue-500 focus:ring-blue-500/20"
               />
-              <span className="text-xs sm:text-sm text-gray-300">{source}</span>
+              <span className="text-xs sm:text-sm text-muted-foreground">{source}</span>
             </motion.label>
           ))}
         </div>
@@ -369,7 +369,7 @@ export function SearchPage() {
           description="Screening contra listas de sanciones, PEPs, debarments y adverse media."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
-              <SearchIcon className="w-6 h-6 text-electric-400" aria-hidden="true" />
+              <SearchIcon className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
             </div>
           }
           actions={<SemanticSearchToggle mode={searchMode} onChange={handleModeChange} />}
@@ -400,7 +400,7 @@ export function SearchPage() {
             className="mt-3"
           />
           {/* Engine toggle: v1 legacy hybrid vs v2 nomenklatura ML multi-script */}
-          <div className="mt-3 flex items-center gap-2 text-xs text-gray-300 flex-wrap">
+          <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
             <span>Motor:</span>
             <button
               type="button"
@@ -416,7 +416,7 @@ export function SearchPage() {
                 "px-3 py-1 rounded-full border transition",
                 engine === "v1"
                   ? "bg-blue-500/20 border-blue-400 text-blue-200"
-                  : "border-foreground/10 text-gray-400 hover:bg-foreground/5",
+                  : "border-foreground/10 text-muted-foreground hover:bg-foreground/5",
               )}
               title="Búsqueda clásica: BM25 fuzzy sobre nombres + fonética"
             >
@@ -435,7 +435,7 @@ export function SearchPage() {
                 "px-3 py-1 rounded-full border transition flex items-center gap-1",
                 engine === "v2"
                   ? "bg-purple-500/20 border-purple-400 text-purple-200"
-                  : "border-foreground/10 text-gray-400 hover:bg-foreground/5",
+                  : "border-foreground/10 text-muted-foreground hover:bg-foreground/5",
               )}
               title="Inteligente (default): scoring ML híbrido + multi-script (Latín↔Cirílico↔Chino↔Árabe) + provenance per-propiedad"
             >
@@ -507,7 +507,7 @@ export function SearchPage() {
                           : `${results.length} resultados`}
                     </h2>
                     {query && (
-                      <p className="text-sm text-gray-400">
+                      <p className="text-sm text-muted-foreground">
                         para &quot;{query}&quot; • modo{" "}
                         {searchMode === "semantic"
                           ? "semántico"
@@ -521,7 +521,7 @@ export function SearchPage() {
                       variant="ghost"
                       size="sm"
                       onClick={clearSearch}
-                      className="text-gray-400 hover:text-foreground"
+                      className="text-muted-foreground hover:text-foreground"
                     >
                       <X className="w-4 h-4 mr-1" />
                       Limpiar
@@ -663,11 +663,11 @@ export function SearchPage() {
                 >
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                      <item.icon className="w-5 h-5 text-blue-400" />
+                      <item.icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                     </div>
                     <span className="font-medium text-foreground">{item.query}</span>
                   </div>
-                  <p className="text-sm text-gray-400">{item.description}</p>
+                  <p className="text-sm text-muted-foreground">{item.description}</p>
                 </motion.button>
               ))}
             </div>

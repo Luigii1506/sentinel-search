@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Loader2, Filter, Sparkles } from 'lucide-react';
+import { Search, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,44 +26,27 @@ interface IntelligentSearchProps {
   sourceLevel?: 1 | 2 | 3 | 4 | 5;
 }
 
-const entityTypeFilters = [
-  { value: 'person', label: 'Personas' },
-  { value: 'company', label: 'Empresas' },
-  { value: 'vessel', label: 'Embarcaciones' },
-  { value: 'aircraft', label: 'Aeronaves' },
-  { value: 'organization', label: 'Organizaciones' },
-];
-
-const riskLevelFilters = [
-  { value: 'critical', label: 'Crítico' },
-  { value: 'high', label: 'Alto' },
-  { value: 'medium', label: 'Medio' },
-  { value: 'low', label: 'Bajo' },
-];
-
 export function IntelligentSearch({
   onSearch,
   onSelectResult,
   className,
   size = 'default',
-  placeholder = 'Buscar personas, empresas, o identificadores...',
+  placeholder,
   autoFocus = false,
   initialQuery = '',
   sourceLevel,
 }: IntelligentSearchProps) {
+  const { t } = useTranslation();
   const {
     query,
     suggestions,
     isLoading,
-    filters,
     setQuery,
-    setFilters,
     executeSearch,
     clearSearch,
   } = useScreening(sourceLevel);
 
   const [isFocused, setIsFocused] = useState(false);
-  const [showFilters, setShowFilters] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   // Initialize query from URL param
@@ -121,29 +105,13 @@ export function IntelligentSearch({
     setIsFocused(false);
   };
 
-  const toggleEntityTypeFilter = (type: string) => {
-    const newTypes = filters.entityTypes.includes(type)
-      ? filters.entityTypes.filter((t) => t !== type)
-      : [...filters.entityTypes, type];
-    setFilters({ ...filters, entityTypes: newTypes });
-  };
-
-  const toggleRiskLevelFilter = (level: string) => {
-    const newLevels = filters.riskLevels.includes(level)
-      ? filters.riskLevels.filter((l) => l !== level)
-      : [...filters.riskLevels, level];
-    setFilters({ ...filters, riskLevels: newLevels });
-  };
-
-  const activeFilterCount = filters.entityTypes.length + filters.riskLevels.length;
-
   return (
     <div ref={containerRef} className={cn('relative w-full', className)}>
       {/* Search Input Container */}
       <motion.div
         className={cn(
           'relative glass rounded-2xl transition-all duration-300',
-          isFocused && 'ring-2 ring-blue-500/50 shadow-lg shadow-blue-500/10',
+          isFocused && 'ring-2 ring-primary/45 shadow-[0_8px_50px_-12px] shadow-primary/40',
           size === 'large' ? 'p-2' : 'p-1.5'
         )}
         initial={false}
@@ -152,148 +120,58 @@ export function IntelligentSearch({
         }}
         transition={{ duration: 0.2 }}
       >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          {/* Search Icon */}
-          <div className="hidden sm:flex items-center justify-center w-10 h-10 rounded-xl bg-foreground/5">
+        <div className="flex items-center gap-2 pl-3 sm:pl-4">
+          {/* Leading search / loading icon */}
+          <div className="flex items-center justify-center shrink-0 text-muted-foreground">
             {isLoading ? (
-              <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+              <Loader2 className={cn('animate-spin text-blue-600 dark:text-blue-400', size === 'large' ? 'w-5 h-5' : 'w-4 h-4')} />
             ) : (
-              <Search className="w-5 h-5 text-gray-400" />
+              <Search className={cn(size === 'large' ? 'w-5 h-5' : 'w-4 h-4')} />
             )}
           </div>
 
-          <div className="flex w-full items-center gap-2 rounded-xl bg-foreground/[0.03] px-3 py-2 sm:flex-1 sm:bg-transparent sm:px-0 sm:py-0">
-            <div className="flex sm:hidden items-center justify-center w-9 h-9 rounded-xl bg-foreground/5 shrink-0">
-              {isLoading ? (
-                <Loader2 className="w-4 h-4 text-blue-400 animate-spin" />
-              ) : (
-                <Search className="w-4 h-4 text-gray-400" />
-              )}
-            </div>
-
-            <Input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onFocus={() => setIsFocused(true)}
-              onKeyDown={handleKeyDown}
-              placeholder={placeholder}
-              autoFocus={autoFocus}
-              className={cn(
-                'min-w-0 flex-1 bg-transparent border-0 px-0 text-foreground placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0',
-                size === 'large' ? 'text-base sm:text-lg h-11 sm:h-12' : 'text-base h-10'
-              )}
-            />
-
-            {query && (
-              <motion.button
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                onClick={() => {
-                  clearSearch();
-                  inputRef.current?.focus();
-                }}
-                className="p-2 rounded-lg hover:bg-foreground/10 transition-colors shrink-0"
-              >
-                <X className="w-4 h-4 text-gray-400" />
-              </motion.button>
+          <Input
+            ref={inputRef}
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder ?? t('search.placeholder')}
+            autoFocus={autoFocus}
+            className={cn(
+              'min-w-0 flex-1 bg-transparent border-0 pl-3 pr-0 text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0',
+              size === 'large' ? 'text-base sm:text-lg h-11 sm:h-12' : 'text-base h-10'
             )}
-          </div>
+          />
 
-          <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className={cn(
-                'w-full gap-2 rounded-xl hover:bg-foreground/10',
-                showFilters && 'bg-foreground/10'
-              )}
+          {query && (
+            <button
+              type="button"
+              onClick={() => {
+                clearSearch();
+                inputRef.current?.focus();
+              }}
+              aria-label={t('search.clear')}
+              className="p-2 rounded-lg hover:bg-foreground/10 transition-colors shrink-0"
             >
-              <Filter className="w-4 h-4" />
-              <span>Filtros</span>
-              {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="bg-blue-500 text-white">
-                  {activeFilterCount}
-                </Badge>
-              )}
-            </Button>
-
-            <Button
-              onClick={handleSearch}
-              className={cn(
-                'btn-primary w-full gap-2 rounded-xl',
-                size === 'large' ? 'px-4 sm:px-6 py-3' : 'px-4 py-2'
-              )}
-            >
-              <Sparkles className="w-4 h-4" />
-              Buscar
-            </Button>
-          </div>
-        </div>
-
-        {/* Filters Panel */}
-        <AnimatePresence>
-          {showFilters && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden"
-            >
-              <div className="pt-4 pb-2 border-t border-foreground/10 mt-3 space-y-4">
-                {/* Entity Types */}
-                <div>
-                  <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
-                    Tipo de Entidad
-                  </span>
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                    {entityTypeFilters.map(({ value, label }) => (
-                      <button
-                        key={value}
-                        onClick={() => toggleEntityTypeFilter(value)}
-                        className={cn(
-                          'w-full sm:w-auto px-3 py-2 rounded-lg text-sm transition-all duration-200 border text-center',
-                          filters.entityTypes.includes(value)
-                            ? 'bg-blue-500/20 border-blue-500/50 text-blue-400'
-                            : 'bg-foreground/5 border-foreground/10 text-gray-400 hover:bg-foreground/10'
-                        )}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Risk Levels */}
-                <div>
-                  <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
-                    Nivel de Riesgo
-                  </span>
-                  <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-                    {riskLevelFilters.map(({ value, label }) => (
-                      <button
-                        key={value}
-                        onClick={() => toggleRiskLevelFilter(value)}
-                        className={cn(
-                          'w-full sm:w-auto px-3 py-2 rounded-lg text-sm transition-all duration-200 border text-center',
-                          filters.riskLevels.includes(value)
-                            ? getRiskBgColor(value)
-                            : 'bg-foreground/5 border-foreground/10 text-gray-400 hover:bg-foreground/10'
-                        )}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
           )}
-        </AnimatePresence>
+
+          {/* Search action — integrated inside the field */}
+          <Button
+            onClick={handleSearch}
+            aria-label={t('search.button')}
+            className={cn(
+              'btn-primary shrink-0 gap-2 rounded-xl',
+              size === 'large' ? 'h-11 sm:h-12 px-4 sm:px-5' : 'h-9 px-4'
+            )}
+          >
+            <Search className="w-4 h-4" />
+            <span className="hidden sm:inline">{t('search.button')}</span>
+          </Button>
+        </div>
       </motion.div>
 
       {/* Suggestions Dropdown */}
@@ -307,8 +185,8 @@ export function IntelligentSearch({
             className="absolute top-full left-0 right-0 mt-2 glass rounded-xl overflow-hidden z-50 shadow-2xl"
           >
             <div className="p-2">
-              <div className="px-3 py-2 text-xs text-gray-500 uppercase tracking-wider">
-                Sugerencias
+              <div className="px-3 py-2 text-xs text-muted-foreground uppercase tracking-wider">
+                {t('search.suggestions')}
               </div>
               {suggestions.map((suggestion, index) => (
                 <motion.button
@@ -347,17 +225,17 @@ export function IntelligentSearch({
                         {suggestion.risk_level}
                       </Badge>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <span>{getEntityTypeLabel(suggestion.entity_type)}</span>
                       {suggestion.nationalities && suggestion.nationalities.length > 0 && (
                         <>
-                          <span className="text-gray-600">•</span>
+                          <span className="text-muted-foreground">•</span>
                           <span>{suggestion.nationalities[0]}</span>
                         </>
                       )}
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {Math.round(suggestion.match_score || 0)}% coincidencia
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {t('search.match', { score: Math.round(suggestion.match_score || 0) })}
                     </div>
                   </div>
 
@@ -380,12 +258,12 @@ export function IntelligentSearch({
             </div>
 
             {/* Footer */}
-            <div className="px-4 py-2 bg-foreground/5 border-t border-foreground/10 text-xs text-gray-500 flex items-center justify-between">
-              <span>Presiona Enter para buscar</span>
+            <div className="px-4 py-2 bg-foreground/5 border-t border-foreground/10 text-xs text-muted-foreground flex items-center justify-between">
+              <span>{t('search.pressEnter')}</span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400">↑</kbd>
-                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400">↓</kbd>
-                para navegar
+                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-muted-foreground">↑</kbd>
+                <kbd className="px-1.5 py-0.5 rounded bg-foreground/10 text-muted-foreground">↓</kbd>
+                {t('search.navigate')}
               </span>
             </div>
           </motion.div>

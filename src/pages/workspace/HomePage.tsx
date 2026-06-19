@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -6,21 +7,18 @@ import {
   Search,
   FileCheck,
   CheckCircle,
-  Sparkles,
   BarChart3,
   Network,
   AlertTriangle,
   Users,
   Building2,
   Globe,
-  Database,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { IntelligentSearch } from '@/components/search/IntelligentSearch';
-import { SourceLevelSelector } from '@/components/SourceLevelSelector';
-import { MetricCard } from '@/components/foundation';
+import { CountUp, GridBackdrop } from '@/components/foundation';
 import { useDashboard } from '@/hooks/useDashboard';
 import { cn, formatCompactNumber } from '@/lib/utils';
 import { fadeUp } from '@/lib/motion';
@@ -44,13 +42,13 @@ function FeatureCard({
       viewport={{ once: true, margin: '-50px' }}
       transition={{ delay, duration: 0.5, ease: "easeOut" }}
       whileHover={{ y: -5, transition: { duration: 0.2 } }}
-      className="glass rounded-xl p-6 card-hover group"
+      className="glass rounded-xl p-6 card-hover group transition-all duration-300 hover:border-primary/30 hover:shadow-[0_14px_48px_-18px] hover:shadow-primary/30"
     >
       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-        <Icon className="w-6 h-6 text-blue-400" />
+        <Icon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
       </div>
       <h3 className="text-lg font-semibold text-foreground mb-2">{title}</h3>
-      <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+      <p className="text-muted-foreground text-sm leading-relaxed">{description}</p>
     </motion.div>
   );
 }
@@ -90,10 +88,10 @@ function RiskLevelCard({
         </span>
       </div>
       <h3 className="text-xl font-semibold text-foreground mb-3">{title}</h3>
-      <p className="text-gray-400 text-sm mb-4">{description}</p>
+      <p className="text-muted-foreground text-sm mb-4">{description}</p>
       <ul className="space-y-1">
         {examples.map((example) => (
-          <li key={example} className="flex items-center gap-2 text-xs text-gray-500">
+          <li key={example} className="flex items-center gap-2 text-xs text-muted-foreground">
             <CheckCircle className="w-3 h-3 flex-shrink-0" />
             {example}
           </li>
@@ -111,8 +109,8 @@ function DataSourceBadge({ name, isMexican = false }: { name: string; isMexican?
       className={cn(
         'px-4 py-2 rounded-lg border text-sm transition-all cursor-pointer',
         isMexican
-          ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20'
-          : 'bg-foreground/5 border-foreground/10 text-gray-300 hover:bg-foreground/10 hover:text-foreground'
+          ? 'bg-green-500/10 border-green-500/30 text-green-700 dark:text-green-400 hover:bg-green-500/20'
+          : 'bg-foreground/5 border-foreground/10 text-muted-foreground hover:bg-foreground/10 hover:text-foreground'
       )}
     >
       {name}
@@ -121,13 +119,27 @@ function DataSourceBadge({ name, isMexican = false }: { name: string; isMexican?
 }
 
 export function HomePage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
   
   const { stats, isLoading } = useDashboard();
-  const [sourceLevel, setSourceLevel] = useState<1 | 2 | 3 | 4 | 5>(2);
+  // Home searches use a focused default (sanctions + enforcement), NOT the
+  // full catalog. Users refine coverage on the results page.
+  const sourceLevel: 1 | 2 | 3 | 4 | 5 = 2;
+
+  // Cursor-following spotlight in the hero. We write CSS vars straight to
+  // the DOM node on mousemove (no React re-render per frame).
+  const spotlightRef = useRef<HTMLDivElement>(null);
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const el = spotlightRef.current;
+    if (!el) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    el.style.setProperty('--mx', `${e.clientX - rect.left}px`);
+    el.style.setProperty('--my', `${e.clientY - rect.top}px`);
+  };
 
   const handleSearch = (query: string) => {
     navigate(`/search?q=${encodeURIComponent(query)}&source_level=${sourceLevel}`);
@@ -138,16 +150,26 @@ export function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative min-h-screen bg-background">
+      {/* Full-page grid backdrop — spans the entire page (all sections). */}
+      <GridBackdrop />
+      <div className="relative z-10">
       {/* Hero Section */}
       <motion.section
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background"
+        onMouseMove={handleHeroMouseMove}
+        className="group relative min-h-screen flex items-center justify-center overflow-hidden"
       >
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
+        {/* Cursor spotlight — fades in on hover, follows the pointer */}
+        <div
+          ref={spotlightRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+          style={{ background: 'radial-gradient(480px circle at var(--mx, 50%) var(--my, 50%), hsl(var(--primary) / 0.10), transparent 45%)' }}
+        />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent" aria-hidden="true" />
         <div className="absolute -left-16 top-24 h-72 w-72 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
         <div className="absolute -right-20 bottom-24 h-80 w-80 rounded-full border border-emerald-400/10 bg-emerald-500/5 blur-3xl" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.04]" aria-hidden="true" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)', backgroundSize: '72px 72px' }} />
 
         <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -156,11 +178,13 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-foreground/5 border border-foreground/10 mb-6"
+              className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-foreground/5 border border-foreground/10 mb-6"
             >
-              <Sparkles className="w-4 h-4 text-green-400" />
-              <span className="text-sm text-gray-300">Cumplimiento PLD/FT México</span>
-              <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-[10px]">v2.0</Badge>
+              <span className="relative flex h-2 w-2" aria-hidden="true">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              <span className="text-sm font-medium text-muted-foreground">{t('home.badge')}</span>
             </motion.div>
 
             {/* Headline */}
@@ -168,14 +192,10 @@ export function HomePage() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight"
+              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight tracking-tight"
             >
-              Cumplimiento{' '}
-              <span className="text-gradient">PLD/FT</span>
-              <br />
-              <span className="text-2xl sm:text-3xl lg:text-4xl font-normal text-gray-400">
-                Inteligencia de Riesgo
-              </span>
+              {t('home.headlineLead')}{' '}
+              <span className="text-gradient">{t('home.headlineAccent')}</span>
             </motion.h1>
 
             {/* Subheadline */}
@@ -183,10 +203,9 @@ export function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto mb-10"
+              className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8"
             >
-              Sistema de verificación contra listas de sanciones internacionales y locales. 
-              Cumple con las regulaciones de la <strong>UIF</strong>, <strong>SAT 69-B</strong> y <strong>CNBV</strong>.
+              {t('home.subheadline')}
             </motion.p>
 
             {/* Search Component */}
@@ -204,159 +223,99 @@ export function HomePage() {
               />
             </motion.div>
 
-            <div className="mt-4 flex justify-center">
-              <SourceLevelSelector value={sourceLevel} onChange={setSourceLevel} />
-            </div>
-
-            {/* Quick Tags */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8 }}
-              className="flex flex-wrap justify-center gap-2 mt-6"
-            >
-              <span className="text-sm text-gray-500">Búsquedas populares:</span>
-              {['OFAC', 'Lista 69-B SAT', 'PEP México', 'Empresas offshore'].map((tag, i) => (
-                <motion.button
-                  key={tag}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.9 + i * 0.1 }}
-                  onClick={() => handleSearch(tag)}
-                  className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  {tag}
-                </motion.button>
-              ))}
-            </motion.div>
           </div>
 
-          {/* Floating Stats */}
+          {/* Hero stats — inline, centered (no cards) */}
           <motion.div
             {...fadeUp}
             transition={{ delay: 1, duration: 0.6 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-16"
+            className="mt-14 flex flex-wrap items-start justify-center gap-x-12 gap-y-8 sm:gap-x-16"
           >
-            {isLoading ? (
-              <>
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="glass rounded-xl p-4 space-y-2">
-                    <Skeleton className="h-4 w-24" />
-                    <Skeleton className="h-8 w-20" />
-                  </div>
-                ))}
-              </>
-            ) : (
-              <>
-                <MetricCard
-                  label="Entidades"
-                  value={`${formatCompactNumber(stats?.total_entities || 33583)}+`}
-                  icon={Shield}
-                  className="glass"
-                />
-                <MetricCard
-                  label="Fuentes de datos"
-                  value={6}
-                  icon={Database}
-                  className="glass"
-                />
-                <MetricCard
-                  label="Uptime SLA"
-                  value="99.9"
-                  unit="%"
-                  icon={CheckCircle}
-                  accent="success"
-                  className="glass"
-                />
-                <MetricCard
-                  label="Respuesta"
-                  value="<50"
-                  unit="ms"
-                  icon={Search}
-                  className="glass"
-                />
-              </>
-            )}
+            {(isLoading
+              ? [null, null, null, null]
+              : [
+                  { node: <CountUp to={stats?.total_entities || 33583} format={formatCompactNumber} suffix="+" />, label: t('home.stats.entities') },
+                  { node: <CountUp to={6} />, label: t('home.stats.sources') },
+                  { node: <CountUp to={99.9} format={(v) => v.toFixed(1)} suffix="%" />, label: t('home.stats.uptime') },
+                  { node: <CountUp to={50} prefix="<" suffix="ms" />, label: t('home.stats.response') },
+                ]
+            ).map((stat, i) => (
+              <div key={stat?.label ?? i} className="flex flex-col items-center gap-2 min-w-[88px]">
+                {stat ? (
+                  <>
+                    <div className="text-3xl sm:text-4xl font-bold text-foreground tabular-nums">
+                      {stat.node}
+                    </div>
+                    <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  </>
+                ) : (
+                  <>
+                    <Skeleton className="h-9 w-24" />
+                    <Skeleton className="h-4 w-20" />
+                  </>
+                )}
+              </div>
+            ))}
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-6 h-10 rounded-full border-2 border-foreground/20 flex items-start justify-center p-2"
-          >
-            <motion.div
-              animate={{ opacity: [1, 0.3, 1] }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-1.5 h-1.5 rounded-full bg-foreground/50"
-            />
-          </motion.div>
-        </motion.div>
       </motion.section>
 
       {/* Features Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             {...fadeUp}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 mb-4">
-              Características
+            <Badge className="bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30 mb-4">
+              {t('home.features.badge')}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Evaluación Integral de Riesgo
+              {t('home.features.title')}
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Nuestra plataforma combina múltiples fuentes de datos y análisis impulsado por IA 
-              para entregar perfiles de riesgo completos en tiempo real.
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t('home.features.subtitle')}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
               icon={Globe}
-              title="Listas Internacionales"
-              description="Verificación contra OFAC, ONU, UE, Reino Unido y otras listas de sanciones globales."
+              title={t('home.features.items.international.title')}
+              description={t('home.features.items.international.description')}
               delay={0}
             />
             <FeatureCard
               icon={Building2}
-              title="Lista 69-B SAT"
-              description="Cumplimiento con requisitos regulatorios mexicanos. Lista de contribuyentes incumplidos."
+              title={t('home.features.items.sat69b.title')}
+              description={t('home.features.items.sat69b.description')}
               delay={0.1}
             />
             <FeatureCard
               icon={Users}
-              title="PEP México"
-              description="Identificación de Personas Políticamente Expuestas según normativa CNBV y UIF."
+              title={t('home.features.items.pep.title')}
+              description={t('home.features.items.pep.description')}
               delay={0.2}
             />
             <FeatureCard
               icon={Network}
-              title="Mapeo de Relaciones"
-              description="Visualiza redes complejas y descubre conexiones ocultas entre entidades."
+              title={t('home.features.items.relationships.title')}
+              description={t('home.features.items.relationships.description')}
               delay={0.3}
             />
             <FeatureCard
               icon={BarChart3}
-              title="Scoring de Riesgo"
-              description="Evaluación de riesgo impulsada por IA combinando sanciones, PEP y factores geográficos."
+              title={t('home.features.items.scoring.title')}
+              description={t('home.features.items.scoring.description')}
               delay={0.4}
             />
             <FeatureCard
               icon={FileCheck}
-              title="Audit Trail"
-              description="Historial completo de investigaciones con registros detallados para cumplimiento regulatorio."
+              title={t('home.features.items.audit.title')}
+              description={t('home.features.items.audit.description')}
               delay={0.5}
             />
           </div>
@@ -364,48 +323,47 @@ export function HomePage() {
       </section>
 
       {/* Risk Classification Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             {...fadeUp}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12"
           >
-            <Badge className="bg-red-500/20 text-red-400 border-red-500/30 mb-4">
-              Clasificación de Riesgo
+            <Badge className="bg-red-500/20 text-red-600 dark:text-red-400 border-red-500/30 mb-4">
+              {t('home.risk.badge')}
             </Badge>
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Sistema de Clasificación PLD/FT
+              {t('home.risk.title')}
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Clasificación de riesgo de cuatro niveles para priorizar investigaciones 
-              y asignar recursos efectivamente según normativa UIF.
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t('home.risk.subtitle')}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <RiskLevelCard
-              level="Crítico"
-              title="Riesgo Crítico"
-              description="Atención inmediata requerida. Entidades con coincidencias confirmadas en listas de sanciones OFAC/ONU."
-              examples={['Coincidencia exacta OFAC', 'Lista 69-B SAT', 'Alertas UIF']}
+              level={t('home.risk.critical.level')}
+              title={t('home.risk.critical.title')}
+              description={t('home.risk.critical.description')}
+              examples={t('home.risk.critical.examples', { returnObjects: true }) as string[]}
               color="border-red-500"
               delay={0}
             />
             <RiskLevelCard
-              level="Alto"
-              title="Riesgo Alto"
-              description="Monitoreo cercano recomendado. PEPs, sus asociados cercanos, o entidades con exposición geográfica de riesgo."
-              examples={['PEP nivel federal', 'Asociados cercanos', 'Jurisdicciones de riesgo']}
+              level={t('home.risk.high.level')}
+              title={t('home.risk.high.title')}
+              description={t('home.risk.high.description')}
+              examples={t('home.risk.high.examples', { returnObjects: true }) as string[]}
               color="border-orange-500"
               delay={0.15}
             />
             <RiskLevelCard
-              level="Medio"
-              title="Riesgo Medio"
-              description="Monitoreo estándar. Entidades con coincidencias parciales o conexiones menores."
-              examples={['Coincidencia fonética', 'PEP local', 'Vínculos indirectos']}
+              level={t('home.risk.medium.level')}
+              title={t('home.risk.medium.title')}
+              description={t('home.risk.medium.description')}
+              examples={t('home.risk.medium.examples', { returnObjects: true }) as string[]}
               color="border-yellow-500"
               delay={0.3}
             />
@@ -414,7 +372,7 @@ export function HomePage() {
       </section>
 
       {/* Data Sources Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-background">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <motion.div
             {...fadeUp}
@@ -423,11 +381,10 @@ export function HomePage() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Fuentes de Datos Verificadas
+              {t('home.sources.title')}
             </h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Agregamos datos de proveedores líderes globales y locales para asegurar 
-              cobertura completa del marco regulatorio mexicano.
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              {t('home.sources.subtitle')}
             </p>
           </motion.div>
 
@@ -437,39 +394,31 @@ export function HomePage() {
             viewport={{ once: true }}
             className="flex flex-wrap justify-center gap-3"
           >
-            <DataSourceBadge name="OFAC SDN" />
-            <DataSourceBadge name="ONU Consolidada" />
-            <DataSourceBadge name="EU Sanctions" />
-            <DataSourceBadge name="UK HMT" />
-            <DataSourceBadge name="Lista 69-B SAT" isMexican />
-            <DataSourceBadge name="UIF México" isMexican />
-            <DataSourceBadge name="PEP CNBV" isMexican />
-            <DataSourceBadge name="World-Check" />
-            <DataSourceBadge name="Adverse Media" />
-            <DataSourceBadge name="Internal" />
+            {(t('home.sources.items', { returnObjects: true }) as string[]).map((name, i) => (
+              <DataSourceBadge key={i} name={name} isMexican={[4, 5, 6].includes(i)} />
+            ))}
           </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="glass rounded-2xl p-8 sm:p-12 relative overflow-hidden"
+            className="glass rounded-2xl p-8 sm:p-10 relative overflow-hidden"
           >
             {/* Background glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl" />
 
             <div className="relative">
               <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-                ¿Listo para Fortalecer tu Cumplimiento?
+                {t('home.cta.title')}
               </h2>
-              <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-                Únete a sujetos obligados que confían en Sentinel PLD para sus 
-                necesidades de inteligencia de riesgo y prevención de lavado de dinero.
+              <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                {t('home.cta.subtitle')}
               </p>
 
               <div className="flex flex-wrap justify-center gap-4">
@@ -478,14 +427,14 @@ export function HomePage() {
                   className="btn-primary gap-2 text-lg px-8 py-3"
                 >
                   <Search className="w-5 h-5" />
-                  Iniciar Búsqueda
+                  {t('home.cta.start')}
                 </Button>
                 <Button
                   variant="outline"
                   className="gap-2 border-foreground/10 hover:bg-foreground/10 text-lg px-8 py-3"
                 >
                   <FileCheck className="w-5 h-5" />
-                  Ver Reporte Demo
+                  {t('home.cta.demo')}
                 </Button>
               </div>
             </div>
@@ -498,11 +447,11 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
             <div>
-              <h4 className="text-foreground font-semibold mb-4">Producto</h4>
+              <h4 className="text-foreground font-semibold mb-4">{t('home.footer.product')}</h4>
               <ul className="space-y-2">
-                {['Búsqueda', 'Monitoreo', 'API', 'Integraciones'].map((item) => (
+                {(t('home.footer.links.product', { returnObjects: true }) as string[]).map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -510,11 +459,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-foreground font-semibold mb-4">Legal</h4>
+              <h4 className="text-foreground font-semibold mb-4">{t('home.footer.legal')}</h4>
               <ul className="space-y-2">
-                {['Términos de Uso', 'Privacidad', 'Cookies', 'CNBV', 'UIF'].map((item) => (
+                {(t('home.footer.links.legal', { returnObjects: true }) as string[]).map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -522,11 +471,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-foreground font-semibold mb-4">Recursos</h4>
+              <h4 className="text-foreground font-semibold mb-4">{t('home.footer.resources')}</h4>
               <ul className="space-y-2">
-                {['Documentación', 'Soporte', 'Status', 'Seguridad'].map((item) => (
+                {(t('home.footer.links.resources', { returnObjects: true }) as string[]).map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -534,11 +483,11 @@ export function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="text-foreground font-semibold mb-4">Regulación</h4>
+              <h4 className="text-foreground font-semibold mb-4">{t('home.footer.regulation')}</h4>
               <ul className="space-y-2">
-                {['Ley Anti-Lavado', 'Circular 32/2013', 'Circular 40/2014', 'Criterios UIF'].map((item) => (
+                {(t('home.footer.links.regulation', { returnObjects: true }) as string[]).map((item) => (
                   <li key={item}>
-                    <a href="#" className="text-gray-400 hover:text-foreground transition-colors text-sm">
+                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
                       {item}
                     </a>
                   </li>
@@ -554,12 +503,13 @@ export function HomePage() {
               </div>
               <span className="text-foreground font-semibold">Sentinel PLD</span>
             </div>
-            <p className="text-gray-500 text-sm">
-              © 2024 Sentinel PLD. Sistema de Cumplimiento PLD/FT.
+            <p className="text-muted-foreground text-sm">
+              {t('home.footer.rights')}
             </p>
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
