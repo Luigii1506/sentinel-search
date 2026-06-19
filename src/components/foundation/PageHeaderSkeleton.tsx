@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -20,8 +21,9 @@ export function PageHeaderSkeleton({
   showDescription = true,
   className,
 }: PageHeaderSkeletonProps) {
+  const { t } = useTranslation();
   return (
-    <div className={cn('space-y-4', className)} role="status" aria-label="Cargando encabezado">
+    <div className={cn('space-y-4', className)} role="status" aria-label={t('common.states.loading')}>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-3 min-w-0">
           {showIcon && <Skeleton className="h-11 w-11 rounded-xl bg-foreground/10" />}

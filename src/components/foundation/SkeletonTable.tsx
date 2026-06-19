@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -26,10 +27,11 @@ export function SkeletonTable({
   rowHeight = 'h-4',
   className,
 }: SkeletonTableProps) {
+  const { t } = useTranslation();
   return (
     <div
       role="status"
-      aria-label="Cargando datos"
+      aria-label={t('common.states.loading')}
       className={cn('p-4 space-y-3', className)}
     >
       {Array.from({ length: rows }).map((_, i) => (

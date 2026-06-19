@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -17,8 +18,9 @@ export function PanelSkeleton({
   titleWidthClassName = 'w-40',
   lineWidthClassNames,
 }: PanelSkeletonProps) {
+  const { t } = useTranslation();
   return (
-    <div className={cn('glass rounded-xl p-4 space-y-3', className)} role="status" aria-label="Cargando panel">
+    <div className={cn('glass rounded-xl p-4 space-y-3', className)} role="status" aria-label={t('common.states.loading')}>
       <Skeleton className={cn('h-5 bg-foreground/10', titleWidthClassName)} />
       <div className="space-y-2">
         {Array.from({ length: lines }).map((_, i) => (
