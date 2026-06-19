@@ -1,7 +1,7 @@
 /**
  * ResolverReviewPage — Cola de UNSURE pairs para review humano (Fase C).
  */
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AppPage, EmptyState, MetricCard, PageHeader, PanelSkeleton } from '@/components/foundation';
+import { humanizeEntityName, getCountryName } from '@/lib/utils';
 import { toast } from 'sonner';
 
 interface EntitySummary {
@@ -156,10 +157,13 @@ export function ResolverReviewPage() {
               {entityLoading ? (
                 <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={4} />
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <EntityCard entity={leftEnt} id={pair.source} side="A" navigate={navigate} />
-                  <EntityCard entity={rightEnt} id={pair.target} side="B" navigate={navigate} />
-                </div>
+                <EntityComparison
+                  left={leftEnt}
+                  right={rightEnt}
+                  leftId={pair.source}
+                  rightId={pair.target}
+                  navigate={navigate}
+                />
               )}
             </CardContent>
           </Card>
@@ -184,32 +188,108 @@ export function ResolverReviewPage() {
   );
 }
 
-function EntityCard({ entity, id, side, navigate }: { entity: EntitySummary | null; id: string; side: string; navigate: ReturnType<typeof useNavigate>; }) {
-  const { t } = useTranslation();
-  const data: any = entity || { id };
-  const name = data.canonical_name || data?.overview?.canonical_name || `${id.slice(0, 12)}...`;
-  const datasets: string[] = data?.overview?.sources || data?.sources || [];
-  const isPep = data?.overview?.is_current_pep || data?.is_current_pep;
-  const isSanctioned = (data?.overview?.sanctions || data?.sanctions || []).length > 0;
+/** Normaliza un APIEntity (campos reales del backend) a una vista comparable. */
+function extractEntity(e: any) {
+  const sources: string[] = e?.data_sources || e?.sources || e?.overview?.sources || [];
+  return {
+    name: e?.primary_name || e?.display_name || e?.canonical_name || e?.overview?.canonical_name || '',
+    type: (e?.entity_type as string) || '',
+    riskScore: (e?.overall_risk_score ?? e?.risk_score) as number | undefined,
+    riskLevel: (e?.risk_level as string) || '',
+    country: e?.country || (Array.isArray(e?.countries) ? e.countries[0] : '') || '',
+    dob: e?.date_of_birth || e?.birth_date || '',
+    isPep: Boolean(e?.is_current_pep ?? e?.overview?.is_current_pep),
+    isSanctioned: Boolean(e?.is_sanctioned ?? ((e?.sanctions || e?.overview?.sanctions || []).length > 0)),
+    sources,
+  };
+}
 
+const norm = (v: unknown) => String(v ?? '').trim().toLowerCase();
+
+/** Una fila de comparación A vs B con resaltado de coincidencia/conflicto. */
+function CompareRow({ label, a, b }: { label: string; a: ReactNode; b: ReactNode }) {
+  const aKey = norm(typeof a === 'string' ? a : '');
+  const bKey = norm(typeof b === 'string' ? b : '');
+  const both = aKey && bKey;
+  const match = both && aKey === bKey;
+  const conflict = both && aKey !== bKey;
+  const tone = match
+    ? 'bg-green-500/10'
+    : conflict
+      ? 'bg-amber-500/10'
+      : '';
+  const cell = 'px-3 py-2 text-sm';
   return (
-    <div className="rounded-xl border border-foreground/10 bg-foreground/5 p-4">
-      <div className="flex items-start justify-between mb-2">
-        <Badge variant="outline" className="text-xs">{side}</Badge>
+    <div className={`grid grid-cols-[120px_1fr_1fr] items-stretch border-t border-foreground/5 ${tone}`}>
+      <div className={`${cell} text-xs uppercase tracking-wide text-muted-foreground self-center`}>{label}</div>
+      <div className={`${cell} border-l border-foreground/5`}>{a || <span className="text-muted-foreground">—</span>}</div>
+      <div className={`${cell} border-l border-foreground/5`}>{b || <span className="text-muted-foreground">—</span>}</div>
+    </div>
+  );
+}
+
+function RiskCell({ score, level }: { score?: number; level?: string }) {
+  if (score == null && !level) return <span className="text-muted-foreground">—</span>;
+  const cls = level === 'critical' ? 'text-red-600 dark:text-red-400'
+    : level === 'high' ? 'text-orange-600 dark:text-orange-400'
+    : level === 'medium' ? 'text-yellow-600 dark:text-yellow-500'
+    : 'text-muted-foreground';
+  return <span className={`font-medium ${cls}`}>{score ?? '—'}{level ? ` · ${level}` : ''}</span>;
+}
+
+function EntityComparison({ left, right, leftId, rightId, navigate }: {
+  left: EntitySummary | null; right: EntitySummary | null;
+  leftId: string; rightId: string; navigate: ReturnType<typeof useNavigate>;
+}) {
+  const { t } = useTranslation();
+  const a = extractEntity(left);
+  const b = extractEntity(right);
+  const sharedSources = a.sources.filter((s) => b.sources.includes(s));
+
+  const HeaderCell = ({ side, name, id }: { side: string; name: string; id: string }) => (
+    <div className="px-3 py-2 border-l border-foreground/5">
+      <div className="flex items-center justify-between gap-2">
+        <Badge variant="outline" className="text-[10px]">{side}</Badge>
         <button onClick={() => navigate(`/entity/${id}`)} className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
           {t('review.resolver.viewProfile')} <ExternalLink className="h-3 w-3" />
         </button>
       </div>
-      <div className="text-foreground font-medium mb-2">{name}</div>
-      <div className="text-xs text-muted-foreground mb-2 font-mono">{id.slice(0, 16)}...</div>
-      <div className="flex flex-wrap gap-1 mb-2">
-        {isPep && <Badge className="text-xs bg-amber-500/20 text-amber-700 dark:text-amber-300">PEP</Badge>}
-        {isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-600 dark:text-red-300">{t('review.resolver.sanction')}</Badge>}
+      <div className="text-foreground font-semibold mt-1 leading-tight">{humanizeEntityName(name) || <span className="font-mono text-xs text-muted-foreground">{id.slice(0, 12)}…</span>}</div>
+      <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{id.slice(0, 18)}…</div>
+    </div>
+  );
+
+  const flags = (e: ReturnType<typeof extractEntity>) => (
+    <div className="flex flex-wrap gap-1">
+      {e.isPep && <Badge className="text-xs bg-amber-500/20 text-amber-700 dark:text-amber-300">PEP</Badge>}
+      {e.isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-600 dark:text-red-300">{t('review.resolver.sanction')}</Badge>}
+      {!e.isPep && !e.isSanctioned && <span className="text-muted-foreground">—</span>}
+    </div>
+  );
+
+  const sourcesCell = (e: ReturnType<typeof extractEntity>) => (
+    e.sources.length ? (
+      <span className="text-xs">{e.sources.slice(0, 4).join(', ')}{e.sources.length > 4 && ` +${e.sources.length - 4}`}</span>
+    ) : <span className="text-muted-foreground">—</span>
+  );
+
+  return (
+    <div className="rounded-xl border border-foreground/10 overflow-hidden">
+      <div className="grid grid-cols-[120px_1fr_1fr]">
+        <div className="px-3 py-2 text-xs uppercase tracking-wide text-muted-foreground self-center">{t('review.resolver.fieldLabel', { defaultValue: 'Campo' })}</div>
+        <HeaderCell side="A" name={a.name} id={leftId} />
+        <HeaderCell side="B" name={b.name} id={rightId} />
       </div>
-      {datasets.length > 0 && (
-        <div className="text-xs text-muted-foreground">
-          <span className="text-muted-foreground">{t('review.resolver.sources')}:</span> {datasets.slice(0, 5).join(', ')}
-          {datasets.length > 5 && ` +${datasets.length - 5}`}
+      <CompareRow label={t('review.resolver.fieldName', { defaultValue: 'Nombre' })} a={humanizeEntityName(a.name)} b={humanizeEntityName(b.name)} />
+      <CompareRow label={t('review.resolver.fieldType', { defaultValue: 'Tipo' })} a={a.type} b={b.type} />
+      <CompareRow label={t('review.resolver.fieldRisk', { defaultValue: 'Riesgo' })} a={<RiskCell score={a.riskScore} level={a.riskLevel} />} b={<RiskCell score={b.riskScore} level={b.riskLevel} />} />
+      <CompareRow label={t('review.resolver.fieldCountry', { defaultValue: 'País' })} a={getCountryName(a.country)} b={getCountryName(b.country)} />
+      <CompareRow label={t('review.resolver.fieldBirth', { defaultValue: 'Nacimiento' })} a={a.dob} b={b.dob} />
+      <CompareRow label={t('review.resolver.fieldFlags', { defaultValue: 'Señales' })} a={flags(a)} b={flags(b)} />
+      <CompareRow label={t('review.resolver.sources')} a={sourcesCell(a)} b={sourcesCell(b)} />
+      {sharedSources.length > 0 && (
+        <div className="px-3 py-2 border-t border-foreground/5 bg-green-500/5 text-xs text-green-700 dark:text-green-400">
+          {t('review.resolver.sharedSources', { defaultValue: 'Fuentes en común' })}: {sharedSources.slice(0, 6).join(', ')}
         </div>
       )}
     </div>
