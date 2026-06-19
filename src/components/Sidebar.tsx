@@ -13,6 +13,7 @@
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Search,
   LayoutDashboard,
@@ -67,6 +68,7 @@ import { usePermissions, type Role } from '@/hooks/usePermissions';
 import { HealthIndicator } from '@/components/HealthIndicator';
 import { UsageIndicator } from '@/components/UsageIndicator';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 // ────────────────────────────── Nav config ──────────────────────────────
 //
@@ -111,65 +113,67 @@ interface NavGroup {
   items: NavItem[];
 }
 
+// `title` and `label` hold i18n keys (resolved with t() at render), not
+// display strings — so the nav re-localizes when the language switches.
 const NAV: NavGroup[] = [
   {
     // Everyone with an account sees these.
-    title: 'Workspace',
+    title: 'nav.groups.workspace',
     items: [
-      { path: '/',               label: 'Home',           icon: LayoutDashboard, shortcut: 'G H' },
-      { path: '/search',         label: 'Búsqueda',       icon: Search,          shortcut: 'G S' },
-      { path: '/screening/bulk', label: 'Screening masivo', icon: Upload,          shortcut: 'G B', minRole: 'analyst' },
-      { path: '/federated',      label: 'Busqueda federada', icon: Globe,         shortcut: 'G F' },
+      { path: '/',               label: 'nav.home',           icon: LayoutDashboard, shortcut: 'G H' },
+      { path: '/search',         label: 'nav.search',         icon: Search,          shortcut: 'G S' },
+      { path: '/screening/bulk', label: 'nav.bulkScreening',  icon: Upload,          shortcut: 'G B', minRole: 'analyst' },
+      { path: '/federated',      label: 'nav.federatedSearch', icon: Globe,          shortcut: 'G F' },
     ],
   },
   {
     // KYC analysts working day-to-day cases.
-    title: 'Compliance',
+    title: 'nav.groups.compliance',
     minRole: 'analyst',
     items: [
-      { path: '/compliance',    label: 'Cases & Watchlist', icon: Shield,    shortcut: 'G C' },
-      { path: '/adverse-media', label: 'Adverse Media',     icon: Newspaper },
+      { path: '/compliance',    label: 'nav.casesWatchlist', icon: Shield,    shortcut: 'G C' },
+      { path: '/adverse-media', label: 'nav.adverseMedia',   icon: Newspaper },
     ],
   },
   {
     // Compliance reviewers / team leads — read-mostly oversight.
-    title: 'Insights',
+    title: 'nav.groups.insights',
     minRole: 'reviewer',
     items: [
-      { path: '/operations',          label: 'Operaciones',  icon: Activity },
-      { path: '/admin/activity-log',  label: 'Registro de actividad', icon: ClipboardList, minRole: 'admin' },
-      { path: '/monitoring',          label: 'Monitoring',   icon: Activity },
-      { path: '/reports',             label: 'Reportes',     icon: BarChart3 },
+      { path: '/operations',          label: 'nav.operations',  icon: Activity },
+      { path: '/admin/activity-log',  label: 'nav.activityLog', icon: ClipboardList, minRole: 'admin' },
+      { path: '/monitoring',          label: 'nav.monitoring',  icon: Activity },
+      { path: '/reports',             label: 'nav.reports',     icon: BarChart3 },
     ],
   },
   {
     // Entity-resolution queues — manual review of edge cases.
-    title: 'Data Review',
+    title: 'nav.groups.dataReview',
     minRole: 'reviewer',
     items: [
-      { path: '/admin/merges',             label: 'Merge Review',      icon: GitMerge },
-      { path: '/admin/resolver-review',    label: 'Revision de resolucion',   icon: GitBranchPlus },
-      { path: '/admin/validation-review',  label: 'Validation Review', icon: ShieldCheck },
+      { path: '/admin/merges',             label: 'nav.mergeReview',      icon: GitMerge },
+      { path: '/admin/resolver-review',    label: 'nav.resolverReview',   icon: GitBranchPlus },
+      { path: '/admin/validation-review',  label: 'nav.validationReview', icon: ShieldCheck },
     ],
   },
   {
     // Data-ops surfaces — sources, health, catalog.
-    title: 'Data Management',
+    title: 'nav.groups.dataManagement',
     minRole: 'admin',
     items: [
-      { path: '/admin/sources',     label: 'Sources Dashboard', icon: Database },
-      { path: '/admin/audit',       label: 'Sources Audit',     icon: FileSearch },
-      { path: '/data/yente-catalog', label: 'Catalogo Yente',    icon: Server },
+      { path: '/admin/sources',      label: 'nav.sourcesDashboard', icon: Database },
+      { path: '/admin/audit',        label: 'nav.sourcesAudit',     icon: FileSearch },
+      { path: '/data/yente-catalog', label: 'nav.yenteCatalog',     icon: Server },
     ],
   },
   {
     // Account / billing / integrations.
-    title: 'System',
+    title: 'nav.groups.system',
     minRole: 'admin',
     items: [
-      { path: '/admin/users',    label: 'Users',    icon: UsersIcon, shortcut: 'G U' },
-      { path: '/admin/api-keys', label: 'API Keys', icon: Key,       shortcut: 'G K' },
-      { path: '/admin/webhooks', label: 'Webhooks', icon: Webhook },
+      { path: '/admin/users',    label: 'nav.users',    icon: UsersIcon, shortcut: 'G U' },
+      { path: '/admin/api-keys', label: 'nav.apiKeys',  icon: Key,       shortcut: 'G K' },
+      { path: '/admin/webhooks', label: 'nav.webhooks', icon: Webhook },
     ],
   },
 ];
@@ -200,11 +204,13 @@ function NavLink({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
+  const { t } = useTranslation();
   const location = useLocation();
   const isActive =
     location.pathname === item.path ||
     (item.path !== '/' && location.pathname.startsWith(item.path));
   const Icon = item.icon;
+  const label = t(item.label);
 
   const content = (
     <Link
@@ -213,13 +219,13 @@ function NavLink({
       className={cn(
         'group flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-sm',
         isActive
-          ? 'bg-primary/10 text-foreground border-l-2 border-brand-electric pl-[10px]'
+          ? 'bg-primary/10 text-foreground border-l-2 border-primary dark:border-brand-electric pl-[10px]'
           : 'text-muted-foreground hover:text-foreground hover:bg-muted',
         collapsed && 'justify-center px-0',
       )}
     >
-      <Icon className={cn('shrink-0 w-4 h-4', isActive && 'text-brand-electric')} aria-hidden="true" />
-      {!collapsed && <span className="truncate">{item.label}</span>}
+      <Icon className={cn('shrink-0 w-4 h-4', isActive && 'text-primary dark:text-brand-electric')} aria-hidden="true" />
+      {!collapsed && <span className="truncate">{label}</span>}
     </Link>
   );
 
@@ -228,7 +234,7 @@ function NavLink({
       <Tooltip delayDuration={300}>
         <TooltipTrigger asChild>{content}</TooltipTrigger>
         <TooltipContent side="right" className="flex items-center gap-2">
-          {item.label}
+          {label}
           {item.shortcut && (
             <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
               {item.shortcut}
@@ -263,6 +269,7 @@ function SidebarBody({
   onNavigate?: () => void;
   onToggleCommand: () => void;
 }) {
+  const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { atLeast } = usePermissions();
 
@@ -302,7 +309,7 @@ function SidebarBody({
           <button
             type="button"
             onClick={onToggleCommand}
-            aria-label="Abrir paleta de comandos"
+            aria-label={t('sidebar.openCommand')}
             className={cn(
               'w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg',
               'bg-muted hover:bg-secondary text-muted-foreground text-sm transition-colors',
@@ -311,7 +318,7 @@ function SidebarBody({
           >
             <div className="flex items-center gap-2 min-w-0">
               <CommandIcon className="w-4 h-4 shrink-0" aria-hidden="true" />
-              {!collapsed && <span className="truncate">Buscar o saltar…</span>}
+              {!collapsed && <span className="truncate">{t('sidebar.commandPalette')}</span>}
             </div>
             {!collapsed && (
               <kbd className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-background text-muted-foreground">
@@ -330,7 +337,7 @@ function SidebarBody({
             <div key={group.title}>
               {/* First group renders without a label so the brand + ⌘K
                   flow naturally into the first nav item. */}
-              {idx > 0 && <SectionLabel collapsed={collapsed}>{group.title}</SectionLabel>}
+              {idx > 0 && <SectionLabel collapsed={collapsed}>{t(group.title)}</SectionLabel>}
               {group.items.map((item) => (
                 <NavLink
                   key={item.path}
@@ -352,6 +359,7 @@ function SidebarBody({
             </div>
           )}
 
+          <LanguageToggle collapsed={collapsed} />
           <ThemeToggle collapsed={collapsed} />
 
           {user && (
@@ -359,7 +367,7 @@ function SidebarBody({
               <DropdownMenuTrigger asChild>
                 <button
                   type="button"
-                  aria-label="Menú de usuario"
+                  aria-label={t('sidebar.userMenu')}
                   className={cn(
                     'w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-muted transition-colors',
                     collapsed && 'justify-center px-0',
@@ -388,13 +396,13 @@ function SidebarBody({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="right" className="w-56">
                 <DropdownMenuLabel className="font-normal">
-                  <div className="text-xs text-muted-foreground">Sesión iniciada como</div>
+                  <div className="text-xs text-muted-foreground">{t('sidebar.signedInAs')}</div>
                   <div className="text-sm font-medium text-foreground truncate">{user.email}</div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout} className="text-red-300 focus:text-red-200">
+                <DropdownMenuItem onClick={logout} className="text-red-600 dark:text-red-300 focus:text-red-200">
                   <LogOut className="mr-2 h-4 w-4" />
-                  Cerrar sesión
+                  {t('sidebar.logout')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -418,6 +426,7 @@ interface SidebarProps {
 /** Desktop sidebar — persistent, fixed-left. Includes the collapse toggle
  *  on the outer edge. State is controlled by the layout. */
 export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: SidebarProps) {
+  const { t } = useTranslation();
   return (
     <aside
       className={cn(
@@ -434,7 +443,7 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
       <button
         type="button"
         onClick={onToggleCollapse}
-        aria-label={collapsed ? 'Expandir sidebar' : 'Contraer sidebar'}
+        aria-label={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}
         className={cn(
           'absolute -right-3 top-20 z-40',
           'w-6 h-6 rounded-full bg-muted border border-border',
@@ -451,6 +460,7 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
 /** Mobile topbar — minimal, hamburger opens the drawer with full sidebar.
  *  collapse props ignored on mobile (the drawer is always full width). */
 export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
@@ -463,7 +473,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
     >
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Abrir menú">
+          <Button variant="ghost" size="icon" aria-label={t('sidebar.openMenu')}>
             <Menu className="w-5 h-5" />
           </Button>
         </SheetTrigger>
@@ -472,7 +482,7 @@ export function TopbarMobile({ onToggleCommand }: { onToggleCommand: () => void 
           className="p-0 w-[280px] bg-sidebar border-r border-sidebar-border"
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Navegación</SheetTitle>
+            <SheetTitle>{t('sidebar.nav')}</SheetTitle>
           </SheetHeader>
           <SidebarBody
             collapsed={false}

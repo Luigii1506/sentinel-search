@@ -1,0 +1,118 @@
+{
+  "common": {
+    "search": "Buscar",
+    "language": "Idioma",
+    "theme": {
+      "light": "Modo claro",
+      "dark": "Modo oscuro",
+      "toLight": "Cambiar a modo claro",
+      "toDark": "Cambiar a modo oscuro"
+    }
+  },
+  "nav": {
+    "groups": {
+      "workspace": "Workspace",
+      "compliance": "Compliance",
+      "insights": "Insights",
+      "dataReview": "Revisión de datos",
+      "dataManagement": "Gestión de datos",
+      "system": "Sistema"
+    },
+    "home": "Inicio",
+    "search": "Búsqueda",
+    "bulkScreening": "Screening masivo",
+    "federatedSearch": "Búsqueda federada",
+    "casesWatchlist": "Casos y watchlist",
+    "adverseMedia": "Adverse Media",
+    "operations": "Operaciones",
+    "activityLog": "Registro de actividad",
+    "monitoring": "Monitoreo",
+    "reports": "Reportes",
+    "mergeReview": "Revisión de merges",
+    "resolverReview": "Revisión de resolución",
+    "validationReview": "Revisión de validación",
+    "sourcesDashboard": "Panel de fuentes",
+    "sourcesAudit": "Auditoría de fuentes",
+    "yenteCatalog": "Catálogo Yente",
+    "users": "Usuarios",
+    "apiKeys": "API Keys",
+    "webhooks": "Webhooks"
+  },
+  "sidebar": {
+    "commandPalette": "Buscar o saltar…",
+    "openCommand": "Abrir paleta de comandos",
+    "userMenu": "Menú de usuario",
+    "signedInAs": "Sesión iniciada como",
+    "logout": "Cerrar sesión",
+    "expand": "Expandir sidebar",
+    "collapse": "Contraer sidebar",
+    "openMenu": "Abrir menú",
+    "nav": "Navegación"
+  },
+  "search": {
+    "placeholder": "Buscar personas, empresas, o identificadores...",
+    "button": "Buscar",
+    "clear": "Limpiar búsqueda",
+    "suggestions": "Sugerencias",
+    "match": "{{score}}% coincidencia",
+    "pressEnter": "Presiona Enter para buscar",
+    "navigate": "para navegar"
+  },
+  "home": {
+    "badge": "Live · Screening en tiempo real",
+    "headlineLead": "Conoce el riesgo",
+    "headlineAccent": "antes de que importe",
+    "subheadline": "Screening instantáneo de personas y empresas contra listas de sanciones globales, bases de PEP, antecedentes y medios adversos — con auditoría completa. Cumplimiento PLD/FT alineado a UIF, SAT 69-B y CNBV.",
+    "stats": {
+      "entities": "Entidades",
+      "sources": "Fuentes de datos",
+      "uptime": "Uptime SLA",
+      "response": "Respuesta"
+    },
+    "features": {
+      "badge": "Características",
+      "title": "Evaluación integral de riesgo",
+      "subtitle": "Nuestra plataforma combina múltiples fuentes de datos y análisis impulsado por IA para entregar perfiles de riesgo completos en tiempo real.",
+      "items": {
+        "international": { "title": "Listas internacionales", "description": "Verificación contra OFAC, ONU, UE, Reino Unido y otras listas de sanciones globales." },
+        "sat69b": { "title": "Lista 69-B SAT", "description": "Cumplimiento con requisitos regulatorios mexicanos. Lista de contribuyentes incumplidos." },
+        "pep": { "title": "PEP México", "description": "Identificación de Personas Políticamente Expuestas según normativa CNBV y UIF." },
+        "relationships": { "title": "Mapeo de relaciones", "description": "Visualiza redes complejas y descubre conexiones ocultas entre entidades." },
+        "scoring": { "title": "Scoring de riesgo", "description": "Evaluación de riesgo impulsada por IA combinando sanciones, PEP y factores geográficos." },
+        "audit": { "title": "Audit trail", "description": "Historial completo de investigaciones con registros detallados para cumplimiento regulatorio." }
+      }
+    },
+    "risk": {
+      "badge": "Clasificación de riesgo",
+      "title": "Sistema de clasificación PLD/FT",
+      "subtitle": "Clasificación de riesgo de cuatro niveles para priorizar investigaciones y asignar recursos efectivamente según normativa UIF.",
+      "critical": { "level": "Crítico", "title": "Riesgo crítico", "description": "Atención inmediata requerida. Entidades con coincidencias confirmadas en listas de sanciones OFAC/ONU.", "examples": ["Coincidencia exacta OFAC", "Lista 69-B SAT", "Alertas UIF"] },
+      "high": { "level": "Alto", "title": "Riesgo alto", "description": "Monitoreo cercano recomendado. PEPs, sus asociados cercanos, o entidades con exposición geográfica de riesgo.", "examples": ["PEP nivel federal", "Asociados cercanos", "Jurisdicciones de riesgo"] },
+      "medium": { "level": "Medio", "title": "Riesgo medio", "description": "Monitoreo estándar. Entidades con coincidencias parciales o conexiones menores.", "examples": ["Coincidencia fonética", "PEP local", "Vínculos indirectos"] }
+    },
+    "sources": {
+      "title": "Fuentes de datos verificadas",
+      "subtitle": "Agregamos datos de proveedores líderes globales y locales para asegurar cobertura completa del marco regulatorio mexicano.",
+      "items": ["OFAC SDN", "ONU Consolidada", "EU Sanctions", "UK HMT", "Lista 69-B SAT", "UIF México", "PEP CNBV", "World-Check", "Adverse Media", "Interno"]
+    },
+    "cta": {
+      "title": "¿Listo para fortalecer tu cumplimiento?",
+      "subtitle": "Únete a sujetos obligados que confían en Sentinel PLD para sus necesidades de inteligencia de riesgo y prevención de lavado de dinero.",
+      "start": "Iniciar búsqueda",
+      "demo": "Ver reporte demo"
+    },
+    "footer": {
+      "product": "Producto",
+      "legal": "Legal",
+      "resources": "Recursos",
+      "regulation": "Regulación",
+      "links": {
+        "product": ["Búsqueda", "Monitoreo", "API", "Integraciones"],
+        "legal": ["Términos de uso", "Privacidad", "Cookies", "CNBV", "UIF"],
+        "resources": ["Documentación", "Soporte", "Status", "Seguridad"],
+        "regulation": ["Ley Anti-Lavado", "Circular 32/2013", "Circular 40/2014", "Criterios UIF"]
+      },
+      "rights": "© 2024 Sentinel PLD. Sistema de cumplimiento PLD/FT."
+    }
+  }
+}

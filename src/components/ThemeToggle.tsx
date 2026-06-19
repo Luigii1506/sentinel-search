@@ -11,16 +11,18 @@
 import { useEffect, useState } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
+  const { t } = useTranslation();
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   const isDark = mounted ? resolvedTheme === 'dark' : true;
-  const label = isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+  const label = isDark ? t('common.theme.toLight') : t('common.theme.toDark');
 
   return (
     <button
@@ -41,7 +43,7 @@ export function ThemeToggle({ collapsed = false }: { collapsed?: boolean }) {
       ) : (
         <Moon className="w-4 h-4 shrink-0" aria-hidden="true" />
       )}
-      {!collapsed && <span className="truncate">{isDark ? 'Modo claro' : 'Modo oscuro'}</span>}
+      {!collapsed && <span className="truncate">{isDark ? t('common.theme.light') : t('common.theme.dark')}</span>}
     </button>
   );
 }

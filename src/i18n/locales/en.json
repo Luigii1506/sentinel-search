@@ -1,0 +1,118 @@
+{
+  "common": {
+    "search": "Search",
+    "language": "Language",
+    "theme": {
+      "light": "Light mode",
+      "dark": "Dark mode",
+      "toLight": "Switch to light mode",
+      "toDark": "Switch to dark mode"
+    }
+  },
+  "nav": {
+    "groups": {
+      "workspace": "Workspace",
+      "compliance": "Compliance",
+      "insights": "Insights",
+      "dataReview": "Data Review",
+      "dataManagement": "Data Management",
+      "system": "System"
+    },
+    "home": "Home",
+    "search": "Search",
+    "bulkScreening": "Bulk screening",
+    "federatedSearch": "Federated search",
+    "casesWatchlist": "Cases & Watchlist",
+    "adverseMedia": "Adverse Media",
+    "operations": "Operations",
+    "activityLog": "Activity log",
+    "monitoring": "Monitoring",
+    "reports": "Reports",
+    "mergeReview": "Merge Review",
+    "resolverReview": "Resolver Review",
+    "validationReview": "Validation Review",
+    "sourcesDashboard": "Sources Dashboard",
+    "sourcesAudit": "Sources Audit",
+    "yenteCatalog": "Yente Catalog",
+    "users": "Users",
+    "apiKeys": "API Keys",
+    "webhooks": "Webhooks"
+  },
+  "sidebar": {
+    "commandPalette": "Search or jump to…",
+    "openCommand": "Open command palette",
+    "userMenu": "User menu",
+    "signedInAs": "Signed in as",
+    "logout": "Log out",
+    "expand": "Expand sidebar",
+    "collapse": "Collapse sidebar",
+    "openMenu": "Open menu",
+    "nav": "Navigation"
+  },
+  "search": {
+    "placeholder": "Search people, companies, or identifiers...",
+    "button": "Search",
+    "clear": "Clear search",
+    "suggestions": "Suggestions",
+    "match": "{{score}}% match",
+    "pressEnter": "Press Enter to search",
+    "navigate": "to navigate"
+  },
+  "home": {
+    "badge": "Live · Real-time screening",
+    "headlineLead": "Know the risk",
+    "headlineAccent": "before it matters",
+    "subheadline": "Instant screening of people and companies against global sanctions lists, PEP databases, criminal records and adverse media — fully audit-logged. AML/CFT compliance aligned with Mexico's UIF, SAT 69-B and CNBV.",
+    "stats": {
+      "entities": "Entities",
+      "sources": "Data sources",
+      "uptime": "Uptime SLA",
+      "response": "Response"
+    },
+    "features": {
+      "badge": "Features",
+      "title": "Comprehensive risk assessment",
+      "subtitle": "Our platform combines multiple data sources with AI-driven analysis to deliver complete risk profiles in real time.",
+      "items": {
+        "international": { "title": "International lists", "description": "Screening against OFAC, UN, EU, UK and other global sanctions lists." },
+        "sat69b": { "title": "SAT 69-B List", "description": "Compliance with Mexican regulatory requirements. List of non-compliant taxpayers." },
+        "pep": { "title": "Mexico PEP", "description": "Identification of Politically Exposed Persons per CNBV and UIF regulations." },
+        "relationships": { "title": "Relationship mapping", "description": "Visualize complex networks and uncover hidden connections between entities." },
+        "scoring": { "title": "Risk scoring", "description": "AI-driven risk assessment combining sanctions, PEP and geographic factors." },
+        "audit": { "title": "Audit trail", "description": "Complete investigation history with detailed logs for regulatory compliance." }
+      }
+    },
+    "risk": {
+      "badge": "Risk classification",
+      "title": "AML/CFT classification system",
+      "subtitle": "Four-tier risk classification to prioritize investigations and allocate resources effectively per UIF regulations.",
+      "critical": { "level": "Critical", "title": "Critical risk", "description": "Immediate attention required. Entities with confirmed matches on OFAC/UN sanctions lists.", "examples": ["Exact OFAC match", "SAT 69-B List", "UIF alerts"] },
+      "high": { "level": "High", "title": "High risk", "description": "Close monitoring recommended. PEPs, their close associates, or entities with risky geographic exposure.", "examples": ["Federal-level PEP", "Close associates", "High-risk jurisdictions"] },
+      "medium": { "level": "Medium", "title": "Medium risk", "description": "Standard monitoring. Entities with partial matches or minor connections.", "examples": ["Phonetic match", "Local PEP", "Indirect links"] }
+    },
+    "sources": {
+      "title": "Verified data sources",
+      "subtitle": "We aggregate data from leading global and local providers to ensure full coverage of the Mexican regulatory framework.",
+      "items": ["OFAC SDN", "UN Consolidated", "EU Sanctions", "UK HMT", "SAT 69-B List", "UIF México", "PEP CNBV", "World-Check", "Adverse Media", "Internal"]
+    },
+    "cta": {
+      "title": "Ready to strengthen your compliance?",
+      "subtitle": "Join obligated entities that trust Sentinel PLD for their risk intelligence and anti-money-laundering needs.",
+      "start": "Start a search",
+      "demo": "View demo report"
+    },
+    "footer": {
+      "product": "Product",
+      "legal": "Legal",
+      "resources": "Resources",
+      "regulation": "Regulation",
+      "links": {
+        "product": ["Search", "Monitoring", "API", "Integrations"],
+        "legal": ["Terms of Use", "Privacy", "Cookies", "CNBV", "UIF"],
+        "resources": ["Documentation", "Support", "Status", "Security"],
+        "regulation": ["Anti-Money Laundering Law", "Circular 32/2013", "Circular 40/2014", "UIF Criteria"]
+      },
+      "rights": "© 2024 Sentinel PLD. AML/CFT compliance system."
+    }
+  }
+}

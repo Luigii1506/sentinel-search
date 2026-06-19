@@ -1,5 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { toast } from 'sonner';
+import { currentLang } from '@/i18n';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 const CSRF_COOKIE_NAME = 'pld_csrf';
@@ -42,6 +43,11 @@ api.interceptors.request.use(
         config.headers['X-CSRF-Token'] = csrfToken;
       }
     }
+
+    // Inject the active UI language so the backend localizes data fields
+    // (Wikidata labels, descriptions, nationalities…). The active language
+    // is authoritative — it overrides any per-call default.
+    config.params = { ...(config.params ?? {}), lang: currentLang() };
 
     return config;
   },
