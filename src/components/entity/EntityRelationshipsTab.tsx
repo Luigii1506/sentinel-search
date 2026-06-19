@@ -86,21 +86,21 @@ export function EntityRelationshipsTab({
             label: 'Personas vinculadas',
             icon: Users,
             types: [],
-            color: 'text-blue-400',
+            color: 'text-blue-600 dark:text-blue-400',
           },
           {
             key: 'organizations',
             label: 'Organizaciones vinculadas',
             icon: Building2,
             types: [],
-            color: 'text-cyan-400',
+            color: 'text-cyan-700 dark:text-cyan-400',
           },
           {
             key: 'other',
             label: 'Otras conexiones',
             icon: Share2,
             types: [],
-            color: 'text-gray-400',
+            color: 'text-muted-foreground',
           },
         ]
       : [
@@ -109,49 +109,49 @@ export function EntityRelationshipsTab({
             label: 'Familiares',
             icon: Users,
             types: ['family'],
-            color: 'text-purple-400',
+            color: 'text-purple-600 dark:text-purple-400',
           },
           {
             key: 'associates',
             label: 'Asociados',
             icon: Network,
             types: ['associate'],
-            color: 'text-blue-400',
+            color: 'text-blue-600 dark:text-blue-400',
           },
           {
             key: 'corporate',
             label: 'Propiedad y Corporativo',
             icon: Building2,
             types: ['beneficial_ownership', 'corporate', 'directorship', 'membership', 'employment'],
-            color: 'text-cyan-400',
+            color: 'text-cyan-700 dark:text-cyan-400',
           },
           {
             key: 'political',
             label: 'Política y Representación',
             icon: Landmark,
             types: ['political', 'representation', 'occupancy'],
-            color: 'text-amber-400',
+            color: 'text-amber-700 dark:text-amber-400',
           },
           {
             key: 'sanctions',
             label: 'Sanciones',
             icon: Shield,
             types: ['sanction'],
-            color: 'text-red-400',
+            color: 'text-red-600 dark:text-red-400',
           },
           {
             key: 'profile',
             label: 'Perfil',
             icon: FileText,
             types: ['professional'],
-            color: 'text-violet-400',
+            color: 'text-violet-600 dark:text-violet-400',
           },
           {
             key: 'other',
             label: 'Otras Relaciones',
             icon: Share2,
             types: [],
-            color: 'text-gray-400',
+            color: 'text-muted-foreground',
           },
         ]
   ), [referenceLike]);
@@ -178,8 +178,8 @@ export function EntityRelationshipsTab({
   if (!relationshipsList) {
     return (
       <div className="glass rounded-xl p-12 text-center">
-        <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-        <p className="text-gray-400">Cargando relaciones...</p>
+        <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Cargando relaciones...</p>
       </div>
     );
   }
@@ -187,16 +187,16 @@ export function EntityRelationshipsTab({
   if (relationshipsList.total === 0) {
     return (
       <div className="glass rounded-xl p-12 text-center">
-        <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+        <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-xl font-medium text-foreground mb-2">Sin Relaciones</h3>
-        <p className="text-gray-400">
+        <p className="text-muted-foreground">
           {hasDetectedOrContextualRelationships
             ? 'Las relaciones detectadas para esta entidad son contextuales y quedaron ocultas por la vista AML priorizada.'
             : 'No se encontraron relaciones para esta entidad.'}
         </p>
         {hasDetectedOrContextualRelationships ? (
           <div className="mt-3 space-y-3">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Se detectaron {totalDetectedRelationships} vínculos en total, pero no hay relaciones priorizadas para esta vista.
             </p>
             {!referenceLike && !includeContextualRelationships ? (
@@ -251,9 +251,9 @@ export function EntityRelationshipsTab({
 
       {filteredRelationships.length === 0 ? (
         <div className="glass rounded-xl p-8 text-center">
-          <Search className="w-10 h-10 text-gray-500 mx-auto mb-3" />
+          <Search className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <h3 className="text-lg font-medium text-foreground mb-2">Sin coincidencias</h3>
-          <p className="text-gray-400">No hay relaciones que coincidan con ese filtro de búsqueda.</p>
+          <p className="text-muted-foreground">No hay relaciones que coincidan con ese filtro de búsqueda.</p>
         </div>
       ) : null}
 

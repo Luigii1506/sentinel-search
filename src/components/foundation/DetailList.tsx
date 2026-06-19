@@ -136,7 +136,7 @@ function CopyButton({ value }: { value: string }) {
       aria-label={copied ? 'Copiado' : 'Copiar al portapapeles'}
       className="shrink-0 text-muted-foreground hover:text-electric-300 transition-colors"
     >
-      {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
+      {copied ? <Check className="w-3.5 h-3.5 text-green-700 dark:text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
     </button>
   );
 }

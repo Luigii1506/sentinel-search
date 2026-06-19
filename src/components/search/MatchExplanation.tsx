@@ -23,22 +23,22 @@ export function MatchExplanation({
 
   return (
     <div className={cn('mt-2 space-y-1', className)}>
-      <p className="text-[10px] uppercase tracking-wide text-gray-500 font-semibold">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">
         Razones del match
       </p>
       <ul className="space-y-0.5">
         {reasons.map((r, i) => (
-          <li key={i} className="text-xs text-gray-300 leading-relaxed">
+          <li key={i} className="text-xs text-muted-foreground leading-relaxed">
             {r}
           </li>
         ))}
         {networkRisk != null && networkRisk > 0 && (
-          <li className="text-xs text-gray-500">
+          <li className="text-xs text-muted-foreground">
             Network risk score: <span className="font-mono">{(networkRisk * 100).toFixed(0)}%</span>
           </li>
         )}
         {riskScore != null && (
-          <li className="text-xs text-gray-500">
+          <li className="text-xs text-muted-foreground">
             Risk score total: <span className="font-mono">{riskScore.toFixed(0)}/100</span>
           </li>
         )}

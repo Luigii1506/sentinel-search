@@ -28,16 +28,16 @@ export function PublicTrajectoryCard({
         : 'Sin registro PEP';
 
   const pepBadgeClass = pepStatus === 'current_pep'
-    ? 'bg-purple-500/20 text-purple-400'
+    ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
     : pepStatus === 'former_pep_in_monitoring'
-      ? 'bg-amber-500/20 text-amber-300'
-      : 'bg-gray-500/20 text-gray-400';
+      ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300'
+      : 'bg-gray-500/20 text-muted-foreground';
 
   return (
     <div className="glass rounded-xl p-6">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
-          <Landmark className="w-5 h-5 text-purple-400" />
+          <Landmark className="w-5 h-5 text-purple-600 dark:text-purple-400" />
           Trayectoria pública
         </h3>
         <div className="flex flex-wrap items-center gap-2">
@@ -46,7 +46,7 @@ export function PublicTrajectoryCard({
               {pepBadgeLabel}
             </Badge>
           )}
-          <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
+          <Badge variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
             {unifiedCareerEntries.length} cargo{unifiedCareerEntries.length !== 1 ? 's' : ''}
           </Badge>
         </div>
@@ -58,25 +58,25 @@ export function PublicTrajectoryCard({
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-foreground font-medium break-words">{entry.title}</p>
                 {(entry.context || entry.source) && (
-                  <p className="text-xs text-gray-400 break-words">{entry.context || formatSourceName(entry.source || '')}</p>
+                  <p className="text-xs text-muted-foreground break-words">{entry.context || formatSourceName(entry.source || '')}</p>
                 )}
                 <div className="mt-1 flex flex-wrap items-center gap-2">
                   {entry.country && (
-                    <span className="text-[10px] text-gray-500">{countryNames[entry.country] || entry.country}</span>
+                    <span className="text-[10px] text-muted-foreground">{countryNames[entry.country] || entry.country}</span>
                   )}
                   {entry.start_date && (
-                    <span className="text-[10px] text-gray-600">{formatDate(entry.start_date)} — {entry.end_date ? formatDate(entry.end_date) : 'Presente'}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatDate(entry.start_date)} — {entry.end_date ? formatDate(entry.end_date) : 'Presente'}</span>
                   )}
                   {entry.source && (
-                    <span className="text-[10px] text-gray-500">{formatSourceName(entry.source) || entry.source}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatSourceName(entry.source) || entry.source}</span>
                   )}
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 {entry.is_pep && (
-                  <Badge variant="outline" className="text-[10px] text-purple-300 border-purple-500/30 bg-purple-500/10">PEP</Badge>
+                  <Badge variant="outline" className="text-[10px] text-purple-600 dark:text-purple-300 border-purple-500/30 bg-purple-500/10">PEP</Badge>
                 )}
-                <Badge variant="outline" className={cn('text-[10px]', entry.is_current ? 'text-emerald-300 border-emerald-500/30 bg-emerald-500/10' : 'text-gray-500')}>
+                <Badge variant="outline" className={cn('text-[10px]', entry.is_current ? 'text-emerald-700 dark:text-emerald-300 border-emerald-500/30 bg-emerald-500/10' : 'text-muted-foreground')}>
                   {entry.is_current ? 'Vigente' : 'Histórico'}
                 </Badge>
               </div>
@@ -85,7 +85,7 @@ export function PublicTrajectoryCard({
         ))}
         {(unifiedCareerEntries.length > 6 || canonicalPepEntries.length > 0) && canonicalPepEntries.length > 0 && (
           <div className="flex flex-wrap gap-3">
-            <button onClick={onOpenPepDetail} className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+            <button onClick={onOpenPepDetail} className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
               Ver detalle PEP <ArrowRight className="w-3 h-3" />
             </button>
           </div>

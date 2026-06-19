@@ -45,7 +45,7 @@ function PasswordStrengthMeter({ password }: { password: string }) {
           />
         ))}
       </div>
-      <p className="text-xs text-gray-500">{label}</p>
+      <p className="text-xs text-muted-foreground">{label}</p>
     </div>
   );
 }
@@ -97,7 +97,7 @@ export function SignUpPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-background flex items-center justify-center py-8 px-4">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.16),transparent_38%),radial-gradient(circle_at_82%_18%,rgba(14,165,233,0.10),transparent_24%),linear-gradient(180deg,#06111f_0%,#091827_48%,#0b1220_100%)]" aria-hidden="true" />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" aria-hidden="true" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/15 to-transparent" aria-hidden="true" />
       <div className="absolute left-[10%] top-[12%] h-44 w-44 rounded-full border border-blue-400/10 bg-blue-500/5 blur-3xl" aria-hidden="true" />
       <div className="absolute bottom-[10%] right-[8%] h-60 w-60 rounded-full border border-cyan-400/10 bg-cyan-500/5 blur-3xl" aria-hidden="true" />
 
@@ -117,7 +117,7 @@ export function SignUpPage() {
             <Shield className="w-8 h-8 text-white" />
           </motion.div>
           <h1 className="text-2xl font-bold text-white">Crea tu cuenta</h1>
-          <p className="text-gray-400 mt-2 text-sm">
+          <p className="text-muted-foreground mt-2 text-sm">
             10 búsquedas gratis al día. Sin tarjeta requerida.
           </p>
         </div>
@@ -125,21 +125,21 @@ export function SignUpPage() {
         <Card className="bg-muted border-foreground/10 backdrop-blur-xl">
           <CardHeader className="pb-4">
             <CardTitle className="text-foreground text-lg">Regístrate</CardTitle>
-            <CardDescription className="text-gray-400">
+            <CardDescription className="text-muted-foreground">
               Empieza a buscar en segundos.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-3.5">
               {error && (
-                <div className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded px-3 py-2">
+                <div className="text-sm text-red-600 dark:text-red-400 bg-red-500/10 border border-red-500/30 rounded px-3 py-2">
                   {error}
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="first_name" className="text-gray-300 text-xs">
+                  <Label htmlFor="first_name" className="text-muted-foreground text-xs">
                     Nombre
                   </Label>
                   <Input
@@ -151,7 +151,7 @@ export function SignUpPage() {
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="last_name" className="text-gray-300 text-xs">
+                  <Label htmlFor="last_name" className="text-muted-foreground text-xs">
                     Apellido
                   </Label>
                   <Input
@@ -165,7 +165,7 @@ export function SignUpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-gray-300 text-xs">
+                <Label htmlFor="username" className="text-muted-foreground text-xs">
                   Username *
                 </Label>
                 <Input
@@ -180,7 +180,7 @@ export function SignUpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-gray-300 text-xs">
+                <Label htmlFor="email" className="text-muted-foreground text-xs">
                   Email *
                 </Label>
                 <Input
@@ -196,7 +196,7 @@ export function SignUpPage() {
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-gray-300 text-xs">
+                <Label htmlFor="password" className="text-muted-foreground text-xs">
                   Contraseña *
                 </Label>
                 <div className="relative">
@@ -214,7 +214,7 @@ export function SignUpPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((s) => !s)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-white"
                   >
                     {showPassword ? (
                       <EyeOff className="w-4 h-4" />
@@ -247,26 +247,26 @@ export function SignUpPage() {
             </div>
 
             <div className="mt-5 pt-4 border-t border-foreground/10 space-y-3">
-              <div className="text-xs text-gray-400 space-y-1.5">
+              <div className="text-xs text-muted-foreground space-y-1.5">
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
                   <span>10 búsquedas diarias gratis</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
                   <span>Acceso a OFAC, EU, UN, INTERPOL y más</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-400 mt-0.5 shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-green-700 dark:text-green-400 mt-0.5 shrink-0" />
                   <span>Sin tarjeta de crédito</span>
                 </div>
               </div>
 
-              <p className="text-xs text-gray-500 text-center pt-2 border-t border-foreground/5">
+              <p className="text-xs text-muted-foreground text-center pt-2 border-t border-foreground/5">
                 ¿Ya tienes cuenta?{' '}
                 <Link
                   to="/login"
-                  className="text-blue-400 hover:text-blue-300 font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-300 font-medium"
                 >
                   Inicia sesión
                 </Link>

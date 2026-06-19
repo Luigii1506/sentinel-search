@@ -44,7 +44,7 @@ function ServiceRow({ name, svc }: { name: string; svc: ServiceStatus | undefine
         <span className={cn('w-2 h-2 rounded-full shrink-0', dotColor)} />
         <span className="text-sm text-gray-200 truncate">{SERVICE_LABELS[name] ?? name}</span>
       </div>
-      <div className="text-xs text-gray-500 shrink-0">
+      <div className="text-xs text-muted-foreground shrink-0">
         {svc.status === 'ok' && typeof svc.latency_ms === 'number'
           ? `${svc.latency_ms}ms`
           : svc.status === 'unavailable'
@@ -80,7 +80,7 @@ export function HealthIndicator() {
           title={`Estado del sistema: ${STATUS_LABEL[overall]}`}
           className="relative flex items-center justify-center w-9 h-9 rounded-lg hover:bg-foreground/5 transition-colors"
         >
-          <Icon className="w-5 h-5 text-gray-400" />
+          <Icon className="w-5 h-5 text-muted-foreground" />
           <span
             className={cn(
               'absolute bottom-1.5 right-1.5 w-2.5 h-2.5 rounded-full ring-2 ring-background',
@@ -98,7 +98,7 @@ export function HealthIndicator() {
             </span>
           </div>
           {health?.environment && (
-            <span className="text-[10px] uppercase tracking-wide text-gray-500">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
               {health.environment}
             </span>
           )}
@@ -110,7 +110,7 @@ export function HealthIndicator() {
                 <ServiceRow key={name} name={name} svc={svc} />
               ))
             : (
-              <p className="text-xs text-gray-500 py-2">
+              <p className="text-xs text-muted-foreground py-2">
                 No se pudo obtener el estado. Posiblemente la API no responde.
               </p>
             )}
@@ -118,10 +118,10 @@ export function HealthIndicator() {
 
         {health?.warnings && health.warnings.length > 0 && (
           <div className="border-t border-foreground/10 mt-3 pt-2">
-            <p className="text-[10px] uppercase text-gray-500 mb-1.5">Avisos</p>
+            <p className="text-[10px] uppercase text-muted-foreground mb-1.5">Avisos</p>
             <ul className="space-y-1">
               {health.warnings.map((w, i) => (
-                <li key={i} className="text-xs text-amber-300/90 flex items-start gap-1.5">
+                <li key={i} className="text-xs text-amber-700 dark:text-amber-300/90 flex items-start gap-1.5">
                   <AlertTriangle className="w-3 h-3 mt-0.5 shrink-0" />
                   <span>{w}</span>
                 </li>

@@ -134,7 +134,7 @@ function FactorBar({ factor }: { factor: RiskFactor }) {
         <span
           className={cn(
             'tabular-nums shrink-0 text-[11px]',
-            isMitigation ? 'text-green-300' : 'text-muted-foreground',
+            isMitigation ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground',
           )}
         >
           {isMitigation ? '−' : '+'}

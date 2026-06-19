@@ -113,7 +113,7 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
               {entity.entity_type}
             </Badge>
             {entity.source_count && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-muted-foreground">
                 {entity.source_count} fuentes
               </span>
             )}
@@ -123,12 +123,12 @@ function EntityNode({ data, selected }: { data: Record<string, unknown>; selecte
           {entity.topics && entity.topics.length > 0 && (
             <div className="flex flex-wrap gap-1 mt-2">
               {entity.topics.slice(0, 2).map(topic => (
-                <span key={topic} className="text-[9px] px-1.5 py-0.5 rounded bg-foreground/10 text-gray-400 capitalize">
+                <span key={topic} className="text-[9px] px-1.5 py-0.5 rounded bg-foreground/10 text-muted-foreground capitalize">
                   {topic}
                 </span>
               ))}
               {entity.topics.length > 2 && (
-                <span className="text-[9px] text-gray-500">+{entity.topics.length - 2}</span>
+                <span className="text-[9px] text-muted-foreground">+{entity.topics.length - 2}</span>
               )}
             </div>
           )}
@@ -376,7 +376,7 @@ export function RelationshipGraph({
       {isFullscreen && (
         <button
           onClick={() => setIsFullscreen(false)}
-          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-card/80 backdrop-blur border border-foreground/10 hover:bg-foreground/10 text-gray-400 hover:text-foreground transition-colors"
+          className="absolute top-4 right-4 z-[60] p-2 rounded-lg bg-card/80 backdrop-blur border border-foreground/10 hover:bg-foreground/10 text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
@@ -450,7 +450,7 @@ export function RelationshipGraph({
             {/* Depth Selector */}
             {onDepthChange && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Layers className="w-3.5 h-3.5" />
                   <span>Profundidad</span>
                 </div>
@@ -462,8 +462,8 @@ export function RelationshipGraph({
                       className={cn(
                         'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                         depth === d
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                          : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
+                          ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                          : 'bg-foreground/5 text-muted-foreground border border-foreground/10 hover:bg-foreground/10'
                       )}
                     >
                       {d}
@@ -476,11 +476,11 @@ export function RelationshipGraph({
             {/* Strength Slider */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Activity className="w-3.5 h-3.5" />
                   <span>Fuerza min.</span>
                 </div>
-                <span className="text-xs text-gray-500">{minStrength}%</span>
+                <span className="text-xs text-muted-foreground">{minStrength}%</span>
               </div>
               <input
                 type="range"
@@ -504,10 +504,10 @@ export function RelationshipGraph({
             {/* Type Filters */}
             {availableTypes.length > 0 && (
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Filter className="w-3.5 h-3.5" />
                   <span>Tipo</span>
-                  <span className="text-gray-500">({filteredEdges.length})</span>
+                  <span className="text-muted-foreground">({filteredEdges.length})</span>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {availableTypes.map((type) => {
@@ -536,9 +536,9 @@ export function RelationshipGraph({
             )}
 
             {/* Stats */}
-            <div className="flex items-center gap-3 pt-1 border-t border-foreground/5 text-xs text-gray-500">
+            <div className="flex items-center gap-3 pt-1 border-t border-foreground/5 text-xs text-muted-foreground">
               <span>{visibleNodeIds.size}{totalNodes && totalNodes !== visibleNodeIds.size ? `/${totalNodes}` : ''} nodos</span>
-              <span className="text-gray-600">·</span>
+              <span className="text-muted-foreground">·</span>
               <span>{filteredEdges.length}{totalEdges && totalEdges !== filteredEdges.length ? `/${totalEdges}` : ''} relaciones</span>
             </div>
           </div>
@@ -547,19 +547,19 @@ export function RelationshipGraph({
         {/* Legend Panel */}
         <Panel position="bottom-left" className="m-4">
           <div className="glass rounded-xl p-3">
-            <div className="text-xs text-gray-500 mb-2 uppercase tracking-wider">Tipos de Entidad</div>
+            <div className="text-xs text-muted-foreground mb-2 uppercase tracking-wider">Tipos de Entidad</div>
             <div className="grid grid-cols-2 gap-2">
               {Object.entries(nodeIcons).slice(0, 4).map(([type, Icon]) => (
                 <div key={type} className="flex items-center gap-2">
-                  <Icon className="w-3 h-3 text-gray-400" />
-                  <span className="text-xs text-gray-400 capitalize">{type}</span>
+                  <Icon className="w-3 h-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground capitalize">{type}</span>
                 </div>
               ))}
             </div>
 
             {onNavigate && (
               <div className="mt-3 pt-3 border-t border-foreground/10">
-                <p className="text-[10px] text-gray-500">
+                <p className="text-[10px] text-muted-foreground">
                   Doble clic en un nodo para navegar
                 </p>
               </div>

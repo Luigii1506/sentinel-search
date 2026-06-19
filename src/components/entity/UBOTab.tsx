@@ -43,7 +43,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
   const isIndividual = ubo.entity_type === 'INDIVIDUAL';
 
   const riskColor = (level: string) =>
-    level === 'critical' ? 'text-red-400' : level === 'high' ? 'text-orange-400' : level === 'medium' ? 'text-yellow-400' : 'text-green-400';
+    level === 'critical' ? 'text-red-600 dark:text-red-400' : level === 'high' ? 'text-orange-700 dark:text-orange-400' : level === 'medium' ? 'text-yellow-700 dark:text-yellow-400' : 'text-green-700 dark:text-green-400';
   const riskBorderColor = (level: string) =>
     level === 'critical' ? 'border-red-500' : level === 'high' ? 'border-orange-500' : level === 'medium' ? 'border-yellow-500' : 'border-green-500';
 
@@ -72,18 +72,18 @@ export function UBOTab({ entityId }: UBOTabProps) {
     <div className="space-y-6">
       <motion.div {...fadeUp} className="glass rounded-xl p-6">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-          <Landmark className="w-5 h-5 text-blue-400" />
+          <Landmark className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           {isIndividual ? 'Análisis de Control y Exposición' : 'Beneficiario Final (UBO)'}
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {owners.length > 0 && (
             <>
               <div>
-                <p className="text-xs text-gray-500">UBOs Identificados</p>
+                <p className="text-xs text-muted-foreground">UBOs Identificados</p>
                 <p className="text-2xl font-bold text-foreground">{owners.length}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">UBOs &gt;25%</p>
+                <p className="text-xs text-muted-foreground">UBOs &gt;25%</p>
                 <p className="text-2xl font-bold text-foreground">{ubo.ubos_above_25pct || 0}</p>
               </div>
             </>
@@ -91,12 +91,12 @@ export function UBOTab({ entityId }: UBOTabProps) {
           {controlled.length > 0 && (
             <>
               <div>
-                <p className="text-xs text-gray-500">Entidades Controladas</p>
+                <p className="text-xs text-muted-foreground">Entidades Controladas</p>
                 <p className="text-2xl font-bold text-foreground">{controlled.length}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Controladas Sancionadas</p>
-                <p className={cn('text-2xl font-bold', ubo.controlled_sanctioned > 0 ? 'text-red-400' : 'text-foreground')}>
+                <p className="text-xs text-muted-foreground">Controladas Sancionadas</p>
+                <p className={cn('text-2xl font-bold', ubo.controlled_sanctioned > 0 ? 'text-red-600 dark:text-red-400' : 'text-foreground')}>
                   {ubo.controlled_sanctioned || 0}
                 </p>
               </div>
@@ -104,14 +104,14 @@ export function UBOTab({ entityId }: UBOTabProps) {
           )}
           {keyRelationships.length > 0 && (
             <div>
-              <p className="text-xs text-gray-500">Vínculos de Riesgo</p>
+              <p className="text-xs text-muted-foreground">Vínculos de Riesgo</p>
               <p className="text-2xl font-bold text-foreground">{keyRelationships.length}</p>
             </div>
           )}
           {ubo.risk_flag && (
             <div>
-              <p className="text-xs text-gray-500">Alerta</p>
-              <p className="text-2xl font-bold text-red-400">RIESGO UBO</p>
+              <p className="text-xs text-muted-foreground">Alerta</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">RIESGO UBO</p>
             </div>
           )}
         </div>
@@ -128,22 +128,22 @@ export function UBOTab({ entityId }: UBOTabProps) {
                     <p className="text-foreground font-medium break-words">{owner.ubo_name || owner.name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {owner.effective_ownership_pct != null && (
-                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
                           {owner.effective_ownership_pct}% efectivo
                         </Badge>
                       )}
                       {owner.is_pep && (
-                        <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-400 border-purple-500/30">
+                        <Badge variant="outline" className="text-xs bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
                           PEP
                         </Badge>
                       )}
                       {owner.is_sanctioned && (
-                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
                           Sancionado
                         </Badge>
                       )}
                       {owner.threshold_25pct && (
-                        <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/30">
+                        <Badge variant="outline" className="text-xs bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30">
                           &gt;25% FATF
                         </Badge>
                       )}
@@ -152,7 +152,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
                   {owner.risk_score != null && (
                     <div className="sm:text-right">
                       <p className={cn('text-lg font-bold', riskColor(owner.risk_level))}>{owner.risk_score}</p>
-                      <p className="text-xs text-gray-500">Risk</p>
+                      <p className="text-xs text-muted-foreground">Risk</p>
                     </div>
                   )}
                 </div>
@@ -165,7 +165,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
       {controlled.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.15 }} className="glass rounded-xl p-6">
           <h3 className="text-lg font-medium text-foreground mb-1">Entidades Controladas</h3>
-          <p className="text-xs text-gray-500 mb-4">Empresas y entidades sobre las que tiene propiedad o dirección</p>
+          <p className="text-xs text-muted-foreground mb-4">Empresas y entidades sobre las que tiene propiedad o dirección</p>
           <div className="space-y-3">
             {controlled.map((controlledEntity: any, index: number) => (
               <div key={index} className={cn('p-4 rounded-lg bg-foreground/5 border-l-4', riskBorderColor(controlledEntity.risk_level))}>
@@ -173,17 +173,17 @@ export function UBOTab({ entityId }: UBOTabProps) {
                   <div className="min-w-0">
                     <p className="text-foreground font-medium break-words">{controlledEntity.entity_name}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+                      <Badge variant="outline" className="text-xs bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30">
                         {controlledEntity.relationship_subtype || controlledEntity.relationship_type}
                       </Badge>
-                      {controlledEntity.description && <span className="text-xs text-gray-500">{controlledEntity.description}</span>}
+                      {controlledEntity.description && <span className="text-xs text-muted-foreground">{controlledEntity.description}</span>}
                       {controlledEntity.percentage != null && (
-                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-400 border-blue-500/30">
+                        <Badge variant="outline" className="text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
                           {controlledEntity.percentage}%
                         </Badge>
                       )}
                       {controlledEntity.is_sanctioned && (
-                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                        <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
                           Sancionado
                         </Badge>
                       )}
@@ -191,7 +191,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
                   </div>
                   <div className="sm:text-right">
                     <p className={cn('text-lg font-bold', riskColor(controlledEntity.risk_level))}>{controlledEntity.risk_score}</p>
-                    <p className="text-xs text-gray-500">Risk</p>
+                    <p className="text-xs text-muted-foreground">Risk</p>
                   </div>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
       {keyRelationships.length > 0 && (
         <motion.div {...fadeUp} transition={{ delay: 0.2 }} className="glass rounded-xl p-6">
           <h3 className="text-lg font-medium text-foreground mb-1">Vínculos de Riesgo</h3>
-          <p className="text-xs text-gray-500 mb-4">Relaciones familiares, políticas y asociaciones con entidades de riesgo medio-alto</p>
+          <p className="text-xs text-muted-foreground mb-4">Relaciones familiares, políticas y asociaciones con entidades de riesgo medio-alto</p>
           <div className="space-y-2">
             {keyRelationships.map((relationship: any, index: number) => (
               <div key={index} className="p-3 rounded-lg bg-foreground/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -223,17 +223,17 @@ export function UBOTab({ entityId }: UBOTabProps) {
                   <div className="min-w-0">
                     <p className="text-foreground text-sm font-medium break-words">{relationship.entity_name}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                      <span className="text-xs text-gray-500 break-words">
+                      <span className="text-xs text-muted-foreground break-words">
                         {relationshipTypeLabel[relationship.relationship_type] || relationship.relationship_type}
                         {relationship.relationship_subtype ? ` · ${relationship.relationship_subtype}` : ''}
                       </span>
                       {relationship.is_pep && (
-                        <Badge variant="outline" className="text-[10px] py-0 bg-purple-500/10 text-purple-400 border-purple-500/30">
+                        <Badge variant="outline" className="text-[10px] py-0 bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
                           PEP
                         </Badge>
                       )}
                       {relationship.is_sanctioned && (
-                        <Badge variant="outline" className="text-[10px] py-0 bg-red-500/10 text-red-400 border-red-500/30">
+                        <Badge variant="outline" className="text-[10px] py-0 bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30">
                           Sancionado
                         </Badge>
                       )}
@@ -248,7 +248,7 @@ export function UBOTab({ entityId }: UBOTabProps) {
       )}
 
       <div className="glass rounded-xl p-4">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Análisis basado en FATF Recomendación 24/25. Se considera Beneficiario Final
           a toda persona natural con participación directa o indirecta ≥25% o con control efectivo.
           Para personas, se muestran entidades controladas y vínculos de riesgo por exposición.

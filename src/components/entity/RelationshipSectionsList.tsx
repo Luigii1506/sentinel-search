@@ -26,10 +26,10 @@ type RelationshipSectionsListProps = {
 };
 
 const priorityBadgeStyles: Record<string, string> = {
-  critical: 'bg-red-500/10 text-red-400 border border-red-500/20',
-  high: 'bg-orange-500/10 text-orange-400 border border-orange-500/20',
-  medium: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
-  low: 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+  critical: 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20',
+  high: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border border-orange-500/20',
+  medium: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border border-yellow-500/20',
+  low: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20',
 };
 
 export function RelationshipSectionsList({
@@ -86,9 +86,9 @@ export function RelationshipSectionsList({
             >
               <div className="flex items-center gap-2">
                 {collapsedRelationshipSections[section.key] ? (
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
                 ) : (
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
+                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
                 )}
                 <SectionIcon className={cn('w-5 h-5', section.color)} />
                 <h3 className={cn('text-lg font-semibold', section.color)}>{section.label}</h3>
@@ -101,7 +101,7 @@ export function RelationshipSectionsList({
                   <div key={`${section.key}-${subgroupLabel || 'all'}`} className="space-y-3">
                     {showSubgroups && (
                       <div className="flex items-center gap-3">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                           {subgroupLabel}
                         </span>
                         <div className="h-px flex-1 bg-foreground/10" />
@@ -111,12 +111,12 @@ export function RelationshipSectionsList({
                       {subgroupRels.map((rel, i) => {
                         const riskColor =
                           rel.related_entity_risk_level === 'critical'
-                            ? 'text-red-400'
+                            ? 'text-red-600 dark:text-red-400'
                             : rel.related_entity_risk_level === 'high'
-                              ? 'text-orange-400'
+                              ? 'text-orange-700 dark:text-orange-400'
                               : rel.related_entity_risk_level === 'medium'
-                                ? 'text-yellow-400'
-                                : 'text-gray-400';
+                                ? 'text-yellow-700 dark:text-yellow-400'
+                                : 'text-muted-foreground';
                         const riskBg =
                           rel.related_entity_risk_level === 'critical'
                             ? 'bg-red-500/10 border-red-500/20'
@@ -168,21 +168,21 @@ export function RelationshipSectionsList({
                                   </span>
                                 )}
                                 {rel.is_resolved ? (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
                                     Resuelta
                                   </span>
                                 ) : (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
                                     Sin resolver
                                   </span>
                                 )}
                                 {(rel.context_category === 'profile_context' || rel.context_category === 'unknown') && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-500/10 text-slate-300 border border-slate-500/20">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-500/10 text-muted-foreground border border-slate-500/20">
                                     Contextual
                                   </span>
                                 )}
                                 {rel.related_entity_is_pep && (
-                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20">
                                     PEP
                                   </span>
                                 )}
@@ -205,7 +205,7 @@ export function RelationshipSectionsList({
                               ) : rel.subtype ? (
                                 <span className={section.color}>{translateSubtype(rel.subtype)}</span>
                               ) : (
-                                <span className="text-gray-500 text-xs">
+                                <span className="text-muted-foreground text-xs">
                                   {referenceLike
                                     ? 'Vínculo contextual'
                                     : section.key === 'family'
@@ -225,14 +225,14 @@ export function RelationshipSectionsList({
                               )}
                               {entityTypeLabel && (
                                 <>
-                                  <span className="text-gray-600 text-xs">·</span>
-                                  <span className="text-xs text-gray-500">{entityTypeLabel}</span>
+                                  <span className="text-muted-foreground text-xs">·</span>
+                                  <span className="text-xs text-muted-foreground">{entityTypeLabel}</span>
                                 </>
                               )}
                               {!referenceLike && rel.context_category && (
                                 <>
-                                  <span className="text-gray-600 text-xs">·</span>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-muted-foreground text-xs">·</span>
+                                  <span className="text-xs text-muted-foreground">
                                     {rel.context_category === 'aml_core'
                                       ? 'AML Core'
                                       : rel.context_category === 'affiliation'
@@ -245,14 +245,14 @@ export function RelationshipSectionsList({
                               )}
                               {rel.percentage != null && (
                                 <>
-                                  <span className="text-gray-600 text-xs">·</span>
-                                  <span className="text-xs text-cyan-400 font-medium">{rel.percentage}%</span>
+                                  <span className="text-muted-foreground text-xs">·</span>
+                                  <span className="text-xs text-cyan-700 dark:text-cyan-400 font-medium">{rel.percentage}%</span>
                                 </>
                               )}
                               {relCountries.length > 0 && (
                                 <>
-                                  <span className="text-gray-600 text-xs">·</span>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-muted-foreground text-xs">·</span>
+                                  <span className="text-xs text-muted-foreground">
                                     {relCountries.map((c: string) => countryNames[c] || c).join(', ')}
                                   </span>
                                 </>
@@ -261,7 +261,7 @@ export function RelationshipSectionsList({
 
                             <div className="flex flex-wrap items-center gap-1.5">
                               {(rel.start_date || rel.end_date) && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-muted-foreground">
                                   <Calendar className="w-3 h-3" />
                                   {rel.start_date && rel.end_date
                                     ? `${formatDate(rel.start_date)} — ${formatDate(rel.end_date)}`
@@ -272,7 +272,7 @@ export function RelationshipSectionsList({
                               )}
 
                               {sourceName && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-muted-foreground">
                                   <Database className="w-3 h-3" />
                                   {referenceLike && sourceName?.toLowerCase() === 'wikidata' ? 'Wikidata' : sourceName}
                                 </span>
@@ -283,10 +283,10 @@ export function RelationshipSectionsList({
                                   className={cn(
                                     'px-1.5 py-0.5 rounded text-[10px] font-medium',
                                     rel.relationship_level === 'DIRECT'
-                                      ? 'bg-red-500/10 text-red-400'
+                                      ? 'bg-red-500/10 text-red-600 dark:text-red-400'
                                       : rel.relationship_level === 'AFFILIATION'
-                                        ? 'bg-yellow-500/10 text-yellow-400'
-                                        : 'bg-gray-500/10 text-gray-400'
+                                        ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400'
+                                        : 'bg-gray-500/10 text-muted-foreground'
                                   )}
                                 >
                                   {rel.relationship_level === 'DIRECT'
@@ -298,20 +298,20 @@ export function RelationshipSectionsList({
                               )}
 
                               {!rel.is_resolved && (
-                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 text-[10px]">
+                                <span className="px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-700 dark:text-amber-400 text-[10px]">
                                   Requiere resolución
                                 </span>
                               )}
 
                               {rel.related_entity_sources && rel.related_entity_sources.length > 1 && (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-gray-400">
+                                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-foreground/5 text-[10px] text-muted-foreground">
                                   <FileText className="w-3 h-3" />
                                   {rel.related_entity_sources.length} fuentes
                                 </span>
                               )}
                             </div>
 
-                            {cleanDescription && <p className="text-xs text-gray-500 mt-2 line-clamp-2">{cleanDescription}</p>}
+                            {cleanDescription && <p className="text-xs text-muted-foreground mt-2 line-clamp-2">{cleanDescription}</p>}
                           </motion.div>
                         );
                       })}

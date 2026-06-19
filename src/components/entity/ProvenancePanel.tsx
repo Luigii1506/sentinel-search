@@ -20,7 +20,7 @@ const POLICY_LABELS: Record<string, { label: string; color: string }> = {
   source_priority: { label: 'Source priority', color: 'bg-purple-100 text-purple-800' },
   first_seen: { label: 'First seen', color: 'bg-amber-100 text-amber-800' },
   union_default: { label: 'Union (default)', color: 'bg-slate-100 text-slate-700' },
-  empty: { label: 'Empty', color: 'bg-slate-100 text-slate-500' },
+  empty: { label: 'Empty', color: 'bg-slate-100 text-muted-foreground' },
 };
 
 export function ProvenancePanel({ entityId }: Props) {

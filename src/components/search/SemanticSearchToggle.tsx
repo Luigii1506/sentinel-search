@@ -27,7 +27,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
               'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'traditional'
                 ? 'bg-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5'
+                : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
             )}
           >
             <Search className="w-4 h-4" />
@@ -41,7 +41,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
               'flex shrink-0 items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200',
               mode === 'semantic'
                 ? 'bg-gradient-to-r from-purple-500 to-blue-500 text-white shadow-lg'
-                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5'
+                : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5'
             )}
           >
             <Brain className="w-4 h-4" />
@@ -53,7 +53,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
         {/* Info Tooltip */}
         <Tooltip>
           <TooltipTrigger asChild>
-            <button className="hidden sm:inline-flex p-2 rounded-lg hover:bg-foreground/10 transition-colors text-gray-400">
+            <button className="hidden sm:inline-flex p-2 rounded-lg hover:bg-foreground/10 transition-colors text-muted-foreground">
               <Info className="w-4 h-4" />
             </button>
           </TooltipTrigger>
@@ -62,7 +62,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
               <p className="font-medium">
                 {mode === 'semantic' ? '🧠 Búsqueda Semántica' : '🔤 Búsqueda Tradicional'}
               </p>
-              <p className="text-sm text-gray-400">
+              <p className="text-sm text-muted-foreground">
                 {mode === 'semantic'
                   ? 'Busca por significado, no solo por texto. Ideal para investigaciones y conceptos abstractos como "terrorismo financiero" o "lavado de dinero".'
                   : 'Busca por coincidencia de texto. Ideal para nombres exactos y búsquedas literales.'}
@@ -76,7 +76,7 @@ export function SemanticSearchToggle({ mode, onChange, className }: SemanticSear
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="hidden md:flex items-center gap-1 text-xs text-gray-500"
+            className="hidden md:flex items-center gap-1 text-xs text-muted-foreground"
           >
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span>526K embeddings</span>

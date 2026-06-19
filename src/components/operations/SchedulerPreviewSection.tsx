@@ -14,14 +14,14 @@ import { adminService } from '@/services/admin';
 import type { SchedulerPreviewResponse } from '@/types/api';
 
 const REASON_LABELS: Record<string, { label: string; color: string }> = {
-  eligible:             { label: 'Elegible AHORA',            color: 'text-emerald-400' },
-  wrong_hour:           { label: 'Fuera de ventana horaria',  color: 'text-gray-500' },
-  wrong_weekday:        { label: 'Día de semana incorrecto',  color: 'text-gray-500' },
-  wrong_dom:            { label: 'Día del mes incorrecto',    color: 'text-gray-500' },
-  wrong_quarter_day:    { label: 'Día trimestral incorrecto', color: 'text-gray-500' },
-  dispatched_recently:  { label: 'Despachado recientemente',  color: 'text-blue-400' },
-  skipped_backoff:      { label: 'Bloqueado por fallos',      color: 'text-red-400' },
-  manual:               { label: 'Sin schedule (manual)',     color: 'text-gray-500' },
+  eligible:             { label: 'Elegible AHORA',            color: 'text-emerald-700 dark:text-emerald-400' },
+  wrong_hour:           { label: 'Fuera de ventana horaria',  color: 'text-muted-foreground' },
+  wrong_weekday:        { label: 'Día de semana incorrecto',  color: 'text-muted-foreground' },
+  wrong_dom:            { label: 'Día del mes incorrecto',    color: 'text-muted-foreground' },
+  wrong_quarter_day:    { label: 'Día trimestral incorrecto', color: 'text-muted-foreground' },
+  dispatched_recently:  { label: 'Despachado recientemente',  color: 'text-blue-600 dark:text-blue-400' },
+  skipped_backoff:      { label: 'Bloqueado por fallos',      color: 'text-red-600 dark:text-red-400' },
+  manual:               { label: 'Sin schedule (manual)',     color: 'text-muted-foreground' },
 };
 
 function formatLocalTime(iso?: string | null): string {
@@ -35,10 +35,10 @@ function formatLocalTime(iso?: string | null): string {
 
 function tierBadge(tier: number) {
   const colors: Record<number, string> = {
-    1: 'bg-red-500/15 text-red-300 border-red-500/30',
-    2: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-    3: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
-    4: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+    1: 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/30',
+    2: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+    3: 'bg-blue-500/15 text-blue-600 dark:text-blue-300 border-blue-500/30',
+    4: 'bg-gray-500/15 text-muted-foreground border-gray-500/30',
   };
   return colors[tier] || colors[4];
 }
@@ -61,7 +61,7 @@ function formatAgoOrFuture(h: number | null | undefined): string {
 }
 
 function reasonMeta(reason: string) {
-  return REASON_LABELS[reason] ?? { label: reason, color: 'text-gray-400' };
+  return REASON_LABELS[reason] ?? { label: reason, color: 'text-muted-foreground' };
 }
 
 type SortKey = 'source_id' | 'tier' | 'frequency' | 'reason' | 'hours_since_last_dispatch' | 'last_sync_result' | 'min_gap_hours' | 'backoff' | 'next_eligible';
@@ -84,7 +84,7 @@ export function SchedulerPreviewSection() {
 
   const sortIcon = (key: SortKey) => {
     if (sortKey !== key) return <span className="text-gray-700 ml-1">↕</span>;
-    return <span className="text-blue-400 ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>;
+    return <span className="text-blue-600 dark:text-blue-400 ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>;
   };
 
   const { data, isLoading, refetch, isFetching } = useQuery<SchedulerPreviewResponse>({
@@ -101,19 +101,19 @@ export function SchedulerPreviewSection() {
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center gap-3 py-3 px-3 hover:bg-foreground/5 transition-colors"
       >
-        {expanded ? <ChevronDown className="w-3.5 h-3.5 text-gray-500" /> : <ChevronRight className="w-3.5 h-3.5 text-gray-500" />}
-        <CalendarClock className="w-4 h-4 text-purple-400" />
+        {expanded ? <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronRight className="w-3.5 h-3.5 text-muted-foreground" />}
+        <CalendarClock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
         <div className="flex-1 text-left">
           <div className="text-sm font-medium text-foreground">Scheduler Preview</div>
-          <div className="text-[11px] text-gray-500">
+          <div className="text-[11px] text-muted-foreground">
             Qué decidiría Beat AHORA si corriera el dispatcher · dry-run permanente
           </div>
         </div>
         {data && (
           <div className="flex items-center gap-2 text-[11px] font-mono">
-            <span className="text-emerald-400">{data.eligible_now} elegibles</span>
-            <span className="text-gray-600">/</span>
-            <span className="text-gray-400">{data.total_scheduled} en vista</span>
+            <span className="text-emerald-700 dark:text-emerald-400">{data.eligible_now} elegibles</span>
+            <span className="text-muted-foreground">/</span>
+            <span className="text-muted-foreground">{data.total_scheduled} en vista</span>
           </div>
         )}
       </button>
@@ -126,7 +126,7 @@ export function SchedulerPreviewSection() {
               className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
                 onlyInWindow
                   ? 'bg-foreground/10 text-foreground border-foreground/20'
-                  : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border-transparent'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border-transparent'
               }`}
               title="Si está activo, solo muestra sources cuya hora coincide ahora"
             >
@@ -136,7 +136,7 @@ export function SchedulerPreviewSection() {
               <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
             </Button>
             {data?.evaluated_at && (
-              <span className="text-[10px] text-gray-500 font-mono ml-auto">
+              <span className="text-[10px] text-muted-foreground font-mono ml-auto">
                 evaluado {formatLocalTime(data.evaluated_at)}
               </span>
             )}
@@ -180,7 +180,7 @@ export function SchedulerPreviewSection() {
             <div className="overflow-x-auto -mx-3 px-3">
               <table className="min-w-full text-xs whitespace-nowrap">
                 <thead>
-                  <tr className="text-left text-[10px] uppercase tracking-wider text-gray-500 border-b border-foreground/5 select-none">
+                  <tr className="text-left text-[10px] uppercase tracking-wider text-muted-foreground border-b border-foreground/5 select-none">
                     <th className="py-1.5 pr-4 cursor-pointer hover:text-foreground" onClick={() => toggleSort('source_id')}>Source{sortIcon('source_id')}</th>
                     <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('tier')}>Tier{sortIcon('tier')}</th>
                     <th className="py-1.5 pr-3 cursor-pointer hover:text-foreground" onClick={() => toggleSort('frequency')}>Freq · hora UTC{sortIcon('frequency')}</th>
@@ -224,28 +224,28 @@ export function SchedulerPreviewSection() {
                               T{s.tier}
                             </span>
                           </td>
-                          <td className="py-1.5 pr-3 text-gray-400 font-mono">
+                          <td className="py-1.5 pr-3 text-muted-foreground font-mono">
                             {s.frequency} · {String(s.schedule_hour_utc).padStart(2, '0')}:{String(s.schedule_minute_utc ?? 0).padStart(2, '0')}
                           </td>
                           <td className={`py-1.5 pr-4 ${meta.color}`}>{meta.label}</td>
                           <td className="py-1.5 pr-3 font-mono" title={s.next_eligible_at ? new Date(s.next_eligible_at).toLocaleString() : ''}>
                             {s.eligible_now ? (
-                              <span className="text-emerald-400">ahora</span>
+                              <span className="text-emerald-700 dark:text-emerald-400">ahora</span>
                             ) : s.hours_until_eligible != null ? (
-                              <span className="text-blue-300">en {formatHoursCompact(s.hours_until_eligible)}</span>
+                              <span className="text-blue-600 dark:text-blue-300">en {formatHoursCompact(s.hours_until_eligible)}</span>
                             ) : (
-                              <span className="text-gray-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
-                          <td className="py-1.5 pr-3 text-gray-400 font-mono">{ago}</td>
+                          <td className="py-1.5 pr-3 text-muted-foreground font-mono">{ago}</td>
                           <td className="py-1.5 pr-3 font-mono">
-                            {s.last_sync_result === 'success' && <span className="text-emerald-400">OK</span>}
-                            {s.last_sync_result === 'failed' && <span className="text-red-400">falló</span>}
-                            {s.last_sync_result === 'skipped_smart' && <span className="text-gray-400">sin cambios</span>}
-                            {s.last_sync_result === 'skipped_lock' && <span className="text-yellow-400">lock</span>}
-                            {!s.last_sync_result && <span className="text-gray-600">—</span>}
+                            {s.last_sync_result === 'success' && <span className="text-emerald-700 dark:text-emerald-400">OK</span>}
+                            {s.last_sync_result === 'failed' && <span className="text-red-600 dark:text-red-400">falló</span>}
+                            {s.last_sync_result === 'skipped_smart' && <span className="text-muted-foreground">sin cambios</span>}
+                            {s.last_sync_result === 'skipped_lock' && <span className="text-yellow-700 dark:text-yellow-400">lock</span>}
+                            {!s.last_sync_result && <span className="text-muted-foreground">—</span>}
                           </td>
-                          <td className="py-1.5 pr-3 text-gray-500 font-mono" title="Tiempo mínimo entre dispatches — evita re-dispatch en la misma ventana">
+                          <td className="py-1.5 pr-3 text-muted-foreground font-mono" title="Tiempo mínimo entre dispatches — evita re-dispatch en la misma ventana">
                             {formatHoursCompact(s.min_gap_hours)}
                           </td>
                           <td className="py-1.5 pr-3 font-mono">
@@ -255,7 +255,7 @@ export function SchedulerPreviewSection() {
                                 const remainingH = (until.getTime() - Date.now()) / 3_600_000;
                                 return (
                                   <span
-                                    className="text-red-400"
+                                    className="text-red-600 dark:text-red-400"
                                     title={`${s.consecutive_failures} fallos consecutivos · backoff de ${s.backoff_hours}h · hasta ${until.toLocaleString()}`}
                                   >
                                     {remainingH > 0 ? `${formatHoursCompact(remainingH)}` : 'expirado'} ({s.consecutive_failures} fails)
@@ -263,7 +263,7 @@ export function SchedulerPreviewSection() {
                                 );
                               })()
                             ) : (
-                              <span className="text-gray-600">—</span>
+                              <span className="text-muted-foreground">—</span>
                             )}
                           </td>
                         </tr>

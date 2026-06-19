@@ -41,8 +41,8 @@ export function EntityNetworkTab({
   if (networkLoading) {
     return (
       <div className="glass rounded-xl p-12 text-center">
-        <RefreshCw className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-        <p className="text-gray-400">Cargando red de relaciones...</p>
+        <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-spin mx-auto mb-4" />
+        <p className="text-muted-foreground">Cargando red de relaciones...</p>
       </div>
     );
   }
@@ -50,9 +50,9 @@ export function EntityNetworkTab({
   if (!networkData?.center) {
     return (
       <div className="glass rounded-xl p-12 text-center">
-        <Users className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+        <Users className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
         <h3 className="text-xl font-medium text-foreground mb-2">Sin Relaciones</h3>
-        <p className="text-gray-400">No se encontraron relaciones para esta entidad.</p>
+        <p className="text-muted-foreground">No se encontraron relaciones para esta entidad.</p>
       </div>
     );
   }

@@ -103,20 +103,20 @@ function formatLocalTime(iso?: string | null): string {
 // ── Source row component ───────────────────────────────────────────────
 
 const STATE_META: Record<string, { icon: any; color: string; bg: string; label: string }> = {
-  running: { icon: Loader2, color: 'text-blue-400', bg: 'border-blue-500/20 bg-blue-500/5', label: 'corriendo' },
-  recent_failed: { icon: XCircle, color: 'text-red-400', bg: 'border-red-500/20 bg-red-500/5', label: 'falló' },
-  stale: { icon: AlertTriangle, color: 'text-amber-400', bg: 'border-amber-500/15 bg-amber-500/5', label: 'desactualizada' },
-  healthy: { icon: CheckCircle2, color: 'text-green-400', bg: 'border-green-500/15 bg-green-500/5', label: 'saludable' },
-  never: { icon: AlertTriangle, color: 'text-zinc-500', bg: 'border-zinc-500/20 bg-zinc-500/5', label: 'sin sync' },
-  idle: { icon: Clock, color: 'text-gray-400', bg: 'border-foreground/5 bg-transparent', label: 'idle' },
+  running: { icon: Loader2, color: 'text-blue-600 dark:text-blue-400', bg: 'border-blue-500/20 bg-blue-500/5', label: 'corriendo' },
+  recent_failed: { icon: XCircle, color: 'text-red-600 dark:text-red-400', bg: 'border-red-500/20 bg-red-500/5', label: 'falló' },
+  stale: { icon: AlertTriangle, color: 'text-amber-700 dark:text-amber-400', bg: 'border-amber-500/15 bg-amber-500/5', label: 'desactualizada' },
+  healthy: { icon: CheckCircle2, color: 'text-green-700 dark:text-green-400', bg: 'border-green-500/15 bg-green-500/5', label: 'saludable' },
+  never: { icon: AlertTriangle, color: 'text-muted-foreground', bg: 'border-zinc-500/20 bg-zinc-500/5', label: 'sin sync' },
+  idle: { icon: Clock, color: 'text-muted-foreground', bg: 'border-foreground/5 bg-transparent', label: 'idle' },
 };
 
 function tierBadge(tier: number) {
   const colors: Record<number, string> = {
-    1: 'bg-red-500/15 text-red-300 border-red-500/30',
-    2: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
-    3: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
-    4: 'bg-gray-500/15 text-gray-400 border-gray-500/30',
+    1: 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/30',
+    2: 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30',
+    3: 'bg-blue-500/15 text-blue-600 dark:text-blue-300 border-blue-500/30',
+    4: 'bg-gray-500/15 text-muted-foreground border-gray-500/30',
   };
   return colors[tier] || colors[4];
 }
@@ -133,7 +133,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
 
   if (isLoading) {
     return (
-      <div className="px-3 py-3 text-xs text-gray-500">
+      <div className="px-3 py-3 text-xs text-muted-foreground">
         <Loader2 className="w-3 h-3 inline animate-spin mr-1" /> Cargando historial…
       </div>
     );
@@ -141,7 +141,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
 
   if (!data || data.runs.length === 0) {
     return (
-      <div className="px-3 py-3 text-xs text-gray-500">
+      <div className="px-3 py-3 text-xs text-muted-foreground">
         Sin runs registrados para esta fuente.
       </div>
     );
@@ -149,7 +149,7 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
 
   return (
     <div className="px-3 py-2 bg-black/30">
-      <p className="text-[10px] uppercase tracking-wider text-gray-500 mb-2">
+      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
         Últimos {data.runs.length} runs
       </p>
       <div className="space-y-1">
@@ -159,9 +159,9 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
             r.status === 'failed' ? '✕' :
             r.status === 'running' ? '⚙' : '⊘';
           const statusColor =
-            r.status === 'success' ? 'text-green-400' :
-            r.status === 'failed' ? 'text-red-400' :
-            r.status === 'running' ? 'text-blue-400' : 'text-gray-500';
+            r.status === 'success' ? 'text-green-700 dark:text-green-400' :
+            r.status === 'failed' ? 'text-red-600 dark:text-red-400' :
+            r.status === 'running' ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground';
 
           const parts: string[] = [];
           if (r.records_processed) parts.push(`${formatNumber(r.records_processed)} procesados`);
@@ -181,31 +181,31 @@ function SourceRunsHistory({ sourceId }: { sourceId: string }) {
 
               {/* Inicio */}
               <div className="col-span-3">
-                <p className="text-gray-300 font-mono">{formatLocalTime(r.started_at)}</p>
-                <p className="text-gray-600 text-[10px]">inicio</p>
+                <p className="text-muted-foreground font-mono">{formatLocalTime(r.started_at)}</p>
+                <p className="text-muted-foreground text-[10px]">inicio</p>
               </div>
 
               {/* Fin */}
               <div className="col-span-3">
-                <p className="text-gray-300 font-mono">
+                <p className="text-muted-foreground font-mono">
                   {r.completed_at ? formatLocalTime(r.completed_at) : '—'}
                 </p>
-                <p className="text-gray-600 text-[10px]">
+                <p className="text-muted-foreground text-[10px]">
                   {r.completed_at ? 'fin' : (r.status === 'running' ? 'aún corriendo' : '—')}
                 </p>
               </div>
 
               {/* Duración */}
               <div className="col-span-2 text-right">
-                <p className="text-gray-300 font-mono">{formatDuration(r.duration_seconds)}</p>
-                <p className="text-gray-600 text-[10px]">duración</p>
+                <p className="text-muted-foreground font-mono">{formatDuration(r.duration_seconds)}</p>
+                <p className="text-muted-foreground text-[10px]">duración</p>
               </div>
 
               {/* Resumen */}
               <div className="col-span-3 min-w-0">
                 <p className={`${statusColor} text-[11px]`}>{summary}</p>
                 {r.error_message && (
-                  <details className="text-red-300/70 text-[10px] group mt-0.5">
+                  <details className="text-red-600 dark:text-red-300/70 text-[10px] group mt-0.5">
                     <summary className="cursor-pointer list-none hover:text-red-300 line-clamp-1 group-open:line-clamp-none break-words">
                       {r.error_message}
                     </summary>
@@ -248,13 +248,13 @@ function LayerDot({ layer, data }: { layer: typeof PIPELINE_LAYERS[number]; data
     : 'bg-foreground/5 border-foreground/10';
 
   const labelColor =
-    data.status === 'running'  ? 'text-blue-300'
-    : data.status === 'complete' ? 'text-emerald-300/80'
-    : 'text-gray-500';
+    data.status === 'running'  ? 'text-blue-600 dark:text-blue-300'
+    : data.status === 'complete' ? 'text-emerald-700 dark:text-emerald-300/80'
+    : 'text-muted-foreground';
 
   // Info visible bajo el dot — counts/% (no solo tooltip)
   const visibleInfo: React.ReactNode = (() => {
-    if (data.status === 'pending') return <span className="text-[9px] text-gray-600">—</span>;
+    if (data.status === 'pending') return <span className="text-[9px] text-muted-foreground">—</span>;
     if (data.percent != null) {
       return (
         <span className={`text-[9px] font-mono ${labelColor}`}>
@@ -269,7 +269,7 @@ function LayerDot({ layer, data }: { layer: typeof PIPELINE_LAYERS[number]; data
         </span>
       );
     }
-    return <span className="text-[9px] text-gray-600">—</span>;
+    return <span className="text-[9px] text-muted-foreground">—</span>;
   })();
 
   // Tooltip con detalle completo
@@ -330,13 +330,13 @@ function PipelineProgressBar({ sourceId, isRunning }: { sourceId: string; isRunn
       {activeLayer && activeProgress && activeProgress.percent != null && (
         <div className="space-y-0.5">
           <div className="flex items-center justify-between text-[10px] font-mono gap-2">
-            <span className="text-blue-300 whitespace-nowrap">
+            <span className="text-blue-600 dark:text-blue-300 whitespace-nowrap">
               {activeLayer.key} {activeProgress.percent.toFixed(1)}%
               {data.chunk_number != null && (
-                <span className="text-blue-400/60 ml-1.5">· chunk {data.chunk_number}</span>
+                <span className="text-blue-600 dark:text-blue-400/60 ml-1.5">· chunk {data.chunk_number}</span>
               )}
             </span>
-            <span className="text-gray-400">
+            <span className="text-muted-foreground">
               {activeProgress.processed?.toLocaleString() ?? '—'}
               {activeProgress.expected != null && ` / ${activeProgress.expected.toLocaleString()} records`}
             </span>
@@ -352,7 +352,7 @@ function PipelineProgressBar({ sourceId, isRunning }: { sourceId: string; isRunn
 
       {/* Si está running pero no tenemos % (bronze sin denominator), mostrar solo records */}
       {activeLayer && activeProgress && activeProgress.percent == null && activeProgress.processed != null && (
-        <div className="text-[10px] font-mono text-blue-300">
+        <div className="text-[10px] font-mono text-blue-600 dark:text-blue-300">
           {activeLayer.key} · {activeProgress.processed.toLocaleString()} records procesados
         </div>
       )}
@@ -374,10 +374,10 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
     const s = source.current_stage;
     subInfo = (
       <div className="space-y-0.5">
-        <p className="text-xs text-blue-300 font-mono">
-          {s.step}{s.cursor && <span className="text-gray-500 ml-1">· {s.cursor}</span>}
+        <p className="text-xs text-blue-600 dark:text-blue-300 font-mono">
+          {s.step}{s.cursor && <span className="text-muted-foreground ml-1">· {s.cursor}</span>}
         </p>
-        <p className="text-[11px] text-gray-500">
+        <p className="text-[11px] text-muted-foreground">
           corriendo {formatDuration(s.elapsed_seconds)}
         </p>
       </div>
@@ -387,11 +387,11 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
     if (r.status === 'failed') {
       subInfo = (
         <div className="space-y-0.5">
-          <p className="text-xs text-red-300/90">
+          <p className="text-xs text-red-600 dark:text-red-300/90">
             falló {formatAgo(r.minutes_ago)} · duración {formatDuration(r.duration_seconds)}
           </p>
           {r.error_message && (
-            <details className="text-[11px] text-red-300/70 group">
+            <details className="text-[11px] text-red-600 dark:text-red-300/70 group">
               <summary className="cursor-pointer list-none flex items-start gap-1 hover:text-red-300">
                 <ChevronRight className="w-3 h-3 mt-0.5 flex-shrink-0 transition-transform group-open:rotate-90" />
                 <span className="line-clamp-1 group-open:line-clamp-none break-words">
@@ -407,7 +407,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
       );
     } else if (r.is_skip || (r.records_processed === 0 && r.records_inserted === 0 && r.records_updated === 0)) {
       subInfo = (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground">
           {r.is_skip ? 'omitido' : 'sin cambios'} {formatAgo(r.minutes_ago)} · duración {formatDuration(r.duration_seconds)}
         </p>
       );
@@ -417,14 +417,14 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
       if (r.records_updated) parts.push(`~${formatNumber(r.records_updated)} cambiaron`);
       if (r.records_processed && !parts.length) parts.push(`${formatNumber(r.records_processed)} procesados`);
       subInfo = (
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-muted-foreground">
           {formatAgo(r.minutes_ago)} · {parts.join(' · ') || 'completado'} · {formatDuration(r.duration_seconds)}
         </p>
       );
     }
   } else if (source.state === 'never') {
     subInfo = (
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         Nunca sincronizada · {source.schedule_frequency || 'sin schedule'}
       </p>
     );
@@ -434,7 +434,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
   let nextInfo: React.ReactNode = null;
   if (source.state !== 'running' && source.next_due_minutes != null && source.next_due_minutes > 0) {
     nextInfo = (
-      <span className="text-[11px] text-gray-500 font-mono">
+      <span className="text-[11px] text-muted-foreground font-mono">
         próximo {formatUntil(source.next_due_minutes)}
       </span>
     );
@@ -446,11 +446,11 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
   if (source.hours_since_last_dispatch != null && source.last_sync_result) {
     const result = source.last_sync_result;
     const resultColor =
-      result === 'failed'        ? 'text-red-400'
-      : result === 'skipped_lock'  ? 'text-yellow-400'
-      : result === 'skipped_smart' ? 'text-gray-400'
-      : result === 'success'       ? 'text-emerald-400'
-      : 'text-gray-500';
+      result === 'failed'        ? 'text-red-600 dark:text-red-400'
+      : result === 'skipped_lock'  ? 'text-yellow-700 dark:text-yellow-400'
+      : result === 'skipped_smart' ? 'text-muted-foreground'
+      : result === 'success'       ? 'text-emerald-700 dark:text-emerald-400'
+      : 'text-muted-foreground';
     const resultLabel =
       result === 'skipped_smart' ? 'sin cambios remotos'
       : result === 'skipped_lock'  ? 'omitido (lock)'
@@ -479,7 +479,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
         : `hace ${Math.round(daysAgo / 30)}m`;
     osInfo = (
       <span
-        className="text-[10px] font-mono text-purple-300/70"
+        className="text-[10px] font-mono text-purple-600 dark:text-purple-300/70"
         title={`OpenSanctions reporta último cambio real ${ageStr} (${source.os_last_change})`}
       >
         OS {ageStr}
@@ -493,7 +493,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
         {/* Caret expand/collapse */}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex-shrink-0 text-gray-500 hover:text-foreground transition-colors"
+          className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
           title={expanded ? 'Colapsar' : 'Expandir historial'}
         >
           {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
@@ -511,7 +511,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
         <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setExpanded(!expanded)}>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-mono text-foreground">{source.source_id}</span>
-            <span className="text-[10px] text-gray-500">{source.schedule_frequency || ''}</span>
+            <span className="text-[10px] text-muted-foreground">{source.schedule_frequency || ''}</span>
             {nextInfo}
             {dispatchInfo}
             {osInfo}
@@ -535,7 +535,7 @@ function SourceRow({ source, onDispatched }: { source: SourceActivityEntry; onDi
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 text-xs text-gray-400 hover:text-foreground"
+            className="h-7 text-xs text-muted-foreground hover:text-foreground"
             onClick={() => navigate(`/admin/sources?focus=${source.source_id}`)}
             title="Ver en /admin/sources"
           >
@@ -665,7 +665,7 @@ export function OperationsPage() {
         }
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <Activity className="w-6 h-6 text-blue-400" />
+            <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
@@ -684,47 +684,47 @@ export function OperationsPage() {
         {opsSummary ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 p-3 rounded-lg bg-foreground/[0.02] border border-foreground/5">
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Skip rate 7d</span>
-              <span className="text-lg font-mono text-emerald-400">
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Skip rate 7d</span>
+              <span className="text-lg font-mono text-emerald-700 dark:text-emerald-400">
                 {(opsSummary.execution_stats_7d?.skip_rate_pct ?? 0).toFixed(1)}%
               </span>
-              <span className="text-[10px] text-gray-600">
+              <span className="text-[10px] text-muted-foreground">
                 {opsSummary.execution_stats_7d?.skipped ?? 0} de {(opsSummary.execution_stats_7d?.total_runs ?? 0) - (opsSummary.execution_stats_7d?.running ?? 0)} terminados
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Success rate</span>
-              <span className="text-lg font-mono text-blue-400">
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Success rate</span>
+              <span className="text-lg font-mono text-blue-600 dark:text-blue-400">
                 {(opsSummary.execution_stats_7d?.success_rate_pct ?? 0).toFixed(1)}%
               </span>
-              <span className="text-[10px] text-gray-600">
+              <span className="text-[10px] text-muted-foreground">
                 {opsSummary.execution_stats_7d?.success ?? 0} success
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Failure rate</span>
-              <span className={`text-lg font-mono ${(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0) > 10 ? 'text-red-400' : 'text-yellow-400'}`}>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Failure rate</span>
+              <span className={`text-lg font-mono ${(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0) > 10 ? 'text-red-600 dark:text-red-400' : 'text-yellow-700 dark:text-yellow-400'}`}>
                 {(opsSummary.execution_stats_7d?.failure_rate_pct ?? 0).toFixed(1)}%
               </span>
-              <span className="text-[10px] text-gray-600">
+              <span className="text-[10px] text-muted-foreground">
                 {opsSummary.execution_stats_7d?.failed ?? 0} failed
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Workers</span>
-              <span className="text-lg font-mono text-cyan-400">
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Workers</span>
+              <span className="text-lg font-mono text-cyan-700 dark:text-cyan-400">
                 {opsSummary.workers?.count ?? '?'}
               </span>
-              <span className="text-[10px] text-gray-600 truncate" title={(opsSummary.workers?.names ?? []).join(', ')}>
+              <span className="text-[10px] text-muted-foreground truncate" title={(opsSummary.workers?.names ?? []).join(', ')}>
                 {(opsSummary.workers?.names ?? []).map((n: string) => n.split('@')[0]).slice(0, 2).join(', ') || '—'}
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-wide text-gray-500">Queues</span>
-              <span className="text-lg font-mono text-purple-400">
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">Queues</span>
+              <span className="text-lg font-mono text-purple-600 dark:text-purple-400">
                 {Object.values(opsSummary.queues || {}).reduce((a: number, b: any) => a + (typeof b === 'number' ? b : 0), 0) as number}
               </span>
-              <span className="text-[10px] text-gray-600" title={JSON.stringify(opsSummary.queues)}>
+              <span className="text-[10px] text-muted-foreground" title={JSON.stringify(opsSummary.queues)}>
                 default:{opsSummary.queues?.default ?? '?'} xl:{opsSummary.queues?.xl ?? '?'}
               </span>
             </div>
@@ -735,7 +735,7 @@ export function OperationsPage() {
 
         {/* ── Filtros: state + tier (combinables) ─────────────── */}
         <div className="flex items-center gap-2 flex-wrap">
-          <Filter className="w-3.5 h-3.5 text-gray-500" />
+          <Filter className="w-3.5 h-3.5 text-muted-foreground" />
           {filterOptions.map((opt) => {
             const active = filter === opt.key;
             return (
@@ -745,15 +745,15 @@ export function OperationsPage() {
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   active
                     ? 'bg-foreground/10 text-foreground border border-foreground/20'
-                    : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border border-transparent'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border border-transparent'
                 }`}
               >
                 {opt.label}
                 {opt.count != null && opt.count > 0 && (
                   <span className={`ml-1.5 text-[10px] font-mono ${
-                    opt.color === 'blue' ? 'text-blue-400' :
-                    opt.color === 'red' ? 'text-red-400' :
-                    opt.color === 'amber' ? 'text-amber-400' : 'text-gray-500'
+                    opt.color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
+                    opt.color === 'red' ? 'text-red-600 dark:text-red-400' :
+                    opt.color === 'amber' ? 'text-amber-700 dark:text-amber-400' : 'text-muted-foreground'
                   }`}>
                     {opt.count}
                   </span>
@@ -766,13 +766,13 @@ export function OperationsPage() {
           <div className="h-5 w-px bg-foreground/10 mx-1" />
 
           {/* Filtro por tier */}
-          <span className="text-[10px] uppercase tracking-wider text-gray-500 mr-1">Tier:</span>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground mr-1">Tier:</span>
           <button
             onClick={() => setTierFilter(null)}
             className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
               tierFilter === null
                 ? 'bg-foreground/10 text-foreground border border-foreground/20'
-                : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border border-transparent'
+                : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border border-transparent'
             }`}
           >
             Todos
@@ -788,12 +788,12 @@ export function OperationsPage() {
                 className={`px-2.5 py-1 rounded-md text-xs font-mono font-medium transition-colors border ${
                   active
                     ? (
-                      tColor === 'red' ? 'bg-red-500/15 text-red-300 border-red-500/40' :
-                      tColor === 'amber' ? 'bg-amber-500/15 text-amber-300 border-amber-500/40' :
-                      tColor === 'blue' ? 'bg-blue-500/15 text-blue-300 border-blue-500/40' :
-                      'bg-gray-500/15 text-gray-300 border-gray-500/40'
+                      tColor === 'red' ? 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/40' :
+                      tColor === 'amber' ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40' :
+                      tColor === 'blue' ? 'bg-blue-500/15 text-blue-600 dark:text-blue-300 border-blue-500/40' :
+                      'bg-gray-500/15 text-muted-foreground border-gray-500/40'
                     )
-                    : 'text-gray-400 hover:text-foreground hover:bg-foreground/5 border-transparent'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-foreground/5 border-transparent'
                 }`}
                 title={
                   t === 1 ? 'Sanciones críticas / Fugitivos' :
@@ -856,7 +856,7 @@ export function OperationsPage() {
 
         {/* ── Infra footer ──────────────────────────────────────── */}
         <div className="flex flex-wrap items-center gap-2 text-xs pt-2 border-t border-foreground/5">
-          <span className="text-gray-500 mr-2">Infraestructura:</span>
+          <span className="text-muted-foreground mr-2">Infraestructura:</span>
           {services && [
             { name: 'API', icon: Zap, ok: services.api?.status === 'ok' },
             { name: 'PG', icon: Database, ok: services.database?.status === 'ok', latency: services.database?.latency_ms },
@@ -877,7 +877,7 @@ export function OperationsPage() {
           })}
           {snapshotsHealth?.snapshots && snapshotsHealth.snapshots.length > 0 && (
             <>
-              <span className="text-gray-500 ml-2">Snapshots:</span>
+              <span className="text-muted-foreground ml-2">Snapshots:</span>
               {snapshotsHealth.snapshots.map((snap) => (
                 <HealthDot
                   key={snap.scope}

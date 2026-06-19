@@ -51,48 +51,48 @@ import type { ComplianceAlert } from '@/services/compliance';
 // ── Mappings ──
 
 const priorityConfig: Record<string, { label: string; color: string }> = {
-  critical: { label: 'Critico', color: 'bg-red-500/10 text-red-400 border-red-500/30' },
-  high: { label: 'Alto', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30' },
-  medium: { label: 'Medio', color: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
-  low: { label: 'Bajo', color: 'bg-green-500/10 text-green-400 border-green-500/30' },
+  critical: { label: 'Critico', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' },
+  high: { label: 'Alto', color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30' },
+  medium: { label: 'Medio', color: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30' },
+  low: { label: 'Bajo', color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30' },
 };
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-  open: { label: 'Abierto', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: CircleDot },
-  in_review: { label: 'En Revision', color: 'bg-purple-500/10 text-purple-400 border-purple-500/30', icon: Scale },
-  escalated: { label: 'Escalado', color: 'bg-orange-500/10 text-orange-400 border-orange-500/30', icon: ArrowUpRight },
-  closed_tp: { label: 'Confirmado', color: 'bg-red-500/10 text-red-400 border-red-500/30', icon: AlertTriangle },
-  closed_fp: { label: 'Descartado', color: 'bg-green-500/10 text-green-400 border-green-500/30', icon: CheckCircle },
-  closed_inconclusive: { label: 'Inconcluso', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30', icon: HelpCircle },
-  sar_filed: { label: 'SAR Presentado', color: 'bg-blue-500/10 text-blue-400 border-blue-500/30', icon: FileWarning },
+  open: { label: 'Abierto', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: CircleDot },
+  in_review: { label: 'En Revision', color: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30', icon: Scale },
+  escalated: { label: 'Escalado', color: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30', icon: ArrowUpRight },
+  closed_tp: { label: 'Confirmado', color: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30', icon: AlertTriangle },
+  closed_fp: { label: 'Descartado', color: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30', icon: CheckCircle },
+  closed_inconclusive: { label: 'Inconcluso', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: HelpCircle },
+  sar_filed: { label: 'SAR Presentado', color: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30', icon: FileWarning },
 };
 
 const decisionConfig: Record<string, { label: string; description: string; color: string; bgColor: string; icon: typeof Clock }> = {
   true_positive: {
     label: 'Verdadero Positivo',
     description: 'La persona coincide con la lista — requiere accion regulatoria',
-    color: 'text-red-400',
+    color: 'text-red-600 dark:text-red-400',
     bgColor: 'bg-red-500/10 border-red-500/20',
     icon: AlertTriangle,
   },
   false_positive: {
     label: 'Falso Positivo',
     description: 'No es la misma persona — descartado y agregado a whitelist',
-    color: 'text-green-400',
+    color: 'text-green-700 dark:text-green-400',
     bgColor: 'bg-green-500/10 border-green-500/20',
     icon: CheckCircle,
   },
   escalate: {
     label: 'Escalado',
     description: 'Requiere revision de un supervisor o MLRO',
-    color: 'text-orange-400',
+    color: 'text-orange-700 dark:text-orange-400',
     bgColor: 'bg-orange-500/10 border-orange-500/20',
     icon: ArrowUpRight,
   },
   inconclusive: {
     label: 'Inconcluso',
     description: 'Informacion insuficiente para determinar',
-    color: 'text-gray-400',
+    color: 'text-muted-foreground',
     bgColor: 'bg-gray-500/10 border-gray-500/20',
     icon: HelpCircle,
   },
@@ -211,7 +211,7 @@ export function CaseDetailPage() {
           title="Caso no encontrado"
           description="El caso que buscas no existe o ya no está disponible."
           action={
-            <Button variant="ghost" onClick={() => navigate('/compliance')} className="text-gray-400">
+            <Button variant="ghost" onClick={() => navigate('/compliance')} className="text-muted-foreground">
               <ArrowLeft className="w-4 h-4 mr-2" /> Volver
             </Button>
           }
@@ -244,7 +244,7 @@ export function CaseDetailPage() {
         description={caseData.case_number}
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <Shield className="w-6 h-6 text-blue-400" />
+            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
@@ -252,7 +252,7 @@ export function CaseDetailPage() {
             <Button
               variant="ghost"
               onClick={() => navigate('/compliance')}
-              className="text-gray-400 hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Casos
             </Button>
@@ -261,7 +261,7 @@ export function CaseDetailPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => navigate(`/entity/${caseData.entity_id}`)}
-                className="w-full sm:w-auto text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
+                className="w-full sm:w-auto text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
               >
                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
                 Ver Entidad
@@ -293,20 +293,20 @@ export function CaseDetailPage() {
                     {primaryDecisionConfig.label}
                   </h2>
                   {caseData.closed_at && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {formatRelativeTime(caseData.closed_at)}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-400 mb-3">
+                <p className="text-sm text-muted-foreground mb-3">
                   {String(primaryDecisionConfig.description)}
                 </p>
 
                 {/* Decision reason */}
                 {!!primaryDecision?.reason && (
                   <div className="bg-black/20 rounded-lg p-3 mb-3">
-                    <p className="text-xs text-gray-500 mb-1">Razon del analista:</p>
-                    <p className="text-sm text-gray-300">{String(primaryDecision.reason)}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Razon del analista:</p>
+                    <p className="text-sm text-muted-foreground">{String(primaryDecision.reason)}</p>
                   </div>
                 )}
 
@@ -314,8 +314,8 @@ export function CaseDetailPage() {
                 {caseData.status === 'closed_tp' && !caseData.sar_filed && (
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-foreground/5">
                     <div className="flex items-start gap-3">
-                      <FileWarning className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                      <span className="text-sm text-amber-400">
+                      <FileWarning className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0" />
+                      <span className="text-sm text-amber-700 dark:text-amber-400">
                         Accion pendiente: Presentar Reporte de Operacion Sospechosa (SAR/ROS)
                       </span>
                     </div>
@@ -324,7 +324,7 @@ export function CaseDetailPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => { fetchSarReport(); setShowSarReport(true); }}
-                        className="text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
+                        className="text-amber-700 dark:text-amber-400 border-amber-500/30 hover:bg-amber-500/10"
                       >
                         <FileText className="w-3.5 h-3.5 mr-1.5" />
                         Ver Reporte
@@ -343,14 +343,14 @@ export function CaseDetailPage() {
                 {caseData.sar_filed && (
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-3 border-t border-foreground/5">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                      <span className="text-sm text-blue-400">SAR/ROS presentado ante el regulador</span>
+                      <CheckCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                      <span className="text-sm text-blue-600 dark:text-blue-400">SAR/ROS presentado ante el regulador</span>
                     </div>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={() => { fetchSarReport(); setShowSarReport(true); }}
-                      className="text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
+                      className="text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/10"
                     >
                       <FileText className="w-3.5 h-3.5 mr-1.5" />
                       Ver Reporte
@@ -372,7 +372,7 @@ export function CaseDetailPage() {
           {/* Top row: number + badges */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-3">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-gray-500 font-mono">{caseData.case_number}</span>
+              <span className="text-sm text-muted-foreground font-mono">{caseData.case_number}</span>
               <Badge variant="outline" className={cn('text-xs gap-1', status.color)}>
                 <StatusIcon className="w-3 h-3" />
                 {status.label}
@@ -381,7 +381,7 @@ export function CaseDetailPage() {
                 {priority.label}
               </Badge>
               {caseData.sla_breached && (
-                <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30 animate-pulse">
+                <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30 animate-pulse">
                   SLA Vencido
                 </Badge>
               )}
@@ -389,7 +389,7 @@ export function CaseDetailPage() {
           </div>
 
           {caseData.description && (
-            <p className="text-sm text-gray-500 mb-4">{caseData.description}</p>
+            <p className="text-sm text-muted-foreground mb-4">{caseData.description}</p>
           )}
 
           <DetailList className="pt-4 border-t border-foreground/5">
@@ -418,9 +418,9 @@ export function CaseDetailPage() {
           className="mb-6"
         >
           <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-            <Shield className="w-4 h-4 text-blue-400" />
+            <Shield className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             Coincidencias detectadas
-            <span className="text-xs text-gray-500 font-normal">({alerts.length})</span>
+            <span className="text-xs text-muted-foreground font-normal">({alerts.length})</span>
           </h2>
 
           {alerts.length === 0 ? (
@@ -446,7 +446,7 @@ export function CaseDetailPage() {
                           {alertDecision.label}
                         </span>
                         {alert.decided_at && (
-                          <span className="text-xs text-gray-500 ml-auto">
+                          <span className="text-xs text-muted-foreground ml-auto">
                             {formatDateTime(alert.decided_at)}
                           </span>
                         )}
@@ -460,9 +460,9 @@ export function CaseDetailPage() {
                           <div className="flex items-start gap-2 mb-2">
                             <p className="text-foreground font-medium break-words">{alert.matched_entity_name}</p>
                             <Badge variant="outline" className={cn('text-[10px] flex-shrink-0',
-                              alert.severity === 'critical' ? 'bg-red-500/10 text-red-400 border-red-500/30' :
-                              alert.severity === 'high' ? 'bg-orange-500/10 text-orange-400 border-orange-500/30' :
-                              'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                              alert.severity === 'critical' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' :
+                              alert.severity === 'high' ? 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30' :
+                              'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30'
                             )}>
                               {alert.severity === 'critical' ? 'Critico' :
                                alert.severity === 'high' ? 'Alto' : 'Medio'}
@@ -472,22 +472,22 @@ export function CaseDetailPage() {
                           {/* Match details — clean layout */}
                           <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-1 text-sm mb-3">
                             <div>
-                              <span className="text-gray-500">Busqueda: </span>
-                              <span className="text-gray-300">"{alert.query_name}"</span>
+                              <span className="text-muted-foreground">Busqueda: </span>
+                              <span className="text-muted-foreground">"{alert.query_name}"</span>
                             </div>
                             <div>
-                              <span className="text-gray-500">Confianza: </span>
+                              <span className="text-muted-foreground">Confianza: </span>
                               <span className={cn('font-mono',
-                                alert.match_confidence >= 0.9 ? 'text-red-400' :
-                                alert.match_confidence >= 0.7 ? 'text-orange-400' : 'text-yellow-400'
+                                alert.match_confidence >= 0.9 ? 'text-red-600 dark:text-red-400' :
+                                alert.match_confidence >= 0.7 ? 'text-orange-700 dark:text-orange-400' : 'text-yellow-700 dark:text-yellow-400'
                               )}>
                                 {Math.round(alert.match_confidence * 100)}%
                               </span>
                             </div>
                             {alert.entity_risk_score != null && (
                               <div>
-                                <span className="text-gray-500">Riesgo: </span>
-                                <span className="text-gray-300 font-mono">{alert.entity_risk_score}</span>
+                                <span className="text-muted-foreground">Riesgo: </span>
+                                <span className="text-muted-foreground font-mono">{alert.entity_risk_score}</span>
                               </div>
                             )}
                           </div>
@@ -498,7 +498,7 @@ export function CaseDetailPage() {
                               {alert.matched_sources.map((s) => (
                                 <span
                                   key={s}
-                                  className="text-[11px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400/70 border border-blue-500/10"
+                                  className="text-[11px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 dark:text-blue-400/70 border border-blue-500/10"
                                 >
                                   {s.replace(/_/g, ' ')}
                                 </span>
@@ -509,8 +509,8 @@ export function CaseDetailPage() {
                           {/* Decision reason inline */}
                           {alert.decision_reason && (
                             <div className="mt-3 p-3 rounded-lg bg-foreground/[0.03] border border-foreground/5">
-                              <p className="text-xs text-gray-500 mb-1">Razon:</p>
-                              <p className="text-sm text-gray-300">{alert.decision_reason}</p>
+                              <p className="text-xs text-muted-foreground mb-1">Razon:</p>
+                              <p className="text-sm text-muted-foreground">{alert.decision_reason}</p>
                             </div>
                           )}
                         </div>
@@ -540,17 +540,17 @@ export function CaseDetailPage() {
           {alerts.length > 0 && !isClosed && (
             <div className="mt-4 glass rounded-lg p-4">
               <div className="flex items-start justify-between gap-3 mb-2">
-                <span className="text-xs text-gray-400">Progreso de revision</span>
-                <span className="text-xs text-gray-400">{decidedAlerts.length}/{alerts.length}</span>
+                <span className="text-xs text-muted-foreground">Progreso de revision</span>
+                <span className="text-xs text-muted-foreground">{decidedAlerts.length}/{alerts.length}</span>
               </div>
-              <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-card rounded-full overflow-hidden">
                 <div
                   className="h-full bg-blue-500 rounded-full transition-all duration-500"
                   style={{ width: `${alerts.length ? (decidedAlerts.length / alerts.length) * 100 : 0}%` }}
                 />
               </div>
               {pendingAlerts.length === 0 && decidedAlerts.length > 0 && (
-                <p className="text-xs text-green-400 mt-2 flex items-center gap-1">
+                <p className="text-xs text-green-700 dark:text-green-400 mt-2 flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" />
                   Todas las alertas revisadas — el caso se cerrara automaticamente
                 </p>
@@ -569,7 +569,7 @@ export function CaseDetailPage() {
             className="mb-6"
           >
             <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-              <Clock className="w-4 h-4 text-gray-400" />
+              <Clock className="w-4 h-4 text-muted-foreground" />
               Historial
             </h2>
             <div className="glass rounded-xl p-5">
@@ -599,25 +599,25 @@ export function CaseDetailPage() {
                           'absolute left-1 w-[22px] h-[22px] rounded-full flex items-center justify-center z-10',
                           'bg-background border border-foreground/10',
                         )}>
-                          <EventIcon className="w-3 h-3 text-gray-500" />
+                          <EventIcon className="w-3 h-3 text-muted-foreground" />
                         </div>
                         <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                           <div className="min-w-0">
-                            <span className="text-sm text-gray-300 break-words">{config.label}</span>
+                            <span className="text-sm text-muted-foreground break-words">{config.label}</span>
                             {description && (
-                              <span className="text-sm text-gray-500 block sm:inline sm:ml-2">— {String(description)}</span>
+                              <span className="text-sm text-muted-foreground block sm:inline sm:ml-2">— {String(description)}</span>
                             )}
                           </div>
-                          <span className="text-[11px] text-gray-600 flex-shrink-0 ml-4">
+                          <span className="text-[11px] text-muted-foreground flex-shrink-0 ml-4">
                             {formatDateTime(event.created_at as string)}
                           </span>
                         </div>
                         {event.old_value != null && event.new_value != null && (
                           <div className="flex items-center gap-2 mt-1 text-xs">
-                            <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-gray-500">
+                            <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-muted-foreground">
                               {statusConfig[String(event.old_value)]?.label || String(event.old_value)}
                             </span>
-                            <ChevronRight className="w-3 h-3 text-gray-600" />
+                            <ChevronRight className="w-3 h-3 text-muted-foreground" />
                             <span className="px-1.5 py-0.5 rounded bg-foreground/5 text-foreground">
                               {statusConfig[String(event.new_value)]?.label || String(event.new_value)}
                             </span>
@@ -641,10 +641,10 @@ export function CaseDetailPage() {
           className="mb-6"
         >
           <h2 className="text-base font-semibold text-foreground mb-3 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-gray-400" />
+            <MessageSquare className="w-4 h-4 text-muted-foreground" />
             Notas
             {notes.length > 0 && (
-              <span className="text-xs text-gray-500 font-normal">({notes.length})</span>
+              <span className="text-xs text-muted-foreground font-normal">({notes.length})</span>
             )}
           </h2>
 
@@ -655,7 +655,7 @@ export function CaseDetailPage() {
                 value={noteContent}
                 onChange={(e) => setNoteContent(e.target.value)}
                 placeholder="Agregar una nota al caso..."
-                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600 mb-3 min-h-[80px]"
+                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground mb-3 min-h-[80px]"
                 rows={2}
               />
               <div className="flex justify-end">
@@ -684,13 +684,13 @@ export function CaseDetailPage() {
                 <div key={String(note.id)} className="glass rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center">
-                      <User className="w-3 h-3 text-blue-400" />
+                      <User className="w-3 h-3 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="text-[11px] text-gray-500">
+                    <span className="text-[11px] text-muted-foreground">
                       {formatDateTime(note.created_at as string)}
                     </span>
                   </div>
-                  <p className="text-gray-300 text-sm whitespace-pre-wrap pl-8">
+                  <p className="text-muted-foreground text-sm whitespace-pre-wrap pl-8">
                     {String(note.content || '')}
                   </p>
                 </div>
@@ -713,12 +713,12 @@ export function CaseDetailPage() {
               {/* Context card */}
               <div className="p-4 rounded-xl bg-foreground/5 border border-foreground/5">
                 <p className="text-foreground font-medium mb-1">{decisionDialog.matched_entity_name}</p>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 text-sm text-gray-400">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3 text-sm text-muted-foreground">
                   <span>Busqueda: "{decisionDialog.query_name}"</span>
-                  <span className="hidden sm:inline text-gray-600">|</span>
+                  <span className="hidden sm:inline text-muted-foreground">|</span>
                   <span className={cn('font-mono',
-                    decisionDialog.match_confidence >= 0.9 ? 'text-red-400' :
-                    decisionDialog.match_confidence >= 0.7 ? 'text-orange-400' : 'text-yellow-400'
+                    decisionDialog.match_confidence >= 0.9 ? 'text-red-600 dark:text-red-400' :
+                    decisionDialog.match_confidence >= 0.7 ? 'text-orange-700 dark:text-orange-400' : 'text-yellow-700 dark:text-yellow-400'
                   )}>
                     {Math.round(decisionDialog.match_confidence * 100)}% confianza
                   </span>
@@ -726,7 +726,7 @@ export function CaseDetailPage() {
                 {decisionDialog.matched_sources.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {decisionDialog.matched_sources.map((s) => (
-                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/5 text-gray-500">
+                      <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/5 text-muted-foreground">
                         {s.replace(/_/g, ' ')}
                       </span>
                     ))}
@@ -736,7 +736,7 @@ export function CaseDetailPage() {
 
               {/* Primary decisions */}
               <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Decision</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">Decision</p>
                 <div className="grid grid-cols-2 gap-2">
                   {/* True Positive */}
                   <button
@@ -745,14 +745,14 @@ export function CaseDetailPage() {
                       'p-4 rounded-xl border-2 text-left transition-all',
                       decisionType === 'true_positive'
                         ? 'bg-red-500/15 border-red-500/60 text-white'
-                        : 'border-foreground/10 text-gray-300 hover:bg-red-500/5 hover:border-red-500/20'
+                        : 'border-foreground/10 text-muted-foreground hover:bg-red-500/5 hover:border-red-500/20'
                     )}
                   >
                     <AlertTriangle className={cn('w-5 h-5 mb-2',
-                      decisionType === 'true_positive' ? 'text-red-400' : 'text-gray-500'
+                      decisionType === 'true_positive' ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground'
                     )} />
                     <span className="text-sm font-medium block">Verdadero Positivo</span>
-                    <span className="text-[11px] text-gray-500 block mt-0.5">
+                    <span className="text-[11px] text-muted-foreground block mt-0.5">
                       Coincide con la entidad; requiere accion
                     </span>
                   </button>
@@ -764,14 +764,14 @@ export function CaseDetailPage() {
                       'p-4 rounded-xl border-2 text-left transition-all',
                       decisionType === 'false_positive'
                         ? 'bg-green-500/15 border-green-500/60 text-white'
-                        : 'border-foreground/10 text-gray-300 hover:bg-green-500/5 hover:border-green-500/20'
+                        : 'border-foreground/10 text-muted-foreground hover:bg-green-500/5 hover:border-green-500/20'
                     )}
                   >
                     <CheckCircle className={cn('w-5 h-5 mb-2',
-                      decisionType === 'false_positive' ? 'text-green-400' : 'text-gray-500'
+                      decisionType === 'false_positive' ? 'text-green-700 dark:text-green-400' : 'text-muted-foreground'
                     )} />
                     <span className="text-sm font-medium block">Falso Positivo</span>
-                    <span className="text-[11px] text-gray-500 block mt-0.5">
+                    <span className="text-[11px] text-muted-foreground block mt-0.5">
                       No corresponde a la entidad evaluada
                     </span>
                   </button>
@@ -785,11 +785,11 @@ export function CaseDetailPage() {
                       'p-3 rounded-xl border-2 text-left transition-all',
                       decisionType === 'escalate'
                         ? 'bg-orange-500/15 border-orange-500/60 text-white'
-                        : 'border-foreground/10 text-gray-300 hover:bg-orange-500/5 hover:border-orange-500/20'
+                        : 'border-foreground/10 text-muted-foreground hover:bg-orange-500/5 hover:border-orange-500/20'
                     )}
                   >
                     <span className="text-sm font-medium">Escalar</span>
-                    <span className="text-[11px] text-gray-500 block">Requiere supervisor</span>
+                    <span className="text-[11px] text-muted-foreground block">Requiere supervisor</span>
                   </button>
                   <button
                     onClick={() => setDecisionType('inconclusive')}
@@ -797,25 +797,25 @@ export function CaseDetailPage() {
                       'p-3 rounded-xl border-2 text-left transition-all',
                       decisionType === 'inconclusive'
                         ? 'bg-gray-500/15 border-gray-500/60 text-white'
-                        : 'border-foreground/10 text-gray-300 hover:bg-gray-500/5 hover:border-gray-500/20'
+                        : 'border-foreground/10 text-muted-foreground hover:bg-gray-500/5 hover:border-gray-500/20'
                     )}
                   >
                     <span className="text-sm font-medium">Inconcluso</span>
-                    <span className="text-[11px] text-gray-500 block">Informacion insuficiente</span>
+                    <span className="text-[11px] text-muted-foreground block">Informacion insuficiente</span>
                   </button>
                 </div>
               </div>
 
               {/* Reason */}
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
+                <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
                   Justificacion (requerida)
                 </label>
                 <Textarea
                   value={decisionReason}
                   onChange={(e) => setDecisionReason(e.target.value)}
                   placeholder="Describe la razon de esta decision..."
-                  className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600"
+                  className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground"
                   rows={3}
                 />
               </div>
@@ -823,24 +823,24 @@ export function CaseDetailPage() {
               {/* Contextual warnings */}
               {decisionType === 'false_positive' && (
                 <div className="p-3 rounded-lg bg-green-500/5 border border-green-500/15 flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-green-400/80">
+                  <Shield className="w-4 h-4 text-green-700 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-green-700 dark:text-green-400/80">
                     Se creara una lista blanca automaticamente para suprimir futuras alertas de esta coincidencia.
                   </p>
                 </div>
               )}
               {decisionType === 'true_positive' && (
                 <div className="p-3 rounded-lg bg-red-500/5 border border-red-500/15 flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-red-400/80">
+                  <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-600 dark:text-red-400/80">
                     El caso se cerrara como confirmado. Deberas evaluar si se requiere presentar un SAR/ROS al regulador.
                   </p>
                 </div>
               )}
               {decisionType === 'escalate' && (
                 <div className="p-3 rounded-lg bg-orange-500/5 border border-orange-500/15 flex items-start gap-2">
-                  <ArrowUpRight className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                  <p className="text-xs text-orange-400/80">
+                  <ArrowUpRight className="w-4 h-4 text-orange-700 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-orange-700 dark:text-orange-400/80">
                     El caso se marcara como escalado. Un supervisor debera tomar la decision final.
                   </p>
                 </div>
@@ -851,7 +851,7 @@ export function CaseDetailPage() {
                 <Button
                   variant="ghost"
                   onClick={() => setDecisionDialog(null)}
-                  className="w-full sm:w-auto text-gray-400"
+                  className="w-full sm:w-auto text-muted-foreground"
                 >
                   Cancelar
                 </Button>
@@ -892,7 +892,7 @@ export function CaseDetailPage() {
           <DialogHeader>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <DialogTitle className="text-lg flex items-center gap-2">
-                <FileWarning className="w-5 h-5 text-amber-400" />
+                <FileWarning className="w-5 h-5 text-amber-700 dark:text-amber-400" />
                 Reporte de Actividad Sospechosa (SAR/ROS)
               </DialogTitle>
             </div>
@@ -910,22 +910,22 @@ export function CaseDetailPage() {
               <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/15">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">Reporte SAR/ROS</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wider">Reporte SAR/ROS</p>
                     <p className="text-lg font-semibold text-foreground mt-1">
                       {(sarReport as any).sar_report?.case?.case_number || caseData.case_number}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Generado</p>
-                    <p className="text-sm text-gray-300">
+                    <p className="text-xs text-muted-foreground">Generado</p>
+                    <p className="text-sm text-muted-foreground">
                       {formatDateTime((sarReport as any).sar_report?.generated_at)}
                     </p>
                   </div>
                 </div>
                 {(sarReport as any).sar_report?.case?.sar_reference && (
                   <div className="flex items-center gap-2 pt-2 border-t border-amber-500/10">
-                    <Hash className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-sm text-amber-400">
+                    <Hash className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400" />
+                    <span className="text-sm text-amber-700 dark:text-amber-400">
                       Referencia: {(sarReport as any).sar_report.case.sar_reference}
                     </span>
                   </div>
@@ -934,7 +934,7 @@ export function CaseDetailPage() {
 
               {/* Subject */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <User className="w-4 h-4" />
                   Sujeto Investigado
                 </h3>
@@ -945,28 +945,28 @@ export function CaseDetailPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                     {(sarReport as any).sar_report?.subject?.entity_type && (
                       <div>
-                        <span className="text-gray-500">Tipo: </span>
-                        <span className="text-gray-300">{(sarReport as any).sar_report.subject.entity_type}</span>
+                        <span className="text-muted-foreground">Tipo: </span>
+                        <span className="text-muted-foreground">{(sarReport as any).sar_report.subject.entity_type}</span>
                       </div>
                     )}
                     {(sarReport as any).sar_report?.subject?.client_name && (
                       <div>
-                        <span className="text-gray-500">Cliente: </span>
-                        <span className="text-gray-300">{(sarReport as any).sar_report.subject.client_name}</span>
+                        <span className="text-muted-foreground">Cliente: </span>
+                        <span className="text-muted-foreground">{(sarReport as any).sar_report.subject.client_name}</span>
                       </div>
                     )}
                     <div>
-                      <span className="text-gray-500">Riesgo: </span>
+                      <span className="text-muted-foreground">Riesgo: </span>
                       <span className={cn('font-mono',
-                        ((sarReport as any).sar_report?.case?.risk_score || 0) >= 70 ? 'text-red-400' : 'text-yellow-400'
+                        ((sarReport as any).sar_report?.case?.risk_score || 0) >= 70 ? 'text-red-600 dark:text-red-400' : 'text-yellow-700 dark:text-yellow-400'
                       )}>
                         {(sarReport as any).sar_report?.case?.risk_score || caseData.risk_score}/100
                         {' '}({(sarReport as any).sar_report?.case?.risk_level || caseData.risk_level})
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Prioridad: </span>
-                      <span className="text-gray-300">
+                      <span className="text-muted-foreground">Prioridad: </span>
+                      <span className="text-muted-foreground">
                         {priorityConfig[(sarReport as any).sar_report?.case?.priority]?.label || caseData.priority}
                       </span>
                     </div>
@@ -976,7 +976,7 @@ export function CaseDetailPage() {
 
               {/* Summary stats */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <ListChecks className="w-4 h-4" />
                   Resumen
                 </h3>
@@ -985,19 +985,19 @@ export function CaseDetailPage() {
                     <p className="text-2xl font-bold text-foreground">
                       {(sarReport as any).sar_report?.summary?.total_alerts || 0}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Alertas</p>
+                    <p className="text-xs text-muted-foreground mt-1">Alertas</p>
                   </div>
                   <div className="glass rounded-xl p-4 text-center">
-                    <p className="text-2xl font-bold text-red-400">
+                    <p className="text-2xl font-bold text-red-600 dark:text-red-400">
                       {(sarReport as any).sar_report?.summary?.true_positives || 0}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Verdaderos Positivos</p>
+                    <p className="text-xs text-muted-foreground mt-1">Verdaderos Positivos</p>
                   </div>
                   <div className="glass rounded-xl p-4 text-center">
-                    <p className="text-2xl font-bold text-blue-400">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {((sarReport as any).sar_report?.summary?.sources_involved || []).length}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Fuentes</p>
+                    <p className="text-xs text-muted-foreground mt-1">Fuentes</p>
                   </div>
                 </div>
               </div>
@@ -1005,7 +1005,7 @@ export function CaseDetailPage() {
               {/* Sources involved */}
               {((sarReport as any).sar_report?.summary?.sources_involved || []).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <Globe className="w-4 h-4" />
                     Listas y Fuentes donde aparece
                   </h3>
@@ -1014,7 +1014,7 @@ export function CaseDetailPage() {
                       {((sarReport as any).sar_report?.summary?.sources_involved || []).map((s: string) => (
                         <span
                           key={s}
-                          className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-400 border border-red-500/15"
+                          className="text-xs px-2.5 py-1 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/15"
                         >
                           {s.replace(/_/g, ' ')}
                         </span>
@@ -1027,7 +1027,7 @@ export function CaseDetailPage() {
               {/* Alerts detail */}
               {((sarReport as any).sar_report?.alerts || []).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4" />
                     Detalle de Alertas
                   </h3>
@@ -1046,15 +1046,15 @@ export function CaseDetailPage() {
                             </Badge>
                           )}
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-400">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
                           <div>Busqueda: "{alert.query_name}"</div>
                           <div>Confianza: <span className="font-mono text-foreground">{Math.round((alert.match_confidence || 0) * 100)}%</span></div>
                           <div>Riesgo: <span className="font-mono text-foreground">{alert.risk_score}</span></div>
                           <div>Tipo: {alert.alert_type}</div>
                         </div>
                         {alert.decision_reason && (
-                          <div className="mt-2 p-2 rounded bg-foreground/[0.03] text-sm text-gray-400">
-                            <span className="text-gray-500">Razon: </span>{alert.decision_reason}
+                          <div className="mt-2 p-2 rounded bg-foreground/[0.03] text-sm text-muted-foreground">
+                            <span className="text-muted-foreground">Razon: </span>{alert.decision_reason}
                           </div>
                         )}
                       </div>
@@ -1066,7 +1066,7 @@ export function CaseDetailPage() {
               {/* Decisions */}
               {((sarReport as any).sar_report?.decisions || []).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <Gavel className="w-4 h-4" />
                     Decisiones Formales
                   </h3>
@@ -1077,11 +1077,11 @@ export function CaseDetailPage() {
                           <span className={cn('font-medium', decisionConfig[dec.decision]?.color || 'text-white')}>
                             {decisionConfig[dec.decision]?.label || dec.decision}
                           </span>
-                          <span className="text-xs text-gray-500">{formatDateTime(dec.created_at)}</span>
+                          <span className="text-xs text-muted-foreground">{formatDateTime(dec.created_at)}</span>
                         </div>
-                        <p className="text-sm text-gray-400">{dec.reason}</p>
+                        <p className="text-sm text-muted-foreground">{dec.reason}</p>
                         {dec.analyst_role && (
-                          <p className="text-xs text-gray-500 mt-1">Rol: {dec.analyst_role}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Rol: {dec.analyst_role}</p>
                         )}
                       </div>
                     ))}
@@ -1092,7 +1092,7 @@ export function CaseDetailPage() {
               {/* Timeline */}
               {((sarReport as any).sar_report?.timeline || []).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <CalendarDays className="w-4 h-4" />
                     Cronologia
                   </h3>
@@ -1100,10 +1100,10 @@ export function CaseDetailPage() {
                     <div className="space-y-2">
                       {((sarReport as any).sar_report?.timeline || []).map((event: any, i: number) => (
                         <div key={i} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-sm py-1 border-b border-foreground/5 last:border-0">
-                          <span className="text-gray-300 break-words">
+                          <span className="text-muted-foreground break-words">
                             {eventTypeConfig[event.event]?.label || event.event}
                           </span>
-                          <span className="text-xs text-gray-500">{formatDateTime(event.timestamp)}</span>
+                          <span className="text-xs text-muted-foreground">{formatDateTime(event.timestamp)}</span>
                         </div>
                       ))}
                     </div>
@@ -1114,15 +1114,15 @@ export function CaseDetailPage() {
               {/* Notes (non-internal only) */}
               {((sarReport as any).sar_report?.notes || []).length > 0 && (
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                     <MessageSquare className="w-4 h-4" />
                     Notas
                   </h3>
                   <div className="glass rounded-xl p-4 space-y-3">
                     {((sarReport as any).sar_report?.notes || []).map((note: any, i: number) => (
                       <div key={i} className="text-sm">
-                        <p className="text-gray-300">{note.content}</p>
-                        <p className="text-xs text-gray-500 mt-1">{formatDateTime(note.created_at)}</p>
+                        <p className="text-muted-foreground">{note.content}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{formatDateTime(note.created_at)}</p>
                       </div>
                     ))}
                   </div>
@@ -1131,34 +1131,34 @@ export function CaseDetailPage() {
 
               {/* Case info */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-2">
                   <Building2 className="w-4 h-4" />
                   Informacion del Caso
                 </h3>
                 <div className="glass rounded-xl p-4">
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-gray-500">Estado: </span>
-                      <span className="text-gray-300">
+                      <span className="text-muted-foreground">Estado: </span>
+                      <span className="text-muted-foreground">
                         {statusConfig[(sarReport as any).sar_report?.case?.status]?.label || (sarReport as any).sar_report?.case?.status}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Resolucion: </span>
-                      <span className="text-gray-300">{(sarReport as any).sar_report?.case?.resolution || '-'}</span>
+                      <span className="text-muted-foreground">Resolucion: </span>
+                      <span className="text-muted-foreground">{(sarReport as any).sar_report?.case?.resolution || '-'}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Creado: </span>
-                      <span className="text-gray-300">{formatDateTime((sarReport as any).sar_report?.case?.created_at)}</span>
+                      <span className="text-muted-foreground">Creado: </span>
+                      <span className="text-muted-foreground">{formatDateTime((sarReport as any).sar_report?.case?.created_at)}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Cerrado: </span>
-                      <span className="text-gray-300">{formatDateTime((sarReport as any).sar_report?.case?.closed_at)}</span>
+                      <span className="text-muted-foreground">Cerrado: </span>
+                      <span className="text-muted-foreground">{formatDateTime((sarReport as any).sar_report?.case?.closed_at)}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">SLA: </span>
-                      <span className={cn('text-gray-300',
-                        (sarReport as any).sar_report?.case?.sla_breached ? 'text-red-400' : ''
+                      <span className="text-muted-foreground">SLA: </span>
+                      <span className={cn('text-muted-foreground',
+                        (sarReport as any).sar_report?.case?.sla_breached ? 'text-red-600 dark:text-red-400' : ''
                       )}>
                         {(sarReport as any).sar_report?.case?.sla_breached ? 'Vencido' : 'Dentro de plazo'}
                       </span>
@@ -1183,7 +1183,7 @@ export function CaseDetailPage() {
                       URL.revokeObjectURL(url);
                       toast.success('Reporte descargado');
                     }}
-                    className="text-gray-400 border-foreground/10 hover:bg-foreground/5"
+                    className="text-muted-foreground border-foreground/10 hover:bg-foreground/5"
                   >
                     <Download className="w-3.5 h-3.5 mr-1.5" />
                     JSON
@@ -1194,7 +1194,7 @@ export function CaseDetailPage() {
                   <Button
                     variant="ghost"
                     onClick={() => setShowSarReport(false)}
-                    className="text-gray-400"
+                    className="text-muted-foreground"
                   >
                     Cerrar
                   </Button>
@@ -1212,8 +1212,8 @@ export function CaseDetailPage() {
             </div>
           ) : (
             <div className="py-8 text-center">
-              <XCircle className="w-12 h-12 text-red-400/50 mx-auto mb-3" />
-              <p className="text-gray-400">No se pudo generar el reporte</p>
+              <XCircle className="w-12 h-12 text-red-600 dark:text-red-400/50 mx-auto mb-3" />
+              <p className="text-muted-foreground">No se pudo generar el reporte</p>
             </div>
           )}
         </DialogContent>
@@ -1226,31 +1226,31 @@ export function CaseDetailPage() {
         <DialogContent className="bg-card border-foreground/10 text-foreground max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg flex items-center gap-2">
-              <FileWarning className="w-5 h-5 text-amber-400" />
+              <FileWarning className="w-5 h-5 text-amber-700 dark:text-amber-400" />
               Registrar SAR/ROS
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-muted-foreground">
               Ingresa el numero de referencia del Reporte de Operacion Sospechosa
               presentado ante la autoridad reguladora (UIF/FinCEN).
             </p>
 
             <div>
-              <label className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
+              <label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
                 Numero de referencia SAR/ROS
               </label>
               <Input
                 value={sarReference}
                 onChange={(e) => setSarReference(e.target.value)}
                 placeholder="Ej: ROS-2026-00145 o SAR-20260314-001"
-                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-gray-600"
+                className="bg-foreground/5 border-foreground/10 text-foreground placeholder:text-muted-foreground"
               />
             </div>
 
             <div className="p-3 rounded-lg bg-amber-500/5 border border-amber-500/15 flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-400/80">
+              <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+              <div className="text-xs text-amber-700 dark:text-amber-400/80">
                 <p className="font-medium mb-1">Esta accion es irreversible</p>
                 <p>El caso se marcara como "SAR Presentado" y se registrara
                   en el historial de auditoria con fecha y referencia.</p>
@@ -1261,7 +1261,7 @@ export function CaseDetailPage() {
               <Button
                 variant="ghost"
                 onClick={() => setShowFileSarDialog(false)}
-                className="text-gray-400"
+                className="text-muted-foreground"
               >
                 Cancelar
               </Button>

@@ -127,7 +127,7 @@ export function ActivityLogPage() {
       id: 'endpoint',
       header: 'Endpoint',
       cell: (row) => (
-        <code className="font-mono text-xs text-electric-300 break-all">{row.endpoint}</code>
+        <code className="font-mono text-xs text-electric-700 dark:text-electric-300 break-all">{row.endpoint}</code>
       ),
     },
     {
@@ -171,7 +171,7 @@ export function ActivityLogPage() {
           description="Auditoría de acciones de usuarios y llamadas al API."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
-              <ClipboardList className="w-6 h-6 text-electric-400" aria-hidden="true" />
+              <ClipboardList className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
             </div>
           }
           actions={

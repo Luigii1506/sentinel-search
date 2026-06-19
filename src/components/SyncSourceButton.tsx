@@ -84,7 +84,7 @@ export function SyncSourceButton({
         <Button
           size={size}
           variant="ghost"
-          className="h-7 text-xs text-gray-400"
+          className="h-7 text-xs text-muted-foreground"
           onClick={() => setConfirming(false)}
         >
           ✕

@@ -235,7 +235,7 @@ export function FederatedSearchPage() {
         description="Consulta una persona o empresa una sola vez y revisa cobertura interna, leaks e inteligencia externa con una lectura más accionable."
         icon={
           <div className="rounded-xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/15 via-blue-500/10 to-transparent p-3">
-            <FileSearch className="h-6 w-6 text-cyan-300" />
+            <FileSearch className="h-6 w-6 text-cyan-700 dark:text-cyan-300" />
           </div>
         }
       />

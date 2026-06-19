@@ -24,11 +24,11 @@ const TONE_STYLES = {
     iconBg: 'bg-muted',
   },
   success: {
-    iconColor: 'text-green-400',
+    iconColor: 'text-green-700 dark:text-green-400',
     iconBg: 'bg-green-500/10 border border-green-500/20',
   },
   warning: {
-    iconColor: 'text-amber-400',
+    iconColor: 'text-amber-700 dark:text-amber-400',
     iconBg: 'bg-amber-500/10 border border-amber-500/20',
   },
 } as const;

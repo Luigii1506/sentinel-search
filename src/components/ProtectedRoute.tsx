@@ -14,7 +14,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-blue-600 dark:text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -30,7 +30,7 @@ export function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) 
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground mb-2">Acceso Denegado</h1>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground">
             No tienes permisos para acceder a esta sección.
           </p>
         </div>

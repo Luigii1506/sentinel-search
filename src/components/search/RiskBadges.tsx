@@ -59,7 +59,7 @@ export function RiskBadges({
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full font-semibold border',
-            'bg-red-500/10 text-red-300 border-red-500/30',
+            'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
             sz,
           )}
           title="Sancionado directamente — en lista oficial de sanciones (OFAC, UN, EU, etc.)"
@@ -71,7 +71,7 @@ export function RiskBadges({
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full font-semibold border',
-            'bg-orange-500/10 text-orange-300 border-orange-500/30',
+            'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30',
             sz,
           )}
           title="Vinculado a sancionado — relacionado con persona/entidad sancionada, pero no sancionado él/ella directamente"
@@ -83,7 +83,7 @@ export function RiskBadges({
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full font-semibold border',
-            'bg-purple-500/10 text-purple-300 border-purple-500/30',
+            'bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/30',
             sz,
           )}
           title={`Politically Exposed Person${pepCategory ? ` — ${formatCategory(pepCategory)}` : ''}`}
@@ -100,7 +100,7 @@ export function RiskBadges({
         <span
           className={cn(
             'inline-flex items-center gap-1 rounded-full font-semibold border',
-            'bg-yellow-500/10 text-yellow-300 border-yellow-500/30',
+            'bg-yellow-500/10 text-yellow-700 dark:text-yellow-300 border-yellow-500/30',
             sz,
           )}
           title={`Relative or Close Associate — familiar/socio de PEP${pepCategory ? ` (${formatCategory(pepCategory)})` : ''}`}

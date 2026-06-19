@@ -49,9 +49,9 @@ export function MetricCard({
 }: MetricCardProps) {
   // Resolve color of the value itself when accent is set.
   const valueColor =
-    accent === 'red'     ? 'text-red-300' :
-    accent === 'amber'   ? 'text-amber-300' :
-    accent === 'success' ? 'text-green-300' :
+    accent === 'red'     ? 'text-red-600 dark:text-red-300' :
+    accent === 'amber'   ? 'text-amber-700 dark:text-amber-300' :
+    accent === 'success' ? 'text-green-700 dark:text-green-300' :
     'text-foreground';
 
   // Resolve delta presentation. higherIsBetter inverts the color when
@@ -66,8 +66,8 @@ export function MetricCard({
 
     const deltaColor =
       delta.value === 0 ? 'text-muted-foreground' :
-      isGood            ? 'text-green-300' :
-      isBad             ? 'text-red-300' :
+      isGood            ? 'text-green-700 dark:text-green-300' :
+      isBad             ? 'text-red-600 dark:text-red-300' :
       'text-muted-foreground';
 
     const Arrow =

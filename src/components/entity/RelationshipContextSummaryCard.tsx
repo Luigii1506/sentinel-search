@@ -62,7 +62,7 @@ export function RelationshipContextSummaryCard({
   return (
     <motion.div {...fadeUp} transition={{ delay: 0.16 }} className="glass rounded-xl p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-4">
-        <h3 className="text-sm font-medium text-gray-400 flex items-center gap-2 uppercase tracking-wide">
+        <h3 className="text-sm font-medium text-muted-foreground flex items-center gap-2 uppercase tracking-wide">
           <Users className="w-4 h-4" />
           Contexto Relacional
         </h3>
@@ -70,7 +70,7 @@ export function RelationshipContextSummaryCard({
           variant="ghost"
           size="sm"
           onClick={onOpenRelationships}
-          className="text-xs text-blue-400 hover:text-blue-300"
+          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
         >
           Ver relaciones
         </Button>
@@ -78,7 +78,7 @@ export function RelationshipContextSummaryCard({
 
       {hasFamilySummary ? (
         <div className="mb-4">
-          <p className="text-xs text-purple-400 uppercase mb-2">Familiares relevantes detectados</p>
+          <p className="text-xs text-purple-600 dark:text-purple-400 uppercase mb-2">Familiares relevantes detectados</p>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
             {overviewFamilyRelationships.length > 0
               ? overviewFamilyRelationships.slice(0, 6).map((rel, index) => (
@@ -86,12 +86,12 @@ export function RelationshipContextSummaryCard({
                     <p className="text-sm text-foreground font-medium break-words">{humanizeEntityName(rel.related_entity_name)}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       {rel.subtype && (
-                        <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
+                        <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20">
                           {translateSubtype(rel.subtype)}
                         </Badge>
                       )}
                       {rel.related_entity_is_pep && (
-                        <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-400 border-purple-500/30">
+                        <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30">
                           PEP
                         </Badge>
                       )}
@@ -107,11 +107,11 @@ export function RelationshipContextSummaryCard({
                   <div key={`${rel.entity_id || rel.qid || rel.name}-${index}`} className="rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
                     <p className="text-sm text-foreground font-medium break-words">{humanizeEntityName(rel.name)}</p>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-300 border-purple-500/20">
+                      <Badge variant="outline" className="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-300 border-purple-500/20">
                         {rel.relationship_label}
                       </Badge>
                       {rel.is_current ? (
-                        <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-300 border-emerald-500/20">
+                        <Badge variant="outline" className="text-[10px] bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20">
                           Vigente
                         </Badge>
                       ) : null}
@@ -120,12 +120,12 @@ export function RelationshipContextSummaryCard({
                 ))}
           </div>
           {overviewFamilyRelationships.length > 6 && (
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               +{overviewFamilyRelationships.length - 6} familiares más en la pestaña de relaciones
             </p>
           )}
           {overviewFamilyRelationships.length === 0 && overviewStructuredFamily.length > 6 ? (
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               +{overviewStructuredFamily.length - 6} familiares más disponibles desde el contexto estructurado.
             </p>
           ) : null}
@@ -133,7 +133,7 @@ export function RelationshipContextSummaryCard({
       ) : referenceLike ? (
         <div className="mb-4 rounded-lg bg-foreground/[0.03] border border-foreground/5 p-3">
           <p className="text-sm text-foreground">Se identificaron {totalDetectedRelationships} relaciones para esta entidad contextual.</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Para acelerar la apertura de referencias, el resumen general no carga el detalle completo de relaciones. Usa la pestaña de relaciones para ver personas y organizaciones vinculadas.
           </p>
         </div>
@@ -142,7 +142,7 @@ export function RelationshipContextSummaryCard({
           <p className="text-sm text-foreground">
             Se identificaron {amlVisibleRelationships} relaciones AML visibles de {totalDetectedRelationships} relaciones detectadas.
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {contextualRelationships > 0
               ? `Hay ${contextualRelationships} vínculos adicionales de contexto/perfil fuera de la vista AML principal.`
               : 'En esta vista rápida no aparecieron familiares resueltos; el contexto principal está en vínculos corporativos, asociados o políticos.'}
@@ -157,8 +157,8 @@ export function RelationshipContextSummaryCard({
           .slice(0, 6)
           .map(([type, count]) => (
             <div key={type} className="flex items-center gap-1.5">
-              <span className="text-xs text-gray-500">{relationshipTypeLabels[type] || type}</span>
-              <Badge className="bg-foreground/10 text-gray-300 text-[10px]">{count}</Badge>
+              <span className="text-xs text-muted-foreground">{relationshipTypeLabels[type] || type}</span>
+              <Badge className="bg-foreground/10 text-muted-foreground text-[10px]">{count}</Badge>
             </div>
           ))}
       </div>

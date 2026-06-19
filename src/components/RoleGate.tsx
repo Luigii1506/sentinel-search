@@ -52,16 +52,16 @@ function ForbiddenPanel({ reason }: { reason?: 'login_required' }) {
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-8">
       <div className="glass rounded-xl p-8 max-w-md text-center">
-        <Shield className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+        <Shield className="w-12 h-12 text-amber-700 dark:text-amber-400 mx-auto mb-4" />
         <h2 className="text-xl font-semibold text-foreground mb-2">
           {reason === 'login_required' ? 'Inicia sesión' : 'Acceso restringido'}
         </h2>
-        <p className="text-sm text-gray-400 mb-2">
+        <p className="text-sm text-muted-foreground mb-2">
           {reason === 'login_required'
             ? 'Esta vista requiere una sesión activa.'
             : 'Tu rol actual no permite ver esta sección.'}
         </p>
-        <p className="text-xs text-gray-500 flex items-center justify-center gap-1.5">
+        <p className="text-xs text-muted-foreground flex items-center justify-center gap-1.5">
           <AlertCircle className="w-3.5 h-3.5" />
           Contacta a un administrador si crees que es un error.
         </p>

@@ -9,6 +9,8 @@
  *   import { PageHeader, EmptyState, DataTable, RiskBadge, MetricCard, SkeletonTable } from '@/components/foundation';
  */
 export { AppPage, Section } from './AppPage';
+export { GridBackdrop } from './GridBackdrop';
+export { CountUp } from './CountUp';
 export { PageHeader } from './PageHeader';
 export { PageHeaderSkeleton } from './PageHeaderSkeleton';
 export { MetricGridSkeleton } from './MetricGridSkeleton';

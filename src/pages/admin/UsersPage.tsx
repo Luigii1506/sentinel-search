@@ -187,7 +187,7 @@ export default function UsersPage() {
       header: 'Status',
       cell: (u) => (
         u.is_active ? (
-          <span className="inline-flex items-center gap-1 text-xs text-green-300">
+          <span className="inline-flex items-center gap-1 text-xs text-green-700 dark:text-green-300">
             <CheckCircle2 className="w-3.5 h-3.5" />
             Activo
           </span>
@@ -241,7 +241,7 @@ export default function UsersPage() {
           <Button
             size="sm"
             variant="ghost"
-            className="h-8 px-2 text-red-300 hover:text-red-200"
+            className="h-8 px-2 text-red-600 dark:text-red-300 hover:text-red-200"
             disabled={isCurrentUser(u)}
             onClick={() => setDeleteTarget(u)}
             aria-label={`Eliminar ${u.username}`}
@@ -260,7 +260,7 @@ export default function UsersPage() {
         description="Gestión de cuentas y roles. Los cambios se aplican inmediatamente."
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
-            <Users className="w-6 h-6 text-electric-400" aria-hidden="true" />
+            <Users className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
           </div>
         }
         actions={

@@ -55,6 +55,7 @@
   --glass-border: rgba(15, 23, 42, 0.08);
   --hover-overlay: rgba(15, 23, 42, 0.04);
   --input-bg: rgba(15, 23, 42, 0.03);
+  --grid-line: rgba(15, 23, 42, 0.07);     /* dark grid lines on light bg */
 
   /* Animation Easings */
   --ease-expo-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -85,6 +86,7 @@
   --glass-border: rgba(31, 111, 235, 0.15);
   --hover-overlay: rgba(255, 255, 255, 0.02);
   --input-bg: rgba(255, 255, 255, 0.05);
+  --grid-line: rgba(255, 255, 255, 0.04);  /* light grid lines on dark bg */
 }
 
 /* Base Styles */
@@ -558,68 +560,72 @@ h5 {
  * invisible. That's why --accent-foreground != --primary-foreground.
  */
 @layer base {
-  /* LIGHT theme (default) — white background, navy text. */
+  /* LIGHT theme (default) — near-white page, pure-white cards so surfaces
+   * read as elevated; navy text; deliberately stronger borders and a darker
+   * muted tone than the slate defaults, which washed out on white. */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 213 73% 15%;             /* navy text on white */
+    --background: 210 40% 97%;             /* slate-50/100 — lets white cards pop */
+    --foreground: 215 50% 12%;             /* near-navy ink, high contrast */
 
-    --card: 0 0% 100%;
-    --card-foreground: 213 73% 15%;
+    --card: 0 0% 100%;                     /* pure white surface */
+    --card-foreground: 215 50% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 213 73% 15%;
+    --popover-foreground: 215 50% 12%;
 
-    --primary: 217 84% 52%;                /* brand blue — constant */
+    --primary: 217 84% 48%;                /* brand blue, a touch deeper for white bg */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 214 32% 91%;              /* slate-200 — raised chrome */
-    --secondary-foreground: 213 73% 15%;
+    --secondary: 214 32% 89%;              /* slate-200 — raised chrome */
+    --secondary-foreground: 215 45% 18%;
 
-    --muted: 210 40% 96%;                  /* slate-100 — muted surfaces */
-    --muted-foreground: 215 16% 47%;       /* slate-500 — secondary text */
+    --muted: 214 32% 93%;                  /* muted surfaces */
+    --muted-foreground: 215 25% 34%;       /* slate-600/700 — secondary text that actually reads */
 
-    --accent: 190 100% 50%;                /* electric — constant accent */
-    --accent-foreground: 213 73% 15%;      /* navy on electric — readable */
+    --accent: 214 32% 91%;                 /* subtle slate — shadcn uses this for hovers */
+    --accent-foreground: 215 50% 12%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 48%;              /* deeper red for white bg */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;                 /* slate-200 */
-    --input: 214 32% 91%;
-    --ring: 217 84% 52%;                   /* blue ring (electric is invisible on white) */
+    --border: 214 25% 83%;                 /* visible slate border */
+    --input: 214 25% 83%;
+    --ring: 217 84% 48%;                   /* blue ring (electric is invisible on white) */
 
     --radius: 0.625rem;
 
-    /* Sidebar (used by shadcn `sidebar-*` utilities) */
-    --sidebar-background: 210 40% 98%;     /* near-white, a hair off the page */
-    --sidebar-foreground: 213 73% 15%;
-    --sidebar-primary: 217 84% 52%;
+    /* Sidebar — a hair darker than the page so the rail separates */
+    --sidebar-background: 214 30% 94%;
+    --sidebar-foreground: 215 50% 12%;
+    --sidebar-primary: 217 84% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 190 100% 50%;
-    --sidebar-accent-foreground: 213 73% 15%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 217 84% 52%;
+    --sidebar-accent: 214 32% 89%;
+    --sidebar-accent-foreground: 215 50% 12%;
+    --sidebar-border: 214 25% 83%;
+    --sidebar-ring: 217 84% 48%;
   }
 
-  /* DARK theme (principal) — carbon background, navy surfaces, electric accent. */
+  /* DARK theme (principal) — carbon background, navy surfaces, electric accent.
+   * Bumped: card a touch lighter than bg, brighter muted text, stronger
+   * borders — so cards and dividers separate more clearly. */
   .dark {
     --background: 220 49% 9%;
     --foreground: 0 0% 100%;
 
-    --card: 213 73% 15%;
+    --card: 214 60% 17%;                   /* slightly lifted off the carbon bg */
     --card-foreground: 0 0% 100%;
 
-    --popover: 213 73% 15%;
+    --popover: 214 60% 17%;
     --popover-foreground: 0 0% 100%;
 
-    --primary: 217 84% 52%;
+    --primary: 217 90% 60%;                /* brighter blue, more pop on dark */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 50% 18%;
+    --secondary: 215 45% 22%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 215 50% 14%;
-    --muted-foreground: 213 30% 67%;
+    --muted: 215 45% 18%;
+    --muted-foreground: 213 35% 76%;       /* brighter secondary text */
 
     --accent: 190 100% 50%;
     --accent-foreground: 213 73% 15%;      /* navy on electric — readable */
@@ -627,18 +633,18 @@ h5 {
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 49% 24%;
-    --input: 215 49% 24%;
+    --border: 215 38% 32%;                 /* more visible dividers */
+    --input: 215 38% 32%;
     --ring: 190 100% 50%;                  /* focus ring = electric */
 
     /* Sidebar */
-    --sidebar-background: 220 49% 9%;
+    --sidebar-background: 222 50% 7%;      /* a touch deeper than content bg */
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 217 84% 52%;
+    --sidebar-primary: 217 90% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 190 100% 50%;
-    --sidebar-accent-foreground: 213 73% 15%;
-    --sidebar-border: 215 49% 24%;
+    --sidebar-accent: 215 45% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 38% 32%;
     --sidebar-ring: 190 100% 50%;
   }
 }

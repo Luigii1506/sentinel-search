@@ -31,17 +31,17 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30">
-            <Brain className="w-4 h-4 text-purple-400" />
-            <span className="text-sm font-medium text-purple-300">Smart Search v5.0</span>
+            <Brain className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <span className="text-sm font-medium text-purple-600 dark:text-purple-300">Smart Search v5.0</span>
           </div>
-          <span className="text-gray-500">•</span>
-          <span className="text-sm text-gray-400">
+          <span className="text-muted-foreground">•</span>
+          <span className="text-sm text-muted-foreground">
             {results.length} resultados semánticos
           </span>
           {executionTime && (
             <>
-              <span className="text-gray-500">•</span>
-              <span className="text-sm text-gray-500">{executionTime}ms</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="text-sm text-muted-foreground">{executionTime}ms</span>
             </>
           )}
         </div>
@@ -74,7 +74,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                     <span className="text-lg font-bold text-white">
                       {Math.round((result.similarity ?? result.confidence ?? result.match_score ?? 0) * 100)}%
                     </span>
-                    <span className="text-[10px] text-gray-400 uppercase">Match</span>
+                    <span className="text-[10px] text-muted-foreground uppercase">Match</span>
                   </div>
                 </div>
 
@@ -109,13 +109,13 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                     </Badge>
 
                     {/* Risk Score */}
-                    <Badge variant="outline" className="text-gray-400 border-foreground/10">
+                    <Badge variant="outline" className="text-muted-foreground border-foreground/10">
                       Score: {result.risk_score ?? result.match_score ?? 'N/A'}
                     </Badge>
 
                     {/* PEP Badge */}
                     {(result.is_pep || result.is_current_pep) && (
-                      <Badge className="bg-amber-500/20 text-amber-400 border-amber-500/30">
+                      <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30">
                         <User className="w-3 h-3 mr-1" />
                         PEP
                       </Badge>
@@ -126,7 +126,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                       <Badge
                         key={source}
                         variant="outline"
-                        className="text-xs bg-foreground/5 border-foreground/10 text-gray-400"
+                        className="text-xs bg-foreground/5 border-foreground/10 text-muted-foreground"
                       >
                         {source}
                       </Badge>
@@ -150,7 +150,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
                         )}
                       />
                     </div>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       Similitud semántica
                     </span>
                   </div>
@@ -162,7 +162,7 @@ export function SemanticResults({ results, executionTime, onSelectEntity }: Sema
       </div>
 
       {/* Footer Info */}
-      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 mt-4">
+      <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground mt-4">
         <Brain className="w-3 h-3" />
         <span>
           Resultados basados en embeddings de 526K entidades usando all-MiniLM-L6-v2

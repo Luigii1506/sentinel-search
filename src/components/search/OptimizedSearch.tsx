@@ -185,7 +185,7 @@ export function OptimizedSearch({
       {/* Search Input */}
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-          <Search className="h-5 w-5 text-gray-400" />
+          <Search className="h-5 w-5 text-muted-foreground" />
         </div>
         
         <Input
@@ -196,7 +196,7 @@ export function OptimizedSearch({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           className="w-full pl-12 pr-24 py-6 text-lg bg-foreground/5 border-foreground/10
-                     text-foreground placeholder:text-gray-500 rounded-xl
+                     text-foreground placeholder:text-muted-foreground rounded-xl
                      focus:ring-2 focus:ring-blue-500 focus:border-transparent
                      transition-all duration-200"
         />
@@ -207,7 +207,7 @@ export function OptimizedSearch({
               onClick={clearSearch}
               className="p-1 hover:bg-foreground/10 rounded-full transition-colors"
             >
-              <XCircle className="w-5 h-5 text-gray-400" />
+              <XCircle className="w-5 h-5 text-muted-foreground" />
             </button>
           )}
           <Button
@@ -236,7 +236,7 @@ export function OptimizedSearch({
 
       {/* Source Level Selector */}
       <div className="mt-3 flex items-center gap-2">
-        <span className="text-xs text-gray-500 mr-1">Nivel:</span>
+        <span className="text-xs text-muted-foreground mr-1">Nivel:</span>
         {([
           { level: 1 as const, label: 'Critical', desc: 'OFAC, ONU, EU, UK HMT, Interpol, FBI, DEA, BIS' },
           { level: 2 as const, label: 'Sanciones', desc: '+ Sanciones, Terrorismo, Law Enforcement restantes' },
@@ -251,8 +251,8 @@ export function OptimizedSearch({
                   className={cn(
                     "px-3 py-1 rounded-full text-xs font-medium border transition-all duration-200",
                     sourceLevel === level
-                      ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                      : "bg-foreground/5 text-gray-400 border-foreground/10 hover:border-foreground/20 hover:text-gray-300"
+                      ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                      : "bg-foreground/5 text-muted-foreground border-foreground/10 hover:border-foreground/20 hover:text-muted-foreground"
                   )}
                 >
                   {label}
@@ -283,9 +283,9 @@ export function OptimizedSearch({
                     variant="outline" 
                     className={cn(
                       "gap-1.5 cursor-help",
-                      metrics.executionTimeMs < 100 ? "border-green-500/30 text-green-400" :
-                      metrics.executionTimeMs < 300 ? "border-yellow-500/30 text-yellow-400" :
-                      "border-orange-500/30 text-orange-400"
+                      metrics.executionTimeMs < 100 ? "border-green-500/30 text-green-700 dark:text-green-400" :
+                      metrics.executionTimeMs < 300 ? "border-yellow-500/30 text-yellow-700 dark:text-yellow-400" :
+                      "border-orange-500/30 text-orange-700 dark:text-orange-400"
                     )}
                   >
                     <Clock className="w-3 h-3" />
@@ -294,7 +294,7 @@ export function OptimizedSearch({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Tiempo de respuesta</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {metrics.executionTimeMs < 100 ? '⚡ Ultra-rápido' :
                      metrics.executionTimeMs < 300 ? '✅ Rápido' :
                      '⏱ Normal'}
@@ -309,7 +309,7 @@ export function OptimizedSearch({
                 <TooltipTrigger asChild>
                   <Badge 
                     variant="outline" 
-                    className="gap-1.5 border-blue-500/30 text-blue-400 cursor-help"
+                    className="gap-1.5 border-blue-500/30 text-blue-600 dark:text-blue-400 cursor-help"
                   >
                     {getStrategyIcon(metrics.strategy)}
                     {getStrategyLabel(metrics.strategy)}
@@ -317,7 +317,7 @@ export function OptimizedSearch({
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Estrategia de búsqueda</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     {metrics.strategy === 'name' && 'Búsqueda por nombre (OpenSearch)'}
                     {metrics.strategy === 'concept' && 'Búsqueda semántica (Embeddings)'}
                     {metrics.strategy === 'hybrid' && 'Combinación de múltiples fuentes'}
@@ -333,7 +333,7 @@ export function OptimizedSearch({
                   <TooltipTrigger asChild>
                     <Badge 
                       variant="outline" 
-                      className="gap-1.5 border-purple-500/30 text-purple-400 cursor-help"
+                      className="gap-1.5 border-purple-500/30 text-purple-600 dark:text-purple-400 cursor-help"
                     >
                       <Database className="w-3 h-3" />
                       Cache
@@ -341,7 +341,7 @@ export function OptimizedSearch({
                   </TooltipTrigger>
                   <TooltipContent>
                     <p>Resultado desde caché</p>
-                    <p className="text-xs text-gray-400">Consulta previa encontrada</p>
+                    <p className="text-xs text-muted-foreground">Consulta previa encontrada</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
@@ -350,7 +350,7 @@ export function OptimizedSearch({
             {/* Total de resultados */}
             <Badge 
               variant="outline" 
-              className="gap-1.5 border-gray-500/30 text-gray-400"
+              className="gap-1.5 border-gray-500/30 text-muted-foreground"
             >
               <BarChart3 className="w-3 h-3" />
               {metrics.totalMatches} resultados
@@ -432,7 +432,7 @@ export function OptimizedSearch({
                     {(result.has_adverse_media || (result.article_count ?? 0) > 0) && (
                       <Badge
                         variant="outline"
-                        className="text-xs gap-1 border-orange-500/30 text-orange-400"
+                        className="text-xs gap-1 border-orange-500/30 text-orange-700 dark:text-orange-400"
                       >
                         <Newspaper className="w-3 h-3" />
                         {result.article_count ?? 0} media
@@ -440,7 +440,7 @@ export function OptimizedSearch({
                     )}
                   </div>
                   
-                  <div className="flex items-center gap-3 text-sm text-gray-400">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="capitalize">{result.entity_type}</span>
                     <span>•</span>
                     <span>Score: {(result.confidence * 100).toFixed(1)}%</span>
@@ -483,8 +483,8 @@ export function OptimizedSearch({
                           className={cn(
                             "p-2 rounded-lg transition-all duration-200",
                             watchlistedIds.has(result.entity_id)
-                              ? "bg-green-500/20 text-green-400 cursor-default"
-                              : "hover:bg-purple-500/20 text-gray-400 hover:text-purple-400"
+                              ? "bg-green-500/20 text-green-700 dark:text-green-400 cursor-default"
+                              : "hover:bg-purple-500/20 text-muted-foreground hover:text-purple-400"
                           )}
                         >
                           {watchlistedIds.has(result.entity_id) ? (
@@ -511,7 +511,7 @@ export function OptimizedSearch({
                             alertMutation.mutate(result);
                           }}
                           disabled={alertMutation.isPending}
-                          className="p-2 rounded-lg hover:bg-orange-500/20 text-gray-400
+                          className="p-2 rounded-lg hover:bg-orange-500/20 text-muted-foreground
                                      hover:text-orange-400 transition-all duration-200"
                         >
                           {alertMutation.isPending && alertMutation.variables?.entity_id === result.entity_id ? (
@@ -527,7 +527,7 @@ export function OptimizedSearch({
                     </Tooltip>
                   </TooltipProvider>
 
-                  <ArrowRight className="w-5 h-5 text-blue-400 ml-1" />
+                  <ArrowRight className="w-5 h-5 text-blue-600 dark:text-blue-400 ml-1" />
                 </div>
               </motion.div>
             ))}

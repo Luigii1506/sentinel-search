@@ -46,12 +46,12 @@ import type { SourceInfo } from '@/types/api';
 // ── Constantes ──
 
 const STATUS_CONFIG = {
-  active: { label: 'Activo', icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
-  pending: { label: 'Pendiente', icon: Clock, color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' },
-  error: { label: 'Error', icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
-  stale: { label: 'Desactualizado', icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
-  disappeared: { label: 'Desaparecida', icon: Shield, color: 'text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
-  inactive: { label: 'Inactiva', icon: Shield, color: 'text-zinc-400', bg: 'bg-zinc-500/10', border: 'border-zinc-500/20' },
+  active: { label: 'Activo', icon: CheckCircle2, color: 'text-green-700 dark:text-green-400', bg: 'bg-green-500/10', border: 'border-green-500/20' },
+  pending: { label: 'Pendiente', icon: Clock, color: 'text-muted-foreground', bg: 'bg-gray-500/10', border: 'border-gray-500/20' },
+  error: { label: 'Error', icon: XCircle, color: 'text-red-600 dark:text-red-400', bg: 'bg-red-500/10', border: 'border-red-500/20' },
+  stale: { label: 'Desactualizado', icon: AlertTriangle, color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' },
+  disappeared: { label: 'Desaparecida', icon: Shield, color: 'text-fuchsia-600 dark:text-fuchsia-400', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/20' },
+  inactive: { label: 'Inactiva', icon: Shield, color: 'text-muted-foreground', bg: 'bg-zinc-500/10', border: 'border-zinc-500/20' },
 };
 
 function effectiveStatus(source: SourceInfo): keyof typeof STATUS_CONFIG {
@@ -94,7 +94,7 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-foreground/10">
         <DialogHeader>
           <DialogTitle className="text-xl text-foreground flex items-center gap-2">
-            <Database className="w-5 h-5 text-blue-400" />
+            <Database className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             {isLoading ? 'Cargando...' : detail?.display_name}
           </DialogTitle>
         </DialogHeader>
@@ -109,21 +109,21 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
             {/* Header Info */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-3 rounded-lg bg-foreground/5">
-                <p className="text-xs text-gray-500">Estado</p>
+                <p className="text-xs text-muted-foreground">Estado</p>
                 <Badge className={`${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.bg} ${STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.color} mt-1`}>
                   {STATUS_CONFIG[detail.status as keyof typeof STATUS_CONFIG]?.label || detail.status}
                 </Badge>
               </div>
               <div className="p-3 rounded-lg bg-foreground/5">
-                <p className="text-xs text-gray-500">Categoria</p>
+                <p className="text-xs text-muted-foreground">Categoria</p>
                 <p className="text-sm text-foreground capitalize">{categoryLabel(detail.category)}</p>
               </div>
               <div className="p-3 rounded-lg bg-foreground/5">
-                <p className="text-xs text-gray-500">Pais</p>
+                <p className="text-xs text-muted-foreground">Pais</p>
                 <p className="text-sm text-foreground">{detail.country || 'N/A'}</p>
               </div>
               <div className="p-3 rounded-lg bg-foreground/5">
-                <p className="text-xs text-gray-500">Entidades</p>
+                <p className="text-xs text-muted-foreground">Entidades</p>
                 <p className="text-sm text-foreground font-mono">{formatNumber(detail.bronze_count)}</p>
               </div>
             </div>
@@ -131,7 +131,7 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
             {/* Conteos por Capa */}
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Layers className="w-4 h-4 text-purple-400" />
+                <Layers className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                 Conteos por Capa
               </h3>
               <div className="grid grid-cols-3 gap-4">
@@ -140,11 +140,11 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
                   <p className="text-2xl font-bold text-foreground">{formatNumber(detail.bronze_count)}</p>
                 </div>
                 <div className="p-4 rounded-lg bg-gray-500/10 border border-gray-500/30">
-                  <p className="text-xs text-gray-400">Silver (Clean)</p>
+                  <p className="text-xs text-muted-foreground">Silver (Clean)</p>
                   <p className="text-2xl font-bold text-foreground">{formatNumber(detail.silver_count)}</p>
                 </div>
                 <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
-                  <p className="text-xs text-yellow-400">Gold (Unified)</p>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-400">Gold (Unified)</p>
                   <p className="text-2xl font-bold text-foreground">{formatNumber(detail.gold_count)}</p>
                 </div>
               </div>
@@ -153,16 +153,16 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
             {/* Metricas 7d */}
             <div className="space-y-3">
               <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-                <Activity className="w-4 h-4 text-green-400" />
+                <Activity className="w-4 h-4 text-green-700 dark:text-green-400" />
                 Metricas (7 dias)
               </h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 rounded-lg bg-green-500/10">
-                  <p className="text-xs text-green-400">Jobs Exitosos</p>
+                  <p className="text-xs text-green-700 dark:text-green-400">Jobs Exitosos</p>
                   <p className="text-xl font-bold text-foreground">{detail.success_count_7d}</p>
                 </div>
                 <div className="p-3 rounded-lg bg-red-500/10">
-                  <p className="text-xs text-red-400">Jobs Fallidos</p>
+                  <p className="text-xs text-red-600 dark:text-red-400">Jobs Fallidos</p>
                   <p className="text-xl font-bold text-foreground">{detail.error_count_7d}</p>
                 </div>
               </div>
@@ -177,16 +177,16 @@ function SourceDetailDialog({ sourceId, children }: { sourceId: string; children
                     <div key={job.id} className="p-3 rounded-lg bg-foreground/5 text-sm">
                       <div className="flex items-center justify-between">
                         <Badge className={
-                          job.status === 'success' ? 'bg-green-500/10 text-green-400' :
-                          job.status === 'failed' ? 'bg-red-500/10 text-red-400' :
-                          'bg-blue-500/10 text-blue-400'
+                          job.status === 'success' ? 'bg-green-500/10 text-green-700 dark:text-green-400' :
+                          job.status === 'failed' ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                          'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                         }>
                           {job.status}
                         </Badge>
-                        <span className="text-gray-500">{formatNumber(job.records_inserted)} registros</span>
+                        <span className="text-muted-foreground">{formatNumber(job.records_inserted)} registros</span>
                       </div>
                       {job.error_message && (
-                        <p className="text-xs text-red-400 mt-1">{job.error_message}</p>
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">{job.error_message}</p>
                       )}
                     </div>
                   ))}
@@ -266,10 +266,10 @@ export function SourcesDashboardPage() {
     return (
       <AppPage width="default">
         <div className="text-center">
-          <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <XCircle className="w-16 h-16 text-red-600 dark:text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Error al cargar fuentes</h2>
-          <p className="text-gray-400 mb-2">No se pudieron obtener los datos</p>
-          <p className="text-sm text-gray-500 mb-4">{(error as Error).message}</p>
+          <p className="text-muted-foreground mb-2">No se pudieron obtener los datos</p>
+          <p className="text-sm text-muted-foreground mb-4">{(error as Error).message}</p>
           <Button onClick={() => refetch()} variant="outline">
             <RefreshCw className="w-4 h-4 mr-2" />
             Reintentar
@@ -290,7 +290,7 @@ export function SourcesDashboardPage() {
         }
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <Database className="w-6 h-6 text-blue-400" />
+            <Database className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
@@ -337,8 +337,8 @@ export function SourcesDashboardPage() {
             onClick={() => setActiveTab('all')}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'all'
-                ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                : 'bg-foreground/5 text-gray-400 border border-foreground/5 hover:bg-foreground/10'
+                ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                : 'bg-foreground/5 text-muted-foreground border border-foreground/5 hover:bg-foreground/10'
             }`}
           >
             Todas ({data?.sources?.length || 0})
@@ -349,8 +349,8 @@ export function SourcesDashboardPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                  : 'bg-foreground/5 text-gray-400 border border-foreground/5 hover:bg-foreground/10'
+                  ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                  : 'bg-foreground/5 text-muted-foreground border border-foreground/5 hover:bg-foreground/10'
               }`}
             >
               {tab.label} ({tab.count})
@@ -361,7 +361,7 @@ export function SourcesDashboardPage() {
         {/* Filters Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por nombre, source_id, dataset, pais..."
               value={searchQuery}
@@ -409,7 +409,7 @@ export function SourcesDashboardPage() {
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground">{source.display_name}</p>
-                      <p className="text-xs text-gray-500 font-mono break-all">{source.source_id}</p>
+                      <p className="text-xs text-muted-foreground font-mono break-all">{source.source_id}</p>
                     </div>
                     <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${statusCfg.bg} ${statusCfg.border} border`}>
                       <StatusIcon className={`w-3 h-3 ${statusCfg.color}`} />
@@ -420,7 +420,7 @@ export function SourcesDashboardPage() {
                   <div className="flex flex-wrap gap-2">
                     <CategoryBadge category={source.category} />
                     {source.country ? (
-                      <Badge variant="outline" className="text-[10px] bg-foreground/5 text-gray-300 border-foreground/10">
+                      <Badge variant="outline" className="text-[10px] bg-foreground/5 text-muted-foreground border-foreground/10">
                         {source.country}
                       </Badge>
                     ) : null}
@@ -428,19 +428,19 @@ export function SourcesDashboardPage() {
 
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="rounded-lg bg-foreground/5 p-3">
-                      <p className="text-[11px] text-gray-500">Bronze</p>
+                      <p className="text-[11px] text-muted-foreground">Bronze</p>
                       <p className="text-foreground font-mono">{source.bronze_count > 0 ? formatNumber(source.bronze_count) : '-'}</p>
                     </div>
                     <div className="rounded-lg bg-foreground/5 p-3">
-                      <p className="text-[11px] text-gray-500">Silver</p>
+                      <p className="text-[11px] text-muted-foreground">Silver</p>
                       <p className="text-foreground font-mono">{source.silver_count > 0 ? formatNumber(source.silver_count) : '-'}</p>
                     </div>
                     <div className="rounded-lg bg-foreground/5 p-3">
-                      <p className="text-[11px] text-gray-500">Gold</p>
+                      <p className="text-[11px] text-muted-foreground">Gold</p>
                       <p className="text-foreground font-mono">{source.gold_count > 0 ? formatNumber(source.gold_count) : '-'}</p>
                     </div>
                     <div className="rounded-lg bg-foreground/5 p-3">
-                      <p className="text-[11px] text-gray-500">Último sync</p>
+                      <p className="text-[11px] text-muted-foreground">Último sync</p>
                       <p className="text-foreground">{formatDate(source.last_sync)}</p>
                     </div>
                   </div>
@@ -463,38 +463,38 @@ export function SourcesDashboardPage() {
             <table className="w-full">
               <thead className="bg-foreground/5 border-b border-foreground/5">
                 <tr>
-                  <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3 w-8"></th>
-                  <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3 w-8"></th>
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Fuente
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Cat
                   </th>
-                  <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Pais
                   </th>
                   <th className="text-right text-xs font-medium text-[#CD853F] uppercase tracking-wider px-3 py-3">
                     Bronze
                   </th>
-                  <th className="text-right text-xs font-medium text-gray-300 uppercase tracking-wider px-3 py-3">
+                  <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Silver
                   </th>
-                  <th className="text-right text-xs font-medium text-yellow-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-right text-xs font-medium text-yellow-700 dark:text-yellow-400 uppercase tracking-wider px-3 py-3">
                     Gold
                   </th>
-                  <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Risk
                   </th>
-                  <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     OS
                   </th>
-                  <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Sync
                   </th>
-                  <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3">
+                  <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3">
                     Status
                   </th>
-                  <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-3 py-3 w-10">
+                  <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-3 w-10">
                   </th>
                 </tr>
               </thead>
@@ -514,7 +514,7 @@ export function SourcesDashboardPage() {
                         onClick={() => toggleRow(source.source_id)}
                       >
                         <td className="px-3 py-2.5">
-                          <button className="text-gray-500 hover:text-foreground">
+                          <button className="text-muted-foreground hover:text-foreground">
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                           </button>
                         </td>
@@ -523,48 +523,48 @@ export function SourcesDashboardPage() {
                             <p className="text-sm font-medium text-foreground truncate">
                               {source.display_name}
                             </p>
-                            <p className="text-xs text-gray-500 font-mono">{source.source_id}</p>
+                            <p className="text-xs text-muted-foreground font-mono">{source.source_id}</p>
                           </div>
                         </td>
                         <td className="px-3 py-2.5">
                           <CategoryBadge category={source.category} />
                         </td>
                         <td className="px-3 py-2.5 text-center">
-                          <span className="text-xs text-gray-400 font-mono">{source.country || '-'}</span>
+                          <span className="text-xs text-muted-foreground font-mono">{source.country || '-'}</span>
                         </td>
                         <td className="px-3 py-2.5 text-right">
-                          <span className={`text-sm font-mono ${source.bronze_count > 0 ? 'text-[#CD853F]' : 'text-gray-600'}`}>
+                          <span className={`text-sm font-mono ${source.bronze_count > 0 ? 'text-[#CD853F]' : 'text-muted-foreground'}`}>
                             {source.bronze_count > 0 ? formatNumber(source.bronze_count) : '-'}
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-right">
-                          <span className={`text-sm font-mono ${source.silver_count > 0 ? 'text-gray-300' : 'text-gray-600'}`}>
+                          <span className={`text-sm font-mono ${source.silver_count > 0 ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
                             {source.silver_count > 0 ? formatNumber(source.silver_count) : '-'}
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-right">
-                          <span className={`text-sm font-mono ${source.gold_count > 0 ? 'text-yellow-400' : 'text-gray-600'}`}>
+                          <span className={`text-sm font-mono ${source.gold_count > 0 ? 'text-yellow-700 dark:text-yellow-400' : 'text-muted-foreground'}`}>
                             {source.gold_count > 0 ? formatNumber(source.gold_count) : '-'}
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${
-                            source.risk_score >= 80 ? 'bg-red-500/10 text-red-400' :
-                            source.risk_score >= 60 ? 'bg-amber-500/10 text-amber-400' :
-                            'bg-green-500/10 text-green-400'
+                            source.risk_score >= 80 ? 'bg-red-500/10 text-red-600 dark:text-red-400' :
+                            source.risk_score >= 60 ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400' :
+                            'bg-green-500/10 text-green-700 dark:text-green-400'
                           }`}>
                             {source.risk_score}
                           </span>
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           {source.has_opensanctions ? (
-                            <Globe className="w-3.5 h-3.5 text-blue-400 mx-auto" />
+                            <Globe className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 mx-auto" />
                           ) : (
                             <span className="text-gray-700">-</span>
                           )}
                         </td>
                         <td className="px-3 py-2.5">
-                          <span className="text-xs text-gray-400">{formatDate(source.last_sync)}</span>
+                          <span className="text-xs text-muted-foreground">{formatDate(source.last_sync)}</span>
                         </td>
                         <td className="px-3 py-2.5 text-center">
                           <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${statusCfg.bg} ${statusCfg.border} border`}>
@@ -580,7 +580,7 @@ export function SourcesDashboardPage() {
                               className="h-7 w-7 p-0"
                               onClick={(e) => e.stopPropagation()}
                             >
-                              <Eye className="w-3.5 h-3.5 text-gray-400" />
+                              <Eye className="w-3.5 h-3.5 text-muted-foreground" />
                             </Button>
                           </SourceDetailDialog>
                         </td>
@@ -598,41 +598,41 @@ export function SourcesDashboardPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-sm">
                               {/* Importer */}
                               <div>
-                                <p className="text-gray-500 mb-1 text-xs uppercase">Importer</p>
-                                <p className="text-gray-300 font-mono text-xs">
+                                <p className="text-muted-foreground mb-1 text-xs uppercase">Importer</p>
+                                <p className="text-muted-foreground font-mono text-xs">
                                   {source.importer_type || 'N/A'}
                                 </p>
-                                <p className="text-gray-500 text-xs mt-1">
+                                <p className="text-muted-foreground text-xs mt-1">
                                   {source.schedule_frequency} · cola: {source.queue || 'default'}
                                 </p>
-                                <p className="text-gray-500 text-xs mt-1">
+                                <p className="text-muted-foreground text-xs mt-1">
                                   {source.sync_strategy || 'scheduled_snapshot'} · {source.freshness_class || 'n/a'}
                                 </p>
                               </div>
 
                               {/* PEP */}
                               <div>
-                                <p className="text-gray-500 mb-1 text-xs uppercase">PEP</p>
+                                <p className="text-muted-foreground mb-1 text-xs uppercase">PEP</p>
                                 {source.is_pep ? (
-                                  <Badge className="bg-purple-500/10 text-purple-400 text-xs">PEP</Badge>
+                                  <Badge className="bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs">PEP</Badge>
                                 ) : (
-                                  <span className="text-gray-600 text-xs">No</span>
+                                  <span className="text-muted-foreground text-xs">No</span>
                                 )}
-                                <p className="text-gray-500 text-xs mt-2">
+                                <p className="text-muted-foreground text-xs mt-2">
                                   {source.is_active === false ? 'Inactiva en scheduler' : source.is_critical ? 'Fuente crítica' : 'Fuente normal'}
                                 </p>
                               </div>
 
                               {/* OS Links */}
                               <div>
-                                <p className="text-gray-500 mb-1 text-xs uppercase">OpenSanctions</p>
+                                <p className="text-muted-foreground mb-1 text-xs uppercase">OpenSanctions</p>
                                 {source.os_url ? (
                                   <div className="space-y-1">
                                     <a
                                       href={source.os_url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1"
+                                      className="text-blue-600 dark:text-blue-400 hover:text-blue-300 text-xs flex items-center gap-1"
                                       onClick={(e) => e.stopPropagation()}
                                     >
                                       <ExternalLink className="w-3 h-3" />
@@ -643,7 +643,7 @@ export function SourcesDashboardPage() {
                                         href={source.os_data_url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-gray-400 hover:text-gray-300 text-xs flex items-center gap-1"
+                                        className="text-muted-foreground hover:text-muted-foreground text-xs flex items-center gap-1"
                                         onClick={(e) => e.stopPropagation()}
                                       >
                                         <Download className="w-3 h-3" />
@@ -652,19 +652,19 @@ export function SourcesDashboardPage() {
                                     )}
                                   </div>
                                 ) : (
-                                  <span className="text-gray-600 text-xs">N/A</span>
+                                  <span className="text-muted-foreground text-xs">N/A</span>
                                 )}
                               </div>
 
                               {/* Smart Update URL */}
                               <div>
-                                <p className="text-gray-500 mb-1 text-xs uppercase">Smart Update URL</p>
+                                <p className="text-muted-foreground mb-1 text-xs uppercase">Smart Update URL</p>
                                 {source.source_url ? (
                                   <a
                                     href={source.source_url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-blue-400 hover:text-blue-300 text-xs truncate block"
+                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-300 text-xs truncate block"
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     {source.source_url.length > 50
@@ -672,7 +672,7 @@ export function SourcesDashboardPage() {
                                       : source.source_url}
                                   </a>
                                 ) : (
-                                  <span className="text-gray-600 text-xs">No configurada</span>
+                                  <span className="text-muted-foreground text-xs">No configurada</span>
                                 )}
                               </div>
                             </div>
@@ -688,12 +688,12 @@ export function SourcesDashboardPage() {
 
           {filteredSources.length === 0 && (
             <div className="text-center py-12">
-              <Database className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">No se encontraron fuentes</p>
+              <Database className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No se encontraron fuentes</p>
             </div>
           )}
 
-          <div className="px-6 py-3 border-t border-foreground/5 text-sm text-gray-500 flex justify-between">
+          <div className="px-6 py-3 border-t border-foreground/5 text-sm text-muted-foreground flex justify-between">
             <span>Mostrando {filteredSources.length} de {data?.sources?.length || 0} fuentes</span>
             <span>
               Bronze: {formatNumber(data?.total_bronze || 0)} · Silver: {formatNumber(data?.total_silver || 0)} · Gold: {formatNumber(data?.total_gold || 0)}

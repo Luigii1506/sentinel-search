@@ -22,7 +22,7 @@ export function SectionCard({
   return (
     <Card className={cn('bg-card border-foreground/5', className)}>
       <CardContent className={cn('p-6', contentClassName)}>
-        <h3 className={cn('text-sm font-semibold text-gray-300 mb-4 flex items-center gap-2', titleClassName)}>
+        <h3 className={cn('text-sm font-semibold text-muted-foreground mb-4 flex items-center gap-2', titleClassName)}>
           {Icon && <Icon className="w-4 h-4" />}
           {title}
         </h3>

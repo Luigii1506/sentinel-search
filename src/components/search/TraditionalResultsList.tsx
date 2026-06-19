@@ -265,26 +265,26 @@ const COUNTRY_NAMES: Record<string, string> = {
 };
 
 const SOURCE_COLOR_MAP: Record<SourceCat, string> = {
-  sanctions: "border-red-500/20 text-red-400/80",
-  pep: "border-purple-500/20 text-purple-400/80",
-  debarment: "border-amber-500/20 text-amber-400/80",
-  regulatory: "border-blue-500/20 text-blue-400/80",
-  law_enforcement: "border-indigo-500/20 text-indigo-400/80",
-  tax: "border-orange-500/20 text-orange-400/80",
-  other: "border-foreground/10 text-gray-400",
+  sanctions: "border-red-500/20 text-red-600 dark:text-red-400/80",
+  pep: "border-purple-500/20 text-purple-600 dark:text-purple-400/80",
+  debarment: "border-amber-500/20 text-amber-700 dark:text-amber-400/80",
+  regulatory: "border-blue-500/20 text-blue-600 dark:text-blue-400/80",
+  law_enforcement: "border-indigo-500/20 text-indigo-600 dark:text-indigo-400/80",
+  tax: "border-orange-500/20 text-orange-700 dark:text-orange-400/80",
+  other: "border-foreground/10 text-muted-foreground",
 };
 
 function getConfidenceTone(confidence?: number) {
   if (confidence == null) {
-    return { label: "Confianza no disponible", className: "bg-foreground/5 text-gray-400 border-foreground/10" };
+    return { label: "Confianza no disponible", className: "bg-foreground/5 text-muted-foreground border-foreground/10" };
   }
   if (confidence >= 0.9) {
-    return { label: `Confianza alta · ${Math.round(confidence * 100)}%`, className: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30" };
+    return { label: `Confianza alta · ${Math.round(confidence * 100)}%`, className: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border-emerald-500/30" };
   }
   if (confidence >= 0.75) {
-    return { label: `Confianza media · ${Math.round(confidence * 100)}%`, className: "bg-amber-500/15 text-amber-400 border-amber-500/30" };
+    return { label: `Confianza media · ${Math.round(confidence * 100)}%`, className: "bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30" };
   }
-  return { label: `Confianza baja · ${Math.round(confidence * 100)}%`, className: "bg-orange-500/15 text-orange-400 border-orange-500/30" };
+  return { label: `Confianza baja · ${Math.round(confidence * 100)}%`, className: "bg-orange-500/15 text-orange-700 dark:text-orange-400 border-orange-500/30" };
 }
 
 function getEvidenceSummary(entity: ScreeningMatch, categories: Set<SourceCat>): string {
@@ -353,13 +353,13 @@ const CATEGORY_BADGE_CONFIG: Record<
   SourceCat,
   { label: string; icon: typeof Shield; bg: string; text: string; border: string }
 > = {
-  sanctions: { label: "Sanciones", icon: Shield, bg: "bg-red-500/15", text: "text-red-400", border: "border-red-500/30" },
-  pep: { label: "PEP", icon: Flag, bg: "bg-purple-500/15", text: "text-purple-400", border: "border-purple-500/30" },
-  debarment: { label: "Inhabilitación", icon: Ban, bg: "bg-amber-500/15", text: "text-amber-400", border: "border-amber-500/30" },
-  regulatory: { label: "Regulatorio", icon: Landmark, bg: "bg-blue-500/15", text: "text-blue-400", border: "border-blue-500/30" },
-  law_enforcement: { label: "Ley", icon: Siren, bg: "bg-indigo-500/15", text: "text-indigo-400", border: "border-indigo-500/30" },
-  tax: { label: "Fiscal", icon: FileText, bg: "bg-orange-500/15", text: "text-orange-400", border: "border-orange-500/30" },
-  other: { label: "Otro", icon: Globe, bg: "bg-gray-500/15", text: "text-gray-400", border: "border-gray-500/30" },
+  sanctions: { label: "Sanciones", icon: Shield, bg: "bg-red-500/15", text: "text-red-600 dark:text-red-400", border: "border-red-500/30" },
+  pep: { label: "PEP", icon: Flag, bg: "bg-purple-500/15", text: "text-purple-600 dark:text-purple-400", border: "border-purple-500/30" },
+  debarment: { label: "Inhabilitación", icon: Ban, bg: "bg-amber-500/15", text: "text-amber-700 dark:text-amber-400", border: "border-amber-500/30" },
+  regulatory: { label: "Regulatorio", icon: Landmark, bg: "bg-blue-500/15", text: "text-blue-600 dark:text-blue-400", border: "border-blue-500/30" },
+  law_enforcement: { label: "Ley", icon: Siren, bg: "bg-indigo-500/15", text: "text-indigo-600 dark:text-indigo-400", border: "border-indigo-500/30" },
+  tax: { label: "Fiscal", icon: FileText, bg: "bg-orange-500/15", text: "text-orange-700 dark:text-orange-400", border: "border-orange-500/30" },
+  other: { label: "Otro", icon: Globe, bg: "bg-gray-500/15", text: "text-muted-foreground", border: "border-gray-500/30" },
 };
 
 function SearchResultCard({
@@ -415,9 +415,9 @@ function SearchResultCard({
             <h3 className="text-[15px] font-semibold text-foreground leading-tight">
               {humanizeEntityName(entity.display_name || entity.name)}
             </h3>
-            {entity.description && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{entity.description}</p>}
+            {entity.description && <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{entity.description}</p>}
             {entity.aliases && entity.aliases.length > 0 && !entity.description && (
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 aka: {entity.aliases.slice(0, 2).map((alias) => humanizeEntityName(alias)).join(", ")}
                 {entity.aliases.length > 2 && ` +${entity.aliases.length - 2}`}
               </p>
@@ -435,13 +435,13 @@ function SearchResultCard({
               {entity.match_explanation && entity.match_explanation.length > 0 && (
                 <MatchExplanation reasons={entity.match_explanation} riskScore={entity.risk_score} networkRisk={entity.network_risk} />
               )}
-              <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-gray-400">
+              <div className="flex items-center gap-2 mt-1 flex-wrap text-[11px] text-muted-foreground">
                 <span>{matchNarrative}</span>
                 {entity.matched_name && entity.matched_name !== entity.name && (
-                  <span className="text-gray-500">Coincidió como: {humanizeEntityName(entity.matched_name)}</span>
+                  <span className="text-muted-foreground">Coincidió como: {humanizeEntityName(entity.matched_name)}</span>
                 )}
                 {topSources.length > 0 && (
-                  <span className="text-gray-500">
+                  <span className="text-muted-foreground">
                     Fuentes clave: {topSources.join(", ")}
                     {sources.length > topSources.length && ` +${sources.length - topSources.length}`}
                   </span>
@@ -457,19 +457,19 @@ function SearchResultCard({
               <Badge className={cn("text-[10px] px-2 py-0.5 font-medium border", confidenceTone.className)}>
                 {confidenceTone.label}
               </Badge>
-              <Badge className="text-[10px] px-2 py-0.5 gap-1 font-medium bg-green-500/15 text-green-400 border-green-500/30">
+              <Badge className="text-[10px] px-2 py-0.5 gap-1 font-medium bg-green-500/15 text-green-700 dark:text-green-400 border-green-500/30">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                 Coincidencia {matchSignalLabel} · {Math.round(entity.match_score || 0)}%
               </Badge>
-              <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-gray-300 border-foreground/10">{coverageSummary}</Badge>
+              <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-muted-foreground border-foreground/10">{coverageSummary}</Badge>
               {entity.has_adverse_media && (
-                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-400 border-red-500/30">
+                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30">
                   <Newspaper className="w-3 h-3" />
                   Adverse Media
                 </Badge>
               )}
               {entity.freshness_factor != null && entity.freshness_factor < 0.5 && (
-                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-amber-500/15 text-amber-400 border-amber-500/30">
+                <Badge className="text-[10px] px-2 py-0.5 gap-1 bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-500/30">
                   <Clock className="w-3 h-3" />
                   Freshness {Math.round(entity.freshness_factor * 100)}%
                 </Badge>
@@ -487,7 +487,7 @@ function SearchResultCard({
                 );
               })}
               {isPep && entity.is_current_pep && !categories.has("pep") && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-purple-500/15 text-purple-400 border-purple-500/30">
+                <span className="inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30">
                   <Flag className="w-3 h-3" />
                   PEP Activo
                 </span>
@@ -504,7 +504,7 @@ function SearchResultCard({
                         e.stopPropagation();
                         onCreateAlert(result);
                       }}
-                      className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-colors"
+                      className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/20 hover:text-red-300 transition-colors"
                     >
                       <AlertCircle className="w-4 h-4" />
                     </button>
@@ -521,7 +521,7 @@ function SearchResultCard({
                       e.stopPropagation();
                       onViewEntity();
                     }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 hover:text-blue-300 transition-colors"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 hover:text-blue-300 transition-colors"
                   >
                     <ExternalLink className="w-4 h-4" />
                   </button>
@@ -530,7 +530,7 @@ function SearchResultCard({
               </Tooltip>
             </TooltipProvider>
             {hasExpandableContent && (
-              <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }} className="w-7 h-7 rounded-lg flex items-center justify-center text-gray-500 hover:text-gray-300">
+              <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-muted-foreground">
                 <ChevronDown className="w-4 h-4" />
               </motion.div>
             )}
@@ -548,13 +548,13 @@ function SearchResultCard({
             className="overflow-hidden"
           >
             <div className="px-4 sm:px-6 pb-5 pt-1 border-t border-foreground/5 space-y-4">
-              <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-400">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
                 {(entity.match_type as string) === "v2_ml" ? (
                   <Badge className="text-[10px] px-2 py-0.5 bg-purple-500/15 text-purple-200 border-purple-400/40" title="Scored by nomenklatura.DefaultAlgorithm — ML model entrenado por OpenSanctions">
                     ✨ v2 ML-scored
                   </Badge>
                 ) : (
-                  <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-gray-300 border-foreground/10">
+                  <Badge className="text-[10px] px-2 py-0.5 bg-foreground/5 text-muted-foreground border-foreground/10">
                     Motor {entity.match_type || "opensearch"}
                   </Badge>
                 )}
@@ -567,23 +567,23 @@ function SearchResultCard({
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-foreground/5 rounded-lg overflow-hidden border border-foreground/5">
                 <div className="bg-card px-3 py-2.5">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Tipo</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Tipo</p>
                   <p className="text-sm text-foreground font-medium mt-0.5 capitalize">{getEntityTypeLabel(entity.entity_type)}</p>
                 </div>
                 <div className="bg-card px-3 py-2.5">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Género</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Género</p>
                   <p className="text-sm text-foreground font-medium mt-0.5">{genderLabel || "—"}</p>
                 </div>
                 <div className="bg-card px-3 py-2.5">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Fecha Nacimiento</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Fecha Nacimiento</p>
                   <p className="text-sm text-foreground font-medium mt-0.5">{entity.birth_date || entity.date_of_birth || "—"}</p>
                 </div>
                 <div className="bg-card px-3 py-2.5">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Lugar Nacimiento</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Lugar Nacimiento</p>
                   <p className="text-sm text-foreground font-medium mt-0.5">{entity.place_of_birth || "—"}</p>
                 </div>
                 <div className="bg-card px-3 py-2.5">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider">Nacionalidad</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Nacionalidad</p>
                   <p className="text-sm text-foreground font-medium mt-0.5">
                     {entity.nationalities_display && entity.nationalities_display.length > 0 ? (
                       <>{countryFlag} {entity.nationalities_display.join(", ")}</>
@@ -594,7 +594,7 @@ function SearchResultCard({
                 </div>
                 {entity.addresses && entity.addresses.length > 0 && (
                   <div className="bg-card px-3 py-2.5 col-span-2">
-                    <p className="text-[10px] text-gray-500 uppercase tracking-wider">Ubicación</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Ubicación</p>
                     <p className="text-sm text-foreground font-medium mt-0.5 break-words">
                       {(() => {
                         const a = entity.addresses[0];
@@ -602,7 +602,7 @@ function SearchResultCard({
                         if ("address" in a) return a.address;
                         return a.full || [a.street, a.city, a.country].filter(Boolean).join(", ");
                       })()}
-                      {entity.addresses.length > 1 && <span className="text-gray-500 text-xs"> +{entity.addresses.length - 1}</span>}
+                      {entity.addresses.length > 1 && <span className="text-muted-foreground text-xs"> +{entity.addresses.length - 1}</span>}
                     </p>
                   </div>
                 )}
@@ -610,7 +610,7 @@ function SearchResultCard({
                   entity.nationalities.length > 0 &&
                   !(entity.nationalities.length === 1 && entity.nationalities[0] === country) && (
                     <div className="bg-card px-3 py-2.5 col-span-2">
-                      <p className="text-[10px] text-gray-500 uppercase tracking-wider">Nacionalidades</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Nacionalidades</p>
                       <p className="text-sm text-foreground font-medium mt-0.5">
                         {entity.nationalities.map((n: string) => `${COUNTRY_FLAGS[n] || ""} ${COUNTRY_NAMES[n] || n}`).join("  ·  ")}
                       </p>
@@ -620,24 +620,24 @@ function SearchResultCard({
 
               {isPep && pepPosition && (
                 <div>
-                  <h4 className="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">Posición</h4>
+                  <h4 className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider mb-2">Posición</h4>
                   <div className="rounded-lg bg-purple-500/5 border border-purple-500/15 px-4 py-3">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-2">
-                        <Flag className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                        <Flag className="w-4 h-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                         <div>
                           <p className="text-sm font-medium text-foreground">{pepPosition.cargo || entity.pep_category}</p>
-                          {pepPosition.dependencia && <p className="text-xs text-gray-400 mt-0.5">{pepPosition.dependencia}</p>}
+                          {pepPosition.dependencia && <p className="text-xs text-muted-foreground mt-0.5">{pepPosition.dependencia}</p>}
                         </div>
                       </div>
                       <div className="text-left sm:text-right">
                         {(pepPosition.start_date || pepPosition.end_date) && (
-                          <p className="text-xs text-purple-400 font-medium">
+                          <p className="text-xs text-purple-600 dark:text-purple-400 font-medium">
                             {pepPosition.start_date?.slice(0, 4)}{pepPosition.end_date ? ` – ${pepPosition.end_date.slice(0, 4)}` : " – Presente"}
                           </p>
                         )}
                         {(pepPosition.start_date || pepPosition.end_date) && (
-                          <p className="text-[10px] text-gray-500 mt-0.5">
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
                             {pepPosition.is_current !== false && !pepPosition.end_date ? "Presente" : pepPosition.end_date?.slice(0, 4)}
                           </p>
                         )}
@@ -651,27 +651,27 @@ function SearchResultCard({
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {entity.positions && entity.positions.length > 0 && (
                     <div className="rounded-lg bg-purple-500/5 border border-purple-500/15 px-3 py-2.5">
-                      <p className="text-[10px] text-purple-400 uppercase tracking-wider font-semibold mb-1.5">Cargos ({entity.positions.length})</p>
+                      <p className="text-[10px] text-purple-600 dark:text-purple-400 uppercase tracking-wider font-semibold mb-1.5">Cargos ({entity.positions.length})</p>
                       <div className="space-y-1">
-                        {entity.positions.filter(Boolean).slice(0, 5).map((p, i) => <p key={i} className="text-xs text-gray-300 leading-snug">{p}</p>)}
-                        {entity.positions.filter(Boolean).length > 5 && <p className="text-[10px] text-gray-500">+{entity.positions.filter(Boolean).length - 5} más</p>}
+                        {entity.positions.filter(Boolean).slice(0, 5).map((p, i) => <p key={i} className="text-xs text-muted-foreground leading-snug">{p}</p>)}
+                        {entity.positions.filter(Boolean).length > 5 && <p className="text-[10px] text-muted-foreground">+{entity.positions.filter(Boolean).length - 5} más</p>}
                       </div>
                     </div>
                   )}
                   {entity.education && entity.education.length > 0 && (
                     <div className="rounded-lg bg-blue-500/5 border border-blue-500/15 px-3 py-2.5">
-                      <p className="text-[10px] text-blue-400 uppercase tracking-wider font-semibold mb-1.5">Educación ({entity.education.length})</p>
+                      <p className="text-[10px] text-blue-600 dark:text-blue-400 uppercase tracking-wider font-semibold mb-1.5">Educación ({entity.education.length})</p>
                       <div className="space-y-1">
-                        {entity.education.filter(Boolean).slice(0, 4).map((e, i) => <p key={i} className="text-xs text-gray-300 leading-snug">{e}</p>)}
-                        {entity.education.filter(Boolean).length > 4 && <p className="text-[10px] text-gray-500">+{entity.education.filter(Boolean).length - 4} más</p>}
+                        {entity.education.filter(Boolean).slice(0, 4).map((e, i) => <p key={i} className="text-xs text-muted-foreground leading-snug">{e}</p>)}
+                        {entity.education.filter(Boolean).length > 4 && <p className="text-[10px] text-muted-foreground">+{entity.education.filter(Boolean).length - 4} más</p>}
                       </div>
                     </div>
                   )}
                   {entity.political && entity.political.length > 0 && (
                     <div className="rounded-lg bg-orange-500/5 border border-orange-500/15 px-3 py-2.5">
-                      <p className="text-[10px] text-orange-400 uppercase tracking-wider font-semibold mb-1.5">Afiliación Política ({entity.political.length})</p>
+                      <p className="text-[10px] text-orange-700 dark:text-orange-400 uppercase tracking-wider font-semibold mb-1.5">Afiliación Política ({entity.political.length})</p>
                       <div className="space-y-1">
-                        {entity.political.filter(Boolean).map((p, i) => <p key={i} className="text-xs text-gray-300 leading-snug">{p}</p>)}
+                        {entity.political.filter(Boolean).map((p, i) => <p key={i} className="text-xs text-muted-foreground leading-snug">{p}</p>)}
                       </div>
                     </div>
                   )}
@@ -680,11 +680,11 @@ function SearchResultCard({
 
               {entity.sanctions_details && entity.sanctions_details.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-red-400 uppercase tracking-wider mb-2">Sanction Records ({entity.sanctions_details.length})</h4>
+                  <h4 className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider mb-2">Sanction Records ({entity.sanctions_details.length})</h4>
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-xs text-gray-400">Autoridades:</span>
+                    <span className="text-xs text-muted-foreground">Autoridades:</span>
                     {[...new Set(entity.sanctions_details.map((s) => s.authority))].map((auth) => (
-                      <span key={auth} className="text-[10px] px-2 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-medium">{auth}</span>
+                      <span key={auth} className="text-[10px] px-2 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 font-medium">{auth}</span>
                     ))}
                   </div>
                   <div className="rounded-lg border border-red-500/15 overflow-hidden divide-y divide-red-500/10">
@@ -692,11 +692,11 @@ function SearchResultCard({
                       <div key={i} className="px-4 py-2.5 bg-red-500/[0.03]">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                           <div>
-                            <p className="text-xs text-gray-300"><span className="text-gray-500">Autoridad:</span> <span className="font-medium">{s.authority}</span></p>
-                            {s.program && <p className="text-xs text-gray-300 mt-0.5"><span className="text-gray-500">Programa:</span> {s.program}</p>}
-                            {s.reason && <p className="text-xs text-gray-300 mt-0.5"><span className="text-gray-500">Razón:</span> {s.reason}</p>}
+                            <p className="text-xs text-muted-foreground"><span className="text-muted-foreground">Autoridad:</span> <span className="font-medium">{s.authority}</span></p>
+                            {s.program && <p className="text-xs text-muted-foreground mt-0.5"><span className="text-muted-foreground">Programa:</span> {s.program}</p>}
+                            {s.reason && <p className="text-xs text-muted-foreground mt-0.5"><span className="text-muted-foreground">Razón:</span> {s.reason}</p>}
                           </div>
-                          <span className="flex items-center gap-1 text-[10px] text-green-400 font-medium flex-shrink-0">
+                          <span className="flex items-center gap-1 text-[10px] text-green-700 dark:text-green-400 font-medium flex-shrink-0">
                             <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
                             Activo
                           </span>
@@ -704,24 +704,24 @@ function SearchResultCard({
                       </div>
                     ))}
                   </div>
-                  {entity.sanctions_details.length > 4 && <p className="text-[10px] text-gray-500 mt-1">+{entity.sanctions_details.length - 4} registros más...</p>}
+                  {entity.sanctions_details.length > 4 && <p className="text-[10px] text-muted-foreground mt-1">+{entity.sanctions_details.length - 4} registros más...</p>}
                 </div>
               )}
 
               {entity.adverse_media_details && entity.adverse_media_details.length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-semibold text-orange-700 dark:text-orange-400 uppercase tracking-wider mb-2">
                     Adverse Media — Severidad {entity.adverse_media_severity}
                   </h4>
                   <div className="rounded-lg border border-orange-500/15 overflow-hidden divide-y divide-orange-500/10">
                     {entity.adverse_media_details.map((am, i) => (
                       <div key={i} className="px-4 py-2.5 bg-orange-500/[0.03]">
                         <div className="flex items-center gap-2">
-                          <Newspaper className="w-3.5 h-3.5 text-orange-400 flex-shrink-0" />
-                          <span className="text-xs text-gray-300 font-medium capitalize">{am.category}</span>
-                          <span className="text-[10px] text-gray-500">sev. {am.severity}</span>
+                          <Newspaper className="w-3.5 h-3.5 text-orange-700 dark:text-orange-400 flex-shrink-0" />
+                          <span className="text-xs text-muted-foreground font-medium capitalize">{am.category}</span>
+                          <span className="text-[10px] text-muted-foreground">sev. {am.severity}</span>
                         </div>
-                        {am.details && <p className="text-[11px] text-gray-500 mt-1 ml-5">{am.details}</p>}
+                        {am.details && <p className="text-[11px] text-muted-foreground mt-1 ml-5">{am.details}</p>}
                       </div>
                     ))}
                   </div>
@@ -730,62 +730,62 @@ function SearchResultCard({
 
               {entity.identifiers && Object.keys(entity.identifiers).length > 0 && (
                 <div>
-                  <h4 className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">Identificadores</h4>
+                  <h4 className="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider mb-2">Identificadores</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {Object.entries(entity.identifiers)
                       .filter(([key, value]) => key !== "additional_documents" && value !== null && value !== undefined && typeof value !== "object")
                       .slice(0, 6)
                       .map(([key, value]) => (
-                        <span key={key} className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        <span key={key} className="text-[10px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
                           {key}: {Array.isArray(value) ? value.join(", ") : String(value)}
                         </span>
                       ))}
-                    {Object.keys(entity.identifiers).length > 6 && <span className="text-[10px] text-gray-500">+{Object.keys(entity.identifiers).length - 6}</span>}
+                    {Object.keys(entity.identifiers).length > 6 && <span className="text-[10px] text-muted-foreground">+{Object.keys(entity.identifiers).length - 6}</span>}
                   </div>
                 </div>
               )}
 
               {entity.explainability && (
                 <div className="pt-3 border-t border-foreground/5">
-                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-[10px] text-gray-500 mb-2">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between text-[10px] text-muted-foreground mb-2">
                     <div className="flex items-center gap-1.5">
-                      <Sparkles className="w-3 h-3 text-purple-400" />
+                      <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
                       <span>Análisis del Algoritmo</span>
                     </div>
-                    {entity.ml_probability !== undefined && <span className="text-purple-400 font-medium">ML: {Math.round(entity.ml_probability * 100)}%</span>}
+                    {entity.ml_probability !== undefined && <span className="text-purple-600 dark:text-purple-400 font-medium">ML: {Math.round(entity.ml_probability * 100)}%</span>}
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1 text-[10px]">
                     {entity.explainability.structural_analysis && (
                       <>
-                        <span className="text-gray-600">Tokens:</span>
-                        <span className="text-gray-400">{entity.explainability.structural_analysis.tokens_matched}</span>
+                        <span className="text-muted-foreground">Tokens:</span>
+                        <span className="text-muted-foreground">{entity.explainability.structural_analysis.tokens_matched}</span>
                       </>
                     )}
                     {entity.explainability.structural_analysis?.surnames_matched !== undefined && (
                       <>
-                        <span className="text-gray-600">Apellidos:</span>
-                        <span className={entity.explainability.structural_analysis.surnames_matched ? "text-green-400" : "text-red-400"}>
+                        <span className="text-muted-foreground">Apellidos:</span>
+                        <span className={entity.explainability.structural_analysis.surnames_matched ? "text-green-700 dark:text-green-400" : "text-red-600 dark:text-red-400"}>
                           {entity.explainability.structural_analysis.surnames_matched ? "✓ Coinciden" : "✗ No coinciden"}
                         </span>
                       </>
                     )}
                     {entity.explainability.text_score_components && (
                       <>
-                        <span className="text-gray-600">Similitud:</span>
-                        <span className="text-gray-400">{Math.round((entity.explainability.text_score_components.avg_jaro_similarity || 0) * 100)}%</span>
+                        <span className="text-muted-foreground">Similitud:</span>
+                        <span className="text-muted-foreground">{Math.round((entity.explainability.text_score_components.avg_jaro_similarity || 0) * 100)}%</span>
                       </>
                     )}
                     {entity.context_breakdown && (
                       <>
-                        <span className="text-gray-600">Contexto:</span>
-                        <span className="text-blue-400">+{Math.round((entity.context_breakdown.country_boost || 0) * 100)}%</span>
+                        <span className="text-muted-foreground">Contexto:</span>
+                        <span className="text-blue-600 dark:text-blue-400">+{Math.round((entity.context_breakdown.country_boost || 0) * 100)}%</span>
                       </>
                     )}
                   </div>
                   {entity.explainability.boosts_applied && Object.keys(entity.explainability.boosts_applied).length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {Object.entries(entity.explainability.boosts_applied).map(([key, value]) => (
-                        <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-400 border border-green-500/20">
+                        <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20">
                           {key}: {value}
                         </span>
                       ))}
@@ -794,7 +794,7 @@ function SearchResultCard({
                   {entity.explainability.penalties_applied && Object.keys(entity.explainability.penalties_applied).length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                       {Object.entries(entity.explainability.penalties_applied).map(([key, value]) => (
-                        <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20">
+                        <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20">
                           {key}: {value}
                         </span>
                       ))}
@@ -805,7 +805,7 @@ function SearchResultCard({
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 pt-3 border-t border-foreground/5">
                 <div className="flex-1">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Fuentes ({sources.length})</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Fuentes ({sources.length})</p>
                   <div className="flex flex-wrap gap-1">
                     {sources.map((source) => (
                       <span key={source} className={`text-[10px] px-2 py-0.5 rounded-full bg-foreground/5 border ${SOURCE_COLOR_MAP[getSourceCategory(source)]}`}>
@@ -815,8 +815,8 @@ function SearchResultCard({
                   </div>
                 </div>
                 <div className="flex-shrink-0 text-left sm:text-right">
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1">Entity ID</p>
-                  <p className="text-[11px] text-gray-400 font-mono">{entity.entity_id?.slice(0, 12)}...</p>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1">Entity ID</p>
+                  <p className="text-[11px] text-muted-foreground font-mono">{entity.entity_id?.slice(0, 12)}...</p>
                 </div>
               </div>
             </div>

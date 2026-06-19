@@ -34,6 +34,7 @@
  */
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { GridBackdrop } from './GridBackdrop';
 
 interface AppPageProps {
   children: ReactNode;
@@ -45,6 +46,9 @@ interface AppPageProps {
    *  matches PageHeader + Section spacing. Reduce to `space-y-4`
    *  for dense dashboards. */
   spacing?: 'compact' | 'default' | 'loose';
+  /** Blueprint grid backdrop behind the page. On by default (universal
+   *  background); pass `grid={false}` to opt a page out. */
+  grid?: boolean;
   /** Inject className on the inner container (rare). */
   className?: string;
 }
@@ -65,13 +69,16 @@ export function AppPage({
   children,
   width = 'default',
   spacing = 'default',
+  grid = true,
   className,
 }: AppPageProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <div className={cn('min-h-screen bg-background', grid && 'relative')}>
+      {grid && <GridBackdrop />}
       <div
         className={cn(
           'mx-auto px-4 py-6 sm:px-6 sm:py-8 lg:px-8',
+          grid && 'relative z-10',
           WIDTH_CLASS[width],
           SPACING_CLASS[spacing],
           className,

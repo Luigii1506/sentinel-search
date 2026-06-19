@@ -221,7 +221,7 @@ export function BulkScreeningPage() {
           description="Screening masivo de nombres contra la base de datos."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-brand-blue/30">
-              <FileSpreadsheet className="w-6 h-6 text-electric-400" aria-hidden="true" />
+              <FileSpreadsheet className="w-6 h-6 text-electric-700 dark:text-electric-400" aria-hidden="true" />
             </div>
           }
         />
@@ -281,10 +281,10 @@ export function BulkScreeningPage() {
                       {file ? (
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
                           <div className="flex items-center gap-2 min-w-0">
-                            <FileText className="w-8 h-8 text-green-400" />
+                            <FileText className="w-8 h-8 text-green-700 dark:text-green-400" />
                             <div className="text-left min-w-0">
                               <p className="text-foreground font-medium break-all">{file.name}</p>
-                              <p className="text-sm text-gray-400">
+                              <p className="text-sm text-muted-foreground">
                                 {(file.size / 1024).toFixed(1)} KB
                               </p>
                             </div>
@@ -302,11 +302,11 @@ export function BulkScreeningPage() {
                           onClick={() => fileInputRef.current?.click()}
                           className="cursor-pointer"
                         >
-                          <Upload className="w-12 h-12 text-gray-500 mx-auto mb-4" />
+                          <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
                           <p className="text-foreground font-medium mb-2">
                             Arrastra un archivo CSV o haz click para seleccionar
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-muted-foreground">
                             Debe tener una columna llamada "name" o "nombre"
                           </p>
                         </div>
@@ -328,9 +328,9 @@ export function BulkScreeningPage() {
                         value={namesText}
                         onChange={(e) => setNamesText(e.target.value)}
                         placeholder="Pega los nombres aqui, uno por linea...&#10;Ejemplo:&#10;Juan Perez&#10;Maria Garcia&#10;Carlos Lopez"
-                        className="min-h-[200px] bg-background border-foreground/10 text-foreground placeholder:text-gray-600"
+                        className="min-h-[200px] bg-background border-foreground/10 text-foreground placeholder:text-muted-foreground"
                       />
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-sm text-muted-foreground mt-2">
                         {parseNamesFromText().length} nombres detectados
                       </p>
                     </CardContent>
@@ -358,7 +358,7 @@ export function BulkScreeningPage() {
                       step={0.05}
                       className="py-4"
                     />
-                    <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm text-gray-500">
+                    <div className="flex flex-col gap-1 sm:flex-row sm:justify-between text-sm text-muted-foreground">
                       <span>50% (Mas resultados)</span>
                       <span>100% (Solo exactos)</span>
                     </div>
@@ -422,12 +422,12 @@ export function BulkScreeningPage() {
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <RefreshCw className="w-8 h-8 text-blue-400 animate-spin" />
+                      <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
                     </div>
                   </div>
                   
                   <h2 className="text-2xl font-bold text-foreground mb-2">Procesando...</h2>
-                  <p className="text-gray-400 mb-6">
+                  <p className="text-muted-foreground mb-6">
                     {job?.processed} de {job?.total} nombres procesados
                   </p>
                   
@@ -440,12 +440,12 @@ export function BulkScreeningPage() {
                   
                   <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 text-sm">
                     <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-green-400" />
-                      <span className="text-gray-300">{job?.completed_count} exitosos</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-700 dark:text-green-400" />
+                      <span className="text-muted-foreground">{job?.completed_count} exitosos</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-400" />
-                      <span className="text-gray-300">{job?.failed_count} fallidos</span>
+                      <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      <span className="text-muted-foreground">{job?.failed_count} fallidos</span>
                     </div>
                   </div>
                 </div>
@@ -469,7 +469,7 @@ export function BulkScreeningPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
                         <h2 className="text-2xl font-bold text-foreground mb-1">Resultados</h2>
-                        <p className="text-gray-400">
+                        <p className="text-muted-foreground">
                           {job?.completed_count} procesados · {job?.failed_count} fallidos
                         </p>
                       </div>
@@ -508,41 +508,41 @@ export function BulkScreeningPage() {
                             <div className="flex items-start justify-between gap-3">
                               <p className="text-sm text-foreground break-words">{result.query}</p>
                               {result.status === 'found' ? (
-                                <Badge className="bg-green-500/10 text-green-400 border-green-500/20">Encontrado</Badge>
+                                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">Encontrado</Badge>
                               ) : result.status === 'not_found' ? (
-                                <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/20">No encontrado</Badge>
+                                <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">No encontrado</Badge>
                               ) : (
-                                <Badge className="bg-red-500/10 text-red-400 border-red-500/20">Error</Badge>
+                                <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">Error</Badge>
                               )}
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-sm">
                               <div>
-                                <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Matches</p>
-                                <p className="text-gray-300">{result.match_count}</p>
+                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Matches</p>
+                                <p className="text-muted-foreground">{result.match_count}</p>
                               </div>
                               <div>
-                                <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Score</p>
+                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Score</p>
                                 {result.top_score ? (
                                   <Badge
                                     variant="outline"
                                     className={cn(
                                       result.top_score >= 90
-                                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
                                         : result.top_score >= 70
-                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                        : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+                                        : 'bg-gray-500/10 text-muted-foreground border-gray-500/20'
                                     )}
                                   >
                                     {Math.round(result.top_score)}%
                                   </Badge>
                                 ) : (
-                                  <span className="text-gray-500">-</span>
+                                  <span className="text-muted-foreground">-</span>
                                 )}
                               </div>
                             </div>
                             <div>
-                              <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Mejor Coincidencia</p>
-                              <p className="text-sm text-gray-300 break-words">{result.top_match_name || '-'}</p>
+                              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Mejor Coincidencia</p>
+                              <p className="text-sm text-muted-foreground break-words">{result.top_match_name || '-'}</p>
                             </div>
                           </CardContent>
                         </Card>
@@ -555,19 +555,19 @@ export function BulkScreeningPage() {
                       <table className="w-full">
                         <thead className="bg-foreground/5 border-b border-foreground/5">
                           <tr>
-                            <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               Nombre Buscado
                             </th>
-                            <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                            <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               Status
                             </th>
-                            <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                            <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               Matches
                             </th>
-                            <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               Mejor Coincidencia
                             </th>
-                            <th className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4">
+                            <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               Score
                             </th>
                           </tr>
@@ -586,24 +586,24 @@ export function BulkScreeningPage() {
                               </td>
                               <td className="px-6 py-4 text-center">
                                 {result.status === 'found' ? (
-                                  <Badge className="bg-green-500/10 text-green-400 border-green-500/20">
+                                  <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
                                     Encontrado
                                   </Badge>
                                 ) : result.status === 'not_found' ? (
-                                  <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/20">
+                                  <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">
                                     No encontrado
                                   </Badge>
                                 ) : (
-                                  <Badge className="bg-red-500/10 text-red-400 border-red-500/20">
+                                  <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
                                     Error
                                   </Badge>
                                 )}
                               </td>
                               <td className="px-6 py-4 text-center">
-                                <span className="text-sm text-gray-300">{result.match_count}</span>
+                                <span className="text-sm text-muted-foreground">{result.match_count}</span>
                               </td>
                               <td className="px-6 py-4">
-                                <span className="text-sm text-gray-300">
+                                <span className="text-sm text-muted-foreground">
                                   {result.top_match_name || '-'}
                                 </span>
                               </td>
@@ -613,16 +613,16 @@ export function BulkScreeningPage() {
                                     variant="outline"
                                     className={cn(
                                       result.top_score >= 90
-                                        ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
                                         : result.top_score >= 70
-                                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/20'
-                                        : 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+                                        : 'bg-gray-500/10 text-muted-foreground border-gray-500/20'
                                     )}
                                   >
                                     {Math.round(result.top_score)}%
                                   </Badge>
                                 ) : (
-                                  <span className="text-gray-500">-</span>
+                                  <span className="text-muted-foreground">-</span>
                                 )}
                               </td>
                             </motion.tr>

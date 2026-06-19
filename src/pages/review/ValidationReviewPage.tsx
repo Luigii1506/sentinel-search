@@ -79,7 +79,7 @@ export function ValidationReviewPage() {
         description="Alertas del consensus engine que requieren revisión humana"
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <ShieldCheck className="w-6 h-6 text-blue-400" />
+            <ShieldCheck className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={

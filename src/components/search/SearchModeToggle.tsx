@@ -56,7 +56,7 @@ const modes: ModeOption[] = [
 export function SearchModeToggle({ mode, onChange, className }: SearchModeToggleProps) {
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      <span className="text-sm text-gray-400 mr-2">Modo:</span>
+      <span className="text-sm text-muted-foreground mr-2">Modo:</span>
       
       <div className="flex bg-foreground/5 rounded-lg p-1 gap-1">
         {modes.map((option) => (
@@ -71,12 +71,12 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
                     "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200",
                     mode === option.value
                       ? "bg-foreground/10 text-foreground"
-                      : "text-gray-400 hover:text-gray-200 hover:bg-foreground/5"
+                      : "text-muted-foreground hover:text-gray-200 hover:bg-foreground/5"
                   )}
                 >
                   <span className={cn(
                     "transition-colors",
-                    mode === option.value ? "text-foreground" : "text-gray-500"
+                    mode === option.value ? "text-foreground" : "text-muted-foreground"
                   )}>
                     {option.icon}
                   </span>
@@ -95,7 +95,7 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
               <TooltipContent side="bottom" className="max-w-xs">
                 <div className="space-y-1">
                   <p className="font-medium">{option.label}</p>
-                  <p className="text-xs text-gray-400">{option.description}</p>
+                  <p className="text-xs text-muted-foreground">{option.description}</p>
                 </div>
               </TooltipContent>
             </Tooltip>
@@ -107,16 +107,16 @@ export function SearchModeToggle({ mode, onChange, className }: SearchModeToggle
         <Tooltip>
           <TooltipTrigger asChild>
             <button className="p-1.5 hover:bg-foreground/10 rounded-full transition-colors">
-              <Info className="w-4 h-4 text-gray-400" />
+              <Info className="w-4 h-4 text-muted-foreground" />
             </button>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-sm">
             <div className="space-y-2 text-sm">
               <p className="font-medium">¿Qué modo elegir?</p>
-              <ul className="space-y-1 text-xs text-gray-400">
-                <li><strong className="text-blue-400">Auto:</strong> Recomendado. El sistema detecta automáticamente si buscas un nombre o concepto.</li>
-                <li><strong className="text-green-400">Nombres:</strong> Mejor para "Juan García", "Empresa XYZ". Usa OpenSearch + fonético.</li>
-                <li><strong className="text-purple-400">Conceptos:</strong> Mejor para "terrorismo financiero", "alto riesgo". Usa embeddings.</li>
+              <ul className="space-y-1 text-xs text-muted-foreground">
+                <li><strong className="text-blue-600 dark:text-blue-400">Auto:</strong> Recomendado. El sistema detecta automáticamente si buscas un nombre o concepto.</li>
+                <li><strong className="text-green-700 dark:text-green-400">Nombres:</strong> Mejor para "Juan García", "Empresa XYZ". Usa OpenSearch + fonético.</li>
+                <li><strong className="text-purple-600 dark:text-purple-400">Conceptos:</strong> Mejor para "terrorismo financiero", "alto riesgo". Usa embeddings.</li>
               </ul>
             </div>
           </TooltipContent>

@@ -61,9 +61,9 @@ const ROLE_LABEL: Record<ApiKeyRole, string> = {
 };
 
 const ROLE_COLOR: Record<ApiKeyRole, string> = {
-  admin: 'bg-red-500/10 text-red-300 border-red-500/30',
-  analyst: 'bg-blue-500/10 text-blue-300 border-blue-500/30',
-  readonly: 'bg-gray-500/10 text-gray-300 border-gray-500/30',
+  admin: 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
+  analyst: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30',
+  readonly: 'bg-gray-500/10 text-muted-foreground border-gray-500/30',
 };
 
 export default function ApiKeysPage() {
@@ -105,12 +105,12 @@ export default function ApiKeysPage() {
         description="Administra las llaves de acceso al API para cada cliente y rol."
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <Key className="w-6 h-6 text-blue-400" />
+            <Key className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
           <>
-            <label className="flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
               <Switch checked={includeRevoked} onCheckedChange={setIncludeRevoked} />
               Mostrar revocadas
             </label>
@@ -125,9 +125,9 @@ export default function ApiKeysPage() {
         {/* Warning banner */}
         <Card className="border-amber-500/30 bg-amber-500/5">
           <CardContent className="p-4 flex items-start gap-3">
-            <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="text-sm text-amber-200/90">
-              <strong className="text-amber-300">Importante:</strong> la key completa
+              <strong className="text-amber-700 dark:text-amber-300">Importante:</strong> la key completa
               se muestra una sola vez al crearla o rotarla. Cópiala y guárdala en
               un gestor seguro — no podrás verla de nuevo.
             </div>
@@ -169,7 +169,7 @@ export default function ApiKeysPage() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-foreground/10 text-left text-xs uppercase tracking-wide text-gray-500">
+                    <tr className="border-b border-foreground/10 text-left text-xs uppercase tracking-wide text-muted-foreground">
                       <th className="px-4 py-3 font-medium">Cliente</th>
                       <th className="px-4 py-3 font-medium">Prefix</th>
                       <th className="px-4 py-3 font-medium">Rol</th>
@@ -186,13 +186,13 @@ export default function ApiKeysPage() {
                         <td className="px-4 py-3">
                           <div className="font-medium text-foreground">{k.client_name}</div>
                           {k.description && (
-                            <div className="text-xs text-gray-500 mt-0.5 max-w-xs truncate">
+                            <div className="text-xs text-muted-foreground mt-0.5 max-w-xs truncate">
                               {k.description}
                             </div>
                           )}
                         </td>
                         <td className="px-4 py-3">
-                          <code className="text-xs font-mono text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded">
+                          <code className="text-xs font-mono text-blue-600 dark:text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded">
                             {k.key_prefix}…
                           </code>
                         </td>
@@ -201,13 +201,13 @@ export default function ApiKeysPage() {
                             {ROLE_LABEL[k.role]}
                           </Badge>
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-400">
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
                           {formatDateOr(k.created_at)}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-400">
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
                           {formatDateOr(k.last_used_at, 'Nunca')}
                         </td>
-                        <td className="px-4 py-3 text-xs text-gray-400">
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
                           {formatDateOr(k.expires_at, 'Sin caducidad')}
                         </td>
                         <td className="px-4 py-3">
@@ -224,7 +224,7 @@ export default function ApiKeysPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-8 px-2 text-blue-300 hover:text-blue-200"
+                                  className="h-8 px-2 text-blue-600 dark:text-blue-300 hover:text-blue-200"
                                   onClick={() => rotateMutation.mutate(k.id)}
                                   disabled={rotateMutation.isPending}
                                 >
@@ -234,7 +234,7 @@ export default function ApiKeysPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="h-8 px-2 text-red-300 hover:text-red-200"
+                                  className="h-8 px-2 text-red-600 dark:text-red-300 hover:text-red-200"
                                   onClick={() => setRevokeTarget(k)}
                                 >
                                   <Trash2 className="w-3.5 h-3.5 mr-1" />
@@ -345,7 +345,7 @@ function CreateKeyDialog({
               onChange={(e) => setClientName(e.target.value)}
               autoFocus
             />
-            <p className="text-[10px] text-gray-500">
+            <p className="text-[10px] text-muted-foreground">
               Identificador interno. Usa snake_case (sin espacios).
             </p>
           </div>
@@ -385,7 +385,7 @@ function CreateKeyDialog({
               value={expiresInDays}
               onChange={(e) => setExpiresInDays(e.target.value)}
             />
-            <p className="text-[10px] text-gray-500">
+            <p className="text-[10px] text-muted-foreground">
               Vacío = sin caducidad. Recomendado: 90 días con rotación automática.
             </p>
           </div>
@@ -441,7 +441,7 @@ function NewKeyDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5 text-green-400" />
+            <Shield className="w-5 h-5 text-green-700 dark:text-green-400" />
             API key creada
           </DialogTitle>
           <DialogDescription>
@@ -460,7 +460,7 @@ function NewKeyDialog({
             <div className="space-y-1.5">
               <Label>API key</Label>
               <div className="flex items-center gap-2">
-                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-foreground/10 font-mono text-sm text-blue-300 break-all">
+                <div className="flex-1 px-3 py-2 rounded-lg bg-black/40 border border-foreground/10 font-mono text-sm text-blue-600 dark:text-blue-300 break-all">
                   {visible ? keyData.api_key : '•'.repeat(Math.min(keyData.api_key.length, 40))}
                 </div>
                 <Button
@@ -479,7 +479,7 @@ function NewKeyDialog({
 
             <Card className="border-amber-500/30 bg-amber-500/5">
               <CardContent className="p-3 flex items-start gap-2 text-xs text-amber-200/90">
-                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <AlertTriangle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   Una vez que cierres este diálogo, la key se ocultará para siempre.
                   Solo podrás ver el prefix <code className="font-mono">{keyData.key_prefix}…</code>

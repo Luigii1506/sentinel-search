@@ -30,15 +30,15 @@ const amCategoryLabels: Record<string, string> = {
 };
 
 const amCategoryColors: Record<string, string> = {
-  terrorism: 'bg-red-500/10 text-red-400 border-red-500/30',
-  sanctions_evasion: 'bg-red-500/10 text-red-300 border-red-500/30',
-  wanted: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-  crime: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
-  human_rights: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
-  financial_crime: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  corruption: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-  offshore: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+  terrorism: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+  sanctions_evasion: 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
+  wanted: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30',
+  crime: 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30',
+  human_rights: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
+  financial_crime: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+  corruption: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30',
+  offshore: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+  regulatory: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
 };
 
 interface EntityAdverseMediaTabProps {
@@ -78,7 +78,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
   }
 
   const sevColor = (score: number) =>
-    score >= 90 ? 'text-red-400' : score >= 70 ? 'text-orange-400' : score >= 50 ? 'text-yellow-400' : 'text-blue-400';
+    score >= 90 ? 'text-red-600 dark:text-red-400' : score >= 70 ? 'text-orange-700 dark:text-orange-400' : score >= 50 ? 'text-yellow-700 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400';
   const sevBg = (score: number) =>
     score >= 90 ? 'bg-red-500' : score >= 70 ? 'bg-orange-500' : score >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
   const sevLabel = (score: number) =>
@@ -87,7 +87,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
   const getMethodBadge = (method: string | undefined) => {
     if (method === 'moonshot_ai' || method === 'moonshot') {
       return (
-        <Badge variant="outline" className="text-[10px] gap-1 bg-violet-500/10 text-violet-400 border-violet-500/30">
+        <Badge variant="outline" className="text-[10px] gap-1 bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30">
           <Brain className="w-3 h-3" />
           Moonshot AI
         </Badge>
@@ -95,7 +95,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
     }
     if (method === 'claude_ai') {
       return (
-        <Badge variant="outline" className="text-[10px] gap-1 bg-cyan-500/10 text-cyan-400 border-cyan-500/30">
+        <Badge variant="outline" className="text-[10px] gap-1 bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30">
           <Brain className="w-3 h-3" />
           Claude AI
         </Badge>
@@ -103,7 +103,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
     }
     if (method === 'keyword') {
       return (
-        <Badge variant="outline" className="text-[10px] gap-1 bg-gray-500/10 text-gray-400 border-gray-500/30">
+        <Badge variant="outline" className="text-[10px] gap-1 bg-gray-500/10 text-muted-foreground border-gray-500/30">
           <Tag className="w-3 h-3" />
           Keywords
         </Badge>
@@ -143,23 +143,23 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                 <span className={cn('text-lg font-bold', sevColor(riskProfile.article_risk_score))}>
                   {Math.round(riskProfile.article_risk_score)}
                 </span>
-                <span className="text-[8px] text-gray-500">{sevLabel(riskProfile.article_risk_score)}</span>
+                <span className="text-[8px] text-muted-foreground">{sevLabel(riskProfile.article_risk_score)}</span>
               </div>
             </div>
             <div className="flex-1 grid grid-cols-3 gap-4">
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
-                <p className="text-xs text-gray-400">Articulos</p>
+                <p className="text-xs text-muted-foreground">Articulos</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
-                <p className="text-xs text-gray-400">Ultimos 30d</p>
+                <p className="text-xs text-muted-foreground">Ultimos 30d</p>
               </div>
               <div>
                 <p className={cn('text-lg font-bold', sevColor(riskProfile.max_severity))}>
                   {riskProfile.max_severity}
                 </p>
-                <p className="text-xs text-gray-400">Max Severity</p>
+                <p className="text-xs text-muted-foreground">Max Severity</p>
               </div>
             </div>
             {riskProfile.top_categories.length > 0 && (
@@ -177,7 +177,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
 
       {structured?.has_adverse_media && structured.categories.length > 0 && (
         <div className="glass rounded-xl p-5">
-          <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4" />
             Categorias Estructuradas (Sources)
           </h4>
@@ -200,11 +200,11 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
       {articles.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+            <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Newspaper className="w-4 h-4" />
               Articulos de Noticias ({articles.length})
             </h4>
-            <a href="/adverse-media" className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+            <a href="/adverse-media" className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
               Ver dashboard completo <ArrowRight className="w-3 h-3" />
             </a>
           </div>
@@ -247,7 +247,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                   )}
                 </div>
 
-                {article.summary && <p className="text-xs text-gray-400 mb-2 line-clamp-2">{article.summary}</p>}
+                {article.summary && <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{article.summary}</p>}
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {article.categories?.map((category) => (
@@ -256,25 +256,25 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                     </Badge>
                   ))}
                   {getMethodBadge(article.classification_method)}
-                  <span className="text-gray-500 flex items-center gap-1 ml-auto">
+                  <span className="text-muted-foreground flex items-center gap-1 ml-auto">
                     {sourceDomain && (
                       <>
                         <Globe className="w-3 h-3" />
-                        <span className="text-gray-400">{sourceDomain}</span>
-                        <span className="text-gray-600 mx-1">·</span>
+                        <span className="text-muted-foreground">{sourceDomain}</span>
+                        <span className="text-muted-foreground mx-1">·</span>
                       </>
                     )}
                     <Clock className="w-3 h-3" />
                     {article.publication_date ? formatDate(article.publication_date) : 'N/A'}
                   </span>
                   {article.link_confidence != null && (
-                    <span className="text-gray-500 flex items-center gap-1">
+                    <span className="text-muted-foreground flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
                       {Math.round(article.link_confidence * 100)}% match
                     </span>
                   )}
                   {article.is_verified && (
-                    <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/30">
+                    <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
                       Verificado
                     </Badge>
                   )}
@@ -285,7 +285,7 @@ export function EntityAdverseMediaTab({ entityId }: EntityAdverseMediaTabProps) 
                     href={article.source_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-400 hover:text-blue-300"
+                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
                   >
                     <ExternalLink className="w-3 h-3" />
                     Leer articulo

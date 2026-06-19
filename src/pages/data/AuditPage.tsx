@@ -57,26 +57,26 @@ function formatDate(dateStr?: string | null): string {
 }
 
 function freshnessLabel(lastSync?: string | null): { text: string; color: string } {
-  if (!lastSync) return { text: 'Sin datos', color: 'text-gray-500' };
+  if (!lastSync) return { text: 'Sin datos', color: 'text-muted-foreground' };
   const diffMs = Date.now() - new Date(lastSync).getTime();
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(hours / 24);
-  if (hours < 1) return { text: '<1h', color: 'text-green-400' };
-  if (hours < 24) return { text: `${hours}h`, color: 'text-green-400' };
-  if (days <= 1) return { text: 'Hoy', color: 'text-green-400' };
-  if (days <= 7) return { text: `${days}d`, color: 'text-green-400' };
-  if (days <= 14) return { text: `${days}d`, color: 'text-yellow-400' };
-  if (days <= 30) return { text: `${days}d`, color: 'text-orange-400' };
-  return { text: `${days}d`, color: 'text-red-400' };
+  if (hours < 1) return { text: '<1h', color: 'text-green-700 dark:text-green-400' };
+  if (hours < 24) return { text: `${hours}h`, color: 'text-green-700 dark:text-green-400' };
+  if (days <= 1) return { text: 'Hoy', color: 'text-green-700 dark:text-green-400' };
+  if (days <= 7) return { text: `${days}d`, color: 'text-green-700 dark:text-green-400' };
+  if (days <= 14) return { text: `${days}d`, color: 'text-yellow-700 dark:text-yellow-400' };
+  if (days <= 30) return { text: `${days}d`, color: 'text-orange-700 dark:text-orange-400' };
+  return { text: `${days}d`, color: 'text-red-600 dark:text-red-400' };
 }
 
 function HealthScoreBadge({ score, status }: { score?: number; status?: string }) {
   if (score == null) return null;
   const colorClass =
-    status === 'healthy' ? 'bg-green-500/15 text-green-300 border-green-500/30' :
-    status === 'warning' ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' :
-    status === 'critical' ? 'bg-red-500/15 text-red-300 border-red-500/30' :
-    'bg-zinc-500/15 text-zinc-300 border-zinc-500/30';
+    status === 'healthy' ? 'bg-green-500/15 text-green-700 dark:text-green-300 border-green-500/30' :
+    status === 'warning' ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30' :
+    status === 'critical' ? 'bg-red-500/15 text-red-600 dark:text-red-300 border-red-500/30' :
+    'bg-zinc-500/15 text-muted-foreground border-zinc-500/30';
   return (
     <span className={`inline-flex items-center justify-center px-2 py-0.5 rounded text-[10px] font-mono font-medium border min-w-[40px] ${colorClass}`}>
       {score}
@@ -240,7 +240,7 @@ export function AuditPage() {
         description="Frescura, estado y confiabilidad de las fuentes de datos"
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <ClipboardList className="w-6 h-6 text-blue-400" />
+            <ClipboardList className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
@@ -259,9 +259,9 @@ export function AuditPage() {
             className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4"
           >
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1 min-w-0">
-                <h3 className="text-sm font-semibold text-red-300">
+                <h3 className="text-sm font-semibold text-red-600 dark:text-red-300">
                   {healthOverview.zombie_jobs.length} jobs zombie detectados
                 </h3>
                 <p className="text-xs text-red-200/80 mt-1">
@@ -296,16 +296,16 @@ export function AuditPage() {
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs text-gray-400 uppercase tracking-wide">Cobertura últimas 24h</span>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide">Cobertura últimas 24h</span>
                   <span className={`text-xs font-medium ${
-                    healthOverview.coverage_24h.coverage_pct >= 80 ? 'text-green-400' :
-                    healthOverview.coverage_24h.coverage_pct >= 50 ? 'text-amber-400' : 'text-red-400'
+                    healthOverview.coverage_24h.coverage_pct >= 80 ? 'text-green-700 dark:text-green-400' :
+                    healthOverview.coverage_24h.coverage_pct >= 50 ? 'text-amber-700 dark:text-amber-400' : 'text-red-600 dark:text-red-400'
                   }`}>
                     {healthOverview.coverage_24h.coverage_pct}%
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-foreground mb-2">
-                  {healthOverview.coverage_24h.synced_in_24h} <span className="text-base text-gray-500 font-normal">/ {healthOverview.coverage_24h.total_active_sources}</span>
+                  {healthOverview.coverage_24h.synced_in_24h} <span className="text-base text-muted-foreground font-normal">/ {healthOverview.coverage_24h.total_active_sources}</span>
                 </div>
                 <div className="w-full h-2 bg-foreground/5 rounded-full overflow-hidden">
                   <div
@@ -316,7 +316,7 @@ export function AuditPage() {
                     style={{ width: `${Math.min(healthOverview.coverage_24h.coverage_pct, 100)}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-muted-foreground mt-2">
                   fuentes activas sincronizadas en 24h
                 </p>
               </CardContent>
@@ -325,23 +325,23 @@ export function AuditPage() {
             {/* Health buckets */}
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
-                <span className="text-xs text-gray-400 uppercase tracking-wide">Estado de salud</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">Estado de salud</span>
                 <div className="grid grid-cols-4 gap-2 mt-2">
                   <div className="text-center">
-                    <div className="text-xl font-bold text-green-400">{healthOverview.health_buckets.healthy}</div>
-                    <p className="text-[10px] text-gray-500 uppercase">healthy</p>
+                    <div className="text-xl font-bold text-green-700 dark:text-green-400">{healthOverview.health_buckets.healthy}</div>
+                    <p className="text-[10px] text-muted-foreground uppercase">healthy</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-amber-400">{healthOverview.health_buckets.warning}</div>
-                    <p className="text-[10px] text-gray-500 uppercase">warning</p>
+                    <div className="text-xl font-bold text-amber-700 dark:text-amber-400">{healthOverview.health_buckets.warning}</div>
+                    <p className="text-[10px] text-muted-foreground uppercase">warning</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-red-400">{healthOverview.health_buckets.critical}</div>
-                    <p className="text-[10px] text-gray-500 uppercase">critical</p>
+                    <div className="text-xl font-bold text-red-600 dark:text-red-400">{healthOverview.health_buckets.critical}</div>
+                    <p className="text-[10px] text-muted-foreground uppercase">critical</p>
                   </div>
                   <div className="text-center">
-                    <div className="text-xl font-bold text-zinc-500">{healthOverview.health_buckets.inactive}</div>
-                    <p className="text-[10px] text-gray-500 uppercase">inactive</p>
+                    <div className="text-xl font-bold text-muted-foreground">{healthOverview.health_buckets.inactive}</div>
+                    <p className="text-[10px] text-muted-foreground uppercase">inactive</p>
                   </div>
                 </div>
               </CardContent>
@@ -350,14 +350,14 @@ export function AuditPage() {
             {/* Próximos syncs */}
             <Card className="bg-card border-foreground/5 lg:col-span-1">
               <CardContent className="p-4">
-                <span className="text-xs text-gray-400 uppercase tracking-wide">Próximos syncs</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">Próximos syncs</span>
                 <div className="mt-2 space-y-1.5 max-h-[120px] overflow-y-auto">
                   {healthOverview.upcoming_syncs.slice(0, 4).map((u) => (
                     <div key={u.source_id} className="flex items-center justify-between text-xs">
-                      <span className="text-gray-300 truncate flex-1 mr-2" title={u.display_name}>
+                      <span className="text-muted-foreground truncate flex-1 mr-2" title={u.display_name}>
                         {u.source_id}
                       </span>
-                      <span className="text-gray-500 flex-shrink-0">
+                      <span className="text-muted-foreground flex-shrink-0">
                         {u.minutes_until < 60 ? `${u.minutes_until}m` : `${Math.floor(u.minutes_until / 60)}h`}
                       </span>
                     </div>
@@ -431,9 +431,9 @@ export function AuditPage() {
             className="mb-8"
           >
             <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
+              <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
               Jobs Fallidos Recientes
-              <Badge className="bg-red-500/10 text-red-400 border-red-500/20">{recentFailed.length}</Badge>
+              <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">{recentFailed.length}</Badge>
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
               {recentFailed.slice(0, 6).map((job) => (
@@ -441,13 +441,13 @@ export function AuditPage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium text-foreground">{job.source}</span>
-                      <Badge variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/20">
+                      <Badge variant="outline" className="text-xs bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
                         Fallido
                       </Badge>
                     </div>
-                    <p className="text-xs text-gray-500">{formatDate(job.started_at)}</p>
+                    <p className="text-xs text-muted-foreground">{formatDate(job.started_at)}</p>
                     {job.error_message && (
-                      <p className="text-xs text-red-400/70 mt-1 truncate">{job.error_message}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400/70 mt-1 truncate">{job.error_message}</p>
                     )}
                   </CardContent>
                 </Card>
@@ -463,7 +463,7 @@ export function AuditPage() {
           className="flex flex-col md:flex-row gap-4 mb-4"
         >
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Buscar por fuente, nombre o pais..."
               value={searchQuery}
@@ -502,12 +502,12 @@ export function AuditPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="text-sm text-foreground font-medium">{item.source_id}</p>
-                          <p className="text-xs text-gray-500">{formatDate(item.updated_at)}</p>
+                          <p className="text-xs text-muted-foreground">{formatDate(item.updated_at)}</p>
                         </div>
                         <StatusBadge status={item.status} />
                       </div>
                       {item.error_message && (
-                        <p className="text-xs text-fuchsia-300/80 mt-2">{item.error_message}</p>
+                        <p className="text-xs text-fuchsia-600 dark:text-fuchsia-300/80 mt-2">{item.error_message}</p>
                       )}
                     </div>
                   )) : (
@@ -532,16 +532,16 @@ export function AuditPage() {
                       <div className="flex items-center justify-between gap-3">
                         <div>
                           <p className="text-sm text-foreground font-medium">{event.source_id}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {event.event_type} · {event.triggered_by} · {formatDate(event.created_at)}
                           </p>
                         </div>
-                        <Badge variant="outline" className="text-xs bg-foreground/5 text-gray-300 border-foreground/10">
+                        <Badge variant="outline" className="text-xs bg-foreground/5 text-muted-foreground border-foreground/10">
                           {event.entity_source_id || 'source'}
                         </Badge>
                       </div>
                       {event.reason && (
-                        <p className="text-xs text-gray-400 mt-2">{event.reason}</p>
+                        <p className="text-xs text-muted-foreground mt-2">{event.reason}</p>
                       )}
                     </div>
                   )) : (
@@ -565,9 +565,9 @@ export function AuditPage() {
         >
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-gray-400" />
+              <ShieldCheck className="w-5 h-5 text-muted-foreground" />
               Fuentes de Datos
-              <Badge className="bg-gray-500/10 text-gray-400 border-gray-500/20">{sources.length}</Badge>
+              <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">{sources.length}</Badge>
             </h2>
           </div>
 
@@ -586,31 +586,31 @@ export function AuditPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-foreground break-words">{source.source_id}</p>
-                          <p className="text-xs text-gray-500 break-words">{source.display_name}</p>
+                          <p className="text-xs text-muted-foreground break-words">{source.display_name}</p>
                         </div>
                         <StatusBadge status={source.audit_status} />
                       </div>
                       {source.stale_reason && (
                         <div className="flex items-center gap-2">
                           <HealthScoreBadge score={source.health_score} status={source.health_status} />
-                          <p className="text-xs text-gray-400 break-words flex-1">{source.stale_reason}</p>
+                          <p className="text-xs text-muted-foreground break-words flex-1">{source.stale_reason}</p>
                         </div>
                       )}
                       <div className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Categoria</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Categoria</p>
                           <CategoryBadge category={source.category || 'OTHER'} />
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Records</p>
-                          <p className="text-gray-300 font-mono">{source.bronze_count.toLocaleString()}</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Records</p>
+                          <p className="text-muted-foreground font-mono">{source.bronze_count.toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Ultimo Sync</p>
-                          <p className="text-gray-300">{formatDate(source.audit_last_sync)}</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Ultimo Sync</p>
+                          <p className="text-muted-foreground">{formatDate(source.audit_last_sync)}</p>
                         </div>
                         <div>
-                          <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Frescura</p>
+                          <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Frescura</p>
                           <p className={`font-medium ${freshness.color}`}>{freshness.text}</p>
                         </div>
                       </div>
@@ -635,39 +635,39 @@ export function AuditPage() {
                 <thead className="bg-foreground/5 border-b border-foreground/5">
                   <tr>
                     <th
-                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-6 py-4 cursor-pointer hover:text-foreground"
+                      className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('source_id')}
                     >
                       Fuente <SortIcon field="source_id" />
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
                       Categoria
                     </th>
                     <th
-                      className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
+                      className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('status')}
                     >
                       Estado <SortIcon field="status" />
                     </th>
-                    <th className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                    <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
                       Salud
                     </th>
                     <th
-                      className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
+                      className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('bronze_count')}
                     >
                       Records <SortIcon field="bronze_count" />
                     </th>
                     <th
-                      className="text-left text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
+                      className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4 cursor-pointer hover:text-foreground"
                       onClick={() => toggleSort('last_sync')}
                     >
                       Ultimo Sync <SortIcon field="last_sync" />
                     </th>
-                    <th className="text-center text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                    <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
                       Frescura
                     </th>
-                    <th className="text-right text-xs font-medium text-gray-400 uppercase tracking-wider px-4 py-4">
+                    <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-4">
                       Acciones
                     </th>
                   </tr>
@@ -686,7 +686,7 @@ export function AuditPage() {
                         <td className="px-6 py-3">
                           <div>
                             <p className="text-sm font-medium text-foreground">{source.source_id}</p>
-                            <p className="text-xs text-gray-500">{source.display_name}</p>
+                            <p className="text-xs text-muted-foreground">{source.display_name}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -699,19 +699,19 @@ export function AuditPage() {
                           <div className="flex items-center gap-2">
                             <HealthScoreBadge score={source.health_score} status={source.health_status} />
                             {source.stale_reason && (
-                              <span className="text-xs text-gray-400 truncate max-w-[220px]" title={source.stale_reason}>
+                              <span className="text-xs text-muted-foreground truncate max-w-[220px]" title={source.stale_reason}>
                                 {source.stale_reason}
                               </span>
                             )}
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <span className="text-sm text-gray-300 font-mono">
+                          <span className="text-sm text-muted-foreground font-mono">
                             {source.bronze_count.toLocaleString()}
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="text-sm text-gray-400">
+                          <span className="text-sm text-muted-foreground">
                             {formatDate(source.audit_last_sync)}
                           </span>
                         </td>

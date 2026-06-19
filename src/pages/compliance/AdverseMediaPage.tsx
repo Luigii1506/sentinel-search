@@ -67,15 +67,15 @@ const itemVariants = {
 };
 
 const categoryColors: Record<string, string> = {
-  terrorism: 'bg-red-500/10 text-red-400 border-red-500/30',
-  sanctions_evasion: 'bg-red-500/10 text-red-300 border-red-500/30',
-  wanted: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-  crime: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
-  human_rights: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
-  financial_crime: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-  corruption: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-  offshore: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-  regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+  terrorism: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+  sanctions_evasion: 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
+  wanted: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30',
+  crime: 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30',
+  human_rights: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
+  financial_crime: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+  corruption: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30',
+  offshore: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+  regulatory: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
 };
 
 const categoryLabels: Record<string, string> = {
@@ -91,24 +91,24 @@ const categoryLabels: Record<string, string> = {
 };
 
 const methodLabels: Record<string, { label: string; color: string; icon: typeof Zap }> = {
-  moonshot_ai: { label: 'Moonshot AI', color: 'bg-violet-500/10 text-violet-400 border-violet-500/30', icon: Brain },
-  claude_ai: { label: 'Claude AI', color: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30', icon: Brain },
-  keyword: { label: 'Keywords', color: 'bg-gray-500/10 text-gray-400 border-gray-500/30', icon: Tag },
-  unknown: { label: 'Sin clasificar', color: 'bg-gray-500/10 text-gray-500 border-gray-500/30', icon: Cpu },
+  moonshot_ai: { label: 'Moonshot AI', color: 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30', icon: Brain },
+  claude_ai: { label: 'Claude AI', color: 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30', icon: Brain },
+  keyword: { label: 'Keywords', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Tag },
+  unknown: { label: 'Sin clasificar', color: 'bg-gray-500/10 text-muted-foreground border-gray-500/30', icon: Cpu },
 };
 
 const sourceTypeColors: Record<string, string> = {
-  rss: 'bg-green-500/10 text-green-400 border-green-500/30',
-  api: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-  gdelt: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+  rss: 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30',
+  api: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
+  gdelt: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
 };
 
 function getSeverityColor(severity: number): string {
-  if (severity >= 90) return 'text-red-400 bg-red-500/10 border-red-500/30';
-  if (severity >= 70) return 'text-orange-400 bg-orange-500/10 border-orange-500/30';
-  if (severity >= 50) return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
-  if (severity >= 30) return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
-  return 'text-gray-400 bg-gray-500/10 border-gray-500/30';
+  if (severity >= 90) return 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30';
+  if (severity >= 70) return 'text-orange-700 dark:text-orange-400 bg-orange-500/10 border-orange-500/30';
+  if (severity >= 50) return 'text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
+  if (severity >= 30) return 'text-blue-600 dark:text-blue-400 bg-blue-500/10 border-blue-500/30';
+  return 'text-muted-foreground bg-gray-500/10 border-gray-500/30';
 }
 
 function getSeverityBarColor(severity: number): string {
@@ -184,7 +184,7 @@ function ArticlesTab() {
         <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-stretch sm:items-end">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar en titulos..."
                 value={searchQuery}
@@ -195,7 +195,7 @@ function ArticlesTab() {
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-full sm:w-[180px] bg-foreground/5 border-foreground/10">
-              <Filter className="w-4 h-4 mr-2 text-gray-400" />
+              <Filter className="w-4 h-4 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Categoria" />
             </SelectTrigger>
             <SelectContent>
@@ -207,7 +207,7 @@ function ArticlesTab() {
           </Select>
           <Select value={selectedDays} onValueChange={setSelectedDays}>
             <SelectTrigger className="w-full sm:w-[140px] bg-foreground/5 border-foreground/10">
-              <Clock className="w-4 h-4 mr-2 text-gray-400" />
+              <Clock className="w-4 h-4 mr-2 text-muted-foreground" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -219,7 +219,7 @@ function ArticlesTab() {
             </SelectContent>
           </Select>
           <div className="w-full sm:w-[180px]">
-            <p className="text-[10px] text-gray-500 mb-1">
+            <p className="text-[10px] text-muted-foreground mb-1">
               Severidad minima: <span className="text-foreground font-mono">{minSeverity}</span>
             </p>
             <Slider
@@ -238,7 +238,7 @@ function ArticlesTab() {
       </div>
 
       {/* Results count */}
-      <p className="text-sm text-gray-400">
+      <p className="text-sm text-muted-foreground">
         {data?.total ?? 0} articulos encontrados
       </p>
 
@@ -299,7 +299,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
               <Badge
                 key={cat}
                 variant="outline"
-                className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-gray-400')}
+                className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-muted-foreground')}
               >
                 {categoryLabels[cat] || cat}
               </Badge>
@@ -312,12 +312,12 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
           </h4>
 
           {article.summary && (
-            <p className="text-xs text-gray-400 line-clamp-2 mb-2">{article.summary}</p>
+            <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{article.summary}</p>
           )}
 
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             {sourceDomain && (
-              <span className="flex items-center gap-1 text-gray-400">
+              <span className="flex items-center gap-1 text-muted-foreground">
                 <Globe className="w-3 h-3" />
                 {sourceDomain}
               </span>
@@ -327,10 +327,10 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
               {formatDate(article.publication_date)}
             </span>
             {article.language && (
-              <span className="uppercase text-gray-600">{article.language}</span>
+              <span className="uppercase text-muted-foreground">{article.language}</span>
             )}
             {article.classification_confidence != null && article.classification_confidence > 0 && (
-              <span className="text-gray-600">
+              <span className="text-muted-foreground">
                 {Math.round(article.classification_confidence * 100)}% conf
               </span>
             )}
@@ -341,9 +341,9 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
         {article.severity > 0 && (
           <div className="w-full sm:w-20 flex sm:flex-col items-start sm:items-center gap-2 sm:gap-1 shrink-0">
             <span className={cn('text-xs font-mono font-bold',
-              article.severity >= 90 ? 'text-red-400' :
-              article.severity >= 70 ? 'text-orange-400' :
-              article.severity >= 50 ? 'text-yellow-400' : 'text-blue-400'
+              article.severity >= 90 ? 'text-red-600 dark:text-red-400' :
+              article.severity >= 70 ? 'text-orange-700 dark:text-orange-400' :
+              article.severity >= 50 ? 'text-yellow-700 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400'
             )}>
               {article.severity}
             </span>
@@ -360,7 +360,7 @@ function ArticleCard({ article, onClick }: { article: AdverseMediaArticle; onCli
           href={article.source_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="self-start text-blue-400 hover:text-blue-300 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
+          className="self-start text-blue-600 dark:text-blue-400 hover:text-blue-300 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity"
           onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink className="w-4 h-4" />
@@ -416,26 +416,26 @@ function SourcesTab() {
       {/* Sources summary */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div className="glass rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-green-400">{activeSources.length}</p>
-          <p className="text-xs text-gray-400">Activas</p>
+          <p className="text-xl font-bold text-green-700 dark:text-green-400">{activeSources.length}</p>
+          <p className="text-xs text-muted-foreground">Activas</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
-          <p className="text-xl font-bold text-red-400">{inactiveSources.length}</p>
-          <p className="text-xs text-gray-400">Inactivas</p>
+          <p className="text-xl font-bold text-red-600 dark:text-red-400">{inactiveSources.length}</p>
+          <p className="text-xs text-muted-foreground">Inactivas</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
           <p className="text-xl font-bold text-foreground">{totalArticles.toLocaleString()}</p>
-          <p className="text-xs text-gray-400">Total Articulos</p>
+          <p className="text-xs text-muted-foreground">Total Articulos</p>
         </div>
         <div className="glass rounded-lg p-3 text-center">
-          <p className={cn('text-xl font-bold', totalErrors > 0 ? 'text-orange-400' : 'text-gray-600')}>{totalErrors}</p>
-          <p className="text-xs text-gray-400">Errores Acumulados</p>
+          <p className={cn('text-xl font-bold', totalErrors > 0 ? 'text-orange-700 dark:text-orange-400' : 'text-muted-foreground')}>{totalErrors}</p>
+          <p className="text-xs text-muted-foreground">Errores Acumulados</p>
         </div>
       </div>
 
       {/* Filter by type */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className="text-xs text-gray-500">Filtrar:</span>
+        <span className="text-xs text-muted-foreground">Filtrar:</span>
         {['all', 'rss', 'api', 'gdelt'].map((type) => (
           <Button
             key={type}
@@ -454,7 +454,7 @@ function SourcesTab() {
 
       {/* Active sources */}
       <div>
-        <h3 className="text-sm font-medium text-gray-400 mb-3">
+        <h3 className="text-sm font-medium text-muted-foreground mb-3">
           Fuentes Activas ({filteredActive.length})
         </h3>
         <div className="space-y-3 md:hidden">
@@ -468,7 +468,7 @@ function SourcesTab() {
                       <div className={cn('w-2 h-2 rounded-full', source.error_count > 5 ? 'bg-red-500' : 'bg-green-500')} />
                       <span className="text-foreground font-medium break-words">{source.display_name}</span>
                     </div>
-                    <p className="text-[11px] text-gray-500 mt-1 break-all">{source.source_key}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1 break-all">{source.source_key}</p>
                   </div>
                   <Badge variant="outline" className={cn('text-[10px]', sourceTypeColors[source.source_type] || '')}>
                     {source.source_type.toUpperCase()}
@@ -476,22 +476,22 @@ function SourcesTab() {
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Articulos</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Articulos</p>
                     <p className="text-foreground font-mono">{source.total_articles}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Calidad</p>
-                    <p className="text-gray-300">{source.quality_score}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Calidad</p>
+                    <p className="text-muted-foreground">{source.quality_score}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Errores</p>
-                    <p className={cn(source.error_count > 5 ? 'text-red-400' : source.error_count > 0 ? 'text-orange-400' : 'text-gray-500')}>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Errores</p>
+                    <p className={cn(source.error_count > 5 ? 'text-red-600 dark:text-red-400' : source.error_count > 0 ? 'text-orange-700 dark:text-orange-400' : 'text-muted-foreground')}>
                       {source.error_count}
                     </p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-500 mb-1">Ultimo Crawl</p>
-                    <p className="text-gray-300">{formatDate(source.last_crawled_at)}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Ultimo Crawl</p>
+                    <p className="text-muted-foreground">{formatDate(source.last_crawled_at)}</p>
                   </div>
                 </div>
                 <Button
@@ -499,7 +499,7 @@ function SourcesTab() {
                   size="sm"
                   onClick={() => crawlMutation.mutate(source.source_key)}
                   disabled={crawlMutation.isPending}
-                  className="w-full border-foreground/10 text-gray-300"
+                  className="w-full border-foreground/10 text-muted-foreground"
                 >
                   <RefreshCw className={cn('w-3.5 h-3.5 mr-2', crawlMutation.isPending && 'animate-spin')} />
                   Ejecutar Crawl
@@ -511,13 +511,13 @@ function SourcesTab() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-foreground/5">
-                <th className="text-left p-3 text-gray-400 font-medium">Fuente</th>
-                <th className="text-left p-3 text-gray-400 font-medium">Tipo</th>
-                <th className="text-right p-3 text-gray-400 font-medium">Articulos</th>
-                <th className="text-right p-3 text-gray-400 font-medium">Calidad</th>
-                <th className="text-right p-3 text-gray-400 font-medium">Errores</th>
-                <th className="text-right p-3 text-gray-400 font-medium">Ultimo Crawl</th>
-                <th className="text-right p-3 text-gray-400 font-medium"></th>
+                <th className="text-left p-3 text-muted-foreground font-medium">Fuente</th>
+                <th className="text-left p-3 text-muted-foreground font-medium">Tipo</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">Articulos</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">Calidad</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">Errores</th>
+                <th className="text-right p-3 text-muted-foreground font-medium">Ultimo Crawl</th>
+                <th className="text-right p-3 text-muted-foreground font-medium"></th>
               </tr>
             </thead>
             <tbody>
@@ -539,7 +539,7 @@ function SourcesTab() {
       {/* Inactive sources */}
       {inactiveSources.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-500 mb-3">
+          <h3 className="text-sm font-medium text-muted-foreground mb-3">
             Fuentes Inactivas ({inactiveSources.length})
           </h3>
           <div className="space-y-3 md:hidden opacity-60">
@@ -547,21 +547,21 @@ function SourcesTab() {
               <div key={source.id} className="glass rounded-xl p-4 space-y-2">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-gray-400 break-words">{source.display_name}</p>
-                    <p className="text-[11px] text-gray-600 mt-1 break-all">{source.source_key}</p>
+                    <p className="text-muted-foreground break-words">{source.display_name}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1 break-all">{source.source_key}</p>
                   </div>
-                  <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-gray-500">
+                  <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-muted-foreground">
                     {source.source_type}
                   </Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-600 mb-1">Articulos</p>
-                    <p className="text-gray-500">{source.total_articles}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Articulos</p>
+                    <p className="text-muted-foreground">{source.total_articles}</p>
                   </div>
                   <div>
-                    <p className="text-[11px] uppercase tracking-wide text-gray-600 mb-1">Errores</p>
-                    <p className="text-red-400/60">{source.error_count}</p>
+                    <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">Errores</p>
+                    <p className="text-red-600 dark:text-red-400/60">{source.error_count}</p>
                   </div>
                 </div>
               </div>
@@ -571,23 +571,23 @@ function SourcesTab() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-foreground/5">
-                  <th className="text-left p-3 text-gray-500 font-medium">Fuente</th>
-                  <th className="text-left p-3 text-gray-500 font-medium">Tipo</th>
-                  <th className="text-right p-3 text-gray-500 font-medium">Articulos</th>
-                  <th className="text-right p-3 text-gray-500 font-medium">Errores</th>
+                  <th className="text-left p-3 text-muted-foreground font-medium">Fuente</th>
+                  <th className="text-left p-3 text-muted-foreground font-medium">Tipo</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Articulos</th>
+                  <th className="text-right p-3 text-muted-foreground font-medium">Errores</th>
                 </tr>
               </thead>
               <tbody>
                 {inactiveSources.map((source) => (
                   <tr key={source.id} className="border-b border-foreground/5 last:border-0">
-                    <td className="p-3 text-gray-500">{source.display_name}</td>
+                    <td className="p-3 text-muted-foreground">{source.display_name}</td>
                     <td className="p-3">
-                      <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-gray-500">
+                      <Badge variant="outline" className="text-[10px] bg-gray-500/10 text-muted-foreground">
                         {source.source_type}
                       </Badge>
                     </td>
-                    <td className="p-3 text-right text-gray-500">{source.total_articles}</td>
-                    <td className="p-3 text-right text-red-400/60">{source.error_count}</td>
+                    <td className="p-3 text-right text-muted-foreground">{source.total_articles}</td>
+                    <td className="p-3 text-right text-red-600 dark:text-red-400/60">{source.error_count}</td>
                   </tr>
                 ))}
               </tbody>
@@ -614,7 +614,7 @@ function SourceRow({
         <div className="flex items-center gap-2">
           <div className={cn('w-2 h-2 rounded-full', source.error_count > 5 ? 'bg-red-500' : 'bg-green-500')} />
           <span className="text-foreground font-medium">{source.display_name}</span>
-          <span className="text-[10px] text-gray-500">{source.source_key}</span>
+          <span className="text-[10px] text-muted-foreground">{source.source_key}</span>
         </div>
       </td>
       <td className="p-3">
@@ -624,18 +624,18 @@ function SourceRow({
       </td>
       <td className="p-3 text-right text-foreground font-mono">{source.total_articles}</td>
       <td className="p-3 text-right">
-        <span className="text-gray-400">{source.quality_score}</span>
+        <span className="text-muted-foreground">{source.quality_score}</span>
       </td>
       <td className="p-3 text-right">
         {source.error_count > 0 ? (
-          <span className={cn(source.error_count > 5 ? 'text-red-400' : 'text-orange-400')}>
+          <span className={cn(source.error_count > 5 ? 'text-red-600 dark:text-red-400' : 'text-orange-700 dark:text-orange-400')}>
             {source.error_count}
           </span>
         ) : (
-          <span className="text-gray-600">0</span>
+          <span className="text-muted-foreground">0</span>
         )}
       </td>
-      <td className="p-3 text-right text-gray-400 text-xs">
+      <td className="p-3 text-right text-muted-foreground text-xs">
         {formatDate(source.last_crawled_at)}
       </td>
       <td className="p-3 text-right">
@@ -644,7 +644,7 @@ function SourceRow({
           size="sm"
           onClick={onCrawl}
           disabled={isCrawling}
-          className="text-xs text-gray-400 hover:text-foreground"
+          className="text-xs text-muted-foreground hover:text-foreground"
         >
           <RefreshCw className={cn('w-3 h-3', isCrawling && 'animate-spin')} />
         </Button>
@@ -678,14 +678,14 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
       {chartData.length > 0 && (
         <div className="glass rounded-xl p-5">
           <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-orange-400" />
+            <BarChart3 className="w-5 h-5 text-orange-700 dark:text-orange-400" />
             Actividad reciente de adverse media
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {recentTrend.map((item) => (
               <div key={item.date} className="rounded-xl border border-foreground/10 bg-foreground/[0.03] p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm text-gray-300">{item.date}</span>
+                  <span className="text-sm text-muted-foreground">{item.date}</span>
                   <span className="text-sm font-mono text-foreground">{item.count}</span>
                 </div>
                 <div className="mt-3 h-2 rounded-full bg-foreground/5 overflow-hidden">
@@ -701,13 +701,13 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
         {/* Category Distribution */}
         <div className="glass rounded-xl p-5">
           <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
+            <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Distribucion por Categoria
           </h3>
           <div className="space-y-3">
             {categories.map(([category, count]) => (
               <div key={category} className="flex items-center gap-3">
-                <span className="text-sm text-gray-400 w-32 shrink-0 truncate">
+                <span className="text-sm text-muted-foreground w-32 shrink-0 truncate">
                   {categoryLabels[category] || category}
                 </span>
                 <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
@@ -729,7 +729,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
               </div>
             ))}
             {categories.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-4">Sin datos de categorias</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Sin datos de categorias</p>
             )}
           </div>
         </div>
@@ -737,7 +737,7 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
         {/* Classification Method Distribution */}
         <div className="glass rounded-xl p-5">
           <h3 className="text-base font-medium text-foreground mb-4 flex items-center gap-2">
-            <Brain className="w-5 h-5 text-violet-400" />
+            <Brain className="w-5 h-5 text-violet-600 dark:text-violet-400" />
             Metodo de Clasificacion
           </h3>
           <div className="space-y-3">
@@ -748,8 +748,8 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
               return (
                 <div key={method} className="flex items-center gap-3">
                   <div className="flex items-center gap-2 w-32 shrink-0">
-                    <Icon className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-400 truncate">{meta.label}</span>
+                    <Icon className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground truncate">{meta.label}</span>
                   </div>
                   <div className="flex-1 h-5 bg-foreground/5 rounded-full overflow-hidden">
                     <motion.div
@@ -765,13 +765,13 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
                   </div>
                   <div className="text-right w-20 shrink-0">
                     <span className="text-sm font-mono text-foreground">{count}</span>
-                    <span className="text-xs text-gray-500 ml-1">({pct}%)</span>
+                    <span className="text-xs text-muted-foreground ml-1">({pct}%)</span>
                   </div>
                 </div>
               );
             })}
             {methods.length === 0 && (
-              <p className="text-sm text-gray-500 text-center py-4">Sin datos de metodos</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Sin datos de metodos</p>
             )}
           </div>
         </div>
@@ -780,23 +780,23 @@ function AnalyticsTab({ stats }: { stats: AdverseMediaStats | undefined }) {
       {/* Key metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Tasa Adverse Media</p>
+          <p className="text-sm text-muted-foreground mb-1">Tasa Adverse Media</p>
           <p className="text-3xl font-bold text-foreground">{stats.adverse_rate_pct}%</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {stats.adverse} de {stats.total_articles} articulos
           </p>
         </div>
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Entity Links</p>
+          <p className="text-sm text-muted-foreground mb-1">Entity Links</p>
           <p className="text-3xl font-bold text-foreground">{stats.total_entity_links}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {stats.entities_with_articles} entidades vinculadas
           </p>
         </div>
         <div className="glass rounded-xl p-5">
-          <p className="text-sm text-gray-400 mb-1">Sin Clasificar</p>
+          <p className="text-sm text-muted-foreground mb-1">Sin Clasificar</p>
           <p className="text-3xl font-bold text-foreground">{stats.unclassified}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             {stats.classified} clasificados
           </p>
         </div>
@@ -870,7 +870,7 @@ function ArticleDetailModal({
                       <Badge
                         key={cat}
                         variant="outline"
-                        className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-gray-400')}
+                        className={cn('text-xs', categoryColors[cat] || 'bg-gray-500/10 text-muted-foreground')}
                       >
                         {categoryLabels[cat] || cat}
                       </Badge>
@@ -882,7 +882,7 @@ function ArticleDetailModal({
             </DialogHeader>
 
             {/* Meta info */}
-            <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 border-b border-foreground/5 pb-3">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground border-b border-foreground/5 pb-3">
               {article.source_display_name && (
                 <span className="flex items-center gap-1">
                   <Newspaper className="w-3 h-3" />
@@ -897,7 +897,7 @@ function ArticleDetailModal({
                 <span className="uppercase">{article.language}</span>
               )}
               {article.classification_confidence != null && (
-                <span className="text-gray-500">
+                <span className="text-muted-foreground">
                   Confianza: {Math.round(article.classification_confidence * 100)}%
                 </span>
               )}
@@ -905,7 +905,7 @@ function ArticleDetailModal({
                 href={article.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 flex items-center gap-1 ml-auto"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1 ml-auto"
               >
                 <ExternalLink className="w-3 h-3" />
                 Ver fuente
@@ -914,8 +914,8 @@ function ArticleDetailModal({
 
             {/* Content snippet */}
             {article.content_snippet && (
-              <div className="bg-foreground/5 rounded-lg p-4 text-sm text-gray-300 leading-relaxed">
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+              <div className="bg-foreground/5 rounded-lg p-4 text-sm text-muted-foreground leading-relaxed">
+                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <FileText className="w-3 h-3" />
                   Extracto
                 </p>
@@ -925,8 +925,8 @@ function ArticleDetailModal({
 
             {/* Summary */}
             {article.summary && article.summary !== article.content_snippet && (
-              <div className="text-sm text-gray-400">
-                <p className="font-medium text-gray-300 mb-1">Resumen</p>
+              <div className="text-sm text-muted-foreground">
+                <p className="font-medium text-muted-foreground mb-1">Resumen</p>
                 {article.summary}
               </div>
             )}
@@ -934,7 +934,7 @@ function ArticleDetailModal({
             {/* Extracted Entities */}
             {article.extracted_entities && article.extracted_entities.length > 0 && (
               <div>
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <User className="w-3 h-3" />
                   Entidades Extraidas ({article.extracted_entities.length})
                 </p>
@@ -946,8 +946,8 @@ function ArticleDetailModal({
                       className={cn(
                         'text-xs',
                         entity.type === 'person'
-                          ? 'bg-blue-500/10 text-blue-400 border-blue-500/30'
-                          : 'bg-purple-500/10 text-purple-400 border-purple-500/30'
+                          ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30'
+                          : 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30'
                       )}
                     >
                       {entity.type === 'person' ? (
@@ -965,7 +965,7 @@ function ArticleDetailModal({
             {/* Entity Links (matched to Gold) */}
             {article.entity_links && article.entity_links.length > 0 && (
               <div>
-                <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                <p className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
                   <Link2 className="w-3 h-3" />
                   Entidades Vinculadas ({article.entity_links.length})
                 </p>
@@ -982,7 +982,7 @@ function ArticleDetailModal({
                         )} />
                         <div>
                           <p className="text-sm text-foreground font-medium">{link.mentioned_name}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             Confianza: {Math.round(link.match_confidence * 100)}%
                             {link.match_method && ` · ${link.match_method}`}
                             {link.is_primary_subject && ' · Sujeto principal'}
@@ -992,7 +992,7 @@ function ArticleDetailModal({
                       <div className="flex items-center gap-2">
                         <a
                           href={`/entity/${link.unified_entity_id}`}
-                          className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1"
                         >
                           <Eye className="w-3 h-3" />
                           Ver perfil
@@ -1000,7 +1000,7 @@ function ArticleDetailModal({
                         <Button
                           variant="outline"
                           size="sm"
-                          className="text-xs border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+                          className="text-xs border-orange-500/30 text-orange-700 dark:text-orange-400 hover:bg-orange-500/10"
                           onClick={() => createCaseMutation.mutate({
                             entity_id: link.unified_entity_id,
                             entity_name: link.mentioned_name,
@@ -1022,11 +1022,11 @@ function ArticleDetailModal({
               article.extracted_entities &&
               article.extracted_entities.length > 0 && (
               <div className="bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-3">
-                <p className="text-xs text-yellow-400 mb-1 flex items-center gap-1">
+                <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-1 flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" />
                   Entidades detectadas sin vincular a Gold
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Las entidades extraidas aun no estan vinculadas a entidades del sistema.
                   Usa la busqueda para vincularlas manualmente.
                 </p>
@@ -1034,7 +1034,7 @@ function ArticleDetailModal({
             )}
           </>
         ) : (
-          <div className="p-8 text-center text-gray-400">
+          <div className="p-8 text-center text-muted-foreground">
             Articulo no encontrado
           </div>
         )}
@@ -1073,7 +1073,7 @@ export function AdverseMediaPage() {
           description="Monitoreo continuo de noticias AML/CFT."
           icon={
             <div className="p-2.5 rounded-lg bg-gradient-to-br from-orange-500/20 to-amber-500/20 border border-orange-500/30">
-              <Newspaper className="w-6 h-6 text-orange-400" aria-hidden="true" />
+              <Newspaper className="w-6 h-6 text-orange-700 dark:text-orange-400" aria-hidden="true" />
             </div>
           }
           actions={

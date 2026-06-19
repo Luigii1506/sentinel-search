@@ -66,13 +66,13 @@ export function RelationshipFiltersPanel({
           className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left"
         >
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-blue-400" />
+            <SlidersHorizontal className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-medium text-foreground">Filtros de relaciones</span>
           </div>
           {showRelationshipFilters ? (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-muted-foreground" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           )}
         </button>
 
@@ -82,7 +82,7 @@ export function RelationshipFiltersPanel({
               <div className="flex items-start justify-between gap-4 pt-4">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-foreground">Incluir relaciones contextuales</p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-muted-foreground">
                     Muestra afiliaciones y vínculos biográficos que normalmente se ocultan en la vista AML priorizada.
                   </p>
                 </div>
@@ -102,8 +102,8 @@ export function RelationshipFiltersPanel({
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relLevelFilter === filter.key
-                      ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
+                      ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                      : 'bg-foreground/5 text-muted-foreground border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -119,8 +119,8 @@ export function RelationshipFiltersPanel({
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relContextFilter === filter.key
-                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
+                      ? 'bg-violet-500/20 text-violet-600 dark:text-violet-300 border border-violet-500/30'
+                      : 'bg-foreground/5 text-muted-foreground border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -136,8 +136,8 @@ export function RelationshipFiltersPanel({
                   className={cn(
                     'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                     relPriorityFilter === filter.key
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                      : 'bg-foreground/5 text-gray-400 border border-foreground/10 hover:bg-foreground/10'
+                      ? 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30'
+                      : 'bg-foreground/5 text-muted-foreground border border-foreground/10 hover:bg-foreground/10'
                   )}
                 >
                   {filter.label}
@@ -155,17 +155,17 @@ export function RelationshipFiltersPanel({
           </div>
         )}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             value={relSearch}
             onChange={(e) => setRelSearch(e.target.value)}
             placeholder="Buscar relaciones por nombre, tipo, país o fuente"
-            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
+            className="w-full bg-foreground/5 border border-foreground/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40"
           />
         </div>
 
         {normalizedRelationshipSearch && (
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-muted-foreground">
             {filteredRelationshipsCount} coincidencia{filteredRelationshipsCount === 1 ? '' : 's'} para "{relSearch.trim()}"
           </p>
         )}

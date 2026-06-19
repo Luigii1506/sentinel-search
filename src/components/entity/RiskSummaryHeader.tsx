@@ -84,19 +84,19 @@ export function RiskSummaryHeader({
                   </Badge>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-sm text-gray-400">
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <span className="capitalize flex items-center gap-1">
-                    {entity.type === 'person' && <span className="text-blue-400">●</span>}
-                    {entity.type === 'company' && <span className="text-purple-400">●</span>}
-                    {entity.type === 'vessel' && <span className="text-cyan-400">●</span>}
-                    {entity.type === 'aircraft' && <span className="text-amber-400">●</span>}
-                    {entity.type === 'organization' && <span className="text-red-400">●</span>}
+                    {entity.type === 'person' && <span className="text-blue-600 dark:text-blue-400">●</span>}
+                    {entity.type === 'company' && <span className="text-purple-600 dark:text-purple-400">●</span>}
+                    {entity.type === 'vessel' && <span className="text-cyan-700 dark:text-cyan-400">●</span>}
+                    {entity.type === 'aircraft' && <span className="text-amber-700 dark:text-amber-400">●</span>}
+                    {entity.type === 'organization' && <span className="text-red-600 dark:text-red-400">●</span>}
                     {entity.type}
                   </span>
 
                   {entity.nationalities && entity.nationalities.length > 0 && (
                     <>
-                      <span className="text-gray-600">•</span>
+                      <span className="text-muted-foreground">•</span>
                       <span className="flex items-center gap-1">
                         <Globe className="w-3.5 h-3.5" />
                         {entity.nationalities.join(', ')}
@@ -106,7 +106,7 @@ export function RiskSummaryHeader({
 
                   {entity.dateOfBirth && (
                     <>
-                      <span className="text-gray-600">•</span>
+                      <span className="text-muted-foreground">•</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" />
                         {new Date(entity.dateOfBirth).toLocaleDateString()}
@@ -116,7 +116,7 @@ export function RiskSummaryHeader({
 
                   {entity.incorporationDate && (
                     <>
-                      <span className="text-gray-600">•</span>
+                      <span className="text-muted-foreground">•</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" />
                         Inc. {new Date(entity.incorporationDate).toLocaleDateString()}
@@ -130,7 +130,7 @@ export function RiskSummaryHeader({
             {/* Aliases */}
             {entity.aliases.length > 0 && (
               <div className="mb-4">
-                <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
+                <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
                   Also Known As
                 </span>
                 <div className="flex flex-wrap gap-2">
@@ -138,13 +138,13 @@ export function RiskSummaryHeader({
                     <Badge
                       key={index}
                       variant="outline"
-                      className="bg-foreground/5 border-foreground/10 text-gray-300"
+                      className="bg-foreground/5 border-foreground/10 text-muted-foreground"
                     >
                       {alias.name}
                     </Badge>
                   ))}
                   {entity.aliases.length > 5 && (
-                    <Badge variant="outline" className="bg-foreground/5 border-foreground/10 text-gray-500">
+                    <Badge variant="outline" className="bg-foreground/5 border-foreground/10 text-muted-foreground">
                       +{entity.aliases.length - 5} more
                     </Badge>
                   )}
@@ -154,7 +154,7 @@ export function RiskSummaryHeader({
 
             {/* Data Sources */}
             <div className="mb-6">
-              <span className="text-xs text-gray-500 uppercase tracking-wider mb-2 block">
+              <span className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">
                 Data Sources
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -178,8 +178,8 @@ export function RiskSummaryHeader({
                   transition={{ delay: 0.2 }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-500/10 border border-red-500/30"
                 >
-                  <Shield className="w-4 h-4 text-red-500" />
-                  <span className="text-sm text-red-400">
+                  <Shield className="w-4 h-4 text-red-600 dark:text-red-500" />
+                  <span className="text-sm text-red-600 dark:text-red-400">
                     {entity.sanctions.length} Sanction{entity.sanctions.length > 1 ? 's' : ''}
                   </span>
                 </motion.div>
@@ -192,8 +192,8 @@ export function RiskSummaryHeader({
                   transition={{ delay: 0.3 }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-pink-500/10 border border-pink-500/30"
                 >
-                  <Flag className="w-4 h-4 text-pink-500" />
-                  <span className="text-sm text-pink-400">PEP</span>
+                  <Flag className="w-4 h-4 text-pink-600 dark:text-pink-500" />
+                  <span className="text-sm text-pink-600 dark:text-pink-400">PEP</span>
                 </motion.div>
               )}
 
@@ -204,8 +204,8 @@ export function RiskSummaryHeader({
                   transition={{ delay: 0.4 }}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg bg-orange-500/10 border border-orange-500/30"
                 >
-                  <AlertTriangle className="w-4 h-4 text-orange-500" />
-                  <span className="text-sm text-orange-400">
+                  <AlertTriangle className="w-4 h-4 text-orange-700 dark:text-orange-500" />
+                  <span className="text-sm text-orange-700 dark:text-orange-400">
                     {entity.adverseMedia.length} Media Alert{entity.adverseMedia.length > 1 ? 's' : ''}
                   </span>
                 </motion.div>
@@ -213,7 +213,7 @@ export function RiskSummaryHeader({
             </div>
 
             {/* Last Updated */}
-            <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+            <div className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />
               <span>Last updated: {formatDateTime(entity.lastUpdated)}</span>
             </div>
@@ -279,15 +279,15 @@ export function RiskSummaryHeader({
 function getRiskColorClass(riskLevel: string): string {
   switch (riskLevel) {
     case 'critical':
-      return 'bg-red-500/15 text-red-500 border-red-500/30';
+      return 'bg-red-500/15 text-red-600 dark:text-red-500 border-red-500/30';
     case 'high':
-      return 'bg-orange-500/15 text-orange-500 border-orange-500/30';
+      return 'bg-orange-500/15 text-orange-700 dark:text-orange-500 border-orange-500/30';
     case 'medium':
-      return 'bg-yellow-500/15 text-yellow-500 border-yellow-500/30';
+      return 'bg-yellow-500/15 text-yellow-700 dark:text-yellow-500 border-yellow-500/30';
     case 'low':
-      return 'bg-green-500/15 text-green-500 border-green-500/30';
+      return 'bg-green-500/15 text-green-700 dark:text-green-500 border-green-500/30';
     default:
-      return 'bg-gray-500/15 text-gray-500 border-gray-500/30';
+      return 'bg-gray-500/15 text-muted-foreground border-gray-500/30';
   }
 }
 

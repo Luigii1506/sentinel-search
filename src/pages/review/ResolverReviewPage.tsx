@@ -112,7 +112,7 @@ export function ResolverReviewPage() {
         description="Pares UNSURE generados por nomenklatura xref. Decide si son la misma entidad o entidades distintas."
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <GitBranchPlus className="w-6 h-6 text-blue-400" />
+            <GitBranchPlus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
       />
@@ -193,19 +193,19 @@ function EntityCard({ entity, id, side, navigate }: { entity: EntitySummary | nu
     <div className="rounded-xl border border-foreground/10 bg-foreground/5 p-4">
       <div className="flex items-start justify-between mb-2">
         <Badge variant="outline" className="text-xs">{side}</Badge>
-        <button onClick={() => navigate(`/entity/${id}`)} className="text-xs text-blue-400 hover:underline inline-flex items-center gap-1">
+        <button onClick={() => navigate(`/entity/${id}`)} className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1">
           Ver perfil <ExternalLink className="h-3 w-3" />
         </button>
       </div>
       <div className="text-foreground font-medium mb-2">{name}</div>
-      <div className="text-xs text-gray-500 mb-2 font-mono">{id.slice(0, 16)}...</div>
+      <div className="text-xs text-muted-foreground mb-2 font-mono">{id.slice(0, 16)}...</div>
       <div className="flex flex-wrap gap-1 mb-2">
-        {isPep && <Badge className="text-xs bg-amber-500/20 text-amber-300">PEP</Badge>}
-        {isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-300">SANCION</Badge>}
+        {isPep && <Badge className="text-xs bg-amber-500/20 text-amber-700 dark:text-amber-300">PEP</Badge>}
+        {isSanctioned && <Badge className="text-xs bg-red-500/20 text-red-600 dark:text-red-300">SANCION</Badge>}
       </div>
       {datasets.length > 0 && (
-        <div className="text-xs text-gray-400">
-          <span className="text-gray-500">Fuentes:</span> {datasets.slice(0, 5).join(', ')}
+        <div className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground">Fuentes:</span> {datasets.slice(0, 5).join(', ')}
           {datasets.length > 5 && ` +${datasets.length - 5}`}
         </div>
       )}

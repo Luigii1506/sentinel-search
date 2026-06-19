@@ -68,11 +68,11 @@ interface ConfirmActionProps {
 const VARIANT_CLASSES: Record<ConfirmVariant, { confirm: string; icon: ReactNode | null }> = {
   destructive: {
     confirm: 'bg-red-600 hover:bg-red-500 text-white',
-    icon: <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />,
+    icon: <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />,
   },
   warning: {
     confirm: 'bg-amber-600 hover:bg-amber-500 text-white',
-    icon: <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />,
+    icon: <AlertTriangle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0" />,
   },
   neutral: {
     confirm: 'bg-electric-500 hover:bg-electric-400 text-navy-900',

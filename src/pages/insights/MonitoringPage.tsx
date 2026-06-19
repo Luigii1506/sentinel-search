@@ -63,9 +63,9 @@ export function MonitoringPage() {
     return (
       <AppPage>
         <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <AlertCircle className="w-16 h-16 text-red-600 dark:text-red-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-foreground mb-2">Error al cargar monitoreo</h2>
-          <p className="text-gray-400 mb-4">No se pudieron obtener los datos de los jobs</p>
+          <p className="text-muted-foreground mb-4">No se pudieron obtener los datos de los jobs</p>
           <Button onClick={() => refetchJobs()} variant="outline">
             <RefreshCw className="w-4 h-4 mr-2" />
             Reintentar
@@ -112,28 +112,28 @@ export function MonitoringPage() {
   const dataQualityAgeSeconds = dataQualitySnapshot?.age_seconds ?? null;
 
   const entityMetricCards = counts ? [
-    { label: 'Bronze', value: formatNumber(counts.bronze), icon: Layers, iconClassName: 'text-amber-400' },
-    { label: 'Silver', value: formatNumber(counts.silver), icon: Layers, iconClassName: 'text-gray-300' },
-    { label: 'Gold', value: formatNumber(counts.gold), icon: Layers, iconClassName: 'text-yellow-400' },
+    { label: 'Bronze', value: formatNumber(counts.bronze), icon: Layers, iconClassName: 'text-amber-700 dark:text-amber-400' },
+    { label: 'Silver', value: formatNumber(counts.silver), icon: Layers, iconClassName: 'text-muted-foreground' },
+    { label: 'Gold', value: formatNumber(counts.gold), icon: Layers, iconClassName: 'text-yellow-700 dark:text-yellow-400' },
   ] : [];
 
   const jobMetricCards = [
-    { label: 'Corriendo', value: running, icon: Play, iconClassName: 'text-blue-400' },
-    { label: 'Exitosos', value: success, icon: CheckCircle2, iconClassName: 'text-green-400' },
-    { label: 'Fallidos', value: failed, icon: XCircle, iconClassName: 'text-red-400' },
-    { label: 'Total jobs', value: totalJobs, icon: TrendingUp, iconClassName: 'text-purple-400' },
+    { label: 'Corriendo', value: running, icon: Play, iconClassName: 'text-blue-600 dark:text-blue-400' },
+    { label: 'Exitosos', value: success, icon: CheckCircle2, iconClassName: 'text-green-700 dark:text-green-400' },
+    { label: 'Fallidos', value: failed, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: 'Total jobs', value: totalJobs, icon: TrendingUp, iconClassName: 'text-purple-600 dark:text-purple-400' },
   ];
 
   const operationalMetricCards = [
-    { label: 'SLO rotos', value: freshnessBreached, icon: AlertCircle, iconClassName: 'text-orange-400' },
-    { label: 'Nunca sync', value: freshnessNeverSynced, icon: Clock, iconClassName: 'text-gray-400' },
-    { label: 'Coverage', value: `${Math.round(mappingCoverage * 100)}%`, icon: Database, iconClassName: 'text-green-400' },
-    { label: 'Dedup gold', value: `${Math.round(goldDedup * 100)}%`, icon: Layers, iconClassName: 'text-yellow-400' },
-    { label: 'DLQ tasks', value: taskDeadLetters, icon: XCircle, iconClassName: 'text-red-400' },
-    { label: 'Disappeared', value: disappearedMarked, icon: AlertCircle, iconClassName: 'text-fuchsia-400' },
-    { label: 'Runtime', value: runtimeTracked, icon: Server, iconClassName: 'text-cyan-400' },
-    { label: 'Alertando', value: runtimeAlerting, icon: AlertCircle, iconClassName: 'text-red-400' },
-    { label: 'Cambio pendiente', value: changedNotMaterialized, icon: RefreshCw, iconClassName: 'text-amber-400' },
+    { label: 'SLO rotos', value: freshnessBreached, icon: AlertCircle, iconClassName: 'text-orange-700 dark:text-orange-400' },
+    { label: 'Nunca sync', value: freshnessNeverSynced, icon: Clock, iconClassName: 'text-muted-foreground' },
+    { label: 'Coverage', value: `${Math.round(mappingCoverage * 100)}%`, icon: Database, iconClassName: 'text-green-700 dark:text-green-400' },
+    { label: 'Dedup gold', value: `${Math.round(goldDedup * 100)}%`, icon: Layers, iconClassName: 'text-yellow-700 dark:text-yellow-400' },
+    { label: 'DLQ tasks', value: taskDeadLetters, icon: XCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: 'Disappeared', value: disappearedMarked, icon: AlertCircle, iconClassName: 'text-fuchsia-600 dark:text-fuchsia-400' },
+    { label: 'Runtime', value: runtimeTracked, icon: Server, iconClassName: 'text-cyan-700 dark:text-cyan-400' },
+    { label: 'Alertando', value: runtimeAlerting, icon: AlertCircle, iconClassName: 'text-red-600 dark:text-red-400' },
+    { label: 'Cambio pendiente', value: changedNotMaterialized, icon: RefreshCw, iconClassName: 'text-amber-700 dark:text-amber-400' },
   ];
 
   const formatRelativeAge = (seconds: number | null | undefined): string => {
@@ -151,7 +151,7 @@ export function MonitoringPage() {
         description="Estado de servicios, pipelines y jobs de ingestion"
         icon={
           <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <Activity className="w-6 h-6 text-blue-400" />
+            <Activity className="w-6 h-6 text-blue-600 dark:text-blue-400" />
           </div>
         }
         actions={
@@ -160,10 +160,10 @@ export function MonitoringPage() {
               <div
                 className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs ${
                   dataQualitySnapshot.is_critical
-                    ? 'border-red-500/30 bg-red-500/10 text-red-300'
+                    ? 'border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-300'
                     : dataQualitySnapshot.is_stale
-                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-                      : 'border-foreground/10 bg-foreground/5 text-gray-400'
+                      ? 'border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-300'
+                      : 'border-foreground/10 bg-foreground/5 text-muted-foreground'
                 }`}
                 title={dataQualitySnapshot.computed_at ? `Snapshot: ${dataQualitySnapshot.computed_at}` : 'Sin snapshot'}
               >
@@ -186,7 +186,7 @@ export function MonitoringPage() {
       />
 
         {services && (
-          <Section title={<span className="flex items-center gap-2"><Server className="w-5 h-5 text-gray-400" />Servicios</span>} className="mb-8">
+          <Section title={<span className="flex items-center gap-2"><Server className="w-5 h-5 text-muted-foreground" />Servicios</span>} className="mb-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -238,11 +238,11 @@ export function MonitoringPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-gray-500 mb-1">Fuentes evaluadas</p>
+                  <p className="text-xs text-muted-foreground mb-1">Fuentes evaluadas</p>
                   <p className="text-xl font-bold text-foreground">{freshness?.total_sources || 0}</p>
                 </div>
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-gray-500 mb-1">Redis durability</p>
+                  <p className="text-xs text-muted-foreground mb-1">Redis durability</p>
                   <p className="text-sm font-medium text-foreground">
                     {redisDurability?.connected
                       ? `${redisDurability.aof_enabled ? 'AOF on' : 'AOF off'} / ${redisDurability.rdb_enabled ? 'RDB on' : 'RDB off'}`
@@ -257,11 +257,11 @@ export function MonitoringPage() {
                     <div key={item.source_id} className="rounded-lg bg-foreground/5 p-3 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm text-foreground font-medium">{item.source_id}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           Tier {item.tier} · {item.age_hours.toFixed(1)}h · SLO {item.slo_hours}h
                         </p>
                       </div>
-                      <Badge className="bg-orange-500/10 text-orange-400 border-orange-500/20">
+                      <Badge className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20">
                         {item.status}
                       </Badge>
                     </div>
@@ -283,11 +283,11 @@ export function MonitoringPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-gray-500 mb-1">Silver unmapped</p>
+                  <p className="text-xs text-muted-foreground mb-1">Silver unmapped</p>
                   <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.silver_unmapped || 0)}</p>
                 </div>
                 <div className="rounded-lg bg-foreground/5 p-3">
-                  <p className="text-xs text-gray-500 mb-1">Gold screenable</p>
+                  <p className="text-xs text-muted-foreground mb-1">Gold screenable</p>
                   <p className="text-xl font-bold text-foreground">{formatNumber(dataQuality?.counts?.gold_screenable || 0)}</p>
                 </div>
               </div>
@@ -299,14 +299,14 @@ export function MonitoringPage() {
                       <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div className="min-w-0">
                           <p className="text-sm text-foreground truncate">{item.source || item.task_name}</p>
-                          <p className="text-xs text-gray-500 truncate">{item.step} · {item.task_name}</p>
+                          <p className="text-xs text-muted-foreground truncate">{item.step} · {item.task_name}</p>
                         </div>
-                        <Badge className="bg-red-500/10 text-red-400 border-red-500/20">
+                        <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
                           {item.attempts}/{item.max_attempts}
                         </Badge>
                       </div>
                       {item.last_error && (
-                        <p className="text-xs text-red-300/80 mt-2 truncate">{item.last_error}</p>
+                        <p className="text-xs text-red-600 dark:text-red-300/80 mt-2 truncate">{item.last_error}</p>
                       )}
                     </div>
                   )) : (

@@ -60,7 +60,7 @@ export function InformationTabs({ entity, className }: InformationTabsProps) {
             value={tab.id}
             className={cn(
               'flex items-center gap-2 px-4 py-3 rounded-t-lg data-[state=active]:bg-foreground/5 data-[state=active]:border-b-2 data-[state=active]:border-blue-500 transition-all',
-              'text-gray-400 data-[state=active]:text-foreground hover:text-foreground hover:bg-foreground/[0.02]'
+              'text-muted-foreground data-[state=active]:text-foreground hover:text-foreground hover:bg-foreground/[0.02]'
             )}
           >
             <tab.icon className="w-4 h-4" />
@@ -166,31 +166,31 @@ function IdentityTab({ entity }: { entity: Entity }) {
       {/* Personal Information */}
       <div className="glass rounded-xl p-5">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-          <UserCircle className="w-5 h-5 text-blue-400" />
+          <UserCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           Personal Information
         </h3>
         <div className="space-y-4">
           {entity.gender && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-gray-400">Gender</span>
+              <span className="text-muted-foreground">Gender</span>
               <span className="text-foreground capitalize break-words sm:text-right">{entity.gender}</span>
             </div>
           )}
           {entity.dateOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-gray-400">Date of Birth</span>
+              <span className="text-muted-foreground">Date of Birth</span>
               <span className="text-foreground break-words sm:text-right">{formatDate(entity.dateOfBirth)}</span>
             </div>
           )}
           {entity.placeOfBirth && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-gray-400">Place of Birth</span>
+              <span className="text-muted-foreground">Place of Birth</span>
               <span className="text-foreground break-words sm:text-right">{entity.placeOfBirth}</span>
             </div>
           )}
           {entity.nationalities && entity.nationalities.length > 0 && (
             <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-              <span className="text-gray-400">Nationality</span>
+              <span className="text-muted-foreground">Nationality</span>
               <span className="text-foreground break-words sm:text-right">{entity.nationalities.join(', ')}</span>
             </div>
           )}
@@ -201,38 +201,38 @@ function IdentityTab({ entity }: { entity: Entity }) {
       {entity.type === 'company' && (
         <div className="glass rounded-xl p-5">
           <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-            <Building className="w-5 h-5 text-purple-400" />
+            <Building className="w-5 h-5 text-purple-600 dark:text-purple-400" />
             Company Information
           </h3>
           <div className="space-y-4">
             {entity.incorporationDate && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-gray-400">Incorporation Date</span>
+                <span className="text-muted-foreground">Incorporation Date</span>
                 <span className="text-foreground break-words sm:text-right">{formatDate(entity.incorporationDate)}</span>
               </div>
             )}
             {entity.incorporationCountry && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-gray-400">Incorporation Country</span>
+                <span className="text-muted-foreground">Incorporation Country</span>
                 <span className="text-foreground break-words sm:text-right">{entity.incorporationCountry}</span>
               </div>
             )}
             {entity.companyType && (
               <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-gray-400">Company Type</span>
+                <span className="text-muted-foreground">Company Type</span>
                 <span className="text-foreground break-words sm:text-right">{entity.companyType}</span>
               </div>
             )}
             {entity.status && (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
-                <span className="text-gray-400">Status</span>
+                <span className="text-muted-foreground">Status</span>
                 <Badge
                   variant="outline"
                   className={cn(
                     'capitalize',
                     entity.status === 'active'
-                      ? 'bg-green-500/10 text-green-400 border-green-500/30'
-                      : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                      ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30'
+                      : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
                   )}
                 >
                   {entity.status}
@@ -246,7 +246,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
       {/* Addresses */}
       <div className="glass rounded-xl p-5 lg:col-span-2">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-red-400" />
+          <MapPin className="w-5 h-5 text-red-600 dark:text-red-400" />
           Addresses ({entity.addresses.length})
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -260,7 +260,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
                   {address.type}
                 </Badge>
                 {address.isCurrent && (
-                  <Badge className="text-[10px] bg-green-500/20 text-green-400 border-green-500/30">
+                  <Badge className="text-[10px] bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
                     Current
                   </Badge>
                 )}
@@ -284,7 +284,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
       {/* Identifications */}
       <div className="glass rounded-xl p-5 lg:col-span-2">
         <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-          <CreditCard className="w-5 h-5 text-amber-400" />
+          <CreditCard className="w-5 h-5 text-amber-700 dark:text-amber-400" />
           Identifications ({entity.identifications.length})
         </h3>
         <div className="space-y-3 md:hidden">
@@ -292,26 +292,26 @@ function IdentityTab({ entity }: { entity: Entity }) {
             <div key={id.id} className="rounded-lg border border-foreground/10 bg-foreground/5 p-4">
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] uppercase tracking-wide text-gray-500">Type</span>
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Type</span>
                   <span className="text-foreground capitalize break-words">{id.type.replace('_', ' ')}</span>
                 </div>
                 <div className="flex flex-col gap-1">
-                  <span className="text-[11px] uppercase tracking-wide text-gray-500">Number</span>
+                  <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Number</span>
                   <span className="text-foreground font-mono break-all">{id.number}</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[11px] uppercase tracking-wide text-gray-500">Country</span>
-                    <span className="text-gray-300 break-words">{id.country || '-'}</span>
+                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Country</span>
+                    <span className="text-muted-foreground break-words">{id.country || '-'}</span>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <span className="text-[11px] uppercase tracking-wide text-gray-500">Source</span>
+                    <span className="text-[11px] uppercase tracking-wide text-muted-foreground">Source</span>
                     {id.source ? (
                       <span className={cn('inline-flex w-fit text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(id.source))}>
                         {id.source}
                       </span>
                     ) : (
-                      <span className="text-gray-300">-</span>
+                      <span className="text-muted-foreground">-</span>
                     )}
                   </div>
                 </div>
@@ -323,10 +323,10 @@ function IdentityTab({ entity }: { entity: Entity }) {
           <table className="w-full">
             <thead>
               <tr className="border-b border-foreground/10">
-                <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Type</th>
-                <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Number</th>
-                <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Country</th>
-                <th className="text-left py-2 px-4 text-sm text-gray-400 font-medium">Source</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Type</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Number</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Country</th>
+                <th className="text-left py-2 px-4 text-sm text-muted-foreground font-medium">Source</th>
               </tr>
             </thead>
             <tbody>
@@ -334,7 +334,7 @@ function IdentityTab({ entity }: { entity: Entity }) {
                 <tr key={id.id} className="border-b border-foreground/5 hover:bg-foreground/[0.02]">
                   <td className="py-3 px-4 text-foreground capitalize">{id.type.replace('_', ' ')}</td>
                   <td className="py-3 px-4 text-foreground font-mono">{id.number}</td>
-                  <td className="py-3 px-4 text-gray-300">{id.country || '-'}</td>
+                  <td className="py-3 px-4 text-muted-foreground">{id.country || '-'}</td>
                   <td className="py-3 px-4">
                     {id.source && (
                       <span className={cn('text-[10px] px-1.5 py-0.5 rounded border', getSourceBadgeClass(id.source))}>
@@ -378,12 +378,12 @@ function SanctionsTab({ entity }: { entity: Entity }) {
           <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Shield className="w-5 h-5 text-red-500" />
+                <Shield className="w-5 h-5 text-red-600 dark:text-red-500" />
                 <span className={cn('text-xs px-2 py-0.5 rounded border', getSourceBadgeClass(sanction.source))}>
                   {sanction.source}
                 </span>
                 {sanction.authority && sanction.authority !== sanction.source && (
-                  <span className="text-xs px-2 py-0.5 rounded border bg-blue-500/10 text-blue-300 border-blue-500/30">
+                  <span className="text-xs px-2 py-0.5 rounded border bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30">
                     {sanction.authority}
                   </span>
                 )}
@@ -397,57 +397,57 @@ function SanctionsTab({ entity }: { entity: Entity }) {
               className={cn(
                 'capitalize',
                 sanction.status === 'active'
-                  ? 'bg-red-500/10 text-red-400 border-red-500/30'
-                  : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                  ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                  : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
               )}
             >
               {sanction.status}
             </Badge>
           </div>
 
-          {sanction.reason && <p className="text-gray-300 mb-3">{sanction.reason}</p>}
+          {sanction.reason && <p className="text-muted-foreground mb-3">{sanction.reason}</p>}
           {sanction.summary && sanction.summary !== sanction.reason && (
-            <p className="text-gray-400 text-sm mb-3 italic">{sanction.summary}</p>
+            <p className="text-muted-foreground text-sm mb-3 italic">{sanction.summary}</p>
           )}
 
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
-              <span className="text-gray-500">Listing Date:</span>
+              <span className="text-muted-foreground">Listing Date:</span>
               <span className="text-foreground ml-2">{formatDate(sanction.listingDate)}</span>
             </div>
             {sanction.start_date && (
               <div>
-                <span className="text-gray-500">Vigente desde:</span>
+                <span className="text-muted-foreground">Vigente desde:</span>
                 <span className="text-foreground ml-2">{formatDate(sanction.start_date)}</span>
               </div>
             )}
             {sanction.end_date && (
               <div>
-                <span className="text-gray-500">Hasta:</span>
+                <span className="text-muted-foreground">Hasta:</span>
                 <span className="text-foreground ml-2">{formatDate(sanction.end_date)}</span>
               </div>
             )}
             {sanction.provisions && (
               <div>
-                <span className="text-gray-500">Disposición:</span>
+                <span className="text-muted-foreground">Disposición:</span>
                 <span className="text-foreground ml-2">{sanction.provisions}</span>
               </div>
             )}
             {sanction.referenceNumber && (
               <div>
-                <span className="text-gray-500">Reference:</span>
+                <span className="text-muted-foreground">Reference:</span>
                 <span className="text-foreground ml-2 font-mono">{sanction.referenceNumber}</span>
               </div>
             )}
           </div>
 
           {sanction.source_url && (
-            <div className="mt-4 pt-3 border-t border-gray-700/50">
+            <div className="mt-4 pt-3 border-t border-border/50">
               <a
                 href={sanction.source_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+                className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
                 Ver documento oficial
@@ -486,8 +486,8 @@ function PepTab({ entity }: { entity: Entity }) {
           <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Flag className="w-5 h-5 text-pink-500" />
-                <span className="text-xs text-gray-400 uppercase tracking-wider">PEP</span>
+                <Flag className="w-5 h-5 text-pink-600 dark:text-pink-500" />
+                <span className="text-xs text-muted-foreground uppercase tracking-wider">PEP</span>
               </div>
               <h4 className="text-lg font-medium text-foreground">{pep.role}</h4>
             </div>
@@ -496,8 +496,8 @@ function PepTab({ entity }: { entity: Entity }) {
               className={cn(
                 'capitalize',
                 pep.isCurrent
-                  ? 'bg-pink-500/10 text-pink-400 border-pink-500/30'
-                  : 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                  ? 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30'
+                  : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
               )}
             >
               {pep.isCurrent ? 'Current' : 'Former'}
@@ -506,22 +506,22 @@ function PepTab({ entity }: { entity: Entity }) {
 
           <div className="flex flex-wrap gap-4 text-sm">
             <div>
-              <span className="text-gray-500">Country:</span>
+              <span className="text-muted-foreground">Country:</span>
               <span className="text-foreground ml-2">{pep.country}</span>
             </div>
             <div>
-              <span className="text-gray-500">Category:</span>
+              <span className="text-muted-foreground">Category:</span>
               <span className="text-foreground ml-2 capitalize">{pep.category.replace('_', ' ')}</span>
             </div>
             {pep.startDate && (
               <div>
-                <span className="text-gray-500">From:</span>
+                <span className="text-muted-foreground">From:</span>
                 <span className="text-foreground ml-2">{formatDate(pep.startDate)}</span>
               </div>
             )}
             {pep.endDate && (
               <div>
-                <span className="text-gray-500">To:</span>
+                <span className="text-muted-foreground">To:</span>
                 <span className="text-foreground ml-2">{formatDate(pep.endDate)}</span>
               </div>
             )}
@@ -573,7 +573,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   }
 
   const severityColor = (s: number) =>
-    s >= 90 ? 'text-red-400' : s >= 70 ? 'text-orange-400' : s >= 50 ? 'text-yellow-400' : 'text-blue-400';
+    s >= 90 ? 'text-red-600 dark:text-red-400' : s >= 70 ? 'text-orange-700 dark:text-orange-400' : s >= 50 ? 'text-yellow-700 dark:text-yellow-400' : 'text-blue-600 dark:text-blue-400';
 
   const severityBg = (s: number) =>
     s >= 90 ? 'bg-red-500' : s >= 70 ? 'bg-orange-500' : s >= 50 ? 'bg-yellow-500' : 'bg-blue-500';
@@ -588,15 +588,15 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
   };
 
   const categoryColors: Record<string, string> = {
-    terrorism: 'bg-red-500/10 text-red-400 border-red-500/30',
-    sanctions_evasion: 'bg-red-500/10 text-red-300 border-red-500/30',
-    wanted: 'bg-orange-500/10 text-orange-400 border-orange-500/30',
-    crime: 'bg-orange-500/10 text-orange-300 border-orange-500/30',
-    human_rights: 'bg-pink-500/10 text-pink-400 border-pink-500/30',
-    financial_crime: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    corruption: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-    offshore: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-    regulatory: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
+    terrorism: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30',
+    sanctions_evasion: 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30',
+    wanted: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30',
+    crime: 'bg-orange-500/10 text-orange-700 dark:text-orange-300 border-orange-500/30',
+    human_rights: 'bg-pink-500/10 text-pink-600 dark:text-pink-400 border-pink-500/30',
+    financial_crime: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+    corruption: 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30',
+    offshore: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30',
+    regulatory: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30',
   };
 
   const getMethodIcon = (method: string | undefined) => {
@@ -636,24 +636,24 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                 <span className={cn('text-lg font-bold', severityColor(riskProfile.article_risk_score))}>
                   {Math.round(riskProfile.article_risk_score)}
                 </span>
-                <span className="text-[8px] text-gray-500">{severityLabel(riskProfile.article_risk_score)}</span>
+                <span className="text-[8px] text-muted-foreground">{severityLabel(riskProfile.article_risk_score)}</span>
               </div>
             </div>
 
             <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3">
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.total_articles}</p>
-                <p className="text-xs text-gray-400">Articulos</p>
+                <p className="text-xs text-muted-foreground">Articulos</p>
               </div>
               <div>
                 <p className="text-lg font-bold text-foreground">{riskProfile.recent_30d}</p>
-                <p className="text-xs text-gray-400">Ultimos 30d</p>
+                <p className="text-xs text-muted-foreground">Ultimos 30d</p>
               </div>
               <div>
                 <p className={cn('text-lg font-bold', severityColor(riskProfile.max_severity))}>
                   {riskProfile.max_severity}
                 </p>
-                <p className="text-xs text-gray-400">Max Severity</p>
+                <p className="text-xs text-muted-foreground">Max Severity</p>
               </div>
             </div>
             {riskProfile.top_categories.length > 0 && (
@@ -672,7 +672,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
       {/* Structured Media (Tier 1) */}
       {structured?.has_adverse_media && structured.categories.length > 0 && (
         <div className="glass rounded-xl p-5">
-          <h4 className="text-sm font-medium text-gray-400 mb-3 flex items-center gap-2">
+          <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
             <Shield className="w-4 h-4" />
             Categorias Estructuradas (Sources)
           </h4>
@@ -696,13 +696,13 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
       {articles.length > 0 && (
         <div>
           <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h4 className="text-sm font-medium text-gray-400 flex items-center gap-2">
+            <h4 className="text-sm font-medium text-muted-foreground flex items-center gap-2">
               <Newspaper className="w-4 h-4" />
               Articulos de Noticias ({articles.length})
             </h4>
             <a
               href="/adverse-media"
-              className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1"
             >
               Ver dashboard completo
               <ArrowRight className="w-3 h-3" />
@@ -744,7 +744,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                 </div>
 
                 {article.summary && (
-                  <p className="text-xs text-gray-400 mb-2 line-clamp-2">{article.summary}</p>
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{article.summary}</p>
                 )}
 
                 <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -756,21 +756,21 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
 
                   {article.classification_method && (
                     <Badge variant="outline" className={cn('text-[10px] gap-1',
-                      article.classification_method === 'moonshot_ai' ? 'bg-violet-500/10 text-violet-400 border-violet-500/30' :
-                      article.classification_method === 'claude_ai' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' :
-                      'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                      article.classification_method === 'moonshot_ai' ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 border-violet-500/30' :
+                      article.classification_method === 'claude_ai' ? 'bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30' :
+                      'bg-gray-500/10 text-muted-foreground border-gray-500/30'
                     )}>
                       <MethodIcon className="w-3 h-3" />
                       {getMethodLabel(article.classification_method)}
                     </Badge>
                   )}
 
-                  <span className="text-gray-500 flex items-center gap-1 break-words sm:ml-auto">
+                  <span className="text-muted-foreground flex items-center gap-1 break-words sm:ml-auto">
                     {sourceDomain && (
                       <>
                         <Globe className="w-3 h-3" />
-                        <span className="text-gray-400">{sourceDomain}</span>
-                        <span className="text-gray-600 mx-1">·</span>
+                        <span className="text-muted-foreground">{sourceDomain}</span>
+                        <span className="text-muted-foreground mx-1">·</span>
                       </>
                     )}
                     <Clock className="w-3 h-3" />
@@ -778,13 +778,13 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                   </span>
 
                   {article.link_confidence != null && (
-                    <span className="text-gray-500 flex items-center gap-1">
+                    <span className="text-muted-foreground flex items-center gap-1">
                       <TrendingUp className="w-3 h-3" />
                       {Math.round(article.link_confidence * 100)}% match
                     </span>
                   )}
                   {article.is_verified && (
-                    <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-400 border-green-500/30">
+                    <Badge variant="outline" className="text-[10px] bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30">
                       Verificado
                     </Badge>
                   )}
@@ -795,7 +795,7 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
                     href={article.source_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-400 hover:text-blue-300"
+                    className="inline-flex items-center gap-1 mt-2 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300"
                   >
                     <ExternalLink className="w-3 h-3" />
                     Leer articulo
@@ -811,15 +811,15 @@ function AdverseMediaTab({ entity }: { entity: Entity }) {
 }
 
 function getRelationshipConfidenceTone(confidence: number): string {
-  if (confidence >= 85) return 'bg-green-500/10 text-green-400 border-green-500/30';
-  if (confidence >= 70) return 'bg-amber-500/10 text-amber-400 border-amber-500/30';
-  return 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+  if (confidence >= 85) return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30';
+  if (confidence >= 70) return 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30';
+  return 'bg-gray-500/10 text-muted-foreground border-gray-500/30';
 }
 
 function getRelationshipStatusTone(isCurrent: boolean): string {
   return isCurrent
-    ? 'bg-green-500/10 text-green-400 border-green-500/30'
-    : 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+    ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30'
+    : 'bg-gray-500/10 text-muted-foreground border-gray-500/30';
 }
 
 // Relationships Tab
@@ -849,26 +849,26 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
     <div className="space-y-4">
       <div className="grid gap-3 md:grid-cols-3">
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones detectadas</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Relaciones detectadas</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{entity.relationships.length}</p>
-          <p className="mt-1 text-sm text-gray-400">Vista consolidada de vinculos conocidos.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Vista consolidada de vinculos conocidos.</p>
         </div>
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Relaciones vigentes</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Relaciones vigentes</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{currentRelationships}</p>
-          <p className="mt-1 text-sm text-gray-400">Se marcan como activas en la data disponible.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Se marcan como activas en la data disponible.</p>
         </div>
         <div className="glass rounded-xl p-4">
-          <p className="text-[11px] uppercase tracking-[0.24em] text-gray-500">Alta confianza</p>
+          <p className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Alta confianza</p>
           <p className="mt-2 text-2xl font-semibold text-foreground">{highConfidenceRelationships}</p>
-          <p className="mt-1 text-sm text-gray-400">Vinculos con score de 85% o superior.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Vinculos con score de 85% o superior.</p>
         </div>
       </div>
 
       {relationshipTypes.length > 0 && (
         <div className="glass rounded-xl p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium uppercase tracking-[0.22em] text-gray-500">Tipos principales</span>
+            <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted-foreground">Tipos principales</span>
             {relationshipTypes.map(([type, count]) => (
               <Badge key={type} variant="outline" className="text-[10px] bg-foreground/5 text-gray-200 border-foreground/10">
                 {getRelationshipTypeLabel(type)} · {count}
@@ -889,7 +889,7 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2 mb-3">
-                <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-400 border-blue-500/30">
+                <Badge variant="outline" className="text-[10px] bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30">
                   {getRelationshipTypeLabel(rel.type)}
                 </Badge>
                 <Badge variant="outline" className={cn('text-[10px]', getRelationshipStatusTone(rel.isCurrent))}>
@@ -910,13 +910,13 @@ function RelationshipsTab({ entity }: { entity: Entity }) {
           </div>
 
           {(rel.startDate || rel.endDate) && (
-            <div className="mt-4 grid gap-3 text-sm text-gray-400 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3 text-sm text-muted-foreground sm:grid-cols-2">
               <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
-                <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Inicio</span>
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Inicio</span>
                 <span className="mt-1 block text-foreground">{rel.startDate ? formatDate(rel.startDate) : 'No disponible'}</span>
               </div>
               <div className="rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2">
-                <span className="block text-[11px] uppercase tracking-[0.22em] text-gray-500">Fin</span>
+                <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Fin</span>
                 <span className="mt-1 block text-foreground">{rel.endDate ? formatDate(rel.endDate) : 'Sin cierre registrado'}</span>
               </div>
             </div>
@@ -952,7 +952,7 @@ function AuditTab({ entity }: { entity: Entity }) {
   return (
     <div className="glass rounded-xl p-5">
       <h3 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
-        <History className="w-5 h-5 text-blue-400" />
+        <History className="w-5 h-5 text-blue-600 dark:text-blue-400" />
         Activity History
       </h3>
 
@@ -979,11 +979,11 @@ function AuditTab({ entity }: { entity: Entity }) {
               <div className="flex-1 pb-4">
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <span className="text-foreground font-medium">{event.action}</span>
-                  <span className="text-xs text-gray-500">by {event.user}</span>
+                  <span className="text-xs text-muted-foreground">by {event.user}</span>
                 </div>
-                <span className="text-xs text-gray-500">{formatDate(event.date)}</span>
+                <span className="text-xs text-muted-foreground">{formatDate(event.date)}</span>
                 {'content' in event && event.content && (
-                  <p className="text-sm text-gray-400 mt-2">{event.content}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{event.content}</p>
                 )}
               </div>
             </motion.div>

@@ -9,10 +9,10 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AppPage, EmptyState, ListPageSkeleton, MetricCard, PageHeader } from '@/components/foundation';
 
 const TIER_COLORS = [
-  { min: 100000, color: 'bg-red-500/10 text-red-300 border-red-500/30', label: 'XL' },
-  { min: 10000, color: 'bg-amber-500/10 text-amber-300 border-amber-500/30', label: 'L' },
-  { min: 1000, color: 'bg-blue-500/10 text-blue-300 border-blue-500/30', label: 'M' },
-  { min: 0, color: 'bg-slate-500/10 text-slate-300 border-slate-500/30', label: 'S' },
+  { min: 100000, color: 'bg-red-500/10 text-red-600 dark:text-red-300 border-red-500/30', label: 'XL' },
+  { min: 10000, color: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30', label: 'L' },
+  { min: 1000, color: 'bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30', label: 'M' },
+  { min: 0, color: 'bg-slate-500/10 text-muted-foreground border-slate-500/30', label: 'S' },
 ];
 
 function tierFor(count: number) {
@@ -62,7 +62,7 @@ export function YenteCatalogPage() {
           <PageHeader
             title="Catalogo Yente"
             description="Catálogo de datasets en formato Yente/OpenSanctions. Consumible por Aleph/ICIJ/OCCRP."
-            icon={<div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30"><Globe className="w-6 h-6 text-purple-400" /></div>}
+            icon={<div className="p-2.5 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30"><Globe className="w-6 h-6 text-purple-600 dark:text-purple-400" /></div>}
             actions={<Button onClick={handleExport} disabled={!catalog} variant="outline"><Download className="h-4 w-4 mr-2" />Export JSON</Button>}
           />
 
@@ -79,7 +79,7 @@ export function YenteCatalogPage() {
               <CardTitle className="text-base flex items-center justify-between">
                 <span>Datasets disponibles</span>
                 <div className="relative w-64">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Filtrar..." className="pl-8 bg-foreground/5 border-foreground/10 text-sm" />
                 </div>
               </CardTitle>
@@ -110,14 +110,14 @@ function DatasetCard({ ds }: { ds: YenteDataset }) {
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="text-sm font-medium text-foreground font-mono truncate" title={ds.name}>{ds.name}</div>
-          {ds.title && ds.title !== ds.name && <div className="text-xs text-gray-500 truncate" title={ds.title}>{ds.title}</div>}
+          {ds.title && ds.title !== ds.name && <div className="text-xs text-muted-foreground truncate" title={ds.title}>{ds.title}</div>}
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded border ${tier.color} shrink-0`}>{tier.label}</span>
       </div>
-      <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
+      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
         <Database className="h-3 w-3" />
         <span className="tabular-nums">{ds.entity_count.toLocaleString()}</span>
-        <span className="text-gray-600">entities</span>
+        <span className="text-muted-foreground">entities</span>
       </div>
     </div>
   );

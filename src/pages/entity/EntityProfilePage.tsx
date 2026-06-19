@@ -297,7 +297,7 @@ function RiskScoreGauge({ score, level }: { score: number; level: RiskLevel }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span className="text-3xl font-bold text-foreground">{score}</span>
-        <span className="text-xs text-gray-400 uppercase">Riesgo</span>
+        <span className="text-xs text-muted-foreground uppercase">Riesgo</span>
       </div>
     </div>
   );
@@ -314,9 +314,9 @@ function InfoItem({ label, value, icon: Icon }: { label: string; value?: any; ic
   if (!displayValue) return null;
   return (
     <div className="flex items-start gap-3 py-2">
-      {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
+      {Icon && <Icon className="w-4 h-4 text-muted-foreground mt-0.5" />}
       <div className="min-w-0">
-        <p className="text-xs text-gray-500 uppercase">{label}</p>
+        <p className="text-xs text-muted-foreground uppercase">{label}</p>
         <p className="text-sm text-foreground break-words">{displayValue}</p>
       </div>
     </div>
@@ -371,19 +371,19 @@ function ListInfoItem({ label, items, icon: Icon, maxVisible = 5 }: {
 
   return (
     <div className="flex items-start gap-3 py-2">
-      {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
+      {Icon && <Icon className="w-4 h-4 text-muted-foreground mt-0.5" />}
       <div>
-        <p className="text-xs text-gray-500 uppercase">{label}</p>
+        <p className="text-xs text-muted-foreground uppercase">{label}</p>
         <ul className="text-sm text-foreground space-y-0.5 mt-0.5">
           {visible.map((item, i) => (
             <li key={i} className="flex items-start gap-1.5">
-              <span className="text-gray-600 mt-1">•</span>
+              <span className="text-muted-foreground mt-1">•</span>
               <span>{item}</span>
             </li>
           ))}
         </ul>
         {remaining > 0 && (
-          <p className="text-xs text-gray-500 mt-1">+{remaining} más</p>
+          <p className="text-xs text-muted-foreground mt-1">+{remaining} más</p>
         )}
       </div>
     </div>
@@ -411,9 +411,9 @@ function ReferenceLinksList({
 
   return (
     <div className="flex items-start gap-3 py-2">
-      {Icon && <Icon className="w-4 h-4 text-gray-500 mt-0.5" />}
+      {Icon && <Icon className="w-4 h-4 text-muted-foreground mt-0.5" />}
       <div className="min-w-0">
-        <p className="text-xs text-gray-500 uppercase">{label}</p>
+        <p className="text-xs text-muted-foreground uppercase">{label}</p>
         <div className="space-y-2 mt-1">
           {visible.map((item, i) => (
             <button
@@ -432,7 +432,7 @@ function ReferenceLinksList({
           <button
             type="button"
             onClick={() => setIsExpanded((value) => !value)}
-            className="text-xs text-blue-400 hover:text-blue-300 mt-1"
+            className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 mt-1"
           >
             {isExpanded ? 'Mostrar menos' : `Ver ${remaining} más`}
           </button>
@@ -453,12 +453,12 @@ function getRiskBorderColor(riesgo?: string): string {
 }
 
 function getRiskBadgeClasses(riesgo?: string): string {
-  if (!riesgo) return 'bg-gray-500/10 text-gray-400';
+  if (!riesgo) return 'bg-gray-500/10 text-muted-foreground';
   const r = riesgo.toUpperCase();
-  if (r === 'CRITICAL') return 'bg-red-500/10 text-red-400 border-red-500/30';
-  if (r === 'HIGH') return 'bg-orange-500/10 text-orange-400 border-orange-500/30';
-  if (r === 'MEDIUM') return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
-  return 'bg-green-500/10 text-green-400 border-green-500/30';
+  if (r === 'CRITICAL') return 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30';
+  if (r === 'HIGH') return 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/30';
+  if (r === 'MEDIUM') return 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/30';
+  return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30';
 }
 
 // Sanction Entry Card (enriched)
@@ -471,7 +471,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
         <div className="min-w-0">
           <h4 className="text-foreground font-medium">{entry.source}</h4>
-          <p className="text-sm text-gray-400">{entry.program}</p>
+          <p className="text-sm text-muted-foreground">{entry.program}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {details?.riesgo && (
@@ -481,13 +481,13 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
           )}
           <Badge variant="outline" className={cn(
             'text-xs',
-            entry.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
+            entry.status === 'active' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 'bg-gray-500/10 text-muted-foreground'
           )}>
             {entry.status === 'active' ? 'Activo' : entry.status}
           </Badge>
         </div>
       </div>
-      <p className="text-sm text-gray-300 mb-2">{entry.reason}</p>
+      <p className="text-sm text-muted-foreground mb-2">{entry.reason}</p>
 
       {/* Enriched details grid */}
       {details && Object.keys(details).length > 0 && (
@@ -495,43 +495,43 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
           <div className="grid grid-cols-1 sm:grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             {details.rfc && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">RFC</p>
+                <p className="text-[10px] text-muted-foreground uppercase">RFC</p>
                 <p className="text-sm text-foreground font-mono break-all">{details.rfc}</p>
               </div>
             )}
             {details.dataset_label && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">Dataset</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Dataset</p>
                 <p className="text-sm text-foreground break-words">{details.dataset_label}</p>
               </div>
             )}
             {details.supuesto && (
               <div className="col-span-2 md:col-span-1">
-                <p className="text-[10px] text-gray-500 uppercase">Supuesto</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Supuesto</p>
                 <p className="text-sm text-foreground break-words">{details.supuesto}</p>
               </div>
             )}
             {details.monto && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">Monto</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Monto</p>
                 <p className="text-sm text-foreground break-words">{details.monto}</p>
               </div>
             )}
             {details.entidad_federativa && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">Entidad Federativa</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Entidad Federativa</p>
                 <p className="text-sm text-foreground break-words">{details.entidad_federativa}</p>
               </div>
             )}
             {details.tipo_persona && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">Tipo Persona</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Tipo Persona</p>
                 <p className="text-sm text-foreground break-words">{details.tipo_persona}</p>
               </div>
             )}
             {details.fecha_publicacion && (
               <div>
-                <p className="text-[10px] text-gray-500 uppercase">Fecha Publicacion</p>
+                <p className="text-[10px] text-muted-foreground uppercase">Fecha Publicacion</p>
                 <p className="text-sm text-foreground break-words">{details.fecha_publicacion}</p>
               </div>
             )}
@@ -540,7 +540,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
           {/* Nested datasets (aggregated format) */}
           {details.datasets && Array.isArray(details.datasets) && details.datasets.length > 1 && (
             <div className="mt-3 pt-3 border-t border-foreground/5">
-              <p className="text-xs text-gray-500 mb-2">
+              <p className="text-xs text-muted-foreground mb-2">
                 Aparece en {details.dataset_count || details.datasets.length} datasets:
               </p>
               <div className="space-y-2">
@@ -552,7 +552,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
                         {String(d.riesgo || 'N/A')}
                       </Badge>
                       <span className="text-xs text-foreground break-words">{String(d.dataset_label || d.dataset || '')}</span>
-                      {d.supuesto ? <span className="text-xs text-gray-500 break-words">{String(d.supuesto)}</span> : null}
+                      {d.supuesto ? <span className="text-xs text-muted-foreground break-words">{String(d.supuesto)}</span> : null}
                     </div>
                   );
                 })}
@@ -562,7 +562,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
         </div>
       )}
 
-      <p className="text-xs text-gray-500 mt-2">Listado: {formatDate(entry.listing_date)}</p>
+      <p className="text-xs text-muted-foreground mt-2">Listado: {formatDate(entry.listing_date)}</p>
     </div>
   );
 }
@@ -819,7 +819,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               onClick={() => navigate(-1)}
-              className="gap-2 text-gray-400 hover:text-foreground"
+              className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver
@@ -828,7 +828,7 @@ const hasSanctions =
               variant="ghost"
               size="sm"
               onClick={() => refetch()}
-              className="gap-2 text-gray-400 hover:text-foreground"
+              className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <RefreshCw className="w-4 h-4" />
               <span className="hidden sm:inline">Actualizar</span>
@@ -836,7 +836,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               size="sm"
-              className="gap-2 text-gray-400 hover:text-foreground"
+              className="gap-2 text-muted-foreground hover:text-foreground"
             >
               <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">Compartir</span>
@@ -844,7 +844,7 @@ const hasSanctions =
             <Button
               variant="ghost"
               size="icon"
-              className="text-gray-400 hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
             >
               <MoreHorizontal className="w-4 h-4" />
             </Button>
@@ -870,19 +870,19 @@ const hasSanctions =
                 </motion.div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <Badge variant="outline" className="text-gray-400">
+                    <Badge variant="outline" className="text-muted-foreground">
                       {entityTypeLabels[entity.entity_type]}
                     </Badge>
                     {referenceLike ? (
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/30">
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30">
                         Referencia contextual
                       </Badge>
                     ) : hasRelationships && !hasSanctions && !hasPep ? (
-                      <Badge variant="outline" className="bg-violet-500/10 text-violet-300 border-violet-500/30">
+                      <Badge variant="outline" className="bg-violet-500/10 text-violet-600 dark:text-violet-300 border-violet-500/30">
                         Entidad relacionada
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-emerald-500/10 text-emerald-300 border-emerald-500/30">
+                      <Badge variant="outline" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
                         Sujeto principal
                       </Badge>
                     )}
@@ -891,9 +891,9 @@ const hasSanctions =
                         variant="outline"
                         className={cn(
                           'capitalize',
-                          profile.header.reference_tier === 'premium' && 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
-                          profile.header.reference_tier === 'graph_only' && 'bg-amber-500/10 text-amber-300 border-amber-500/30',
-                          profile.header.reference_tier === 'suppress' && 'bg-gray-500/10 text-gray-300 border-gray-500/30',
+                          profile.header.reference_tier === 'premium' && 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+                          profile.header.reference_tier === 'graph_only' && 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30',
+                          profile.header.reference_tier === 'suppress' && 'bg-gray-500/10 text-muted-foreground border-gray-500/30',
                         )}
                         title={profile.header.reference_tier_reason || undefined}
                       >
@@ -916,17 +916,17 @@ const hasSanctions =
                     {/* Topics */}
                     {entity.topics?.map((topic: string) => {
                       const topicColors: Record<string, string> = {
-                        sanction: 'bg-red-500/10 text-red-400 border-red-500/20',
-                        pep: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-                        crime: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-                        debarment: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-                        poi: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+                        sanction: 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20',
+                        pep: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20',
+                        crime: 'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20',
+                        debarment: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
+                        poi: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
                       };
                       return (
                         <Badge
                           key={topic}
                           variant="outline"
-                          className={`text-xs capitalize ${topicColors[topic] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'}`}
+                          className={`text-xs capitalize ${topicColors[topic] || 'bg-gray-500/10 text-muted-foreground border-gray-500/20'}`}
                         >
                           {topic}
                         </Badge>
@@ -1010,7 +1010,7 @@ const hasSanctions =
               {/* Data Sources */}
               <div className="mt-6">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-2">
-                  <p className="text-xs text-gray-500 uppercase">Fuentes de Datos</p>
+                  <p className="text-xs text-muted-foreground uppercase">Fuentes de Datos</p>
                   <SourceLevelSelector value={sourceLevel} onChange={handleSourceLevelChange} size="sm" />
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1031,7 +1031,7 @@ const hasSanctions =
             {/* Right: Risk Score */}
             <div className="flex flex-col items-center justify-center">
               <RiskScoreGauge score={entity.overall_risk_score} level={entity.risk_level} />
-              <p className="text-sm text-gray-400 mt-4">Score de Riesgo</p>
+              <p className="text-sm text-muted-foreground mt-4">Score de Riesgo</p>
             </div>
           </div>
         </motion.div>
@@ -1082,42 +1082,42 @@ const hasSanctions =
                   className="glass rounded-xl p-6">
                   <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <h3 className="text-lg font-medium text-foreground flex items-center gap-2">
-                      <Shield className="w-5 h-5 text-red-400" />
+                      <Shield className="w-5 h-5 text-red-600 dark:text-red-400" />
                       Sanciones
                     </h3>
-                    <Badge className="w-fit bg-red-500/20 text-red-400 text-xs">{entity.sanctions.length}</Badge>
+                    <Badge className="w-fit bg-red-500/20 text-red-600 dark:text-red-400 text-xs">{entity.sanctions.length}</Badge>
                   </div>
                   <div className="space-y-3">
                     {entity.sanctions.slice(0, 5).map((s, i) => (
                       <div key={i} className={cn('p-3 rounded-lg border-l-2',
-                        s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-foreground/[0.02] border-gray-600/30'
+                        s.status === 'active' ? 'bg-red-500/5 border-red-500/50' : 'bg-foreground/[0.02] border-border/30'
                       )}>
                         <div className="mb-1 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="text-sm text-foreground font-medium break-words">{s.source}</span>
                             {s.authority && s.authority !== s.source && (
-                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-300 border border-blue-500/30">
                                 {s.authority}
                               </span>
                             )}
                           </div>
                           <Badge variant="outline" className={cn('text-[10px]',
-                            s.status === 'active' ? 'bg-red-500/10 text-red-400 border-red-500/30' : 'bg-gray-500/10 text-gray-400'
+                            s.status === 'active' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 'bg-gray-500/10 text-muted-foreground'
                           )}>
                             {s.status === 'active' ? 'Activa' : s.status === 'removed' ? 'Removida' : s.status}
                           </Badge>
                         </div>
-                        <p className="text-xs text-gray-400 break-words">{s.program}</p>
-                        {s.reason && <p className="text-xs text-gray-500 mt-1 break-words line-clamp-2">{s.reason}</p>}
+                        <p className="text-xs text-muted-foreground break-words">{s.program}</p>
+                        {s.reason && <p className="text-xs text-muted-foreground mt-1 break-words line-clamp-2">{s.reason}</p>}
                         <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
-                          <p className="text-[10px] text-gray-600">Listado: {formatDate(s.listing_date)}</p>
+                          <p className="text-[10px] text-muted-foreground">Listado: {formatDate(s.listing_date)}</p>
                           {s.source_url && (
                             <a
                               href={s.source_url}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-0.5 text-[10px] text-blue-400 hover:text-blue-300"
+                              className="inline-flex items-center gap-0.5 text-[10px] text-blue-600 dark:text-blue-400 hover:text-blue-300"
                             >
                               Fuente oficial <ExternalLink className="w-2.5 h-2.5" />
                             </a>
@@ -1127,7 +1127,7 @@ const hasSanctions =
                     ))}
                     {entity.sanctions.length > 5 && (
                       <button onClick={() => setActiveTab('sanctions')}
-                        className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                        className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-300 flex items-center gap-1">
                         Ver {entity.sanctions.length - 5} más <ArrowRight className="w-3 h-3" />
                       </button>
                     )}
@@ -1189,9 +1189,9 @@ const hasSanctions =
           <TabsContent value="sanctions">
             {entity.sanctions.length === 0 ? (
               <div className="glass rounded-xl p-12 text-center">
-                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <CheckCircle className="w-16 h-16 text-green-700 dark:text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-medium text-foreground mb-2">Sin Sanciones</h3>
-                <p className="text-gray-400">Esta entidad no aparece en listas de sanciones.</p>
+                <p className="text-muted-foreground">Esta entidad no aparece en listas de sanciones.</p>
               </div>
             ) : (
               <div className="space-y-4">

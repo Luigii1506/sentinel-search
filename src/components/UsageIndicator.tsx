@@ -45,9 +45,9 @@ export function UsageIndicator() {
     'bg-blue-500';
 
   const textColor =
-    remaining === 0 ? 'text-red-300' :
-    pct >= 70 ? 'text-amber-300' :
-    'text-gray-300';
+    remaining === 0 ? 'text-red-600 dark:text-red-300' :
+    pct >= 70 ? 'text-amber-700 dark:text-amber-300' :
+    'text-muted-foreground';
 
   return (
     <Popover>
@@ -75,7 +75,7 @@ export function UsageIndicator() {
       <PopoverContent align="end" className="w-72 p-4">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-foreground">Plan {PLAN_LABEL[plan ?? 'free']}</span>
-          <span className="text-xs text-gray-500">{used_today} / {daily_limit} hoy</span>
+          <span className="text-xs text-muted-foreground">{used_today} / {daily_limit} hoy</span>
         </div>
 
         <div className="w-full h-1.5 rounded-full bg-foreground/10 overflow-hidden mb-3">
@@ -85,7 +85,7 @@ export function UsageIndicator() {
           />
         </div>
 
-        <p className="text-xs text-gray-400 mb-3">
+        <p className="text-xs text-muted-foreground mb-3">
           {remaining === 0
             ? 'Has alcanzado el límite diario.'
             : remaining === 1
@@ -94,7 +94,7 @@ export function UsageIndicator() {
         </p>
 
         {resets_at && (
-          <p className="text-[11px] text-gray-500 mb-3">
+          <p className="text-[11px] text-muted-foreground mb-3">
             El contador se reinicia {formatResetTime(resets_at)}.
           </p>
         )}

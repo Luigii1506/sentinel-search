@@ -48,11 +48,11 @@ export function HealthDot({
         className,
       )}
     >
-      {Icon && <Icon className="w-3.5 h-3.5 shrink-0 text-gray-500" aria-hidden="true" />}
+      {Icon && <Icon className="w-3.5 h-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />}
       <div className={cn('w-2.5 h-2.5 rounded-full shrink-0', resolveDotColor(status))} />
       <div className="min-w-0">
         <div className="text-sm font-medium text-foreground leading-none">{label}</div>
-        {detail && <div className="text-xs text-gray-500 mt-1 truncate">{detail}</div>}
+        {detail && <div className="text-xs text-muted-foreground mt-1 truncate">{detail}</div>}
       </div>
     </div>
   );

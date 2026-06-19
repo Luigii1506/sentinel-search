@@ -65,14 +65,14 @@ export function OAuthCallbackPage() {
       >
         {error ? (
           <>
-            <ShieldAlert className="w-10 h-10 text-red-400 mx-auto" />
-            <p className="text-red-300">{error}</p>
-            <p className="text-sm text-gray-500">Te enviaremos al login…</p>
+            <ShieldAlert className="w-10 h-10 text-red-600 dark:text-red-400 mx-auto" />
+            <p className="text-red-600 dark:text-red-300">{error}</p>
+            <p className="text-sm text-muted-foreground">Te enviaremos al login…</p>
           </>
         ) : (
           <>
-            <Loader2 className="w-10 h-10 text-electric-400 mx-auto animate-spin" />
-            <p className="text-gray-300">Validando sesión con Google…</p>
+            <Loader2 className="w-10 h-10 text-electric-700 dark:text-electric-400 mx-auto animate-spin" />
+            <p className="text-muted-foreground">Validando sesión con Google…</p>
           </>
         )}
       </motion.div>

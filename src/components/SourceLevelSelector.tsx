@@ -24,7 +24,7 @@ interface SourceLevelSelectorProps {
 export function SourceLevelSelector({ value, onChange, className, size = 'md' }: SourceLevelSelectorProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <span className={cn("block text-gray-500", size === 'sm' ? 'text-[10px]' : 'text-xs')}>Nivel de cobertura</span>
+      <span className={cn("block text-muted-foreground", size === 'sm' ? 'text-[10px]' : 'text-xs')}>Nivel de cobertura</span>
       <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
       {SOURCE_LEVELS.map(({ level, label, desc }) => (
         <TooltipProvider key={level}>
@@ -36,8 +36,8 @@ export function SourceLevelSelector({ value, onChange, className, size = 'md' }:
                   "shrink-0 font-medium border transition-all duration-200 whitespace-nowrap",
                   size === 'sm' ? 'px-2.5 py-1 rounded-full text-[10px]' : 'px-3 py-1.5 rounded-full text-xs',
                   value === level
-                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                    : "bg-foreground/5 text-gray-400 border-foreground/10 hover:border-foreground/20 hover:text-gray-300"
+                    ? "bg-blue-500/20 text-blue-600 dark:text-blue-400 border-blue-500/30"
+                    : "bg-foreground/5 text-muted-foreground border-foreground/10 hover:border-foreground/20 hover:text-muted-foreground"
                 )}
               >
                 {label}

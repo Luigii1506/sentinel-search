@@ -58,17 +58,17 @@ export function PerformanceMonitor() {
   }, [recentQueries]);
 
   const getPerformanceColor = (time: number) => {
-    if (time < 100) return 'text-green-400';
-    if (time < 300) return 'text-yellow-400';
-    return 'text-orange-400';
+    if (time < 100) return 'text-green-700 dark:text-green-400';
+    if (time < 300) return 'text-yellow-700 dark:text-yellow-400';
+    return 'text-orange-700 dark:text-orange-400';
   };
 
   
   return (
     <Card className="bg-foreground/5 border-foreground/10">
       <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-gray-300 flex items-center gap-2">
-          <Activity className="w-4 h-4 text-blue-400" />
+        <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+          <Activity className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           Performance Monitor
         </CardTitle>
       </CardHeader>
@@ -77,7 +77,7 @@ export function PerformanceMonitor() {
         <div className="grid grid-cols-2 gap-3">
           {/* Average Time */}
           <div className="p-3 rounded-lg bg-foreground/5">
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Clock className="w-3 h-3" />
               Tiempo Medio
             </div>
@@ -88,11 +88,11 @@ export function PerformanceMonitor() {
 
           {/* Cache Hit Rate */}
           <div className="p-3 rounded-lg bg-foreground/5">
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Database className="w-3 h-3" />
               Cache Hit Rate
             </div>
-            <div className="text-2xl font-bold text-blue-400">
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               {stats.cacheHitRate.toFixed(0)}%
             </div>
             <Progress 
@@ -103,21 +103,21 @@ export function PerformanceMonitor() {
 
           {/* Cache Size */}
           <div className="p-3 rounded-lg bg-foreground/5">
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <Zap className="w-3 h-3" />
               Cache Size
             </div>
-            <div className="text-2xl font-bold text-purple-400">
+            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
               {stats.cacheSize}
             </div>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               / {screeningService.getCacheStats().maxSize} max
             </div>
           </div>
 
           {/* Total Queries */}
           <div className="p-3 rounded-lg bg-foreground/5">
-            <div className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
               <TrendingUp className="w-3 h-3" />
               Queries
             </div>
@@ -130,7 +130,7 @@ export function PerformanceMonitor() {
         {/* Recent Queries */}
         {recentQueries.length > 0 && (
           <div className="space-y-2">
-            <div className="text-xs text-gray-400 font-medium">
+            <div className="text-xs text-muted-foreground font-medium">
               Últimas búsquedas
             </div>
             <div className="space-y-1 max-h-32 overflow-y-auto">
@@ -142,13 +142,13 @@ export function PerformanceMonitor() {
                   className="flex items-center justify-between p-2 rounded 
                            bg-foreground/5 text-sm"
                 >
-                  <span className="truncate text-gray-300 max-w-[150px]">
+                  <span className="truncate text-muted-foreground max-w-[150px]">
                     {query.query}
                   </span>
                   <div className="flex items-center gap-2">
                     {query.fromCache && (
                       <Badge variant="outline" className="text-xs border-purple-500/30 
-                                                          text-purple-400">
+                                                          text-purple-600 dark:text-purple-400">
                         cache
                       </Badge>
                     )}
@@ -163,7 +163,7 @@ export function PerformanceMonitor() {
         )}
 
         {/* Performance Legend */}
-        <div className="flex items-center gap-4 text-xs text-gray-500 pt-2 
+        <div className="flex items-center gap-4 text-xs text-muted-foreground pt-2 
                       border-t border-foreground/10">
           <div className="flex items-center gap-1">
             <div className="w-2 h-2 rounded-full bg-green-500" />

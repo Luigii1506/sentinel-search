@@ -68,7 +68,7 @@ export function GoogleSignInButton({
   return (
     <div className="space-y-3">
       {!hideDivider && (
-        <div className="flex items-center gap-3 text-xs text-gray-500 uppercase tracking-wider">
+        <div className="flex items-center gap-3 text-xs text-muted-foreground uppercase tracking-wider">
           <div className="flex-1 h-px bg-foreground/10" />
           <span>o</span>
           <div className="flex-1 h-px bg-foreground/10" />
