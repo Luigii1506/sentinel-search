@@ -1,6 +1,7 @@
-import { Suspense, lazy, type ComponentType } from 'react';
+import { Suspense, lazy, useEffect, type ComponentType } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import i18n from '@/i18n';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
@@ -135,6 +136,18 @@ function GuardedPage({
 }
 
 function App() {
+  // Backend data (entity profiles, relationships, search…) is localized via
+  // the `lang` query param sent on every request. React Query caches by key
+  // (which doesn't include lang), so when the UI language changes we must
+  // invalidate cached queries to refetch in the new language.
+  useEffect(() => {
+    const handler = () => queryClient.invalidateQueries();
+    i18n.on('languageChanged', handler);
+    return () => {
+      i18n.off('languageChanged', handler);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
