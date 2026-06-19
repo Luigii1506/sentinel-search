@@ -158,10 +158,25 @@ export const entityService = {
    * Get entity by ID
    */
   async getById(id: string, source_level?: number): Promise<APIEntity> {
-    const response = await api.get(`/api/v1/entity/${id}`, {
+    // v1 fue eliminado (todo es v2/FTM). El detalle de entidad ahora vive en
+    // GET /api/v2/entities/{id} (EntityDetail), cuyo shape difiere del APIEntity
+    // legacy: canonical_name/all_sources/risk_score/birth_date/countries en vez
+    // de primary_name/data_sources/overall_risk_score/date_of_birth/country.
+    // Se mapea aquí para que los consumidores existentes sigan funcionando.
+    const response = await api.get(`/api/v2/entities/${id}`, {
       params: source_level ? { source_level } : undefined,
     });
-    return response.data;
+    const d = response.data ?? {};
+    return {
+      ...d,
+      primary_name: d.canonical_name ?? d.primary_name,
+      data_sources: d.all_sources ?? d.data_sources ?? [],
+      overall_risk_score: d.risk_score ?? d.overall_risk_score,
+      date_of_birth: d.birth_date ?? d.date_of_birth,
+      country: Array.isArray(d.countries) ? d.countries[0] : d.country,
+      is_sanctioned: d.is_sanctioned ?? ((d.sanctions_details?.length ?? 0) > 0),
+      sanctions: d.sanctions ?? d.sanctions_details ?? [],
+    } as APIEntity;
   },
 
   /**
