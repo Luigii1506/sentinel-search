@@ -337,7 +337,21 @@
         "representative": "Representante",
         "sanctions": "Relación sancionatoria",
         "profile": "Contexto de perfil",
-        "profilecontext": "Contexto de perfil"
+        "profilecontext": "Contexto de perfil",
+        "motherinlaw": "Suegra",
+        "fatherinlaw": "Suegro",
+        "soninlaw": "Yerno",
+        "daughterinlaw": "Nuera",
+        "brotherinlaw": "Cuñado",
+        "sisterinlaw": "Cuñada",
+        "parentinlaw": "Suegro/a",
+        "childinlaw": "Yerno/Nuera",
+        "grandfather": "Abuelo",
+        "grandmother": "Abuela",
+        "grandparent": "Abuelo/a",
+        "grandson": "Nieto",
+        "granddaughter": "Nieta",
+        "grandchild": "Nieto/a"
       },
       "summaryType": {
         "beneficial_ownership": "Beneficiario",

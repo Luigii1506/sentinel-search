@@ -88,6 +88,22 @@ const RELATIONSHIP_SUBTYPE_KEYS = new Set([
   'sanctions',
   'profile',
   'profilecontext',
+  // In-laws (deben matchear ANTES que el substring 'mother'/'father'/'son'…).
+  'motherinlaw',
+  'fatherinlaw',
+  'soninlaw',
+  'daughterinlaw',
+  'brotherinlaw',
+  'sisterinlaw',
+  'parentinlaw',
+  'childinlaw',
+  // Abuelos / nietos.
+  'grandfather',
+  'grandmother',
+  'grandparent',
+  'grandson',
+  'granddaughter',
+  'grandchild',
 ]);
 
 export function translateSubtype(subtype?: string | null): string {
@@ -202,11 +218,14 @@ export function getRelationshipSubgroup(
 
   switch (sectionKey) {
     case 'family':
+      // Extended-family / in-law indicators FIRST: "mother-in-law" contiene
+      // "mother", "grandfather" contiene "father", etc. — si no se revisan
+      // antes, caerían en parents/children por substring.
+      if (has('in-law', 'in law', 'grand', 'uncle', 'aunt', 'nephew', 'niece', 'cousin')) return 'extendedFamily';
       if (has('wife', 'husband', 'spouse', 'partner', 'significant other', 'fiance', 'fiancé', 'fiancée', 'cohabitant')) return 'partner';
       if (has('son', 'daughter', 'child', 'stepson', 'stepdaughter', 'godson', 'goddaughter')) return 'children';
       if (has('father', 'mother', 'parent', 'stepfather', 'stepmother', 'godfather', 'godmother', 'godparent')) return 'parents';
       if (has('brother', 'sister', 'sibling', 'half-brother', 'half-sister', 'stepbrother', 'stepsister')) return 'siblings';
-      if (has('grand', 'uncle', 'aunt', 'nephew', 'niece', 'cousin', 'in-law')) return 'extendedFamily';
       return 'otherFamily';
     case 'associates':
       if (has('business partner', 'partner')) return 'partners';

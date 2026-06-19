@@ -337,7 +337,21 @@
         "representative": "Representative",
         "sanctions": "Sanction-related link",
         "profile": "Profile context",
-        "profilecontext": "Profile context"
+        "profilecontext": "Profile context",
+        "motherinlaw": "Mother-in-law",
+        "fatherinlaw": "Father-in-law",
+        "soninlaw": "Son-in-law",
+        "daughterinlaw": "Daughter-in-law",
+        "brotherinlaw": "Brother-in-law",
+        "sisterinlaw": "Sister-in-law",
+        "parentinlaw": "Parent-in-law",
+        "childinlaw": "Child-in-law",
+        "grandfather": "Grandfather",
+        "grandmother": "Grandmother",
+        "grandparent": "Grandparent",
+        "grandson": "Grandson",
+        "granddaughter": "Granddaughter",
+        "grandchild": "Grandchild"
       },
       "summaryType": {
         "beneficial_ownership": "Beneficial Owner",
