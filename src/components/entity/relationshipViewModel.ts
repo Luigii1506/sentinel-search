@@ -13,6 +13,7 @@ export type RelationshipSectionConfig = {
 };
 
 export type RelationshipLike = {
+  related_entity_id?: string;
   related_entity_name: string;
   related_entity_is_pep?: boolean;
   related_entity_risk_score?: number;
@@ -129,15 +130,19 @@ export function deriveRelationshipViewModel<T extends RelationshipLike>(args: {
   }
 
   for (const key of Object.keys(groupedByType)) {
+    // Final tiebreaker uses a language-independent key (related_entity_id)
+    // so the order stays stable when the UI language switches and display
+    // names change. Falls back to the name when there's no id.
+    const stableKey = (rel: T) => rel.related_entity_id || rel.related_entity_name;
     groupedByType[key].sort((a, b) => {
       if (referenceLike) {
         return getReferenceRelationshipSortScore(b) - getReferenceRelationshipSortScore(a)
-          || a.related_entity_name.localeCompare(b.related_entity_name);
+          || stableKey(a).localeCompare(stableKey(b));
       }
       return (b.relationship_strength || 0) - (a.relationship_strength || 0)
         || (b.related_entity_risk_score || 0) - (a.related_entity_risk_score || 0)
         || Number(Boolean(b.related_entity_is_pep)) - Number(Boolean(a.related_entity_is_pep))
-        || a.related_entity_name.localeCompare(b.related_entity_name);
+        || stableKey(a).localeCompare(stableKey(b));
     });
   }
 
