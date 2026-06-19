@@ -108,11 +108,24 @@ export function translateSubtype(subtype?: string | null): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-  const matchedKey = RELATIONSHIP_SUBTYPE_KEYS.has(compact)
+  let matchedKey: string | null = RELATIONSHIP_SUBTYPE_KEYS.has(compact)
     ? compact
     : RELATIONSHIP_SUBTYPE_KEYS.has(normalized)
       ? normalized
       : null;
+
+  // Granular FtM subtypes ("male first cousin", "paternal uncle", "half
+  // brother"…) don't match a key exactly. Fall back to a substring match
+  // against the known kinship/role roots (longest first) so they still
+  // localize instead of showing raw English.
+  if (!matchedKey) {
+    for (const key of SUBSTRING_MATCH_KEYS) {
+      if (compact.includes(key) || normalized.includes(key)) {
+        matchedKey = key;
+        break;
+      }
+    }
+  }
 
   if (matchedKey) {
     return i18n.t(`entity.relationships.subtype.${matchedKey}`, { defaultValue: capitalizedFallback });
@@ -120,6 +133,14 @@ export function translateSubtype(subtype?: string | null): string {
 
   return capitalizedFallback;
 }
+
+// Roots to substring-match for granular subtypes, longest first to avoid
+// premature short matches (e.g. match "brother" before "other").
+const SUBSTRING_MATCH_KEYS = [
+  'daughter', 'husband', 'brother', 'sister', 'spouse', 'cousin', 'father',
+  'mother', 'parent', 'sibling', 'partner', 'founder', 'member', 'owner',
+  'uncle', 'aunt', 'child', 'wife', 'son',
+];
 
 export function getReferenceRelationshipSection(rel: {
   related_entity_type?: string;

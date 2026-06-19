@@ -564,7 +564,7 @@ function TabPanelFallback({ lines = 4 }: { lines?: number }) {
 }
 
 export function EntityProfilePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -619,8 +619,9 @@ export function EntityProfilePage() {
     }
   };
 
+  const lang = (i18n.resolvedLanguage || i18n.language || 'es').split('-')[0] as 'es' | 'en';
   const { entity, isLoading, error, refetch } = useEntity(id, sourceLevel);
-  const { profile, isLoading: profileLoading } = useEntityProfile(id);
+  const { profile, isLoading: profileLoading } = useEntityProfile(id, lang);
   const isProfilePending = profileLoading && !profile;
   const referenceLikeForQueries = entity ? isReferenceLikeEntity(entity, profile) : isWikidataOnlyProfile(profile);
   const overviewStructuredFamilyCount =
@@ -645,7 +646,10 @@ export function EntityProfilePage() {
     level: relLevelFilter,
     aml_priority: relPriorityFilter,
     context_category: relContextFilter,
-    hide_noise: referenceLikeForQueries ? false : !includeContextualRelationships,
+    // Always fetch the full set (AML + contextual). The contextual toggle is
+    // applied client-side so the summary counts and the rendered list derive
+    // from one consistent source and always reconcile.
+    hide_noise: false,
     limit: 100,
   });
 
@@ -688,7 +692,6 @@ const hasSanctions =
   const contextualRelationships = profile?.connections?.contextual_relationships ?? Math.max(totalDetectedRelationships - amlVisibleRelationships, 0);
   const prioritizedRelationshipCounts = profile?.connections?.relationship_counts || {};
   const allRelationshipCounts = profile?.connections?.all_relationship_counts || {};
-  const contextualRelationshipCounts = profile?.connections?.contextual_relationship_counts || {};
   const hasRelationships = amlVisibleRelationships > 0;
   const hasContextualProfileData =
     !!profile?.header.description ||
@@ -699,7 +702,8 @@ const hasSanctions =
   const referenceLike = entity ? isReferenceLikeEntity(entity, profile) : false;
   const isCorporateEntity = entity?.entity_type === 'company' || entity?.entity_type === 'organization';
   const shouldShowRelationshipsTab = isProfilePending || hasRelationships || hasContextualProfileData;
-  const relationshipsTabCount = isProfilePending ? undefined : totalDetectedRelationships || undefined;
+  const relationshipsTabCount = relationshipsList?.total
+    ?? (isProfilePending ? undefined : totalDetectedRelationships || undefined);
   const showNetwork = hasRelationships;
   const showNetworkRisk = !referenceLike && ((entity?.overall_risk_score || 0) >= 40 || hasRelationships);
   const showUBO = isCorporateEntity && !referenceLike && hasRelationships;
@@ -1247,10 +1251,6 @@ const hasSanctions =
     referenceLike={referenceLike}
     includeContextualRelationships={includeContextualRelationships}
     setIncludeContextualRelationships={setIncludeContextualRelationships}
-    amlVisibleRelationships={amlVisibleRelationships}
-    contextualRelationships={contextualRelationships}
-    prioritizedRelationshipCounts={prioritizedRelationshipCounts}
-    contextualRelationshipCounts={contextualRelationshipCounts}
     showRelationshipFilters={showRelationshipFilters}
     setShowRelationshipFilters={setShowRelationshipFilters}
     relLevelFilter={relLevelFilter}

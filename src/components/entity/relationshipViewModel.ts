@@ -44,10 +44,16 @@ export const relationshipPriorityFilterOptions: Array<{ key: RelationshipPriorit
   { key: 'low', label: 'Low' },
 ];
 
+/** A relationship is "contextual" (profile context / noise) vs AML-core. */
+function isContextualRelationship(rel: RelationshipLike): boolean {
+  return rel.context_category === 'profile_context' || rel.context_category === 'unknown';
+}
+
 export function deriveRelationshipViewModel<T extends RelationshipLike>(args: {
   relationships: T[];
   relSearch: string;
   referenceLike: boolean;
+  includeContextual: boolean;
   sectionConfig: RelationshipSectionConfig[];
   getReferenceRelationshipSection: (rel: T) => string;
   getReferenceRelationshipSortScore: (rel: T) => number;
@@ -56,6 +62,7 @@ export function deriveRelationshipViewModel<T extends RelationshipLike>(args: {
     relationships,
     relSearch,
     referenceLike,
+    includeContextual,
     sectionConfig,
     getReferenceRelationshipSection,
     getReferenceRelationshipSortScore,
@@ -83,18 +90,38 @@ export function deriveRelationshipViewModel<T extends RelationshipLike>(args: {
       })
     : relationships;
 
+  // Split AML-core vs contextual. The contextual toggle filters client-side
+  // so every count derives from a single fetched set (hide_noise=false) and
+  // always reconciles with what's rendered.
+  const contextualRelationships = filteredRelationships.filter(isContextualRelationship);
+  const amlRelationships = filteredRelationships.filter((rel) => !isContextualRelationship(rel));
+  const visibleRelationships = includeContextual ? filteredRelationships : amlRelationships;
+
   const groupedByType: Record<string, T[]> = {};
   for (const section of sectionConfig) {
     groupedByType[section.key] = [];
   }
 
-  const resolvedRelationshipCount = filteredRelationships.filter((rel) => rel.is_resolved).length;
-  const unresolvedRelationshipCount = filteredRelationships.length - resolvedRelationshipCount;
-  const contextualVisibleRelationshipCount = filteredRelationships.filter(
-    (rel) => rel.context_category === 'profile_context' || rel.context_category === 'unknown'
-  ).length;
+  const resolvedRelationshipCount = visibleRelationships.filter((rel) => rel.is_resolved).length;
+  const unresolvedRelationshipCount = visibleRelationships.length - resolvedRelationshipCount;
 
-  for (const rel of filteredRelationships) {
+  const totalDetectedCount = filteredRelationships.length;
+  const amlVisibleCount = amlRelationships.length;
+  const contextualCount = contextualRelationships.length;
+  const contextualVisibleRelationshipCount = includeContextual ? contextualCount : 0;
+
+  // Per-type breakdown of the AML-core set (summary chips) and of the
+  // hidden contextual set.
+  const perTypeCounts: Record<string, number> = {};
+  for (const rel of amlRelationships) {
+    perTypeCounts[rel.type] = (perTypeCounts[rel.type] || 0) + 1;
+  }
+  const contextualPerTypeCounts: Record<string, number> = {};
+  for (const rel of contextualRelationships) {
+    contextualPerTypeCounts[rel.type] = (contextualPerTypeCounts[rel.type] || 0) + 1;
+  }
+
+  for (const rel of visibleRelationships) {
     const typeSection = referenceLike
       ? sectionConfig.find((section) => section.key === getReferenceRelationshipSection(rel)) || sectionConfig[sectionConfig.length - 1]
       : sectionConfig.find((section) => section.types.includes(rel.type)) || sectionConfig[sectionConfig.length - 1];
@@ -117,9 +144,15 @@ export function deriveRelationshipViewModel<T extends RelationshipLike>(args: {
   return {
     normalizedRelationshipSearch,
     filteredRelationships,
+    visibleRelationships,
     groupedByType,
     resolvedRelationshipCount,
     unresolvedRelationshipCount,
     contextualVisibleRelationshipCount,
+    totalDetectedCount,
+    amlVisibleCount,
+    contextualCount,
+    perTypeCounts,
+    contextualPerTypeCounts,
   };
 }

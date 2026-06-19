@@ -67,11 +67,28 @@ export type UnifiedCareerEntry = {
 };
 
 export function normalizePepRole(value?: string): string {
-  return (value || '')
+  const normalized = (value || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+
+  return normalized
+    .replace(/\bpresidente del gobierno de rusia\b/g, 'prime minister of russia')
+    .replace(/\bpresidente de la federacion\b/g, 'president of russia')
+    .replace(/\bestados unidos mexicanos\b/g, 'the united mexican states')
+    .replace(/\bpresidente del\b/g, 'president of')
+    .replace(/\bpresidente de la\b/g, 'president of')
+    .replace(/\bpresidente de los\b/g, 'president of')
+    .replace(/\bpresidente de\b/g, 'president of')
+    .replace(/\bprimer ministro\b/g, 'prime minister')
+    .replace(/\bjefe de gobierno\b/g, 'head of government')
+    .replace(/\bmovimiento de regeneracion nacional\b/g, 'national regeneration movement')
+    .replace(/\bpartido de la revolucion democratica\b/g, 'democratic revolution party')
+    .replace(/\bciudad de mexico\b/g, 'mexico city')
+    .replace(/\bfederacion de rusia\b/g, 'russian federation')
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
@@ -107,8 +124,6 @@ export function buildCanonicalPepEntries(entity?: APIEntity, profile?: EntityPro
     });
   }
 
-  const matchedLegacyIds = new Set<string>();
-
   const merged = profileEntries.map((entry, index) => {
     const role = String((entry as { name?: string; cargo?: string }).name || (entry as { cargo?: string }).cargo || '').trim();
     const startDate = (entry as { start_date?: string }).start_date;
@@ -121,17 +136,14 @@ export function buildCanonicalPepEntries(entity?: APIEntity, profile?: EntityPro
         pepDatesCompatible(legacy.end_date, endDate)
       );
     });
-    if (legacyMatch?.id) {
-      matchedLegacyIds.add(legacyMatch.id);
-    }
     const status = String((entry as { status?: string }).status || '').toLowerCase();
     const isCurrent = legacyMatch?.is_current ?? (status === 'current' || status === 'active' || (!endDate && Boolean(startDate)));
 
     return {
       id: legacyMatch?.id || `profile-pep-${index}`,
       category: legacyMatch?.category || entity?.pep_category || 'PEP',
-      role: legacyMatch?.role || role,
-      country: legacyMatch?.country || String((entry as { country?: string }).country || '').toUpperCase(),
+      role,
+      country: String((entry as { country?: string }).country || legacyMatch?.country || '').trim(),
       institution: legacyMatch?.institution,
       start_date: legacyMatch?.start_date || startDate,
       end_date: legacyMatch?.end_date || endDate,
@@ -144,8 +156,10 @@ export function buildCanonicalPepEntries(entity?: APIEntity, profile?: EntityPro
     } satisfies CanonicalPepEntry;
   });
 
-  const unmatchedLegacyEntries = legacyEntries.filter((legacy) => !matchedLegacyIds.has(legacy.id));
-  const combinedEntries = [...merged, ...unmatchedLegacyEntries];
+  // Cuando el profile v2 ya trae pep_positions, esa lista es la fuente
+  // canónica y localizada. Mantener legacyEntries no matcheados reintroduce
+  // duplicados cruzando idiomas (ej. ES from legacy + EN from profile).
+  const combinedEntries = [...merged];
 
   const deduped = new Map<string, CanonicalPepEntry>();
   combinedEntries.forEach((entry) => {

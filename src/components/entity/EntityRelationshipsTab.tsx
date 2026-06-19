@@ -30,10 +30,6 @@ type EntityRelationshipsTabProps = {
   referenceLike: boolean;
   includeContextualRelationships: boolean;
   setIncludeContextualRelationships: (value: boolean) => void;
-  amlVisibleRelationships: number;
-  contextualRelationships: number;
-  prioritizedRelationshipCounts: Record<string, number>;
-  contextualRelationshipCounts: Record<string, number>;
   showRelationshipFilters: boolean;
   setShowRelationshipFilters: (value: boolean | ((value: boolean) => boolean)) => void;
   relLevelFilter: RelationshipLevelFilter;
@@ -57,10 +53,6 @@ export function EntityRelationshipsTab({
   referenceLike,
   includeContextualRelationships,
   setIncludeContextualRelationships,
-  amlVisibleRelationships,
-  contextualRelationships,
-  prioritizedRelationshipCounts,
-  contextualRelationshipCounts,
   showRelationshipFilters,
   setShowRelationshipFilters,
   relLevelFilter,
@@ -160,21 +152,27 @@ export function EntityRelationshipsTab({
 
   const {
     normalizedRelationshipSearch,
-    filteredRelationships,
+    visibleRelationships,
     groupedByType,
     resolvedRelationshipCount,
     unresolvedRelationshipCount,
     contextualVisibleRelationshipCount,
+    totalDetectedCount,
+    amlVisibleCount,
+    contextualCount,
+    perTypeCounts,
+    contextualPerTypeCounts,
   } = useMemo(
     () => deriveRelationshipViewModel({
       relationships: relationshipsList?.relationships || [],
       relSearch: deferredRelSearch,
       referenceLike,
+      includeContextual: includeContextualRelationships,
       sectionConfig,
       getReferenceRelationshipSection,
       getReferenceRelationshipSortScore,
     }),
-    [deferredRelSearch, referenceLike, relationshipsList?.relationships, sectionConfig]
+    [deferredRelSearch, referenceLike, includeContextualRelationships, relationshipsList?.relationships, sectionConfig]
   );
 
   if (!relationshipsList) {
@@ -219,16 +217,16 @@ export function EntityRelationshipsTab({
   return (
     <div className="space-y-6">
       <RelationshipSummaryHeader
-        amlVisibleRelationships={amlVisibleRelationships}
-        totalDetectedRelationships={totalDetectedRelationships}
+        amlVisibleRelationships={amlVisibleCount}
+        totalDetectedRelationships={totalDetectedCount}
         resolvedRelationshipCount={resolvedRelationshipCount}
         unresolvedRelationshipCount={unresolvedRelationshipCount}
-        contextualRelationships={contextualRelationships}
+        contextualRelationships={contextualCount}
         contextualVisibleRelationshipCount={contextualVisibleRelationshipCount}
         includeContextualRelationships={includeContextualRelationships}
         referenceLike={referenceLike}
-        prioritizedRelationshipCounts={prioritizedRelationshipCounts}
-        contextualRelationshipCounts={contextualRelationshipCounts}
+        prioritizedRelationshipCounts={perTypeCounts}
+        contextualRelationshipCounts={contextualPerTypeCounts}
       />
 
       <RelationshipFiltersPanel
@@ -246,12 +244,12 @@ export function EntityRelationshipsTab({
         relSearch={relSearch}
         setRelSearch={setRelSearch}
         normalizedRelationshipSearch={normalizedRelationshipSearch}
-        filteredRelationshipsCount={filteredRelationships.length}
+        filteredRelationshipsCount={visibleRelationships.length}
         contextFilterOptions={relationshipContextFilterOptions}
         priorityFilterOptions={relationshipPriorityFilterOptions}
       />
 
-      {filteredRelationships.length === 0 ? (
+      {visibleRelationships.length === 0 ? (
         <div className="glass rounded-xl p-8 text-center">
           <Search className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
           <h3 className="text-lg font-medium text-foreground mb-2">{t('entity.relationships.noMatches.title')}</h3>
