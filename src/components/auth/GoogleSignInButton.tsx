@@ -16,6 +16,7 @@
  */
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import api from '@/services/api';
 
 interface GoogleSignInButtonProps {
@@ -31,9 +32,10 @@ interface GoogleSignInButtonProps {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 
 export function GoogleSignInButton({
-  label = 'Continuar con Google',
+  label,
   hideDivider = false,
 }: GoogleSignInButtonProps) {
+  const { t } = useTranslation();
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const location = useLocation();
 
@@ -70,7 +72,7 @@ export function GoogleSignInButton({
       {!hideDivider && (
         <div className="flex items-center gap-3 text-xs text-muted-foreground uppercase tracking-wider">
           <div className="flex-1 h-px bg-foreground/10" />
-          <span>o</span>
+          <span>{t('common.auth.or')}</span>
           <div className="flex-1 h-px bg-foreground/10" />
         </div>
       )}
@@ -84,7 +86,7 @@ export function GoogleSignInButton({
         className="w-full inline-flex items-center justify-center gap-3 rounded-md border border-foreground/15 bg-white hover:bg-gray-50 text-gray-800 font-medium px-4 py-2.5 transition-colors"
       >
         <GoogleGlyph className="w-4 h-4" />
-        <span>{label}</span>
+        <span>{label ?? t('common.auth.signInWithGoogle')}</span>
       </button>
     </div>
   );

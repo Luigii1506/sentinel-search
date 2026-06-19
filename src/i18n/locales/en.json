@@ -58,7 +58,32 @@
       "company": "Company",
       "vessel": "Vessel",
       "aircraft": "Aircraft",
-      "organization": "Organization"
+      "organization": "Organization",
+      "entity": "Entity"
+    },
+    "errors": {
+      "recovering": "Service recovering",
+      "recoveringRetry": "{{detail}}. Retrying in {{secs}}s…",
+      "sessionExpired": "Session expired. Please sign in again.",
+      "forbidden": "You don't have permission to perform this action.",
+      "tooManyRequests": "Too many requests. Please wait a moment.",
+      "dailyLimit": "You've reached your daily limit.",
+      "quotaDescription": "Current plan: {{limit}} searches/day. Resets: {{reset}}.",
+      "server": "Server error. Try again later.",
+      "stillDegraded": "Service is still degraded. Retry in a minute.",
+      "network": "Connection error. Check your internet connection.",
+      "field": "field",
+      "soon": "soon"
+    },
+    "auth": {
+      "signInWithGoogle": "Sign in with Google",
+      "invalidCredentials": "Invalid credentials. Please try again.",
+      "signedOut": "Signed out successfully",
+      "accountCreated": "Account created. Welcome!",
+      "welcome": "Welcome",
+      "welcomeNamed": "Welcome, {{name}}",
+      "signupFailed": "Couldn't create the account",
+      "or": "or"
     }
   },
   "nav": {

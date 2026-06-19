@@ -58,7 +58,32 @@
       "company": "Empresa",
       "vessel": "Embarcación",
       "aircraft": "Aeronave",
-      "organization": "Organización"
+      "organization": "Organización",
+      "entity": "Entidad"
+    },
+    "errors": {
+      "recovering": "Servicio recuperándose",
+      "recoveringRetry": "{{detail}}. Reintentando en {{secs}}s…",
+      "sessionExpired": "Sesión expirada. Por favor inicia sesión nuevamente.",
+      "forbidden": "No tienes permisos para realizar esta acción.",
+      "tooManyRequests": "Demasiadas solicitudes. Por favor espera un momento.",
+      "dailyLimit": "Has alcanzado el límite diario.",
+      "quotaDescription": "Plan actual: {{limit}} búsquedas/día. Resetea: {{reset}}.",
+      "server": "Error del servidor. Intenta más tarde.",
+      "stillDegraded": "El servicio sigue degradado. Reintenta en un minuto.",
+      "network": "Error de conexión. Verifica tu internet.",
+      "field": "campo",
+      "soon": "pronto"
+    },
+    "auth": {
+      "signInWithGoogle": "Iniciar sesión con Google",
+      "invalidCredentials": "Credenciales inválidas. Intenta nuevamente.",
+      "signedOut": "Sesión cerrada correctamente",
+      "accountCreated": "Cuenta creada. ¡Bienvenido!",
+      "welcome": "Bienvenido",
+      "welcomeNamed": "Bienvenido, {{name}}",
+      "signupFailed": "No se pudo crear la cuenta",
+      "or": "o"
     }
   },
   "nav": {

@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import i18n from '@/i18n';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -138,20 +139,8 @@ export function getRiskLabel(riskLevel: string): string {
 
 // Get entity type icon
 export function getEntityTypeLabel(type: string): string {
-  switch (type) {
-    case 'person':
-      return 'Persona';
-    case 'company':
-      return 'Empresa';
-    case 'vessel':
-      return 'Embarcación';
-    case 'aircraft':
-      return 'Aeronave';
-    case 'organization':
-      return 'Organización';
-    default:
-      return 'Entidad';
-  }
+  const known = new Set(['person', 'company', 'vessel', 'aircraft', 'organization']);
+  return i18n.t(`common.entityType.${known.has(type) ? type : 'entity'}`);
 }
 
 // Get source badge color

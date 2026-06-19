@@ -1,6 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import { toast } from 'sonner';
-import { currentLang } from '@/i18n';
+import i18n, { currentLang } from '@/i18n';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000';
 const CSRF_COOKIE_NAME = 'pld_csrf';
@@ -75,8 +75,8 @@ api.interceptors.response.use(
       );
       const detail =
         (error.response.data as { detail?: string })?.detail ||
-        'Servicio recuperándose';
-      toast.warning(`${detail}. Reintentando en ${retryAfterSec}s…`);
+        i18n.t('common.errors.recovering');
+      toast.warning(i18n.t('common.errors.recoveringRetry', { detail, secs: retryAfterSec }));
       await new Promise((r) => setTimeout(r, retryAfterSec * 1000));
       return api(originalRequest);
     }
@@ -101,7 +101,7 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         if (!isPublicAuthRoute(currentPath)) {
-          toast.error('Sesión expirada. Por favor inicia sesión nuevamente.');
+          toast.error(i18n.t('common.errors.sessionExpired'));
           window.location.href = '/login';
         }
         return Promise.reject(refreshError);
@@ -111,14 +111,14 @@ api.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 403:
-          toast.error('No tienes permisos para realizar esta acción.');
+          toast.error(i18n.t('common.errors.forbidden'));
           break;
         case 422: {
           const data = error.response.data as { detail?: Array<{ msg: string; loc: string[] }> | string };
           if (Array.isArray(data.detail)) {
             const firstError = data.detail[0];
             if (firstError && typeof firstError === 'object') {
-              const field = firstError.loc?.join('.') || 'campo';
+              const field = firstError.loc?.join('.') || i18n.t('common.errors.field');
               toast.error(`${field}: ${firstError.msg}`);
             }
           } else if (typeof data.detail === 'string') {
@@ -127,7 +127,7 @@ api.interceptors.response.use(
           break;
         }
         case 429:
-          toast.error('Demasiadas solicitudes. Por favor espera un momento.');
+          toast.error(i18n.t('common.errors.tooManyRequests'));
           break;
         case 402: {
           const headers = error.response.headers;
@@ -135,10 +135,10 @@ api.interceptors.response.use(
           const reset = headers['x-quota-reset'];
           const detail =
             (error.response.data as { detail?: string })?.detail ||
-            'Has alcanzado el límite diario.';
+            i18n.t('common.errors.dailyLimit');
           toast.error(detail, {
             description: limit
-              ? `Plan actual: ${limit} búsquedas/día. Resetea: ${reset || 'pronto'}.`
+              ? i18n.t('common.errors.quotaDescription', { limit, reset: reset || i18n.t('common.errors.soon') })
               : undefined,
             action: {
               label: 'Upgrade',
@@ -157,10 +157,10 @@ api.interceptors.response.use(
           break;
         }
         case 500:
-          toast.error('Error del servidor. Intenta más tarde.');
+          toast.error(i18n.t('common.errors.server'));
           break;
         case 503:
-          toast.error('Servicio sigue degradado. Por favor reintenta en un minuto.');
+          toast.error(i18n.t('common.errors.stillDegraded'));
           break;
         default: {
           const message = (error.response.data as { detail?: string })?.detail;
@@ -170,7 +170,7 @@ api.interceptors.response.use(
         }
       }
     } else if (error.request) {
-      toast.error('Error de conexión. Verifica tu internet.');
+      toast.error(i18n.t('common.errors.network'));
     }
 
     return Promise.reject(error);

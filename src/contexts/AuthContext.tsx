@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { authService, type SignupCredentials } from '@/services/auth';
 import type { User, LoginCredentials } from '@/types/api';
 import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 interface AuthContextType {
   user: User | null;
@@ -44,13 +45,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Failed to load user profile after login');
       }
       setUser(userData);
-      toast.success(`Bienvenido${userData.first_name ? `, ${userData.first_name}` : ''}`);
+      toast.success(
+        userData.first_name
+          ? i18n.t('common.auth.welcomeNamed', { name: userData.first_name })
+          : i18n.t('common.auth.welcome'),
+      );
     } catch (error: unknown) {
       console.error('Login error:', error);
       const detail =
         (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       const friendly =
-        typeof detail === 'string' ? detail : 'Credenciales inválidas. Intenta nuevamente.';
+        typeof detail === 'string' ? detail : i18n.t('common.auth.invalidCredentials');
       toast.error(friendly);
       throw error;
     } finally {
@@ -62,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await authService.logout();
       setUser(null);
-      toast.success('Sesión cerrada correctamente');
+      toast.success(i18n.t('common.auth.signedOut'));
     } catch (error) {
       console.error('Logout error:', error);
       setUser(null);
@@ -78,11 +83,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Failed to load user profile after signup');
       }
       setUser(userData);
-      toast.success('Cuenta creada. ¡Bienvenido!');
+      toast.success(i18n.t('common.auth.accountCreated'));
     } catch (error: unknown) {
       const detail =
         (error as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
-      toast.error(detail || 'No se pudo crear la cuenta');
+      toast.error(detail || i18n.t('common.auth.signupFailed'));
       throw error;
     } finally {
       setIsLoading(false);
