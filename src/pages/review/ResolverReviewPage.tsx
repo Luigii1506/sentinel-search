@@ -5,7 +5,7 @@ import { useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus } from 'lucide-react';
+import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus, Copy, Fingerprint } from 'lucide-react';
 import { resolverService, type UnsurePair } from '@/services/resolver';
 import { entityService } from '@/services/entities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -150,7 +150,9 @@ export function ResolverReviewPage() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-base">
                 <span>{t('review.resolver.sameEntityQuestion')}</span>
-                {pair.score !== null && <Badge variant="outline">{t('review.resolver.score')}: {pair.score.toFixed(3)}</Badge>}
+                {pair.score !== null
+                  ? <Badge variant="outline">{t('review.resolver.score')}: {(pair.score * 100).toFixed(0)}%</Badge>
+                  : <Badge variant="outline" className="text-amber-600 dark:text-amber-400">{t('review.resolver.ruleMatch', { defaultValue: 'Regla de identificador' })}</Badge>}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -162,6 +164,7 @@ export function ResolverReviewPage() {
                   right={rightEnt}
                   leftId={pair.source}
                   rightId={pair.target}
+                  matchUser={pair.user}
                   navigate={navigate}
                 />
               )}
@@ -188,6 +191,48 @@ export function ResolverReviewPage() {
   );
 }
 
+/** Normaliza identifiers (scalar o lista) a {clave: string[]}. */
+function idValues(identifiers: Record<string, any> | undefined | null): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  if (!identifiers || typeof identifiers !== 'object') return out;
+  for (const [k, v] of Object.entries(identifiers)) {
+    if (v == null || v === '') continue;
+    const arr = (Array.isArray(v) ? v : [v]).map((x) => String(x).trim()).filter(Boolean);
+    if (arr.length) out[k] = arr;
+  }
+  return out;
+}
+
+/** Extrae la clave de identificador del "user" del judgement (xref-gt-<key>). */
+function parseMatchKey(user?: string): string | null {
+  const m = (user || '').match(/^xref-gt-(.+)$/);
+  return m ? m[1] : null;
+}
+
+/** Copia texto al portapapeles con feedback. */
+async function copyText(value: string, label?: string) {
+  try {
+    await navigator.clipboard.writeText(value);
+    toast.success(`Copiado: ${label ?? value}`);
+  } catch {
+    toast.error('No se pudo copiar');
+  }
+}
+
+/** Botón pequeño para copiar un valor al portapapeles. */
+function CopyButton({ value, label }: { value: string; label?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => { e.stopPropagation(); void copyText(value, label); }}
+      className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors align-middle ml-1"
+      title="Copiar al portapapeles"
+    >
+      <Copy className="h-3 w-3" />
+    </button>
+  );
+}
+
 /** Normaliza un APIEntity (campos reales del backend) a una vista comparable. */
 function extractEntity(e: any) {
   const sources: string[] = e?.data_sources || e?.sources || e?.overview?.sources || [];
@@ -201,6 +246,7 @@ function extractEntity(e: any) {
     isPep: Boolean(e?.is_current_pep ?? e?.overview?.is_current_pep),
     isSanctioned: Boolean(e?.is_sanctioned ?? ((e?.sanctions || e?.overview?.sanctions || []).length > 0)),
     sources,
+    identifiers: idValues(e?.identifiers),
   };
 }
 
@@ -237,14 +283,43 @@ function RiskCell({ score, level }: { score?: number; level?: string }) {
   return <span className={`font-medium ${cls}`}>{score ?? '—'}{level ? ` · ${level}` : ''}</span>;
 }
 
-function EntityComparison({ left, right, leftId, rightId, navigate }: {
+function EntityComparison({ left, right, leftId, rightId, matchUser, navigate }: {
   left: EntitySummary | null; right: EntitySummary | null;
-  leftId: string; rightId: string; navigate: ReturnType<typeof useNavigate>;
+  leftId: string; rightId: string; matchUser?: string; navigate: ReturnType<typeof useNavigate>;
 }) {
   const { t } = useTranslation();
   const a = extractEntity(left);
   const b = extractEntity(right);
   const sharedSources = a.sources.filter((s) => b.sources.includes(s));
+
+  // ¿Por qué hacen match? El judgement viene de xref-gt-<clave>: comparten ese id.
+  const matchKey = parseMatchKey(matchUser);
+  const sharedIdVals = matchKey
+    ? (a.identifiers[matchKey] || []).filter((v) => (b.identifiers[matchKey] || []).includes(v))
+    : [];
+  const namesDiffer = norm(a.name) && norm(b.name) && norm(a.name) !== norm(b.name);
+
+  const idsCell = (ids: Record<string, string[]>) => {
+    const keys = Object.keys(ids);
+    if (!keys.length) return <span className="text-muted-foreground">—</span>;
+    return (
+      <div className="space-y-0.5">
+        {keys.map((k) => (
+          <div key={k} className="text-xs flex items-center gap-1 flex-wrap">
+            <span className="text-muted-foreground">{k}:</span>
+            {ids[k].map((v, i) => {
+              const shared = matchKey === k && sharedIdVals.includes(v);
+              return (
+                <span key={i} className={`font-mono inline-flex items-center ${shared ? 'bg-green-500/20 text-green-700 dark:text-green-300 px-1 rounded' : ''}`}>
+                  {v}<CopyButton value={v} label={k} />
+                </span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const HeaderCell = ({ side, name, id }: { side: string; name: string; id: string }) => (
     <div className="px-3 py-2 border-l border-foreground/5">
@@ -254,8 +329,11 @@ function EntityComparison({ left, right, leftId, rightId, navigate }: {
           {t('review.resolver.viewProfile')} <ExternalLink className="h-3 w-3" />
         </button>
       </div>
-      <div className="text-foreground font-semibold mt-1 leading-tight">{humanizeEntityName(name) || <span className="font-mono text-xs text-muted-foreground">{id.slice(0, 12)}…</span>}</div>
-      <div className="text-[10px] text-muted-foreground font-mono mt-0.5">{id.slice(0, 18)}…</div>
+      <div className="text-foreground font-semibold mt-1 leading-tight flex items-center gap-1">
+        <span>{humanizeEntityName(name) || <span className="font-mono text-xs text-muted-foreground">{id.slice(0, 12)}…</span>}</span>
+        {name && <CopyButton value={humanizeEntityName(name)} label="nombre" />}
+      </div>
+      <div className="text-[10px] text-muted-foreground font-mono mt-0.5 flex items-center">{id.slice(0, 18)}…<CopyButton value={id} label="ID" /></div>
     </div>
   );
 
@@ -274,6 +352,36 @@ function EntityComparison({ left, right, leftId, rightId, navigate }: {
   );
 
   return (
+    <div className="space-y-3">
+      {/* ¿Por qué hacen match? */}
+      {matchKey && (
+        <div className="rounded-lg border border-blue-500/20 bg-blue-500/5 px-3 py-2.5 text-sm">
+          <div className="flex items-center gap-2 font-medium text-blue-700 dark:text-blue-300">
+            <Fingerprint className="h-4 w-4" />
+            {t('review.resolver.whyMatch', { defaultValue: '¿Por qué se proponen?' })}
+          </div>
+          <div className="mt-1 text-muted-foreground">
+            {sharedIdVals.length > 0 ? (
+              <>
+                {t('review.resolver.matchByIdentifier', { defaultValue: 'Comparten el identificador' })}{' '}
+                <span className="font-mono font-semibold text-foreground">{matchKey}</span>{' = '}
+                {sharedIdVals.map((v, i) => (
+                  <span key={i} className="font-mono bg-green-500/20 text-green-700 dark:text-green-300 px-1 rounded mr-1">
+                    {v}<CopyButton value={v} label={matchKey} />
+                  </span>
+                ))}
+                <span className="block mt-1 text-xs">
+                  {t('review.resolver.ruleNotName', { defaultValue: 'Es una coincidencia por REGLA de identificador, no por similitud de nombre.' })}
+                  {namesDiffer && ' ' + t('review.resolver.namesDifferWarn', { defaultValue: 'Los nombres son distintos — si el identificador es de baja calidad (p. ej. un número corto que no es un ID válido), probablemente NO sean la misma entidad.' })}
+                </span>
+              </>
+            ) : (
+              t('review.resolver.matchStaleId', { defaultValue: `Se propusieron por compartir un identificador (${matchKey}), pero ya no comparten ese valor.` })
+            )}
+          </div>
+        </div>
+      )}
+
     <div className="rounded-xl border border-foreground/10 overflow-hidden">
       <div className="grid grid-cols-[120px_1fr_1fr]">
         <div className="px-3 py-2 text-xs uppercase tracking-wide text-muted-foreground self-center">{t('review.resolver.fieldLabel', { defaultValue: 'Campo' })}</div>
@@ -287,11 +395,13 @@ function EntityComparison({ left, right, leftId, rightId, navigate }: {
       <CompareRow label={t('review.resolver.fieldBirth', { defaultValue: 'Nacimiento' })} a={a.dob} b={b.dob} />
       <CompareRow label={t('review.resolver.fieldFlags', { defaultValue: 'Señales' })} a={flags(a)} b={flags(b)} />
       <CompareRow label={t('review.resolver.sources')} a={sourcesCell(a)} b={sourcesCell(b)} />
+      <CompareRow label={t('review.resolver.fieldIdentifiers', { defaultValue: 'Identificadores' })} a={idsCell(a.identifiers)} b={idsCell(b.identifiers)} />
       {sharedSources.length > 0 && (
         <div className="px-3 py-2 border-t border-foreground/5 bg-green-500/5 text-xs text-green-700 dark:text-green-400">
           {t('review.resolver.sharedSources', { defaultValue: 'Fuentes en común' })}: {sharedSources.slice(0, 6).join(', ')}
         </div>
       )}
+    </div>
     </div>
   );
 }
