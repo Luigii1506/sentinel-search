@@ -1,15 +1,20 @@
 import { Suspense, lazy, useEffect, type ComponentType } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { motion, AnimatePresence } from 'framer-motion';
+import { easeWater } from '@/lib/motion';
 import i18n from '@/i18n';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SearchHistoryProvider } from '@/contexts/SearchHistoryContext';
 import { useSidebarCollapse } from '@/hooks/useSidebarCollapse';
 import { useCommandPalette } from '@/hooks/useCommandPalette';
 import { ListPageSkeleton } from '@/components/foundation';
 import { cn } from '@/lib/utils';
 import { RoleGate } from '@/components/RoleGate';
 import { PublicOnlyRoute } from '@/components/PublicOnlyRoute';
+import { Sidebar, TopbarMobile } from '@/components/Sidebar';
+import { SearchSidebar } from '@/components/search/SearchSidebar';
 import type { Role } from '@/hooks/usePermissions';
 
 // Create Query Client
@@ -33,8 +38,6 @@ function lazyNamedPage<TModule extends Record<string, unknown>>(
   });
 }
 
-const Sidebar = lazyNamedPage(() => import('@/components/Sidebar'), 'Sidebar');
-const TopbarMobile = lazyNamedPage(() => import('@/components/Sidebar'), 'TopbarMobile');
 const CommandPalette = lazyNamedPage(() => import('@/components/CommandPalette'), 'CommandPalette');
 const LoginPage = lazyNamedPage(() => import('@/pages/auth/LoginPage'), 'LoginPage');
 const SignUpPage = lazyNamedPage(() => import('@/pages/auth/SignUpPage'), 'SignUpPage');
@@ -84,34 +87,65 @@ function RouteLoadingFallback() {
 //
 // Shell: persistent sidebar (240/60px) on lg+, off-canvas drawer + slim
 // topbar on < lg. CommandPalette is mounted at the layout level so
-// ⌘K / Ctrl+K works on any route (the hook also binds the global
-// keydown listener once).
+// ⌘K / Ctrl+K works on any route.
+//
+// MODO BÚSQUEDA: en /search el nav principal se reemplaza por completo por
+// el SearchSidebar (historial). El morph es un AnimatePresence sobre el rail
+// fijo + una transición suave del padding de <main> (el centro "crece" de
+// ancho), y un reveal de arriba-hacia-abajo del contenido en cada ruta.
 function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const { open, setOpen } = useCommandPalette();
   const { collapsed, toggle } = useSidebarCollapse();
+  const location = useLocation();
+  const isSearchMode = location.pathname === '/search';
+
+  // Rail width: 264px en modo búsqueda (SearchSidebar), 60/240 en nav normal.
+  // Clases estáticas para que Tailwind JIT las genere.
+  const railPadding = isSearchMode
+    ? 'lg:pl-[264px]'
+    : collapsed
+      ? 'lg:pl-[60px]'
+      : 'lg:pl-[240px]';
 
   return (
     <>
-      <Suspense fallback={null}>
-        <Sidebar
-          onToggleCommand={() => setOpen(true)}
-          collapsed={collapsed}
-          onToggleCollapse={toggle}
-        />
-        <TopbarMobile onToggleCommand={() => setOpen(true)} />
-      </Suspense>
+      {/* Desktop rail — morphs nav ⇄ historial */}
+      <AnimatePresence initial={false}>
+        {isSearchMode ? (
+          <SearchSidebar key="search-rail" />
+        ) : (
+          <Sidebar
+            key="nav-rail"
+            onToggleCommand={() => setOpen(true)}
+            collapsed={collapsed}
+            onToggleCollapse={toggle}
+          />
+        )}
+      </AnimatePresence>
+
+      <TopbarMobile onToggleCommand={() => setOpen(true)} />
+
       {open ? (
         <Suspense fallback={null}>
           <CommandPalette open={open} onOpenChange={setOpen} />
         </Suspense>
       ) : null}
+
       <main
         className={cn(
-          'min-h-screen transition-[padding] duration-200',
-          collapsed ? 'lg:pl-[60px]' : 'lg:pl-[240px]',
+          'min-h-screen transition-[padding] duration-[1100ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]',
+          railPadding,
         )}
       >
-        {children}
+        {/* Reveal de contenido por ruta — de arriba hacia abajo, fluido. */}
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0, y: -22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: easeWater }}
+        >
+          {children}
+        </motion.div>
       </main>
     </>
   );
@@ -151,6 +185,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <SearchHistoryProvider>
         <Router>
           <div className="min-h-screen bg-background text-foreground">
             <Routes>
@@ -378,6 +413,7 @@ function App() {
             />
           </div>
         </Router>
+        </SearchHistoryProvider>
       </AuthProvider>
       {ReactQueryDevtools && (
         <Suspense fallback={null}>

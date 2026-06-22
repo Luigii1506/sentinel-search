@@ -31,6 +31,14 @@
       "vessel": "Embarcaciones sancionadas",
       "offshore": "Empresas en paraísos fiscales",
       "terrorism": "Vinculados a actividades terroristas"
+    },
+    "historySidebar": {
+      "backHome": "Volver al inicio",
+      "newSearch": "Nueva búsqueda",
+      "title": "Historial",
+      "clearAll": "Limpiar historial",
+      "emptyTitle": "Sin búsquedas aún",
+      "emptyDescription": "Tus búsquedas aparecerán aquí. Haz clic para retomarlas al instante."
     }
   },
   "bulk": {

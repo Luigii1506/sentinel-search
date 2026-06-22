@@ -31,6 +31,14 @@
       "vessel": "Sanctioned vessels",
       "offshore": "Companies in tax havens",
       "terrorism": "Linked to terrorist activities"
+    },
+    "historySidebar": {
+      "backHome": "Back to home",
+      "newSearch": "New search",
+      "title": "History",
+      "clearAll": "Clear history",
+      "emptyTitle": "No searches yet",
+      "emptyDescription": "Your searches will appear here. Click one to revisit it instantly."
     }
   },
   "bulk": {

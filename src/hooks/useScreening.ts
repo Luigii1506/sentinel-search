@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { screeningService } from '@/services/screening';
-import type { ScreeningRequest, ScreeningMatch, ScreeningResponse } from '@/types/api';
+import type { ScreeningRequest, ScreeningMatch, ScreeningResponse, AdvancedScreeningFields } from '@/types/api';
 
 export interface SearchFilters {
   entityTypes: string[];
@@ -36,8 +36,19 @@ export interface UseScreeningReturn {
   setFilters: (filters: SearchFilters) => void;
   setSearchMode: (mode: 'traditional' | 'semantic' | 'auto') => void;
   clearSearch: () => void;
-  executeSearch: (searchQuery: string) => void;
+  executeSearch: (searchQuery: string, advanced?: AdvancedScreeningFields) => void;
   executeSemanticSearch: (searchQuery: string) => void;
+  /**
+   * Hidrata la vista con un snapshot guardado (historial) SIN golpear el
+   * backend. Restaura el estado histórico exacto: query, modo y matches.
+   */
+  restoreSnapshot: (snapshot: {
+    query: string;
+    results: ScreeningMatch[];
+    resultCount: number;
+    searchMode: 'traditional' | 'semantic' | 'auto';
+    executionTimeMs?: number;
+  }) => void;
   clearCache: () => void;
 }
 
@@ -139,8 +150,9 @@ export function useScreening(
     setQueryState(newQuery);
   }, []);
 
-  // Execute optimized search (auto mode)
-  const executeSearch = useCallback((searchQuery: string) => {
+  // Execute optimized search (auto mode). `advanced` = campos multi-campo
+  // opcionales (RFC/DOB/pasaporte/país) que el backend usa para desambiguar.
+  const executeSearch = useCallback((searchQuery: string, advanced?: AdvancedScreeningFields) => {
     const trimmedQuery = searchQuery.trim();
     if (!trimmedQuery || trimmedQuery.length < 2) return;
 
@@ -159,6 +171,7 @@ export function useScreening(
         countries: filters.countries.length > 0 ? filters.countries : undefined,
         risk_levels: filters.riskLevels.length > 0 ? filters.riskLevels : undefined,
       },
+      advanced,
     };
 
     void runSearch(request);
@@ -180,6 +193,39 @@ export function useScreening(
       min_similarity: 0.4,
     });
   }, [semanticSearchMutation]);
+
+  // Restore a saved snapshot (search history) without any network call.
+  const restoreSnapshot = useCallback(
+    (snapshot: {
+      query: string;
+      results: ScreeningMatch[];
+      resultCount: number;
+      searchMode: 'traditional' | 'semantic' | 'auto';
+      executionTimeMs?: number;
+    }) => {
+      inFlightTokenRef.current++; // invalida cualquier búsqueda en vuelo
+      semanticSearchMutation.reset(); // fuerza a getResults() a leer de searchData
+      setSearchPending(false);
+      setSuggestions([]);
+      setQueryState(snapshot.query);
+      setSearchMode(snapshot.searchMode);
+      setHasSearched(true);
+      setSearchData({
+        query: snapshot.query,
+        total_matches: snapshot.resultCount,
+        matches: snapshot.results,
+        execution_time_ms: snapshot.executionTimeMs ?? 0,
+        filters_applied: {},
+      });
+      setPerformance({
+        executionTimeMs: snapshot.executionTimeMs ?? 0,
+        fromCache: true,
+        strategy: 'snapshot',
+        sourcesUsed: [],
+      });
+    },
+    [semanticSearchMutation],
+  );
 
   // Clear search
   const clearSearch = useCallback(() => {
@@ -250,6 +296,7 @@ export function useScreening(
     clearSearch,
     executeSearch,
     executeSemanticSearch,
+    restoreSnapshot,
     clearCache,
   };
 }

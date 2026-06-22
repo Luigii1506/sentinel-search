@@ -14,6 +14,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
+import { springRail } from '@/lib/motion';
 import {
   Search,
   LayoutDashboard,
@@ -428,7 +430,12 @@ interface SidebarProps {
 export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: SidebarProps) {
   const { t } = useTranslation();
   return (
-    <aside
+    <motion.aside
+      key="nav-rail"
+      initial={{ opacity: 0, y: -28 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -28 }}
+      transition={springRail}
       className={cn(
         'hidden lg:flex fixed inset-y-0 left-0 z-30 flex-col',
         'bg-sidebar border-r border-sidebar-border',
@@ -453,7 +460,7 @@ export function Sidebar({ onToggleCommand, collapsed, onToggleCollapse }: Sideba
       >
         {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
       </button>
-    </aside>
+    </motion.aside>
   );
 }
 

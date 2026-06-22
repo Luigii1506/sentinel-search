@@ -153,7 +153,17 @@
     "suggestions": "Sugerencias",
     "match": "{{score}}% coincidencia",
     "pressEnter": "Presiona Enter para buscar",
-    "navigate": "para navegar"
+    "navigate": "para navegar",
+    "advanced": {
+      "toggle": "Búsqueda avanzada",
+      "title": "Campos adicionales (desambiguación)",
+      "rfc": "RFC / ID fiscal",
+      "passport": "Pasaporte",
+      "nationalId": "ID nacional / cédula",
+      "birthDate": "Fecha de nacimiento",
+      "country": "País",
+      "wikidataId": "Wikidata ID"
+    }
   },
   "home": {
     "badge": "Live · Screening en tiempo real",

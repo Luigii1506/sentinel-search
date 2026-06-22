@@ -201,6 +201,12 @@ export const screeningService = {
    * Calls API directly to preserve all response fields
    */
   async search(request: ScreeningRequest & { engine?: 'v1' | 'v2' }): Promise<ScreeningResponse> {
+    // Campos avanzados multi-campo: solo se envían los definidos (el backend
+    // los usa para desambiguar vía v2 ML — RFC/DOB/pasaporte/país).
+    const adv = request.advanced || {};
+    const advancedBody = Object.fromEntries(
+      Object.entries(adv).filter(([, v]) => v != null && String(v).trim() !== ''),
+    );
     const response = await api.post('/api/v2/screen/gold', {
       name: request.name,
       max_results: request.max_results ?? 50,
@@ -208,6 +214,7 @@ export const screeningService = {
       source_level: request.source_level,
       lang: 'es',
       ...(request.engine ? { engine: request.engine } : {}),
+      ...advancedBody,
     });
 
     const entityTypeMap: Record<string, string> = {

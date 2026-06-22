@@ -42,6 +42,21 @@ export interface ScreeningRequest {
     countries?: string[];
     risk_levels?: string[];
   };
+  /** Búsqueda multi-campo: identificadores + atributos para desambiguar
+   *  (activan el scoring ML v2 en el backend). Todos opcionales. */
+  advanced?: AdvancedScreeningFields;
+}
+
+/** Campos opcionales de screening multi-campo (RFC, fecha nac., pasaporte, …). */
+export interface AdvancedScreeningFields {
+  birth_date?: string;   // "YYYY" o "YYYY-MM-DD"
+  country?: string;
+  nationality?: string;
+  rfc?: string;
+  tax_id?: string;
+  passport?: string;
+  national_id?: string;
+  wikidata_id?: string;
 }
 
 export interface SanctionDetail {

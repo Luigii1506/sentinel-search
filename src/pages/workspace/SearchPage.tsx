@@ -26,8 +26,9 @@ import { SourceLevelSelector } from "@/components/SourceLevelSelector";
 import { SemanticSearchToggle } from "@/components/search/SemanticSearchToggle";
 import { SemanticResults } from "@/components/search/SemanticResults";
 import { cn, getEntityTypeLabel } from "@/lib/utils";
-import { fadeUp } from "@/lib/motion";
+import { fadeUp, easeWater, springExpand } from "@/lib/motion";
 import { useScreening } from "@/hooks/useScreening";
+import { useSearchHistory } from "@/contexts/SearchHistoryContext";
 import { complianceService } from "@/services/compliance";
 import type { EntityType, RiskLevel, DataSource } from "@/types";
 
@@ -263,8 +264,17 @@ export function SearchPage() {
     setSearchMode,
     executeSearch,
     executeSemanticSearch,
+    restoreSnapshot,
     clearSearch,
   } = useScreening(sourceLevel, engine);
+
+  const { addSearch, getEntry } = useSearchHistory();
+  // Cuando un cambio de sourceLevel proviene de restaurar un snapshot, NO
+  // queremos que el efecto de sourceLevel dispare una búsqueda en vivo que
+  // pisaría el snapshot. Esta bandera suprime ese disparo una vez.
+  const suppressSourceLevelSearch = useRef(false);
+  // Firma de la última búsqueda guardada en historial (evita duplicados).
+  const lastRecordedSig = useRef("");
 
   const [showFilters, setShowFilters] = useState(false);
   const [localFilters, setLocalFilters] = useState({
@@ -273,36 +283,91 @@ export function SearchPage() {
     sources: filters.sources,
   });
 
-  // Execute search on mount if query param exists.
-  // StrictMode en dev re-monta componentes y re-ejecuta effects. Esto causaba
-  // 4 requests al mismo /screen/gold (2 mounts × 2 useEffects). Guardamos el
-  // último (query, sourceLevel) ejecutado a nivel de módulo para deduplicar
-  // dentro de una ventana de 500ms (suficiente para cubrir el StrictMode rerun).
+  // Reacciona a los parámetros de URL — el SearchSidebar (historial) y la
+  // home navegan aquí con distintos modos:
+  //   ?restore=<id> → hidrata el SNAPSHOT exacto sin red (historial)
+  //   ?fresh=<ts>   → limpia la vista (botón "Nueva búsqueda")
+  //   ?q=<query>    → ejecuta búsqueda en vivo (home / recarga)
+  // StrictMode re-ejecuta effects en dev; shouldExecuteSearch deduplica
+  // dentro de 500ms para no golpear el backend múltiples veces.
   useEffect(() => {
+    const restoreId = searchParams.get("restore");
+    const fresh = searchParams.get("fresh");
+
+    if (restoreId) {
+      const entry = getEntry(restoreId);
+      if (entry) {
+        // Suprime el disparo del efecto de sourceLevel/engine al restaurar.
+        suppressSourceLevelSearch.current = true;
+        lastRecordedSig.current = `${entry.query}::${entry.sourceLevel}::${entry.engine}::${entry.searchMode}`;
+        setSourceLevel(entry.sourceLevel);
+        setEngine(entry.engine);
+        restoreSnapshot({
+          query: entry.query,
+          results: entry.results,
+          resultCount: entry.resultCount,
+          searchMode: entry.searchMode,
+          executionTimeMs: entry.executionTimeMs,
+        });
+      }
+      return;
+    }
+
+    if (fresh) {
+      clearSearch();
+      return;
+    }
+
     if (initialQuery && shouldExecuteSearch(initialQuery, sourceLevel)) {
       executeSearch(initialQuery);
     }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
-  // Re-execute search when sourceLevel changes
+  // Re-execute search when sourceLevel changes (salvo que venga de un restore).
   const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
       return;
     }
+    if (suppressSourceLevelSearch.current) {
+      suppressSourceLevelSearch.current = false;
+      return;
+    }
     const q = query || initialQuery;
     if (q && shouldExecuteSearch(q, sourceLevel)) {
       executeSearch(q);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceLevel]);
 
-  const handleSearch = (searchQuery: string) => {
+  // Graba cada búsqueda EN VIVO en el historial (snapshot exacto). No graba
+  // restauraciones (estás viendo una foto, no una búsqueda nueva).
+  useEffect(() => {
+    if (!hasSearched || isLoading || !query) return;
+    if (searchParams.get("restore")) return;
+    const sig = `${query}::${sourceLevel}::${engine}::${searchMode}`;
+    if (lastRecordedSig.current === sig) return;
+    lastRecordedSig.current = sig;
+    addSearch({
+      query,
+      sourceLevel,
+      engine,
+      searchMode,
+      resultCount: results.length,
+      results,
+      executionTimeMs: performance?.executionTimeMs,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasSearched, isLoading, query, results, sourceLevel, engine, searchMode]);
+
+  const handleSearch = (searchQuery: string, advanced?: import("@/types/api").AdvancedScreeningFields) => {
     setSearchParams({ q: searchQuery, source_level: String(sourceLevel) });
     if (searchMode === "semantic") {
       executeSemanticSearch(searchQuery);
     } else {
-      executeSearch(searchQuery);
+      executeSearch(searchQuery, advanced);
     }
   };
 
@@ -360,7 +425,15 @@ export function SearchPage() {
     localFilters.sources.length;
 
   return (
-    <AppPage>
+    <AppPage width="wide">
+      {/* El centro "crece" de ancho al entrar al modo búsqueda: pasa de un
+          contenedor acotado (64rem) a ocupar todo el ancho disponible. */}
+      <motion.div
+        initial={{ maxWidth: "64rem" }}
+        animate={{ maxWidth: "120rem" }}
+        transition={springExpand}
+        className="mx-auto w-full space-y-6"
+      >
         <PageHeader
           title={t("workspace.search.title")}
           description={t("workspace.search.description")}
@@ -373,8 +446,9 @@ export function SearchPage() {
         />
 
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: easeWater, delay: 0.15 }}
           className="space-y-4"
         >
           <IntelligentSearch
@@ -453,9 +527,10 @@ export function SearchPage() {
         <AnimatePresence mode="wait">
           {hasSearched && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.7, ease: easeWater }}
               className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6"
             >
               {/* Filters Sidebar */}
@@ -660,7 +735,7 @@ export function SearchPage() {
                 <motion.button
                   key={item.query}
                   {...fadeUp}
-                  transition={{ delay: index * 0.1 }}
+                  transition={{ delay: index * 0.09, duration: 0.7, ease: easeWater }}
                   whileHover={{ scale: 1.02, y: -2 }}
                   onClick={() => handleSearch(item.query)}
                   className="glass rounded-xl p-4 text-left hover:bg-foreground/[0.03] transition-all group"
@@ -677,6 +752,7 @@ export function SearchPage() {
             </div>
           </motion.div>
         )}
+      </motion.div>
     </AppPage>
   );
 }

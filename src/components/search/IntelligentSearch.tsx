@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, Loader2 } from 'lucide-react';
+import { Search, X, Loader2, SlidersHorizontal } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { easeWater, springSoft } from '@/lib/motion';
 import { useScreening } from '@/hooks/useScreening';
-import type { ScreeningMatch } from '@/types/api';
+import type { ScreeningMatch, AdvancedScreeningFields } from '@/types/api';
 import {
   getRiskColor,
   getRiskBgColor,
@@ -16,7 +17,7 @@ import {
 } from '@/lib/utils';
 
 interface IntelligentSearchProps {
-  onSearch?: (query: string) => void;
+  onSearch?: (query: string, advanced?: AdvancedScreeningFields) => void;
   onSelectResult?: (entityId: string) => void;
   className?: string;
   size?: 'default' | 'large';
@@ -48,6 +49,18 @@ export function IntelligentSearch({
 
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [advanced, setAdvanced] = useState<AdvancedScreeningFields>({});
+
+  const cleanAdvanced = (): AdvancedScreeningFields | undefined => {
+    const entries = Object.entries(advanced).filter(
+      ([, v]) => v != null && String(v).trim() !== '',
+    );
+    return entries.length ? (Object.fromEntries(entries) as AdvancedScreeningFields) : undefined;
+  };
+  const advancedCount = Object.values(advanced).filter(
+    (v) => v != null && String(v).trim() !== '',
+  ).length;
 
   // Initialize query from URL param
   useEffect(() => {
@@ -93,8 +106,9 @@ export function IntelligentSearch({
 
   const handleSearch = () => {
     if (query.trim()) {
-      executeSearch(query);
-      onSearch?.(query);
+      const adv = cleanAdvanced();
+      executeSearch(query, adv);
+      onSearch?.(query, adv);
       setIsFocused(false);
     }
   };
@@ -116,9 +130,9 @@ export function IntelligentSearch({
         )}
         initial={false}
         animate={{
-          scale: isFocused ? 1.01 : 1,
+          scale: isFocused ? 1.015 : 1,
         }}
-        transition={{ duration: 0.2 }}
+        transition={springSoft}
       >
         <div className="flex items-center gap-2 pl-3 sm:pl-4">
           {/* Leading search / loading icon */}
@@ -159,6 +173,27 @@ export function IntelligentSearch({
             </button>
           )}
 
+          {/* Toggle búsqueda avanzada (multi-campo) */}
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((s) => !s)}
+            aria-label={t('search.advanced.toggle')}
+            title={t('search.advanced.toggle')}
+            className={cn(
+              'relative shrink-0 p-2 rounded-lg transition-colors',
+              showAdvanced || advancedCount > 0
+                ? 'text-blue-600 dark:text-brand-electric bg-blue-500/10'
+                : 'text-muted-foreground hover:bg-foreground/10',
+            )}
+          >
+            <SlidersHorizontal className={cn(size === 'large' ? 'w-5 h-5' : 'w-4 h-4')} />
+            {advancedCount > 0 && (
+              <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-blue-600 px-1 text-[10px] font-semibold text-white">
+                {advancedCount}
+              </span>
+            )}
+          </button>
+
           {/* Search action — integrated inside the field */}
           <Button
             onClick={handleSearch}
@@ -174,14 +209,66 @@ export function IntelligentSearch({
         </div>
       </motion.div>
 
+      {/* Panel de búsqueda avanzada (multi-campo) */}
+      <AnimatePresence>
+        {showAdvanced && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: easeWater }}
+            className="overflow-hidden"
+          >
+            <div className="mt-2 glass rounded-xl p-3 sm:p-4">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                  {t('search.advanced.title')}
+                </span>
+                {advancedCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setAdvanced({})}
+                    className="text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    {t('search.clear')}
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {([
+                  { key: 'rfc', label: t('search.advanced.rfc'), type: 'text' },
+                  { key: 'passport', label: t('search.advanced.passport'), type: 'text' },
+                  { key: 'national_id', label: t('search.advanced.nationalId'), type: 'text' },
+                  { key: 'birth_date', label: t('search.advanced.birthDate'), type: 'text', placeholder: 'YYYY-MM-DD' },
+                  { key: 'country', label: t('search.advanced.country'), type: 'text', placeholder: 'MX, US…' },
+                  { key: 'wikidata_id', label: t('search.advanced.wikidataId'), type: 'text', placeholder: 'Q…' },
+                ] as const).map((f) => (
+                  <div key={f.key} className="flex flex-col gap-1">
+                    <label className="text-[11px] text-muted-foreground">{f.label}</label>
+                    <Input
+                      type={f.type}
+                      value={advanced[f.key] ?? ''}
+                      placeholder={'placeholder' in f ? f.placeholder : undefined}
+                      onChange={(e) => setAdvanced((a) => ({ ...a, [f.key]: e.target.value }))}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+                      className="h-9 bg-foreground/[0.03] border-foreground/10 text-sm"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Suggestions Dropdown */}
       <AnimatePresence>
         {isFocused && suggestions.length > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+            initial={{ opacity: 0, y: -12, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.98 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            exit={{ opacity: 0, y: -12, scale: 0.98 }}
+            transition={{ duration: 0.45, ease: easeWater }}
             className="absolute top-full left-0 right-0 mt-2 glass rounded-xl overflow-hidden z-50 shadow-2xl"
           >
             <div className="p-2">
@@ -191,9 +278,9 @@ export function IntelligentSearch({
               {suggestions.map((suggestion, index) => (
                 <motion.button
                   key={suggestion.entity_id}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  transition={{ delay: index * 0.07, duration: 0.5, ease: easeWater }}
                   onClick={() => handleSelectSuggestion(suggestion)}
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={cn(
