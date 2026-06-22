@@ -872,14 +872,26 @@ const hasSanctions =
             {/* Left: Info */}
             <div className="flex-1">
               <div className="flex items-start gap-4 mb-4">
-                <motion.div
-                  initial={{ scale: 0.8 }}
-                  animate={{ scale: 1 }}
-                  className="w-16 h-16 rounded-xl flex items-center justify-center"
-                  style={{ backgroundColor: `${riskColor}15` }}
-                >
-                  <Icon className="w-8 h-8" style={{ color: riskColor }} />
-                </motion.div>
+                {profile?.header.image ? (
+                  <motion.img
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    src={profile.header.image}
+                    alt={entity.primary_name || ''}
+                    loading="lazy"
+                    className="w-16 h-16 rounded-xl object-cover border border-foreground/10 shrink-0"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                ) : (
+                  <motion.div
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: `${riskColor}15` }}
+                  >
+                    <Icon className="w-8 h-8" style={{ color: riskColor }} />
+                  </motion.div>
+                )}
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant="outline" className="text-muted-foreground">
@@ -945,6 +957,43 @@ const hasSanctions =
                       );
                     })}
                   </div>
+                  {/* Enlaces externos: Wikipedia / Wikidata / sitio oficial */}
+                  {(profile?.header.wikipedia || profile?.header.wikidata_qid || profile?.header.official_website) && (
+                    <div className="mt-2 flex items-center gap-2 flex-wrap">
+                      {profile?.header.wikipedia &&
+                        Object.entries(profile.header.wikipedia).map(([lang, url]) => (
+                          <a
+                            key={lang}
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
+                          >
+                            <ExternalLink className="w-3 h-3" /> Wikipedia ({lang.toUpperCase()})
+                          </a>
+                        ))}
+                      {profile?.header.wikidata_qid && (
+                        <a
+                          href={`https://www.wikidata.org/wiki/${profile.header.wikidata_qid}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Wikidata
+                        </a>
+                      )}
+                      {profile?.header.official_website && (
+                        <a
+                          href={profile.header.official_website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-foreground/10 text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-colors"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Web
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1011,6 +1060,33 @@ const hasSanctions =
                 )}
                 <InfoItem label={t('entity.fields.religion')} value={profile?.personal.religion || (Array.isArray(entity.religion) ? entity.religion[0] : entity.religion)} icon={Tag} />
                 <InfoItem label={t('entity.fields.ethnicity')} value={profile?.personal.ethnicity || (Array.isArray(entity.ethnicity) ? entity.ethnicity[0] : entity.ethnicity)} icon={Tag} />
+                {/* Campos ricos de Wikidata (antes capturados pero no mostrados) */}
+                {profile?.career.occupations?.length ? (
+                  <ListInfoItem label={t('entity.fields.occupations')} items={profile.career.occupations} icon={User} maxVisible={5} />
+                ) : null}
+                {profile?.risk.net_worth && (
+                  <InfoItem label={t('entity.fields.netWorth')} value={profile.risk.net_worth} icon={CreditCard} />
+                )}
+                {profile?.overview.death_date && (
+                  <InfoItem label={t('entity.fields.deathDate')} value={formatDate(profile.overview.death_date)} icon={Calendar} />
+                )}
+                {profile?.overview.death_place && (
+                  <InfoItem label={t('entity.fields.deathPlace')} value={profile.overview.death_place} icon={MapPin} />
+                )}
+                {profile?.risk.cause_of_death && (
+                  <InfoItem label={t('entity.fields.causeOfDeath')} value={profile.risk.cause_of_death} icon={Tag} />
+                )}
+                {profile?.risk.military_rank && (
+                  <InfoItem label={t('entity.fields.militaryRank')} value={[profile.risk.military_rank, profile.risk.military_branch].filter(Boolean).join(' · ')} icon={Tag} />
+                )}
+                {(profile?.personal.nicknames?.length || profile?.personal.pseudonyms?.length) ? (
+                  <ListInfoItem
+                    label={t('entity.fields.aliasesKnown')}
+                    items={[...(profile?.personal.nicknames || []), ...(profile?.personal.pseudonyms || [])]}
+                    icon={User}
+                    maxVisible={5}
+                  />
+                ) : null}
                 {entity.incorporation_date && (
                   <InfoItem label={t('entity.fields.incorporationDate')} value={formatDate(entity.incorporation_date)} icon={Calendar} />
                 )}

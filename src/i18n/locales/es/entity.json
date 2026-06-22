@@ -69,7 +69,14 @@
       "religion": "Religión",
       "ethnicity": "Etnicidad",
       "incorporationDate": "Fecha de Constitución",
-      "incorporationCountry": "País de Constitución"
+      "incorporationCountry": "País de Constitución",
+      "occupations": "Ocupaciones",
+      "netWorth": "Patrimonio",
+      "deathDate": "Fecha de fallecimiento",
+      "deathPlace": "Lugar de fallecimiento",
+      "causeOfDeath": "Causa de muerte",
+      "militaryRank": "Rango militar",
+      "aliasesKnown": "Apodos / seudónimos"
     },
     "list": {
       "more": "+{{count}} más",

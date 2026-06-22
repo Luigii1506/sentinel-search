@@ -33,6 +33,9 @@ export interface ProfileHeader {
   risk_score: number;
   topics: string[];
   wikidata_qid?: string;
+  image?: string;                       // foto (Wikidata P18 → Commons)
+  wikipedia?: Record<string, string>;   // {en: url, es: url}
+  official_website?: string;
   reference_tier?: 'premium' | 'graph_only' | 'suppress';
   reference_tier_reason?: string;
 }

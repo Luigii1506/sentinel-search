@@ -69,7 +69,14 @@
       "religion": "Religion",
       "ethnicity": "Ethnicity",
       "incorporationDate": "Incorporation Date",
-      "incorporationCountry": "Incorporation Country"
+      "incorporationCountry": "Incorporation Country",
+      "occupations": "Occupations",
+      "netWorth": "Net worth",
+      "deathDate": "Date of death",
+      "deathPlace": "Place of death",
+      "causeOfDeath": "Cause of death",
+      "militaryRank": "Military rank",
+      "aliasesKnown": "Nicknames / pseudonyms"
     },
     "list": {
       "more": "+{{count}} more",
