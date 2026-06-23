@@ -67,7 +67,7 @@ export function PublicTrajectoryCard({
                     <span className="text-[10px] text-muted-foreground">{countryNames[entry.country] || entry.country}</span>
                   )}
                   {entry.start_date && (
-                    <span className="text-[10px] text-muted-foreground">{formatDate(entry.start_date)} — {entry.end_date ? formatDate(entry.end_date) : t('entity.trajectory.present')}</span>
+                    <span className="text-[10px] text-muted-foreground">{formatDate(entry.start_date)}{entry.end_date ? ` — ${formatDate(entry.end_date)}` : entry.is_current ? ` — ${t('entity.trajectory.present')}` : ''}</span>
                   )}
                   {entry.source && (
                     <span className="text-[10px] text-muted-foreground">{formatSourceName(entry.source) || entry.source}</span>

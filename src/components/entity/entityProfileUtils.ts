@@ -137,7 +137,14 @@ export function buildCanonicalPepEntries(entity?: APIEntity, profile?: EntityPro
       );
     });
     const status = String((entry as { status?: string }).status || '').toLowerCase();
-    const isCurrent = legacyMatch?.is_current ?? (status === 'current' || status === 'active' || (!endDate && Boolean(startDate)));
+    // Si el backend envía status, confiar en él (no inferir "current" por end_date
+    // vacío: cargos transitorios/superados ya vienen como 'ended' aunque les falte
+    // end_date). Solo usar el heurístico de end_date cuando NO viene status.
+    const isCurrent = legacyMatch?.is_current ?? (
+      status
+        ? status === 'current' || status === 'active'
+        : !endDate && Boolean(startDate)
+    );
 
     return {
       id: legacyMatch?.id || `profile-pep-${index}`,

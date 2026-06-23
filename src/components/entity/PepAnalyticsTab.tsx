@@ -152,8 +152,11 @@ export function PepAnalyticsTab({ canonicalPepEntries, pepStatus = 'non_pep', pe
                       <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
                         {pep.start_date ? formatDate(pep.start_date) : '?'}
-                        {' — '}
-                        {pep.end_date ? formatDate(pep.end_date) : t('entity.pep.present')}
+                        {pep.end_date
+                          ? ` — ${formatDate(pep.end_date)}`
+                          : pep.is_current
+                            ? ` — ${t('entity.pep.present')}`
+                            : ''}
                       </span>
                     </div>
                   )}
