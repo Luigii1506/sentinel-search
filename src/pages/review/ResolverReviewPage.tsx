@@ -5,8 +5,8 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus, Copy, Fingerprint, ChevronLeft, ChevronRight } from 'lucide-react';
-import { resolverService, type UnsurePair, type JudgementPair, type CanonicalGroup } from '@/services/resolver';
+import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus, Copy, Fingerprint, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { resolverService, type UnsurePair, type JudgementPair, type CanonicalGroup, type CanonicalGroupMember } from '@/services/resolver';
 import { entityService } from '@/services/entities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AppPage, EmptyState, MetricCard, PageHeader, PanelSkeleton } from '@/components/foundation';
-import { humanizeEntityName, getCountryName } from '@/lib/utils';
+import { humanizeEntityName, getCountryName, formatDate } from '@/lib/utils';
+import { formatSourceName } from '@/components/entity/entityProfileUtils';
 import { toast } from 'sonner';
 
 type ResolverTab = 'queue' | 'canonical' | 'positives' | 'negatives';
@@ -282,16 +283,17 @@ function Paginator({ offset, limit, total, count, onPrev, onNext, disabled }: {
   );
 }
 
-/** Tab de grupos canónicos (clusters fusionados). */
+/** Tab de grupos canónicos = AUDITOR DE FUSIONES. Detecta merges sospechosos. */
 function CanonicalGroupsTab({ navigate, enabled }: {
   navigate: ReturnType<typeof useNavigate>; enabled: boolean;
 }) {
   const { t } = useTranslation();
   const [offset, setOffset] = useState(0);
+  const [onlySuspicious, setOnlySuspicious] = useState(true);
 
   const { data, isLoading, isFetching, error } = useQuery({
-    queryKey: ['resolver-canonical-groups', offset],
-    queryFn: () => resolverService.getCanonicalGroups(PAGE_SIZE, offset),
+    queryKey: ['resolver-canonical-groups', offset, onlySuspicious],
+    queryFn: () => resolverService.getCanonicalGroups(PAGE_SIZE, offset, onlySuspicious),
     enabled,
     refetchOnWindowFocus: false,
   });
@@ -299,13 +301,27 @@ function CanonicalGroupsTab({ navigate, enabled }: {
   const errorMessage = error instanceof Error ? error.message : t('review.resolver.loadError');
   const groups = data?.groups ?? [];
 
-  const groupTitle = (g: CanonicalGroup) =>
-    g.canonical_name
-      ? humanizeEntityName(g.canonical_name)
-      : (g.members[0]?.name ? humanizeEntityName(g.members[0].name) : g.canonical_id);
-
   return (
     <>
+      <p className="text-sm text-muted-foreground mb-3">
+        {t('review.resolver.audit.helper')}
+      </p>
+
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <div className="flex items-center gap-2">
+          <Switch id="only-suspicious" checked={onlySuspicious} onCheckedChange={(v) => { setOnlySuspicious(v); setOffset(0); }} />
+          <label htmlFor="only-suspicious" className="text-sm cursor-pointer font-medium">
+            {t('review.resolver.audit.onlySuspicious')}
+          </label>
+        </div>
+        {data && (
+          <Badge variant="outline" className="text-amber-600 dark:text-amber-400 border-amber-500/40">
+            <ShieldAlert className="h-3.5 w-3.5 mr-1" />
+            {t('review.resolver.audit.suspiciousCount', { suspicious: data.suspicious_total, total: data.total })}
+          </Badge>
+        )}
+      </div>
+
       {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
@@ -315,44 +331,16 @@ function CanonicalGroupsTab({ navigate, enabled }: {
       {isLoading ? (
         <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={8} />
       ) : groups.length === 0 ? (
-        <EmptyState icon={GitBranchPlus} title={t('review.resolver.tabs.canonical')} description={t('review.resolver.noData')} />
+        <EmptyState
+          icon={onlySuspicious ? ShieldCheck : GitBranchPlus}
+          title={onlySuspicious ? t('review.resolver.audit.noSuspiciousTitle') : t('review.resolver.tabs.canonical')}
+          description={onlySuspicious ? t('review.resolver.audit.noSuspiciousDescription') : t('review.resolver.noData')}
+          tone={onlySuspicious ? 'success' : undefined}
+        />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {groups.map((g) => (
-            <Card key={g.canonical_id} className="bg-foreground/5 border-foreground/10">
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center justify-between gap-2 text-base">
-                  <span className="font-semibold leading-tight">{groupTitle(g)}</span>
-                  <Badge variant="outline" className="shrink-0">{t('review.resolver.size')}: {g.size}</Badge>
-                </CardTitle>
-                <div className="text-[10px] text-muted-foreground font-mono mt-0.5 flex items-center">
-                  {g.canonical_id.slice(0, 24)}…<CopyButton value={g.canonical_id} label="ID" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1.5">{t('review.resolver.members')}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {g.members.map((m) => {
-                    const label = m.name ? humanizeEntityName(m.name) : m.id.slice(0, 12) + '…';
-                    return m.is_gold ? (
-                      <button
-                        key={m.id}
-                        type="button"
-                        onClick={() => navigate(`/entity/${m.id}`)}
-                        className="inline-flex items-center gap-1 rounded-md border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 transition-colors"
-                      >
-                        {label}
-                        <ExternalLink className="h-3 w-3" />
-                      </button>
-                    ) : (
-                      <span key={m.id} className="inline-flex items-center rounded-md border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-xs text-muted-foreground">
-                        {label}
-                      </span>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
+            <CanonicalGroupCard key={g.canonical_id} group={g} navigate={navigate} />
           ))}
         </div>
       )}
@@ -368,6 +356,145 @@ function CanonicalGroupsTab({ navigate, enabled }: {
         />
       )}
     </>
+  );
+}
+
+/** Tarjeta de un grupo canónico con tabla comparativa de miembros y resaltado de conflictos. */
+function CanonicalGroupCard({ group, navigate }: {
+  group: CanonicalGroup; navigate: ReturnType<typeof useNavigate>;
+}) {
+  const { t } = useTranslation();
+  const g = group;
+
+  const title = g.canonical_name
+    ? humanizeEntityName(g.canonical_name)
+    : (g.members[0]?.name ? humanizeEntityName(g.members[0].name) : g.canonical_id);
+
+  // ¿Qué columnas resaltar? (derivado de g.conflicts)
+  const conflictBirth = g.conflicts.includes('birth_date');
+  const conflictCountry = g.conflicts.includes('country');
+  const conflictId = g.conflicts.some((c) => c.startsWith('id:'));
+  const conflictTint = 'bg-amber-500/10';
+
+  const memberCompactIds = (m: CanonicalGroupMember) => {
+    const ids = idValues(m.identifiers);
+    const keys = STRONG_ID_KEYS.filter((k) => ids[k]?.length);
+    if (!keys.length) return <span className="text-muted-foreground">—</span>;
+    return (
+      <div className="flex flex-wrap gap-1">
+        {keys.map((k) =>
+          ids[k].map((v, i) => (
+            <span key={`${k}-${i}`} className="inline-flex items-center gap-0.5 rounded border border-foreground/10 bg-foreground/5 px-1 py-0.5 text-[10px] font-mono">
+              <span className="text-muted-foreground">{k}:</span>{v}
+            </span>
+          )),
+        )}
+      </div>
+    );
+  };
+
+  const memberSources = (m: CanonicalGroupMember) => {
+    if (!m.sources?.length) return <span className="text-muted-foreground">—</span>;
+    const shown = m.sources.slice(0, 3);
+    return (
+      <div className="flex flex-wrap gap-1">
+        {shown.map((s) => (
+          <span key={s} className="inline-flex items-center rounded border border-foreground/10 bg-foreground/5 px-1.5 py-0.5 text-[10px]">
+            {formatSourceName(s) ?? s}
+          </span>
+        ))}
+        {m.sources.length > 3 && (
+          <span className="text-[10px] text-muted-foreground self-center">+{m.sources.length - 3}</span>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <Card className={`bg-foreground/5 ${g.suspicious ? 'border-amber-500/40' : 'border-foreground/10'}`}>
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-start justify-between gap-2 text-base">
+          <span className="font-semibold leading-tight">{title}</span>
+          <Badge variant="outline" className="shrink-0">
+            {t('review.resolver.audit.mergedEntities', { count: g.size })}
+          </Badge>
+        </CardTitle>
+        <div className="text-[10px] text-muted-foreground font-mono mt-0.5 flex items-center">
+          {g.canonical_id.slice(0, 24)}…<CopyButton value={g.canonical_id} label="ID" />
+        </div>
+        {/* Indicador de salud */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-2">
+          {g.suspicious ? (
+            <>
+              <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40">
+                <ShieldAlert className="h-3.5 w-3.5 mr-1" />
+                {t('review.resolver.audit.possibleBadMerge')}
+              </Badge>
+              {g.conflicts.map((c) => (
+                <span key={c} className="inline-flex items-center rounded-md border border-amber-500/30 bg-amber-500/5 px-2 py-0.5 text-[11px] text-amber-700 dark:text-amber-300">
+                  {conflictLabel(c, t)}
+                </span>
+              ))}
+            </>
+          ) : (
+            <Badge className="bg-green-500/15 text-green-700 dark:text-green-400 border border-green-500/30">
+              <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+              {t('review.resolver.audit.consistent')}
+            </Badge>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('review.resolver.audit.colName')}</TableHead>
+              <TableHead className={conflictBirth ? conflictTint : ''}>{t('review.resolver.audit.colBirth')}</TableHead>
+              <TableHead className={conflictCountry ? conflictTint : ''}>{t('review.resolver.audit.colCountry')}</TableHead>
+              <TableHead className={conflictId ? conflictTint : ''}>{t('review.resolver.audit.colIdentifiers')}</TableHead>
+              <TableHead>{t('review.resolver.audit.colSources')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {g.members.map((m) => {
+              const label = m.name ? humanizeEntityName(m.name) : m.id.slice(0, 12) + '…';
+              const countries = (m.countries || []).map((c) => getCountryName(c) || c).filter(Boolean).join(', ');
+              return (
+                <TableRow key={m.id} className={m.is_active === false ? 'opacity-60' : ''}>
+                  <TableCell>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {m.is_gold ? (
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/entity/${m.id}`)}
+                          className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline text-left text-sm"
+                        >
+                          {label}
+                          <ExternalLink className="h-3 w-3 shrink-0" />
+                        </button>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">{label}</span>
+                      )}
+                      {m.is_active === false && (
+                        <span className="text-[10px] text-muted-foreground italic">({t('review.resolver.audit.inactive')})</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className={`text-xs ${conflictBirth ? conflictTint : ''}`}>
+                    {m.birth_date || <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className={`text-xs ${conflictCountry ? conflictTint : ''}`}>
+                    {countries || <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className={conflictId ? conflictTint : ''}>{memberCompactIds(m)}</TableCell>
+                  <TableCell>{memberSources(m)}</TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -402,12 +529,13 @@ function JudgementsTab({ judgement, navigate, enabled }: {
 
   return (
     <>
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex items-center gap-2 mb-1">
         <Switch id={`reviewable-${judgement}`} checked={reviewableOnly} onCheckedChange={(v) => { setReviewableOnly(v); setOffset(0); }} />
-        <label htmlFor={`reviewable-${judgement}`} className="text-sm text-muted-foreground cursor-pointer">
-          {t('review.resolver.reviewableOnly')}
+        <label htmlFor={`reviewable-${judgement}`} className="text-sm cursor-pointer font-medium">
+          {t('review.resolver.activeOnly')}
         </label>
       </div>
+      <p className="text-xs text-muted-foreground mb-4">{t('review.resolver.activeOnlyHelp')}</p>
 
       {error && (
         <Alert variant="destructive" className="mb-4">
@@ -431,7 +559,7 @@ function JudgementsTab({ judgement, navigate, enabled }: {
                 <TableRow>
                   <TableHead>{t('review.resolver.colLeft')}</TableHead>
                   <TableHead>{t('review.resolver.colRight')}</TableHead>
-                  <TableHead>{t('review.resolver.colUser')}</TableHead>
+                  <TableHead>{t('review.resolver.colMethod')}</TableHead>
                   <TableHead>{t('review.resolver.colScore')}</TableHead>
                   <TableHead>{t('review.resolver.colDate')}</TableHead>
                 </TableRow>
@@ -441,10 +569,12 @@ function JudgementsTab({ judgement, navigate, enabled }: {
                   <TableRow key={`${p.left_id}-${p.right_id}-${i}`}>
                     <TableCell>{nameButton(p.left_id, p.left_name)}</TableCell>
                     <TableCell>{nameButton(p.right_id, p.right_name)}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{p.user || '—'}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[11px] font-normal">{methodLabel(p.user, t)}</Badge>
+                    </TableCell>
                     <TableCell className="text-xs">{p.score != null ? `${(p.score * 100).toFixed(0)}%` : '—'}</TableCell>
                     <TableCell className="text-xs text-muted-foreground">
-                      {p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}
+                      {p.created_at ? formatDate(p.created_at) : '—'}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -466,6 +596,59 @@ function JudgementsTab({ judgement, navigate, enabled }: {
       )}
     </>
   );
+}
+
+/** Identificadores "fuertes" que mostramos de forma compacta en la tabla de auditoría. */
+const STRONG_ID_KEYS = ['wikidataId', 'taxNumber', 'passportNumber', 'innCode', 'ogrnCode'];
+
+/**
+ * Traduce un código de conflicto del backend a una etiqueta legible.
+ * Códigos: "birth_date", "gender", "country", "id:taxNumber", "id:wikidataId", etc.
+ */
+function conflictLabel(code: string, t: (k: string, o?: any) => string): string {
+  if (code.startsWith('id:')) {
+    const key = code.slice(3);
+    const map: Record<string, string> = {
+      taxNumber: t('review.resolver.audit.conflict.idTaxNumber'),
+      wikidataId: t('review.resolver.audit.conflict.idWikidataId'),
+      innCode: t('review.resolver.audit.conflict.idInnCode'),
+      ogrnCode: t('review.resolver.audit.conflict.idOgrnCode'),
+      passportNumber: t('review.resolver.audit.conflict.idPassportNumber'),
+    };
+    return map[key] ?? t('review.resolver.audit.conflict.idGeneric', { key });
+  }
+  const map: Record<string, string> = {
+    birth_date: t('review.resolver.audit.conflict.birthDate'),
+    gender: t('review.resolver.audit.conflict.gender'),
+    country: t('review.resolver.audit.conflict.country'),
+  };
+  return map[code] ?? code;
+}
+
+/**
+ * Traduce el "user"/método de un judgement a una etiqueta legible.
+ * Ej: "auto-xref" → "Auto (cross-ref)", "review-ui" → "Manual",
+ * "auto-rescore:conflicting_wikidata_qid" → "Auto: QID distinto".
+ */
+function methodLabel(user: string | null, t: (k: string, o?: any) => string): string {
+  if (!user) return '—';
+  if (user === 'review-ui' || user === 'operator') return t('review.resolver.audit.method.manual');
+  if (user === 'auto-xref') return t('review.resolver.audit.method.autoXref');
+  if (user.startsWith('auto-rescore:')) {
+    const reason = user.slice('auto-rescore:'.length);
+    const map: Record<string, string> = {
+      conflicting_wikidata_qid: t('review.resolver.audit.reason.conflictingWikidataQid'),
+      conflicting_birth_year: t('review.resolver.audit.reason.conflictingBirthYear'),
+      conflicting_identifier: t('review.resolver.audit.reason.conflictingIdentifier'),
+      generational_suffix: t('review.resolver.audit.reason.generationalSuffix'),
+      disjoint_surnames: t('review.resolver.audit.reason.disjointSurnames'),
+      shared_strong_identifier: t('review.resolver.audit.reason.sharedStrongIdentifier'),
+    };
+    const human = map[reason] ?? reason.replace(/_/g, ' ');
+    return t('review.resolver.audit.method.autoRescore', { reason: human });
+  }
+  if (user.startsWith('auto-')) return t('review.resolver.audit.method.autoXref');
+  return user;
 }
 
 /** Normaliza identifiers (scalar o lista) a {clave: string[]}. */

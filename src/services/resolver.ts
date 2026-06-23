@@ -53,19 +53,31 @@ export interface CanonicalGroupMember {
   id: string;
   name: string | null;
   is_gold: boolean;
+  is_active: boolean;
+  birth_date: string | null;
+  gender: string | null;
+  countries: string[];
+  identifiers: Record<string, unknown>;
+  sources: string[];
+  risk_score: number | null;
 }
 
 export interface CanonicalGroup {
   canonical_id: string;
   canonical_name: string | null;
   size: number;
+  suspicious: boolean;
+  /** Códigos de conflicto, p.ej. "birth_date", "gender", "country", "id:taxNumber". */
+  conflicts: string[];
   members: CanonicalGroupMember[];
 }
 
 export interface CanonicalGroupsResponse {
   total: number;
+  suspicious_total: number;
   limit: number;
   offset: number;
+  only_suspicious: boolean;
   groups: CanonicalGroup[];
 }
 
@@ -116,9 +128,9 @@ export const resolverService = {
     return data;
   },
 
-  async getCanonicalGroups(limit = 50, offset = 0): Promise<CanonicalGroupsResponse> {
+  async getCanonicalGroups(limit = 50, offset = 0, onlySuspicious = false): Promise<CanonicalGroupsResponse> {
     const { data } = await api.get('/api/v2/admin/er/canonical-groups', {
-      params: { limit, offset },
+      params: { limit, offset, only_suspicious: onlySuspicious },
     });
     return data;
   },
