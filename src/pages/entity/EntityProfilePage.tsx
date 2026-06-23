@@ -45,7 +45,7 @@ import { buildCanonicalPepEntries, buildUnifiedCareerEntries, countryNames, form
 import type { RelationshipLevelFilter, RelationshipContextFilter, RelationshipPriorityFilter } from '@/components/entity/relationshipViewModel';
 import { getReferenceRelationshipSortScore, translateSubtype } from '@/components/entity/relationshipHelpers';
 import { AppPage, PageHeader, DetailPageSkeleton, EmptyState, CategoryBadge, PanelSkeleton } from '@/components/foundation';
-import { cn, getRiskColor, formatDate, humanizeEntityName } from '@/lib/utils';
+import { cn, getRiskColor, formatDate, humanizeEntityName, getSourceBadgeClass } from '@/lib/utils';
 import { fadeUp } from '@/lib/motion';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
@@ -452,18 +452,50 @@ function getRiskBadgeClasses(riesgo?: string): string {
   return 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30';
 }
 
+// Texto oficial colapsable (descripciones largas multi-idioma)
+function CollapsibleSanctionText({ text }: { text: string }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const isLong = text.length > 180;
+  const shown = expanded || !isLong ? text : `${text.slice(0, 180).trimEnd()}…`;
+  return (
+    <div className="mb-2">
+      <p className="text-[10px] text-muted-foreground uppercase mb-1">{t('entity.sanctions.officialDetail')}</p>
+      <p className="text-sm text-muted-foreground whitespace-pre-line break-words">{shown}</p>
+      {isLong && (
+        <button
+          onClick={() => setExpanded((v) => !v)}
+          className="text-xs text-blue-500 hover:text-blue-400 mt-1"
+        >
+          {expanded ? t('entity.sanctions.seeLess') : t('entity.sanctions.seeMore')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 // Sanction Entry Card (enriched)
 function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
   const { t } = useTranslation();
   const details = entry.details;
   const borderColor = details?.riesgo ? getRiskBorderColor(details.riesgo) : 'border-red-500';
+  const dateValue = formatDate(entry.listing_date) || formatDate(entry.start_date || '');
+  const dateLabel = formatDate(entry.listing_date)
+    ? t('entity.sanctions.listingDate')
+    : t('entity.sanctions.validFrom');
+  const programLong = (entry.program || '').length > 80;
+  const detailText = entry.reason || entry.summary || '';
 
   return (
     <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-3">
         <div className="min-w-0">
-          <h4 className="text-foreground font-medium">{entry.source}</h4>
-          <p className="text-sm text-muted-foreground">{entry.program}</p>
+          <h4 className="text-foreground font-medium break-words">{entry.authority || entry.source}</h4>
+          {entry.authority && entry.authority !== entry.source && (
+            <span className={cn('inline-block mt-1 text-[10px] px-2 py-0.5 rounded border', getSourceBadgeClass(entry.source))}>
+              {entry.source}
+            </span>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {details?.riesgo && (
@@ -475,11 +507,21 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
             'text-xs',
             entry.status === 'active' ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30' : 'bg-gray-500/10 text-muted-foreground'
           )}>
-            {entry.status === 'active' ? t('entity.sanctions.statusActive') : entry.status}
+            {entry.status === 'active' ? t('entity.sanctions.statusActive') : t('entity.sanctions.statusInactive')}
           </Badge>
         </div>
       </div>
-      <p className="text-sm text-muted-foreground mb-2">{entry.reason}</p>
+
+      {entry.program && (
+        <div className="mb-2">
+          <p className="text-[10px] text-muted-foreground uppercase mb-0.5">{t('entity.sanctions.programRegime')}</p>
+          <p className={cn('text-sm text-foreground break-words', programLong && 'line-clamp-2')} title={programLong ? entry.program : undefined}>
+            {entry.program}
+          </p>
+        </div>
+      )}
+
+      {detailText && <CollapsibleSanctionText text={detailText} />}
 
       {/* Enriched details grid */}
       {details && Object.keys(details).length > 0 && (
@@ -554,7 +596,18 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
         </div>
       )}
 
-      <p className="text-xs text-muted-foreground mt-2">{t('entity.sanctions.listing', { date: formatDate(entry.listing_date) })}</p>
+      <div className="mt-3 pt-2 border-t border-foreground/5 flex flex-wrap items-center justify-between gap-2">
+        {dateValue ? (
+          <p className="text-xs text-muted-foreground">{dateLabel}: <span className="text-foreground">{dateValue}</span></p>
+        ) : (
+          <p className="text-xs text-muted-foreground/60 italic">{t('entity.sanctions.noDate')}</p>
+        )}
+        {entry.source_url && (
+          <a href={entry.source_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:text-blue-400 inline-flex items-center gap-1">
+            {t('entity.sanctions.source')} <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+      </div>
     </div>
   );
 }
@@ -1198,7 +1251,9 @@ const hasSanctions =
                         <p className="text-xs text-muted-foreground break-words">{s.program}</p>
                         {s.reason && <p className="text-xs text-muted-foreground mt-1 break-words line-clamp-2">{s.reason}</p>}
                         <div className="mt-1 flex items-center justify-between gap-2 flex-wrap">
-                          <p className="text-[10px] text-muted-foreground">{t('entity.sanctions.listing', { date: formatDate(s.listing_date) })}</p>
+                          {(formatDate(s.listing_date) || formatDate(s.start_date || '')) && (
+                            <p className="text-[10px] text-muted-foreground">{t('entity.sanctions.listing', { date: formatDate(s.listing_date) || formatDate(s.start_date || '') })}</p>
+                          )}
                           {s.source_url && (
                             <a
                               href={s.source_url}

@@ -181,7 +181,24 @@ export const entityService = {
       // APIEntity declara estos arrays como requeridos; EntityDetail (v2) usa
       // otros nombres o no los trae. Se proveen defaults para que el consumidor
       // (que lee .length sin guard) no crashee.
-      sanctions: d.sanctions ?? d.sanctions_details ?? [],
+      // Normaliza sanctions_details (nombres del backend) → APISanctionEntry.
+      // El backend usa listed_date (no listing_date) y no trae source/status.
+      sanctions: ((d.sanctions ?? d.sanctions_details ?? []) as Array<Record<string, unknown>>).map((x) => ({
+        id: String(x.id ?? ''),
+        source: String(x.source ?? x.authority ?? ''),
+        authority: x.authority ? String(x.authority) : undefined,
+        program: String(x.program ?? ''),
+        listing_date: String(x.listing_date ?? x.listed_date ?? ''),
+        start_date: x.start_date ? String(x.start_date) : undefined,
+        end_date: x.end_date ? String(x.end_date) : undefined,
+        reason: String(x.reason ?? ''),
+        summary: x.summary ? String(x.summary) : undefined,
+        provisions: x.provisions ? String(x.provisions) : undefined,
+        source_url: x.source_url ? String(x.source_url) : undefined,
+        reference_number: x.reference_number ? String(x.reference_number) : undefined,
+        status: (x.status as 'active' | 'suspended' | 'removed') ?? 'active',
+        details: x.details as APISanctionEntry['details'],
+      })),
       sanctions_details: d.sanctions_details ?? [],
       pep_entries: d.pep_entries ?? d.pep_positions ?? [],
       adverse_media: d.adverse_media ?? [],
