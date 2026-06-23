@@ -45,7 +45,8 @@ import { buildCanonicalPepEntries, buildUnifiedCareerEntries, countryNames, form
 import type { RelationshipLevelFilter, RelationshipContextFilter, RelationshipPriorityFilter } from '@/components/entity/relationshipViewModel';
 import { getReferenceRelationshipSortScore, translateSubtype } from '@/components/entity/relationshipHelpers';
 import { AppPage, PageHeader, DetailPageSkeleton, EmptyState, CategoryBadge, PanelSkeleton } from '@/components/foundation';
-import { cn, getRiskColor, formatDate, humanizeEntityName, getSourceBadgeClass } from '@/lib/utils';
+import { cn, getRiskColor, formatDate, humanizeEntityName, getCountryName } from '@/lib/utils';
+import { resolveSanctionAuthority, flagEmoji } from '@/lib/sanctionAuthorities';
 import { fadeUp } from '@/lib/motion';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
@@ -474,10 +475,98 @@ function CollapsibleSanctionText({ text }: { text: string }) {
   );
 }
 
+// Nombre de país para mostrar; trata "EU" (no resuelto por Intl) de forma explícita.
+function sanctionCountryLabel(t: TFunction, iso2?: string): string {
+  if (!iso2) return '';
+  if (iso2.toUpperCase() === 'EU') return t('entity.sanctions.euJurisdiction');
+  return getCountryName(iso2) || iso2;
+}
+
+// Banner-resumen en el TOP de la sección de sanciones: cuenta autoridades y
+// jurisdicciones distintas y muestra chips de bandera por jurisdicción.
+function SanctionsSummaryBanner({ sanctions }: { sanctions: APISanctionEntry[] }) {
+  const { t } = useTranslation();
+
+  const { authorityCount, jurisdictions, programCount } = useMemo(() => {
+    const authoritySet = new Set<string>();
+    const countryOrder: string[] = [];
+    const countrySet = new Set<string>();
+    const programSet = new Set<string>();
+
+    for (const s of sanctions) {
+      const info = resolveSanctionAuthority(s.authority, s.source);
+      if (info?.cleanName) authoritySet.add(info.cleanName.toUpperCase());
+      if (info?.country) {
+        const iso = info.country.toUpperCase();
+        if (!countrySet.has(iso)) {
+          countrySet.add(iso);
+          countryOrder.push(iso);
+        }
+      }
+      if (s.program && s.program.trim()) programSet.add(s.program.trim());
+    }
+
+    return {
+      authorityCount: authoritySet.size,
+      jurisdictions: countryOrder,
+      programCount: programSet.size,
+    };
+  }, [sanctions]);
+
+  if (sanctions.length === 0) return null;
+
+  return (
+    <div className="glass rounded-xl p-4 border-l-4 border-red-600 bg-red-500/[0.04]">
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-foreground">
+            {t('entity.sanctions.summaryTitle', {
+              authorities: authorityCount,
+              jurisdictions: jurisdictions.length,
+            })}
+          </p>
+          {programCount > 0 && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {t('entity.sanctions.programsCount', { count: programCount })}
+            </p>
+          )}
+          {jurisdictions.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {jurisdictions.map((iso) => {
+                const flag = flagEmoji(iso);
+                return (
+                  <span
+                    key={iso}
+                    title={sanctionCountryLabel(t, iso)}
+                    className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md bg-foreground/5 border border-foreground/10 text-foreground"
+                  >
+                    {flag && <span aria-hidden className="text-sm leading-none">{flag}</span>}
+                    <span className="font-medium">{iso}</span>
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // Sanction Entry Card (enriched)
 function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
   const { t } = useTranslation();
   const details = entry.details;
+  const authInfo = resolveSanctionAuthority(entry.authority, entry.source);
+  const flag = authInfo?.country ? flagEmoji(authInfo.country) : '';
+  const countryName = sanctionCountryLabel(t, authInfo?.country);
+  // Autoridad cruda a mostrar como línea secundaria si difiere del nombre limpio.
+  const rawAuthority = (entry.authority || '').trim();
+  const showRawAuthority = !!rawAuthority && !!authInfo && rawAuthority.toLowerCase() !== authInfo.cleanName.toLowerCase();
+  // Chip de provenance (lista origen) cuando el source difiere del nombre limpio.
+  const rawSource = (entry.source || '').trim();
+  const showProvenance = !!rawSource && (!authInfo || rawSource.toLowerCase() !== authInfo.cleanName.toLowerCase()) && rawSource.toLowerCase() !== rawAuthority.toLowerCase();
   const borderColor = details?.riesgo ? getRiskBorderColor(details.riesgo) : 'border-red-500';
   const dateValue = formatDate(entry.listing_date) || formatDate(entry.start_date || '');
   const dateLabel = formatDate(entry.listing_date)
@@ -490,11 +579,23 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
     <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between mb-3">
         <div className="min-w-0">
-          <h4 className="text-foreground font-medium break-words">{entry.authority || entry.source}</h4>
-          {entry.authority && entry.authority !== entry.source && (
-            <span className={cn('inline-block mt-1 text-[10px] px-2 py-0.5 rounded border', getSourceBadgeClass(entry.source))}>
-              {entry.source}
+          <h4 className="text-foreground font-semibold break-words flex items-center gap-2">
+            {flag && <span aria-hidden className="text-lg leading-none">{flag}</span>}
+            <span>
+              {authInfo?.cleanName || entry.authority || entry.source}
+              {countryName && <span className="text-muted-foreground font-normal"> · {countryName}</span>}
             </span>
+          </h4>
+          {showRawAuthority && (
+            <p className="text-xs text-muted-foreground mt-0.5 break-words">{rawAuthority}</p>
+          )}
+          {showProvenance && (
+            <p className="text-[10px] text-muted-foreground mt-1.5 flex items-center gap-1.5">
+              <span className="uppercase tracking-wide">{t('entity.sanctions.list')}</span>
+              <span className="font-mono px-1.5 py-0.5 rounded bg-foreground/5 border border-foreground/10 text-foreground/80 break-all">
+                {rawSource}
+              </span>
+            </p>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -597,11 +698,16 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
       )}
 
       <div className="mt-3 pt-2 border-t border-foreground/5 flex flex-wrap items-center justify-between gap-2">
-        {dateValue ? (
-          <p className="text-xs text-muted-foreground">{dateLabel}: <span className="text-foreground">{dateValue}</span></p>
-        ) : (
-          <p className="text-xs text-muted-foreground/60 italic">{t('entity.sanctions.noDate')}</p>
-        )}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {dateValue ? (
+            <p className="text-xs text-muted-foreground">{dateLabel}: <span className="text-foreground">{dateValue}</span></p>
+          ) : (
+            <p className="text-xs text-muted-foreground/60 italic">{t('entity.sanctions.noDate')}</p>
+          )}
+          {entry.reference_number && (
+            <p className="text-xs text-muted-foreground">{t('entity.sanctions.labels.reference')} <span className="text-foreground font-mono break-all">{entry.reference_number}</span></p>
+          )}
+        </div>
         {entry.source_url && (
           <a href={entry.source_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:text-blue-400 inline-flex items-center gap-1">
             {t('entity.sanctions.source')} <ExternalLink className="w-3 h-3" />
@@ -1338,6 +1444,7 @@ const hasSanctions =
               </div>
             ) : (
               <div className="space-y-4">
+                <SanctionsSummaryBanner sanctions={entity.sanctions} />
                 {entity.sanctions.map((sanction, i) => (
                   <motion.div
                     key={i}

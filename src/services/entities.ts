@@ -1,5 +1,5 @@
 import api from './api';
-import type { APIEntity } from '@/types/api';
+import type { APIEntity, APISanctionEntry } from '@/types/api';
 import type { RelationshipListItem } from './graph';
 
 const referenceResolutionCache = new Map<string, ReferenceResolution>();

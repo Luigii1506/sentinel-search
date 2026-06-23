@@ -115,6 +115,12 @@
       "officialDocument": "View official document",
       "appearsInDatasets": "Appears in {{count}} datasets:",
       "viewMore": "View {{count}} more",
+      "summaryTitle": "Sanctioned by {{authorities}} authorities across {{jurisdictions}} jurisdictions",
+      "jurisdictions": "Jurisdictions",
+      "programsCount": "{{count}} program",
+      "programsCount_other": "{{count}} programs",
+      "list": "List:",
+      "euJurisdiction": "European Union",
       "details": {
         "rfc": "Tax ID",
         "dataset": "Dataset",

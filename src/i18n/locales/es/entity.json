@@ -115,6 +115,12 @@
       "officialDocument": "Ver documento oficial",
       "appearsInDatasets": "Aparece en {{count}} datasets:",
       "viewMore": "Ver {{count}} más",
+      "summaryTitle": "Sancionado por {{authorities}} autoridades en {{jurisdictions}} jurisdicciones",
+      "jurisdictions": "Jurisdicciones",
+      "programsCount": "{{count}} programa",
+      "programsCount_other": "{{count}} programas",
+      "list": "Lista:",
+      "euJurisdiction": "Unión Europea",
       "details": {
         "rfc": "RFC",
         "dataset": "Dataset",
