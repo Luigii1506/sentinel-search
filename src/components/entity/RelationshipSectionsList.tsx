@@ -135,9 +135,15 @@ export function RelationshipSectionsList({
                         const referenceSummary = referenceLike ? getReferenceRelationshipSummary(rel) : null;
                         const cleanDescription =
                           rel.description &&
+                          // En familia el description es solo un nombre (caption FTM) →
+                          // ruido: el rol (Padre/Hijo) + el nombre ya lo dicen todo.
+                          rel.type !== 'family' &&
                           !rel.description.includes('→') &&
                           !rel.description.includes('—') &&
-                          !rel.description.toLowerCase().startsWith('wikidata ')
+                          !rel.description.toLowerCase().startsWith('wikidata ') &&
+                          // Ocultar si solo duplica el nombre de la entidad relacionada.
+                          rel.description.trim().toLowerCase() !==
+                            (rel.related_entity_name || '').trim().toLowerCase()
                             ? rel.description
                             : null;
 
