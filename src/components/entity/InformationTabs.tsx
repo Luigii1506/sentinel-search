@@ -355,6 +355,30 @@ function IdentityTab({ entity }: { entity: Entity }) {
   );
 }
 
+// Collapsible long-text block (official detail / provisions in the source language)
+function CollapsibleText({ text, limit = 150 }: { text: string; limit?: number }) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const trimmed = text.trim();
+  const needsClamp = trimmed.length > limit;
+  const shown = !needsClamp || expanded ? trimmed : `${trimmed.slice(0, limit).trimEnd()}…`;
+
+  return (
+    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line break-words">
+      {shown}
+      {needsClamp && (
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="ml-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          {expanded ? t('entity.infoTabs.sanctions.seeLess') : t('entity.infoTabs.sanctions.seeMore')}
+        </button>
+      )}
+    </p>
+  );
+}
+
 // Sanctions Tab
 function SanctionsTab({ entity }: { entity: Entity }) {
   const { t } = useTranslation();
@@ -371,95 +395,153 @@ function SanctionsTab({ entity }: { entity: Entity }) {
 
   return (
     <div className="space-y-4">
-      {entity.sanctions.map((sanction, index) => (
-        <motion.div
-          key={sanction.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="glass rounded-xl p-5 border-l-4 border-red-500"
-        >
-          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <Shield className="w-5 h-5 text-red-600 dark:text-red-500" />
-                <span className={cn('text-xs px-2 py-0.5 rounded border', getSourceBadgeClass(sanction.source))}>
-                  {sanction.source}
-                </span>
-                {sanction.authority && sanction.authority !== sanction.source && (
-                  <span className="text-xs px-2 py-0.5 rounded border bg-blue-500/10 text-blue-600 dark:text-blue-300 border-blue-500/30">
-                    {sanction.authority}
+      {entity.sanctions.map((sanction, index) => {
+        // Dates: prefer explicit listing date, fall back to start date. Guard every
+        // formatDate so empty/invalid values never render "Invalid Date".
+        const listingFormatted = formatDate(sanction.listingDate);
+        const startFormatted = formatDate(sanction.start_date ?? '');
+        const endFormatted = formatDate(sanction.end_date ?? '');
+        const primaryDate = listingFormatted
+          ? { label: t('entity.infoTabs.sanctions.listingDate'), value: listingFormatted }
+          : startFormatted
+            ? { label: t('entity.infoTabs.sanctions.validFrom'), value: startFormatted }
+            : null;
+
+        // Authority is the real sanctioning body; fall back to source code.
+        const authority = sanction.authority?.trim() || sanction.source;
+        const program = sanction.program?.trim() || '';
+        const programLong = program.length > 80;
+
+        // Consolidated official detail: reason is canonical, summary only if it adds info.
+        const reason = sanction.reason?.trim() || '';
+        const summary = sanction.summary?.trim() || '';
+        const detail = reason || (summary !== reason ? summary : '');
+        const provisions = sanction.provisions?.trim() || '';
+        const showProvisions = provisions && provisions !== detail;
+
+        const isActive = sanction.status === 'active';
+
+        return (
+          <motion.div
+            key={sanction.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="glass rounded-xl p-5 border-l-4 border-red-500 space-y-3"
+          >
+            {/* Header: authority (primary) + source badge + status */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-start gap-2 min-w-0">
+                <Shield className="w-5 h-5 text-red-600 dark:text-red-500 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <h4 className="text-base font-semibold text-foreground leading-snug break-words">
+                    {authority}
+                  </h4>
+                  <span
+                    className={cn(
+                      'mt-1 inline-block text-[10px] px-1.5 py-0.5 rounded border',
+                      getSourceBadgeClass(sanction.source)
+                    )}
+                  >
+                    {sanction.source}
                   </span>
+                </div>
+              </div>
+              <Badge
+                variant="outline"
+                className={cn(
+                  'shrink-0',
+                  isActive
+                    ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
+                    : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
+                )}
+              >
+                {isActive
+                  ? t('entity.infoTabs.sanctions.statusActive')
+                  : t('entity.infoTabs.sanctions.statusInactive')}
+              </Badge>
+            </div>
+
+            {/* Program / regime */}
+            {program && (
+              <div>
+                <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground/70">
+                  {t('entity.infoTabs.sanctions.programRegime')}
+                </span>
+                <p
+                  className={cn('text-sm text-foreground break-words', programLong && 'line-clamp-2')}
+                  title={programLong ? program : undefined}
+                >
+                  {program}
+                </p>
+              </div>
+            )}
+
+            {/* Date line — only when there is a real date */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+              {primaryDate ? (
+                <span>
+                  <span className="text-muted-foreground">{primaryDate.label}</span>
+                  <span className="text-foreground ml-1.5">{primaryDate.value}</span>
+                </span>
+              ) : (
+                <span className="text-xs text-muted-foreground/60 italic">
+                  {t('entity.infoTabs.sanctions.noDate')}
+                </span>
+              )}
+              {endFormatted && (
+                <span>
+                  <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.until')}</span>
+                  <span className="text-foreground ml-1.5">{endFormatted}</span>
+                </span>
+              )}
+              {sanction.referenceNumber && (
+                <span>
+                  <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.reference')}</span>
+                  <span className="text-foreground ml-1.5 font-mono text-xs">{sanction.referenceNumber}</span>
+                </span>
+              )}
+            </div>
+
+            {/* Official detail (source language) + provisions, consolidated & collapsible */}
+            {(detail || showProvisions) && (
+              <div className="space-y-2 pt-1">
+                {detail && (
+                  <div>
+                    <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground/70 mb-0.5">
+                      {t('entity.infoTabs.sanctions.officialDetail')}
+                    </span>
+                    <CollapsibleText text={detail} />
+                  </div>
+                )}
+                {showProvisions && (
+                  <div>
+                    <span className="block text-xs font-medium uppercase tracking-wide text-muted-foreground/70 mb-0.5">
+                      {t('entity.infoTabs.sanctions.provisions')}
+                    </span>
+                    <CollapsibleText text={provisions} />
+                  </div>
                 )}
               </div>
-              <h4 className="text-lg font-medium text-foreground">
-                {sanction.program ? t('entity.infoTabs.sanctions.programLabel', { program: sanction.program }) : t('entity.infoTabs.sanctions.sanctionLabel')}
-              </h4>
-            </div>
-            <Badge
-              variant="outline"
-              className={cn(
-                'capitalize',
-                sanction.status === 'active'
-                  ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/30'
-                  : 'bg-gray-500/10 text-muted-foreground border-gray-500/30'
-              )}
-            >
-              {sanction.status}
-            </Badge>
-          </div>
+            )}
 
-          {sanction.reason && <p className="text-muted-foreground mb-3">{sanction.reason}</p>}
-          {sanction.summary && sanction.summary !== sanction.reason && (
-            <p className="text-muted-foreground text-sm mb-3 italic">{sanction.summary}</p>
-          )}
-
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.listingDate')}</span>
-              <span className="text-foreground ml-2">{formatDate(sanction.listingDate)}</span>
-            </div>
-            {sanction.start_date && (
-              <div>
-                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.validFrom')}</span>
-                <span className="text-foreground ml-2">{formatDate(sanction.start_date)}</span>
+            {/* Source link */}
+            {sanction.source_url && (
+              <div className="pt-2 border-t border-border/50">
+                <a
+                  href={sanction.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  {t('entity.infoTabs.sanctions.source')}
+                </a>
               </div>
             )}
-            {sanction.end_date && (
-              <div>
-                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.until')}</span>
-                <span className="text-foreground ml-2">{formatDate(sanction.end_date)}</span>
-              </div>
-            )}
-            {sanction.provisions && (
-              <div>
-                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.provision')}</span>
-                <span className="text-foreground ml-2">{sanction.provisions}</span>
-              </div>
-            )}
-            {sanction.referenceNumber && (
-              <div>
-                <span className="text-muted-foreground">{t('entity.infoTabs.sanctions.reference')}</span>
-                <span className="text-foreground ml-2 font-mono">{sanction.referenceNumber}</span>
-              </div>
-            )}
-          </div>
-
-          {sanction.source_url && (
-            <div className="mt-4 pt-3 border-t border-border/50">
-              <a
-                href={sanction.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                {t('entity.infoTabs.sanctions.officialDocument')}
-              </a>
-            </div>
-          )}
-        </motion.div>
-      ))}
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

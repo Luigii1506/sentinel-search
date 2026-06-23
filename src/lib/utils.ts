@@ -61,7 +61,9 @@ export function formatCompactNumber(num: number): string {
 
 // Format date
 export function formatDate(dateString: string): string {
+  if (!dateString) return '';
   const date = parseDisplayDate(dateString);
+  if (Number.isNaN(date.getTime())) return '';  // evita "Invalid Date" en fechas vacías/malformadas
   return date.toLocaleDateString('es-MX', {
     year: 'numeric',
     month: 'short',
