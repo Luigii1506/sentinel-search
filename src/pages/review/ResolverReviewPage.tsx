@@ -99,12 +99,23 @@ export function ResolverReviewPage() {
   const statsCards = useMemo(() => {
     if (!status) return null;
     return (
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-        <MetricCard label={t('review.resolver.stats.unsurePending')} value={status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label={t('review.resolver.stats.positivePending')} value={status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label={t('review.resolver.stats.negative')} value={status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
-        <MetricCard label={t('review.resolver.stats.canonicalGroups')} value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
-      </div>
+      <>
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-2">
+          <MetricCard label={t('review.resolver.stats.unsurePending')} value={status.reviewable?.unsure ?? status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.positivePending')} value={status.reviewable?.positive ?? status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.negative')} value={status.reviewable?.negative ?? status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.canonicalGroups')} value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
+        </div>
+        {status.stale && (status.stale.unsure + status.stale.positive + status.stale.negative) > 0 && (
+          <p className="text-xs text-muted-foreground mb-6">
+            {t('review.resolver.stats.staleNote', {
+              unsure: status.stale.unsure,
+              positive: status.stale.positive,
+              negative: status.stale.negative,
+            })}
+          </p>
+        )}
+      </>
     );
   }, [status, t]);
 

@@ -16,6 +16,18 @@ export interface ResolverStatus {
     no_judgement: number;
     total: number;
   };
+  /** Pares accionables: ambos lados son entidades Gold activas (lo que va a la cola). */
+  reviewable?: {
+    unsure: number;
+    positive: number;
+    negative: number;
+  };
+  /** Pares 'stale': un lado fue fusionado/desactivado por el dedup → sin acción. */
+  stale?: {
+    unsure: number;
+    positive: number;
+    negative: number;
+  };
   canonical_ids_count: number;
   thresholds: { positive: number; negative: number };
 }

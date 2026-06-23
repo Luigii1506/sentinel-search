@@ -77,10 +77,11 @@
       "title": "Revisión de resolución",
       "description": "Pares UNSURE generados por cruce de referencias. Decide si son la misma entidad o entidades distintas.",
       "stats": {
-        "unsurePending": "UNSURE pendientes",
-        "positivePending": "Positivos pendientes",
-        "negative": "Negativos",
-        "canonicalGroups": "Grupos canónicos"
+        "unsurePending": "UNSURE revisables",
+        "positivePending": "Positivos revisables",
+        "negative": "Negativos revisables",
+        "canonicalGroups": "Grupos canónicos",
+        "staleNote": "Se ocultan pares 'históricos' (un lado ya fusionado por el dedup, sin acción posible): {{unsure}} UNSURE, {{positive}} positivos, {{negative}} negativos."
       },
       "loadError": "Error al cargar la cola de revisión",
       "emptyTitle": "Cola vacía",
