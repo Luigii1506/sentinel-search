@@ -1,20 +1,26 @@
 /**
  * ResolverReviewPage — Cola de UNSURE pairs para review humano (Fase C).
  */
-import { useMemo, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus, Copy, Fingerprint } from 'lucide-react';
-import { resolverService, type UnsurePair } from '@/services/resolver';
+import { CheckCircle, XCircle, SkipForward, AlertTriangle, Loader2, RefreshCw, ExternalLink, GitBranchPlus, Copy, Fingerprint, ChevronLeft, ChevronRight } from 'lucide-react';
+import { resolverService, type UnsurePair, type JudgementPair, type CanonicalGroup } from '@/services/resolver';
 import { entityService } from '@/services/entities';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AppPage, EmptyState, MetricCard, PageHeader, PanelSkeleton } from '@/components/foundation';
 import { humanizeEntityName, getCountryName } from '@/lib/utils';
 import { toast } from 'sonner';
+
+type ResolverTab = 'queue' | 'canonical' | 'positives' | 'negatives';
+const PAGE_SIZE = 50;
 
 interface EntitySummary {
   id: string;
@@ -25,6 +31,92 @@ interface EntitySummary {
 export function ResolverReviewPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<ResolverTab>('queue');
+
+  const { data: statusData } = useQuery({
+    queryKey: ['resolver-status'],
+    queryFn: () => resolverService.getStatus(),
+    refetchOnWindowFocus: false,
+  });
+  const status = statusData ?? null;
+
+  const statsCards = useMemo(() => {
+    if (!status) return null;
+    return (
+      <>
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-2">
+          <MetricCard label={t('review.resolver.stats.unsurePending')} value={status.reviewable?.unsure ?? status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.positivePending')} value={status.reviewable?.positive ?? status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.negative')} value={status.reviewable?.negative ?? status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
+          <MetricCard label={t('review.resolver.stats.canonicalGroups')} value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
+        </div>
+        {status.stale && (status.stale.unsure + status.stale.positive + status.stale.negative) > 0 && (
+          <p className="text-xs text-muted-foreground mb-6">
+            {t('review.resolver.stats.staleNote', {
+              unsure: status.stale.unsure,
+              positive: status.stale.positive,
+              negative: status.stale.negative,
+            })}
+          </p>
+        )}
+      </>
+    );
+  }, [status, t]);
+
+  return (
+    <AppPage>
+      <PageHeader
+        title={t('review.resolver.title')}
+        description={t('review.resolver.description')}
+        icon={
+          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
+            <GitBranchPlus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+          </div>
+        }
+      />
+
+      {statsCards}
+
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ResolverTab)}>
+        <TabsList className="mb-6 bg-foreground/5 border border-foreground/10">
+          <TabsTrigger value="queue" className="data-[state=active]:bg-foreground/10">
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {t('review.resolver.tabs.queue')}
+          </TabsTrigger>
+          <TabsTrigger value="canonical" className="data-[state=active]:bg-foreground/10">
+            <GitBranchPlus className="w-4 h-4 mr-2" />
+            {t('review.resolver.tabs.canonical')}
+          </TabsTrigger>
+          <TabsTrigger value="positives" className="data-[state=active]:bg-foreground/10">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            {t('review.resolver.tabs.positives')}
+          </TabsTrigger>
+          <TabsTrigger value="negatives" className="data-[state=active]:bg-foreground/10">
+            <XCircle className="w-4 h-4 mr-2" />
+            {t('review.resolver.tabs.negatives')}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="queue">
+          <QueueTab navigate={navigate} />
+        </TabsContent>
+        <TabsContent value="canonical">
+          <CanonicalGroupsTab navigate={navigate} enabled={activeTab === 'canonical'} />
+        </TabsContent>
+        <TabsContent value="positives">
+          <JudgementsTab judgement="positive" navigate={navigate} enabled={activeTab === 'positives'} />
+        </TabsContent>
+        <TabsContent value="negatives">
+          <JudgementsTab judgement="negative" navigate={navigate} enabled={activeTab === 'negatives'} />
+        </TabsContent>
+      </Tabs>
+    </AppPage>
+  );
+}
+
+/** Cola UNSURE: par a par para decisión humana (comportamiento original). */
+function QueueTab({ navigate }: { navigate: ReturnType<typeof useNavigate> }) {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -36,12 +128,8 @@ export function ResolverReviewPage() {
   } = useQuery({
     queryKey: ['resolver-review'],
     queryFn: async () => {
-      const [status, pairsRes] = await Promise.all([
-        resolverService.getStatus(),
-        resolverService.listUnsure(1, 0),
-      ]);
+      const pairsRes = await resolverService.listUnsure(1, 0);
       return {
-        status,
         pair: pairsRes.pairs[0] ?? null,
       };
     },
@@ -49,7 +137,6 @@ export function ResolverReviewPage() {
   });
 
   const pair = data?.pair ?? null;
-  const status = data?.status ?? null;
 
   const [leftQuery, rightQuery] = useQueries({
     queries: [
@@ -96,43 +183,8 @@ export function ResolverReviewPage() {
   const leftEnt = leftQuery.data ?? (pair ? { id: pair.source } : null);
   const rightEnt = rightQuery.data ?? (pair ? { id: pair.target } : null);
 
-  const statsCards = useMemo(() => {
-    if (!status) return null;
-    return (
-      <>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-2">
-          <MetricCard label={t('review.resolver.stats.unsurePending')} value={status.reviewable?.unsure ?? status.judgements.unsure} icon={AlertTriangle} accent="amber" className="bg-foreground/5 border-foreground/10" />
-          <MetricCard label={t('review.resolver.stats.positivePending')} value={status.reviewable?.positive ?? status.judgements.positive} icon={CheckCircle} accent="success" className="bg-foreground/5 border-foreground/10" />
-          <MetricCard label={t('review.resolver.stats.negative')} value={status.reviewable?.negative ?? status.judgements.negative} icon={XCircle} accent="red" className="bg-foreground/5 border-foreground/10" />
-          <MetricCard label={t('review.resolver.stats.canonicalGroups')} value={status.canonical_ids_count} icon={GitBranchPlus} className="bg-foreground/5 border-foreground/10" />
-        </div>
-        {status.stale && (status.stale.unsure + status.stale.positive + status.stale.negative) > 0 && (
-          <p className="text-xs text-muted-foreground mb-6">
-            {t('review.resolver.stats.staleNote', {
-              unsure: status.stale.unsure,
-              positive: status.stale.positive,
-              negative: status.stale.negative,
-            })}
-          </p>
-        )}
-      </>
-    );
-  }, [status, t]);
-
   return (
-    <AppPage>
-      <PageHeader
-        title={t('review.resolver.title')}
-        description={t('review.resolver.description')}
-        icon={
-          <div className="p-2.5 rounded-lg bg-gradient-to-br from-brand-blue/20 to-brand-electric/20 border border-blue-500/30">
-            <GitBranchPlus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-          </div>
-        }
-      />
-
-      {statsCards}
-
+    <>
       {error && (
         <Alert variant="destructive" className="mb-4">
           <AlertTriangle className="h-4 w-4" />
@@ -198,7 +250,221 @@ export function ResolverReviewPage() {
           </div>
         </>
       )}
-    </AppPage>
+    </>
+  );
+}
+
+/** Paginador reutilizable Prev/Next con etiqueta "X–Y de TOTAL". */
+function Paginator({ offset, limit, total, count, onPrev, onNext, disabled }: {
+  offset: number; limit: number; total: number; count: number;
+  onPrev: () => void; onNext: () => void; disabled?: boolean;
+}) {
+  const { t } = useTranslation();
+  if (total === 0) return null;
+  const from = offset + 1;
+  const to = offset + count;
+  return (
+    <div className="flex items-center justify-between mt-4">
+      <span className="text-xs text-muted-foreground">
+        {t('review.resolver.pagination', { from, to, total })}
+      </span>
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" disabled={disabled || offset <= 0} onClick={onPrev}>
+          <ChevronLeft className="h-4 w-4 mr-1" />
+          {t('review.resolver.prev')}
+        </Button>
+        <Button variant="outline" size="sm" disabled={disabled || offset + limit >= total} onClick={onNext}>
+          {t('review.resolver.next')}
+          <ChevronRight className="h-4 w-4 ml-1" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/** Tab de grupos canónicos (clusters fusionados). */
+function CanonicalGroupsTab({ navigate, enabled }: {
+  navigate: ReturnType<typeof useNavigate>; enabled: boolean;
+}) {
+  const { t } = useTranslation();
+  const [offset, setOffset] = useState(0);
+
+  const { data, isLoading, isFetching, error } = useQuery({
+    queryKey: ['resolver-canonical-groups', offset],
+    queryFn: () => resolverService.getCanonicalGroups(PAGE_SIZE, offset),
+    enabled,
+    refetchOnWindowFocus: false,
+  });
+
+  const errorMessage = error instanceof Error ? error.message : t('review.resolver.loadError');
+  const groups = data?.groups ?? [];
+
+  const groupTitle = (g: CanonicalGroup) =>
+    g.canonical_name
+      ? humanizeEntityName(g.canonical_name)
+      : (g.members[0]?.name ? humanizeEntityName(g.members[0].name) : g.canonical_id);
+
+  return (
+    <>
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      {isLoading ? (
+        <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={8} />
+      ) : groups.length === 0 ? (
+        <EmptyState icon={GitBranchPlus} title={t('review.resolver.tabs.canonical')} description={t('review.resolver.noData')} />
+      ) : (
+        <div className="space-y-3">
+          {groups.map((g) => (
+            <Card key={g.canonical_id} className="bg-foreground/5 border-foreground/10">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center justify-between gap-2 text-base">
+                  <span className="font-semibold leading-tight">{groupTitle(g)}</span>
+                  <Badge variant="outline" className="shrink-0">{t('review.resolver.size')}: {g.size}</Badge>
+                </CardTitle>
+                <div className="text-[10px] text-muted-foreground font-mono mt-0.5 flex items-center">
+                  {g.canonical_id.slice(0, 24)}…<CopyButton value={g.canonical_id} label="ID" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1.5">{t('review.resolver.members')}</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {g.members.map((m) => {
+                    const label = m.name ? humanizeEntityName(m.name) : m.id.slice(0, 12) + '…';
+                    return m.is_gold ? (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => navigate(`/entity/${m.id}`)}
+                        className="inline-flex items-center gap-1 rounded-md border border-blue-500/30 bg-blue-500/10 px-2 py-0.5 text-xs text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 transition-colors"
+                      >
+                        {label}
+                        <ExternalLink className="h-3 w-3" />
+                      </button>
+                    ) : (
+                      <span key={m.id} className="inline-flex items-center rounded-md border border-foreground/10 bg-foreground/5 px-2 py-0.5 text-xs text-muted-foreground">
+                        {label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+      {data && (
+        <Paginator
+          offset={offset}
+          limit={PAGE_SIZE}
+          total={data.total}
+          count={groups.length}
+          disabled={isFetching}
+          onPrev={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
+      )}
+    </>
+  );
+}
+
+/** Tab de decisiones positivas/negativas (tabla de pares). */
+function JudgementsTab({ judgement, navigate, enabled }: {
+  judgement: 'positive' | 'negative'; navigate: ReturnType<typeof useNavigate>; enabled: boolean;
+}) {
+  const { t } = useTranslation();
+  const [offset, setOffset] = useState(0);
+  const [reviewableOnly, setReviewableOnly] = useState(true);
+
+  const { data, isLoading, isFetching, error } = useQuery({
+    queryKey: ['resolver-judgements', judgement, reviewableOnly, offset],
+    queryFn: () => resolverService.getJudgements(judgement, reviewableOnly, PAGE_SIZE, offset),
+    enabled,
+    refetchOnWindowFocus: false,
+  });
+
+  const errorMessage = error instanceof Error ? error.message : t('review.resolver.loadError');
+  const pairs = data?.pairs ?? [];
+
+  const nameButton = (id: string, name: string | null) => (
+    <button
+      type="button"
+      onClick={() => navigate(`/entity/${id}`)}
+      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline text-left"
+    >
+      {name ? humanizeEntityName(name) : <span className="font-mono text-xs text-muted-foreground">{id.slice(0, 12)}…</span>}
+      <ExternalLink className="h-3 w-3 shrink-0" />
+    </button>
+  );
+
+  return (
+    <>
+      <div className="flex items-center gap-2 mb-4">
+        <Switch id={`reviewable-${judgement}`} checked={reviewableOnly} onCheckedChange={(v) => { setReviewableOnly(v); setOffset(0); }} />
+        <label htmlFor={`reviewable-${judgement}`} className="text-sm text-muted-foreground cursor-pointer">
+          {t('review.resolver.reviewableOnly')}
+        </label>
+      </div>
+
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>{errorMessage}</AlertDescription>
+        </Alert>
+      )}
+      {isLoading ? (
+        <PanelSkeleton className="rounded-xl border border-foreground/5 bg-foreground/[0.02] p-6" lines={8} />
+      ) : pairs.length === 0 ? (
+        <EmptyState
+          icon={judgement === 'positive' ? CheckCircle : XCircle}
+          title={judgement === 'positive' ? t('review.resolver.tabs.positives') : t('review.resolver.tabs.negatives')}
+          description={t('review.resolver.noData')}
+        />
+      ) : (
+        <Card className="bg-foreground/5 border-foreground/10">
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('review.resolver.colLeft')}</TableHead>
+                  <TableHead>{t('review.resolver.colRight')}</TableHead>
+                  <TableHead>{t('review.resolver.colUser')}</TableHead>
+                  <TableHead>{t('review.resolver.colScore')}</TableHead>
+                  <TableHead>{t('review.resolver.colDate')}</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pairs.map((p: JudgementPair, i) => (
+                  <TableRow key={`${p.left_id}-${p.right_id}-${i}`}>
+                    <TableCell>{nameButton(p.left_id, p.left_name)}</TableCell>
+                    <TableCell>{nameButton(p.right_id, p.right_name)}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{p.user || '—'}</TableCell>
+                    <TableCell className="text-xs">{p.score != null ? `${(p.score * 100).toFixed(0)}%` : '—'}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {p.created_at ? new Date(p.created_at).toLocaleDateString() : '—'}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+      {data && (
+        <Paginator
+          offset={offset}
+          limit={PAGE_SIZE}
+          total={data.total}
+          count={pairs.length}
+          disabled={isFetching}
+          onPrev={() => setOffset((o) => Math.max(0, o - PAGE_SIZE))}
+          onNext={() => setOffset((o) => o + PAGE_SIZE)}
+        />
+      )}
+    </>
   );
 }
 

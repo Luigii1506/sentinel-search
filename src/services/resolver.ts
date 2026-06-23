@@ -49,6 +49,45 @@ export interface DecideResponse {
   canonical_after: string | null;
 }
 
+export interface CanonicalGroupMember {
+  id: string;
+  name: string | null;
+  is_gold: boolean;
+}
+
+export interface CanonicalGroup {
+  canonical_id: string;
+  canonical_name: string | null;
+  size: number;
+  members: CanonicalGroupMember[];
+}
+
+export interface CanonicalGroupsResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  groups: CanonicalGroup[];
+}
+
+export interface JudgementPair {
+  left_id: string;
+  left_name: string | null;
+  right_id: string;
+  right_name: string | null;
+  user: string | null;
+  score: number | null;
+  created_at: string | null;
+}
+
+export interface JudgementsResponse {
+  judgement: 'positive' | 'negative';
+  reviewable_only: boolean;
+  total: number;
+  limit: number;
+  offset: number;
+  pairs: JudgementPair[];
+}
+
 export const resolverService = {
   async getStatus(): Promise<ResolverStatus> {
     const { data } = await api.get('/api/v2/admin/er/status');
@@ -73,6 +112,25 @@ export const resolverService = {
       right_id: rightId,
       judgement,
       user,
+    });
+    return data;
+  },
+
+  async getCanonicalGroups(limit = 50, offset = 0): Promise<CanonicalGroupsResponse> {
+    const { data } = await api.get('/api/v2/admin/er/canonical-groups', {
+      params: { limit, offset },
+    });
+    return data;
+  },
+
+  async getJudgements(
+    judgement: 'positive' | 'negative',
+    reviewableOnly = true,
+    limit = 50,
+    offset = 0,
+  ): Promise<JudgementsResponse> {
+    const { data } = await api.get('/api/v2/admin/er/judgements', {
+      params: { judgement, reviewable_only: reviewableOnly, limit, offset },
     });
     return data;
   },
