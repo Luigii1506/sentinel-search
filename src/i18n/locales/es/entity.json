@@ -123,6 +123,8 @@
       "programsCount": "{{count}} programa",
       "programsCount_other": "{{count}} programas",
       "list": "Lista:",
+      "alsoListedIn": "También figura en estas listas de sanciones",
+      "membershipNote": "Aparece en la lista (sin detalle estructurado)",
       "euJurisdiction": "Unión Europea",
       "details": {
         "rfc": "RFC",

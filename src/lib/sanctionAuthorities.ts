@@ -57,9 +57,17 @@ const AUTHORITY_RULES: AuthorityRule[] = [
     officialUrl: 'https://www.bis.doc.gov/index.php/the-denied-persons-list',
     description: 'Bureau of Industry and Security de EE.UU. (control de exportaciones).',
   },
+  {
+    match: ['us_trade_csl', 'trade_csl', 'consolidated screening list'],
+    cleanName: 'US Trade CSL',
+    country: 'US',
+    officialUrl: 'https://www.trade.gov/consolidated-screening-list',
+    description: 'Lista consolidada de screening del Departamento de Comercio de EE.UU.',
+  },
   // ── Unión Europea ──────────────────────────────────────────────────────────
   {
     match: ['eu-cfsp', 'eu_cfsp', 'eur-cfsp', 'cfsp', 'eu_sanctions', 'eu_fsf', 'european union', 'council of the european union'],
+    // nota: EU_SANCTIONS también resuelve aquí.
     cleanName: 'UE (CFSP)',
     country: 'EU',
     officialUrl: 'https://www.sanctionsmap.eu/',
@@ -67,11 +75,32 @@ const AUTHORITY_RULES: AuthorityRule[] = [
   },
   // ── Reino Unido ────────────────────────────────────────────────────────────
   {
-    match: ['hm treasury', 'ofsi', 'fcdo', 'gb_ofsi', 'gb_hmt', 'her majesty', 'his majesty'],
+    match: ['hm treasury', 'ofsi', 'fcdo', 'gb_ofsi', 'gb_hmt', 'gb_hmt_sanctions', 'gb_fcdo_sanctions', 'her majesty', 'his majesty'],
     cleanName: 'OFSI/HM Treasury',
     country: 'GB',
     officialUrl: 'https://www.gov.uk/government/publications/financial-sanctions-consolidated-list-of-targets',
     description: 'Office of Financial Sanctions Implementation del Tesoro del Reino Unido.',
+  },
+  // ── Letonia ────────────────────────────────────────────────────────────────
+  {
+    match: ['lv_fiu', 'lv_fiu_sanctions', 'financial intelligence unit of latvia'],
+    cleanName: 'FID (Letonia)',
+    country: 'LV',
+    description: 'Unidad de Inteligencia Financiera de Letonia (sanciones nacionales).',
+  },
+  // ── Lituania ───────────────────────────────────────────────────────────────
+  {
+    match: ['lt_fiu', 'lt_fiu_freezes', 'financial crime investigation service'],
+    cleanName: 'FNTT (Lituania)',
+    country: 'LT',
+    description: 'Servicio de Investigación de Delitos Financieros de Lituania (congelamientos).',
+  },
+  // ── Mónaco ─────────────────────────────────────────────────────────────────
+  {
+    match: ['mc_fund_freezes', 'mc_fund', 'monaco fund freezes', 'siccfin'],
+    cleanName: 'SICCFIN (Mónaco)',
+    country: 'MC',
+    description: 'Autoridad de Mónaco para el congelamiento de fondos (sanciones).',
   },
   // ── Canadá ─────────────────────────────────────────────────────────────────
   {
@@ -115,7 +144,7 @@ const AUTHORITY_RULES: AuthorityRule[] = [
   },
   // ── Nueva Zelanda ──────────────────────────────────────────────────────────
   {
-    match: ['ministry of foreign affairs and trade', 'mfat'],
+    match: ['ministry of foreign affairs and trade', 'mfat', 'nz_russia', 'nz_russia_sanctions'],
     cleanName: 'MFAT',
     country: 'NZ',
     officialUrl: 'https://www.mfat.govt.nz/en/countries-and-regions/russia/russia-sanctions/',
@@ -123,7 +152,7 @@ const AUTHORITY_RULES: AuthorityRule[] = [
   },
   // ── Ucrania ────────────────────────────────────────────────────────────────
   {
-    match: ['гур мо україни', 'гур', 'gur', 'main directorate of intelligence'],
+    match: ['гур мо україни', 'гур', 'gur', 'main directorate of intelligence', 'ua_war', 'ua_war_sanctions', 'war_sanctions'],
     cleanName: 'GUR (Defensa)',
     country: 'UA',
     officialUrl: 'https://war-sanctions.gur.gov.ua/en',
@@ -215,6 +244,77 @@ export function resolveSanctionAuthority(
 
   // Sin mapeo: devolvemos la autoridad cruda (o el source) tal cual, sin país.
   return { cleanName: rawAuthority || rawSource, country: undefined };
+}
+
+// ── Clasificación de fuentes de sanciones ───────────────────────────────────
+//
+// Determina si un código de dataset corresponde a una LISTA DE SANCIONES.
+// Diseño CONSERVADOR: ante la duda, devuelve false (nunca etiquetar una
+// fuente no-sancionatoria como sanción).
+
+// Patrones que SÍ son sanciones (substring, case-insensitive sobre el código).
+const SANCTION_CODE_PATTERNS: string[] = [
+  'sanction',
+  'ofac',
+  'sdn',
+  'sam_exclusions',
+  'debar',
+  'bis',
+  '_csl',
+  'trade_csl',
+  'freeze',
+  'fund_freezes',
+  'gels',
+  'gels_avoir',
+  'fcdo',
+  'hmt',
+  'tresor',
+  'seco',
+  'dfat',
+  'fiu_',
+  'fod_sanctions',
+  'nsdc',
+  'war_sanctions',
+  'un_sc',
+  'unsc',
+];
+
+// Patrones que NUNCA son sanciones (tienen prioridad sobre los positivos).
+const NON_SANCTION_CODE_PATTERNS: string[] = [
+  'cia_world',
+  'world_leaders',
+  'world_factbook',
+  'rusi_report',
+  'acf_bribe',
+  'ga_protocol',
+  'coh_disqualified',
+  '_pep',
+  'wikidata',
+  'poi',
+];
+
+/**
+ * `true` si el código de dataset corresponde a una lista de sanciones.
+ * Las exclusiones explícitas (PEP, world leaders, etc.) tienen prioridad.
+ */
+export function isSanctionSource(code: string): boolean {
+  const c = (code || '').trim().toLowerCase();
+  if (!c) return false;
+  if (NON_SANCTION_CODE_PATTERNS.some((p) => c.includes(p))) return false;
+  return SANCTION_CODE_PATTERNS.some((p) => c.includes(p));
+}
+
+/**
+ * Resuelve un CÓDIGO de dataset (p.ej. "GB_HMT_SANCTIONS") a
+ * {cleanName, country, officialUrl, description} reutilizando el resolver
+ * de autoridades. Pensado para fuentes de "membresía" sin registro
+ * estructurado de sanción.
+ */
+export function resolveSanctionSourceCode(code: string): SanctionAuthorityInfo | undefined {
+  const raw = (code || '').trim();
+  if (!raw) return undefined;
+  // El resolver hace match por substring sobre authority+source combinados.
+  return resolveSanctionAuthority(undefined, raw);
 }
 
 /**

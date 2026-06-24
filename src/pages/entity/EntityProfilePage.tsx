@@ -47,7 +47,7 @@ import type { RelationshipLevelFilter, RelationshipContextFilter, RelationshipPr
 import { getReferenceRelationshipSortScore, translateSubtype } from '@/components/entity/relationshipHelpers';
 import { AppPage, PageHeader, DetailPageSkeleton, EmptyState, CategoryBadge, PanelSkeleton } from '@/components/foundation';
 import { cn, getRiskColor, formatDate, humanizeEntityName, getCountryName } from '@/lib/utils';
-import { resolveSanctionAuthority, flagEmoji } from '@/lib/sanctionAuthorities';
+import { resolveSanctionAuthority, resolveSanctionSourceCode, isSanctionSource, flagEmoji } from '@/lib/sanctionAuthorities';
 import { fadeUp } from '@/lib/motion';
 import { SourceLevelSelector } from '@/components/SourceLevelSelector';
 import type { RiskLevel } from '@/types';
@@ -483,9 +483,120 @@ function sanctionCountryLabel(t: TFunction, iso2?: string): string {
   return getCountryName(iso2) || iso2;
 }
 
+// Entrada de "solo membresía": la entidad figura en una lista de sanciones
+// (via data_sources) pero NO hay un registro estructurado con el detalle.
+interface MembershipSanction {
+  /** Código de dataset crudo (p.ej. "GB_HMT_SANCTIONS"). */
+  code: string;
+  cleanName: string;
+  country?: string;
+  officialUrl?: string;
+}
+
+// Calcula las fuentes de sanciones de data_sources que NO están ya cubiertas por
+// una tarjeta estructurada. Dedupe por país: si una sanción estructurada ya cubre
+// ese país, no se duplica. Para listas sin país, se deduplica por código.
+function computeMembershipOnly(
+  dataSources: string[] | undefined,
+  sanctions: APISanctionEntry[],
+): MembershipSanction[] {
+  if (!dataSources || dataSources.length === 0) return [];
+
+  // Países (y nombres limpios) ya cubiertos por tarjetas estructuradas.
+  const structuredCountries = new Set<string>();
+  const structuredNames = new Set<string>();
+  for (const s of sanctions) {
+    const info = resolveSanctionAuthority(s.authority, s.source);
+    if (info?.country) structuredCountries.add(info.country.toUpperCase());
+    if (info?.cleanName) structuredNames.add(info.cleanName.toUpperCase());
+  }
+
+  const seenCodes = new Set<string>();
+  const seenCountries = new Set<string>();
+  const out: MembershipSanction[] = [];
+
+  for (const raw of dataSources) {
+    const code = (raw || '').trim();
+    if (!code) continue;
+    if (!isSanctionSource(code)) continue;
+
+    const key = code.toUpperCase();
+    if (seenCodes.has(key)) continue;
+    seenCodes.add(key);
+
+    const info = resolveSanctionSourceCode(code);
+    const country = info?.country?.toUpperCase();
+    const cleanName = info?.cleanName || code;
+
+    // Dedupe contra tarjetas estructuradas y entre membresías por país.
+    if (country) {
+      if (structuredCountries.has(country)) continue;
+      if (seenCountries.has(country)) continue;
+      seenCountries.add(country);
+    } else if (structuredNames.has(cleanName.toUpperCase())) {
+      continue;
+    }
+
+    out.push({ code, cleanName, country, officialUrl: info?.officialUrl });
+  }
+
+  return out;
+}
+
+// Sección que lista las fuentes de sanciones de "solo membresía".
+function MembershipSanctionsSection({ membership }: { membership: MembershipSanction[] }) {
+  const { t } = useTranslation();
+  if (membership.length === 0) return null;
+
+  return (
+    <div className="glass rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-foreground mb-3">{t('entity.sanctions.alsoListedIn')}</h3>
+      <div className="space-y-2">
+        {membership.map((m) => {
+          const flag = m.country ? flagEmoji(m.country) : '';
+          const countryName = sanctionCountryLabel(t, m.country);
+          return (
+            <div
+              key={m.code}
+              className="flex flex-wrap items-center gap-2 rounded-lg border border-foreground/10 bg-foreground/[0.03] px-3 py-2"
+            >
+              {flag && <span aria-hidden className="text-base leading-none">{flag}</span>}
+              <span className="text-sm font-medium text-foreground">
+                {m.cleanName}
+                {countryName && <span className="text-muted-foreground font-normal"> ({countryName})</span>}
+              </span>
+              <span className="inline-flex items-center gap-1 text-[11px]">
+                <span className="text-muted-foreground uppercase tracking-wide">{t('entity.sanctions.list')}</span>
+                <span className="font-mono text-foreground bg-foreground/5 border border-foreground/10 rounded px-1.5 py-0.5">{m.code}</span>
+              </span>
+              {m.officialUrl && (
+                <a
+                  href={m.officialUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {t('entity.sanctions.officialSourceLink')} <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+              <span className="text-[11px] text-muted-foreground italic w-full sm:w-auto">{t('entity.sanctions.membershipNote')}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 // Banner-resumen en el TOP de la sección de sanciones: cuenta autoridades y
 // jurisdicciones distintas y muestra chips de bandera por jurisdicción.
-function SanctionsSummaryBanner({ sanctions }: { sanctions: APISanctionEntry[] }) {
+function SanctionsSummaryBanner({
+  sanctions,
+  membership = [],
+}: {
+  sanctions: APISanctionEntry[];
+  membership?: MembershipSanction[];
+}) {
   const { t } = useTranslation();
 
   const { authorityCount, jurisdictions, programCount } = useMemo(() => {
@@ -494,17 +605,26 @@ function SanctionsSummaryBanner({ sanctions }: { sanctions: APISanctionEntry[] }
     const countrySet = new Set<string>();
     const programSet = new Set<string>();
 
+    const addCountry = (country?: string) => {
+      if (!country) return;
+      const iso = country.toUpperCase();
+      if (!countrySet.has(iso)) {
+        countrySet.add(iso);
+        countryOrder.push(iso);
+      }
+    };
+
     for (const s of sanctions) {
       const info = resolveSanctionAuthority(s.authority, s.source);
       if (info?.cleanName) authoritySet.add(info.cleanName.toUpperCase());
-      if (info?.country) {
-        const iso = info.country.toUpperCase();
-        if (!countrySet.has(iso)) {
-          countrySet.add(iso);
-          countryOrder.push(iso);
-        }
-      }
+      addCountry(info?.country);
       if (s.program && s.program.trim()) programSet.add(s.program.trim());
+    }
+
+    // Une las fuentes "solo membresía" para reflejar la cobertura jurisdiccional real.
+    for (const m of membership) {
+      if (m.cleanName) authoritySet.add(m.cleanName.toUpperCase());
+      addCountry(m.country);
     }
 
     return {
@@ -512,9 +632,9 @@ function SanctionsSummaryBanner({ sanctions }: { sanctions: APISanctionEntry[] }
       jurisdictions: countryOrder,
       programCount: programSet.size,
     };
-  }, [sanctions]);
+  }, [sanctions, membership]);
 
-  if (sanctions.length === 0) return null;
+  if (sanctions.length === 0 && membership.length === 0) return null;
 
   return (
     <div className="glass rounded-xl p-4 border-l-4 border-red-600 bg-red-500/[0.04]">
@@ -850,6 +970,12 @@ const unifiedCareerEntries = useMemo(() => buildUnifiedCareerEntries(profile, ca
 const pepStatus = profile?.overview.pep_status || entity?.pep_status || 'non_pep';
 const pepMonitoringUntil = profile?.overview.pep_monitoring_until || entity?.pep_monitoring_until || null;
 const taxIdentification = useMemo(() => entity?.identifications?.find((item) => item.type === 'tax_id'), [entity?.identifications]);
+// Fuentes de sanciones de "solo membresía": data_sources que son listas de
+// sanciones pero sin tarjeta estructurada (dedupe por país/código).
+const membershipSanctions = useMemo(
+  () => computeMembershipOnly(entity?.data_sources, entity?.sanctions || []),
+  [entity?.data_sources, entity?.sanctions],
+);
 const hasSanctions =
 
  (entity?.sanctions?.length || 0) > 0;
@@ -1446,7 +1572,7 @@ const hasSanctions =
 
           {/* Sanctions Tab */}
           <TabsContent value="sanctions">
-            {entity.sanctions.length === 0 ? (
+            {entity.sanctions.length === 0 && membershipSanctions.length === 0 ? (
               <div className="glass rounded-xl p-12 text-center">
                 <CheckCircle className="w-16 h-16 text-green-700 dark:text-green-500 mx-auto mb-4" />
                 <h3 className="text-xl font-medium text-foreground mb-2">{t('entity.sanctions.empty.title')}</h3>
@@ -1454,7 +1580,7 @@ const hasSanctions =
               </div>
             ) : (
               <div className="space-y-4">
-                <SanctionsSummaryBanner sanctions={entity.sanctions} />
+                <SanctionsSummaryBanner sanctions={entity.sanctions} membership={membershipSanctions} />
                 {entity.sanctions.map((sanction, i) => (
                   <motion.div
                     key={i}
@@ -1465,6 +1591,7 @@ const hasSanctions =
                     <SanctionEntry entry={sanction} />
                   </motion.div>
                 ))}
+                <MembershipSanctionsSection membership={membershipSanctions} />
               </div>
             )}
           </TabsContent>

@@ -123,6 +123,8 @@
       "programsCount": "{{count}} program",
       "programsCount_other": "{{count}} programs",
       "list": "List:",
+      "alsoListedIn": "Also appears on these sanctions lists",
+      "membershipNote": "Appears on the list (no structured detail)",
       "euJurisdiction": "European Union",
       "details": {
         "rfc": "Tax ID",
