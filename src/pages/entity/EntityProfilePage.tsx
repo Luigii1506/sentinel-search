@@ -28,6 +28,7 @@ import {
   ExternalLink,
   Tag,
   ArrowRight,
+  Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -574,6 +575,8 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
     : t('entity.sanctions.validFrom');
   const programLong = (entry.program || '').length > 80;
   const detailText = entry.reason || entry.summary || '';
+  // Fuente oficial: preferir source_url por-registro; si no, la URL mapeada de la autoridad.
+  const officialUrl = entry.source_url || authInfo?.officialUrl;
 
   return (
     <div className={cn('glass rounded-lg p-4 border-l-4', borderColor)}>
@@ -581,10 +584,17 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
         <div className="min-w-0">
           <h4 className="text-foreground font-semibold break-words flex items-center gap-2">
             {flag && <span aria-hidden className="text-lg leading-none">{flag}</span>}
-            <span>
+            <span title={authInfo?.description || undefined}>
               {authInfo?.cleanName || entry.authority || entry.source}
               {countryName && <span className="text-muted-foreground font-normal"> · {countryName}</span>}
             </span>
+            {authInfo?.description && (
+              <Info
+                className="w-3 h-3 text-muted-foreground/60 shrink-0 cursor-help"
+                aria-label={authInfo.description}
+                title={authInfo.description}
+              />
+            )}
           </h4>
           {showRawAuthority && (
             <p className="text-xs text-muted-foreground mt-0.5 break-words">{rawAuthority}</p>
@@ -615,7 +625,7 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
 
       {entry.program && (
         <div className="mb-2">
-          <p className="text-[10px] text-muted-foreground uppercase mb-0.5">{t('entity.sanctions.programRegime')}</p>
+          <p className="text-[10px] text-muted-foreground uppercase mb-0.5">{t('entity.sanctions.programRegimeLegal')}</p>
           <p className={cn('text-sm text-foreground break-words', programLong && 'line-clamp-2')} title={programLong ? entry.program : undefined}>
             {entry.program}
           </p>
@@ -708,9 +718,9 @@ function SanctionEntry({ entry }: { entry: APISanctionEntry }) {
             <p className="text-xs text-muted-foreground">{t('entity.sanctions.labels.reference')} <span className="text-foreground font-mono break-all">{entry.reference_number}</span></p>
           )}
         </div>
-        {entry.source_url && (
-          <a href={entry.source_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:text-blue-400 inline-flex items-center gap-1">
-            {t('entity.sanctions.source')} <ExternalLink className="w-3 h-3" />
+        {officialUrl && (
+          <a href={officialUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-500 hover:text-blue-400 inline-flex items-center gap-1">
+            {t('entity.sanctions.officialSourceLink')} <ExternalLink className="w-3 h-3" />
           </a>
         )}
       </div>
