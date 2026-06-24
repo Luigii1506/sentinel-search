@@ -242,6 +242,36 @@ export interface ArticleDetail {
   entity_links: ArticleEntityLink[];
 }
 
+// ── Adverse Media Review Queue (Linking 2.0) ──
+
+export interface ReviewLinkArticle {
+  id: string;
+  title: string;
+  url: string;
+  summary: string | null;
+  publication_date: string | null;
+  primary_category: string | null;
+  severity_score: number;
+}
+
+export interface ReviewLink {
+  link_id: string;
+  mentioned_name: string;
+  match_confidence: number;
+  entity_id: string;
+  entity_name: string;
+  entity_type: string;
+  entity_risk: number;
+  article: ReviewLinkArticle;
+}
+
+export interface ReviewLinksResponse {
+  total: number;
+  limit: number;
+  offset: number;
+  items: ReviewLink[];
+}
+
 // ── Service ──
 
 export const complianceService = {
@@ -429,6 +459,24 @@ export const complianceService = {
   async getArticleDetail(articleId: string): Promise<ArticleDetail> {
     const response = await api.get(`/api/v2/adverse-media/articles/${articleId}`);
     return response.data;
+  },
+
+  // Review Queue (Linking 2.0): links awaiting human confirmation/rejection
+  async listReviewLinks(params?: { limit?: number; offset?: number }): Promise<ReviewLinksResponse> {
+    const response = await api.get('/api/v2/adverse-media/links/review', { params });
+    return response.data;
+  },
+
+  async verifyLink(linkId: string, analystId?: string): Promise<{ message?: string }> {
+    const response = await api.post(`/api/v2/adverse-media/links/${linkId}/verify`, {
+      verified: true,
+      ...(analystId ? { analyst_id: analystId } : {}),
+    });
+    return response.data;
+  },
+
+  async rejectLink(linkId: string): Promise<void> {
+    await api.delete(`/api/v2/adverse-media/links/${linkId}`);
   },
 
   async createAlertFromArticle(data: {

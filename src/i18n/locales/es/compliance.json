@@ -284,7 +284,39 @@
       "tabs": {
         "articles": "Artículos",
         "sources": "Fuentes",
-        "analytics": "Análisis"
+        "analytics": "Análisis",
+        "review": "Cola de revisión"
+      },
+      "review": {
+        "title": "Cola de revisión",
+        "subtitle": "Revisa los links dudosos entre noticias y entidades antes de confiar en ellos.",
+        "resultsCount": "{{count}} link pendiente de revisión",
+        "resultsCount_other": "{{count}} links pendientes de revisión",
+        "article": "Noticia",
+        "match": "Coincidencia",
+        "confidence": "Confianza",
+        "mentionedAs": "Mencionado como",
+        "matchedTo": "Vinculado a",
+        "risk": "Riesgo",
+        "viewProfile": "Ver perfil",
+        "viewArticle": "Abrir noticia",
+        "showMore": "Ver más",
+        "showLess": "Ver menos",
+        "confirm": "Confirmar",
+        "reject": "Rechazar",
+        "empty": "No hay links pendientes de revisión",
+        "emptyDescription": "Todos los links entre noticias y entidades han sido revisados.",
+        "toast": {
+          "confirmed": "Link confirmado",
+          "confirmError": "No se pudo confirmar el link",
+          "rejected": "Link rechazado y eliminado",
+          "rejectError": "No se pudo rechazar el link"
+        },
+        "pagination": {
+          "showing": "Mostrando {{from}}-{{to}} de {{total}}",
+          "previous": "Anterior",
+          "next": "Siguiente"
+        }
       },
       "category": {
         "terrorism": "Terrorismo",

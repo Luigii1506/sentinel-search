@@ -284,7 +284,39 @@
       "tabs": {
         "articles": "Articles",
         "sources": "Sources",
-        "analytics": "Analytics"
+        "analytics": "Analytics",
+        "review": "Review Queue"
+      },
+      "review": {
+        "title": "Review Queue",
+        "subtitle": "Review uncertain links between news and entities before trusting them.",
+        "resultsCount": "{{count}} link pending review",
+        "resultsCount_other": "{{count}} links pending review",
+        "article": "Article",
+        "match": "Match",
+        "confidence": "Confidence",
+        "mentionedAs": "Mentioned as",
+        "matchedTo": "Matched to",
+        "risk": "Risk",
+        "viewProfile": "View profile",
+        "viewArticle": "Open article",
+        "showMore": "Show more",
+        "showLess": "Show less",
+        "confirm": "Confirm",
+        "reject": "Reject",
+        "empty": "No links pending review",
+        "emptyDescription": "All links between news and entities have been reviewed.",
+        "toast": {
+          "confirmed": "Link confirmed",
+          "confirmError": "Could not confirm the link",
+          "rejected": "Link rejected and deleted",
+          "rejectError": "Could not reject the link"
+        },
+        "pagination": {
+          "showing": "Showing {{from}}-{{to}} of {{total}}",
+          "previous": "Previous",
+          "next": "Next"
+        }
       },
       "category": {
         "terrorism": "Terrorism",

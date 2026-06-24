@@ -28,6 +28,8 @@ import {
   Cpu,
   Tag,
   BarChart3,
+  Trash2,
+  ClipboardCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -56,6 +58,7 @@ import type {
   AdverseMediaArticle,
   AdverseMediaStats,
   AdverseMediaSource,
+  ReviewLink,
 } from '@/services/compliance';
 
 const containerVariants = {
@@ -1057,6 +1060,306 @@ function ArticleDetailModal({
   );
 }
 
+// ── Review Queue Tab (Linking 2.0) ──
+
+const REVIEW_PAGE_SIZE = 25;
+
+function confidenceColor(confidence: number): string {
+  return confidence >= 0.7
+    ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/30'
+    : 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30';
+}
+
+function getRiskColor(risk: number): string {
+  if (risk >= 90) return 'text-red-600 dark:text-red-400 bg-red-500/10 border-red-500/30';
+  if (risk >= 70) return 'text-orange-700 dark:text-orange-400 bg-orange-500/10 border-orange-500/30';
+  if (risk >= 40) return 'text-yellow-700 dark:text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
+  return 'text-muted-foreground bg-gray-500/10 border-gray-500/30';
+}
+
+function ReviewQueueTab() {
+  const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const [offset, setOffset] = useState(0);
+
+  const queryKey = ['adverse-media-review-links', offset];
+
+  const { data, isLoading } = useQuery({
+    queryKey,
+    queryFn: () => complianceService.listReviewLinks({ limit: REVIEW_PAGE_SIZE, offset }),
+  });
+
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ['adverse-media-review-links'] });
+
+  const verifyMutation = useMutation({
+    mutationFn: (linkId: string) => complianceService.verifyLink(linkId),
+    onSuccess: () => {
+      toast.success(t('compliance.adverseMedia.review.toast.confirmed'));
+      invalidate();
+    },
+    onError: () => toast.error(t('compliance.adverseMedia.review.toast.confirmError')),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: (linkId: string) => complianceService.rejectLink(linkId),
+    onSuccess: () => {
+      toast.success(t('compliance.adverseMedia.review.toast.rejected'));
+      invalidate();
+    },
+    onError: () => toast.error(t('compliance.adverseMedia.review.toast.rejectError')),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        {[...Array(4)].map((_, i) => (
+          <PanelSkeleton key={i} className="rounded-xl" lines={4} />
+        ))}
+      </div>
+    );
+  }
+
+  const items = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const pendingLinkId = verifyMutation.isPending
+    ? verifyMutation.variables
+    : rejectMutation.isPending
+      ? rejectMutation.variables
+      : null;
+
+  return (
+    <div className="space-y-4">
+      {/* Header / purpose */}
+      <div className="glass rounded-xl p-4 flex items-start gap-3">
+        <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 shrink-0">
+          <ShieldAlert className="w-4 h-4 text-amber-700 dark:text-amber-400" />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium text-foreground">{t('compliance.adverseMedia.review.title')}</h3>
+          <p className="text-xs text-muted-foreground">{t('compliance.adverseMedia.review.subtitle')}</p>
+        </div>
+      </div>
+
+      {/* Results count */}
+      <p className="text-sm text-muted-foreground">
+        {t('compliance.adverseMedia.review.resultsCount', { count: total })}
+      </p>
+
+      {items.length === 0 ? (
+        <EmptyState
+          icon={CheckCircle}
+          title={t('compliance.adverseMedia.review.empty')}
+          description={t('compliance.adverseMedia.review.emptyDescription')}
+          tone="success"
+        />
+      ) : (
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-3">
+          {items.map((link) => (
+            <ReviewLinkCard
+              key={link.link_id}
+              link={link}
+              onConfirm={() => verifyMutation.mutate(link.link_id)}
+              onReject={() => rejectMutation.mutate(link.link_id)}
+              isPending={pendingLinkId === link.link_id}
+            />
+          ))}
+        </motion.div>
+      )}
+
+      {/* Pagination */}
+      {total > REVIEW_PAGE_SIZE && (
+        <div className="flex items-center justify-between pt-2">
+          <p className="text-xs text-muted-foreground">
+            {t('compliance.adverseMedia.review.pagination.showing', {
+              from: total === 0 ? 0 : offset + 1,
+              to: Math.min(offset + REVIEW_PAGE_SIZE, total),
+              total,
+            })}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-foreground/10"
+              disabled={offset === 0}
+              onClick={() => setOffset((o) => Math.max(0, o - REVIEW_PAGE_SIZE))}
+            >
+              {t('compliance.adverseMedia.review.pagination.previous')}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-foreground/10"
+              disabled={offset + REVIEW_PAGE_SIZE >= total}
+              onClick={() => setOffset((o) => o + REVIEW_PAGE_SIZE)}
+            >
+              {t('compliance.adverseMedia.review.pagination.next')}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ReviewLinkCard({
+  link,
+  onConfirm,
+  onReject,
+  isPending,
+}: {
+  link: ReviewLink;
+  onConfirm: () => void;
+  onReject: () => void;
+  isPending: boolean;
+}) {
+  const { t } = useTranslation();
+  const [expanded, setExpanded] = useState(false);
+  const { article } = link;
+  const confidencePct = Math.round(link.match_confidence * 100);
+
+  return (
+    <motion.div variants={itemVariants} className="glass rounded-xl p-5">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        {/* LEFT: article context */}
+        <div className="lg:col-span-5 min-w-0">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            {article.severity_score > 0 && (
+              <Badge variant="outline" className={cn('text-xs', getSeverityColor(article.severity_score))}>
+                {article.severity_score}
+              </Badge>
+            )}
+            {article.primary_category && (
+              <Badge
+                variant="outline"
+                className={cn('text-xs', categoryColors[article.primary_category] || 'bg-gray-500/10 text-muted-foreground')}
+              >
+                {categoryLabel(t, article.primary_category)}
+              </Badge>
+            )}
+          </div>
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-foreground hover:text-blue-300 transition-colors flex items-start gap-1 group"
+          >
+            <span className="line-clamp-2">{article.title}</span>
+            <ExternalLink className="w-3.5 h-3.5 shrink-0 mt-0.5 opacity-50 group-hover:opacity-100" />
+          </a>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {formatDate(article.publication_date, t)}
+            </span>
+          </div>
+          {article.summary && (
+            <div className="mt-2">
+              <p className={cn('text-xs text-muted-foreground', !expanded && 'line-clamp-2')}>
+                {article.summary}
+              </p>
+              {article.summary.length > 140 && (
+                <button
+                  type="button"
+                  onClick={() => setExpanded((v) => !v)}
+                  className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                >
+                  {expanded
+                    ? t('compliance.adverseMedia.review.showLess')
+                    : t('compliance.adverseMedia.review.showMore')}
+                </button>
+              )}
+            </div>
+          )}
+          {/* Severity bar */}
+          {article.severity_score > 0 && (
+            <div className="mt-3 h-1.5 bg-foreground/5 rounded-full overflow-hidden max-w-[200px]">
+              <div
+                className={cn('h-full rounded-full transition-all', getSeverityBarColor(article.severity_score))}
+                style={{ width: `${article.severity_score}%` }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* MIDDLE: the match */}
+        <div className="lg:col-span-4 min-w-0 flex flex-col justify-center gap-2 lg:border-x lg:border-foreground/5 lg:px-4">
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">
+              {t('compliance.adverseMedia.review.mentionedAs')}
+            </p>
+            <p className="text-sm text-foreground font-medium break-words">{link.mentioned_name}</p>
+          </div>
+          <div className="flex items-center text-muted-foreground">
+            <Link2 className="w-4 h-4" />
+            <span className="mx-1">→</span>
+          </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-wide text-muted-foreground mb-0.5">
+              {t('compliance.adverseMedia.review.matchedTo')}
+            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <a
+                href={`/entity/${link.entity_id}`}
+                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-300 font-medium flex items-center gap-1 break-words"
+              >
+                {link.entity_type === 'organization' || link.entity_type === 'company' ? (
+                  <Building2 className="w-3.5 h-3.5 shrink-0" />
+                ) : (
+                  <User className="w-3.5 h-3.5 shrink-0" />
+                )}
+                {link.entity_name}
+              </a>
+              {link.entity_risk > 0 && (
+                <Badge variant="outline" className={cn('text-[10px]', getRiskColor(link.entity_risk))}>
+                  {t('compliance.adverseMedia.review.risk')}: {link.entity_risk}
+                </Badge>
+              )}
+            </div>
+            {link.entity_type && (
+              <p className="text-[11px] text-muted-foreground mt-0.5">{link.entity_type}</p>
+            )}
+          </div>
+        </div>
+
+        {/* RIGHT: confidence + actions */}
+        <div className="lg:col-span-3 flex flex-col gap-3 lg:items-end justify-center">
+          <div className="flex flex-col lg:items-end gap-1">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              {t('compliance.adverseMedia.review.confidence')}
+            </span>
+            <Badge variant="outline" className={cn('text-sm font-mono', confidenceColor(link.match_confidence))}>
+              {confidencePct}%
+            </Badge>
+          </div>
+          <div className="flex gap-2 w-full lg:w-auto">
+            <Button
+              size="sm"
+              className="flex-1 lg:flex-none bg-green-600 hover:bg-green-700 text-white"
+              onClick={onConfirm}
+              disabled={isPending}
+            >
+              <CheckCircle className="w-4 h-4 mr-1" />
+              {t('compliance.adverseMedia.review.confirm')}
+            </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              className="flex-1 lg:flex-none"
+              onClick={onReject}
+              disabled={isPending}
+            >
+              <Trash2 className="w-4 h-4 mr-1" />
+              {t('compliance.adverseMedia.review.reject')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Main Page ──
 
 export function AdverseMediaPage() {
@@ -1168,6 +1471,10 @@ export function AdverseMediaPage() {
             <TrendingUp className="w-4 h-4 mr-2" />
             {t('compliance.adverseMedia.tabs.analytics')}
           </TabsTrigger>
+          <TabsTrigger value="review" className="data-[state=active]:bg-foreground/10">
+            <ClipboardCheck className="w-4 h-4 mr-2" />
+            {t('compliance.adverseMedia.tabs.review')}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="articles">
@@ -1178,6 +1485,9 @@ export function AdverseMediaPage() {
         </TabsContent>
         <TabsContent value="analytics">
           <AnalyticsTab stats={stats} />
+        </TabsContent>
+        <TabsContent value="review">
+          <ReviewQueueTab />
         </TabsContent>
       </Tabs>
     </AppPage>
