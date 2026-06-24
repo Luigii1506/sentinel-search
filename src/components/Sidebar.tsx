@@ -27,6 +27,7 @@ import {
   GitBranchPlus,
   ShieldCheck,
   Newspaper,
+  ScrollText,
   Globe,
   Key,
   Webhook,
@@ -133,8 +134,9 @@ const NAV: NavGroup[] = [
     title: 'nav.groups.compliance',
     minRole: 'analyst',
     items: [
-      { path: '/compliance',    label: 'nav.casesWatchlist', icon: Shield,    shortcut: 'G C' },
-      { path: '/adverse-media', label: 'nav.adverseMedia',   icon: Newspaper },
+      { path: '/compliance',            label: 'nav.casesWatchlist',  icon: Shield,    shortcut: 'G C' },
+      { path: '/adverse-media',         label: 'nav.adverseMedia',    icon: Newspaper },
+      { path: '/compliance/regulatory', label: 'nav.regulatoryReports', icon: ScrollText },
     ],
   },
   {

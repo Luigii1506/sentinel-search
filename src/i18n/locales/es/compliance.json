@@ -1,5 +1,120 @@
 {
   "compliance": {
+    "regulatory": {
+      "title": "Reportes Regulatorios",
+      "description": "Captura de operaciones y generación de reportes regulatorios para autoridades.",
+      "yes": "Sí",
+      "no": "No",
+      "tabs": {
+        "operations": "Operaciones",
+        "generate": "Generar reporte"
+      },
+      "reportTypes": {
+        "relevante": "Relevante",
+        "inusual": "Inusual",
+        "preocupante": "Preocupante"
+      },
+      "personType": {
+        "fisica": "Persona física",
+        "moral": "Persona moral"
+      },
+      "filters": {
+        "period": "Período",
+        "reportType": "Tipo de reporte",
+        "allTypes": "Todos"
+      },
+      "columns": {
+        "reference": "Referencia",
+        "date": "Fecha",
+        "reportType": "Tipo reporte",
+        "operation": "Operación",
+        "instrument": "Instrumento",
+        "amount": "Monto",
+        "client": "Cliente",
+        "rfc": "RFC",
+        "reported": "Reportado"
+      },
+      "pagination": {
+        "summary": "Mostrando {{from}}–{{to}} de {{total}}"
+      },
+      "fields": {
+        "reference": "Referencia",
+        "reportType": "Tipo de reporte",
+        "operationDate": "Fecha de operación",
+        "period": "Período",
+        "operationType": "Tipo de operación",
+        "instrument": "Instrumento",
+        "amount": "Monto",
+        "currency": "Moneda",
+        "amountMxn": "Monto MXN",
+        "branch": "Sucursal",
+        "personType": "Tipo de persona",
+        "subjectName": "Nombre del sujeto",
+        "rfc": "RFC",
+        "curp": "CURP",
+        "birthDate": "Fecha de nacimiento",
+        "nationality": "Nacionalidad",
+        "address": "Domicilio",
+        "clientId": "ID de cliente",
+        "unusualReason": "Motivo de inusualidad"
+      },
+      "operations": {
+        "register": "Registrar operación",
+        "importCsv": "Importar CSV",
+        "empty": {
+          "title": "Sin operaciones",
+          "description": "No hay operaciones para los filtros seleccionados. Registra una o importa un CSV."
+        }
+      },
+      "register": {
+        "title": "Registrar operación",
+        "submit": "Registrar",
+        "saving": "Guardando…",
+        "toast": {
+          "created": "Operación registrada",
+          "error": "No se pudo registrar la operación"
+        }
+      },
+      "import": {
+        "title": "Importar operaciones (CSV)",
+        "file": "Archivo CSV",
+        "submit": "Importar",
+        "importing": "Importando…",
+        "expectedColumns": "Columnas esperadas (flexibles):",
+        "toast": {
+          "success": "{{count}} operaciones importadas",
+          "error": "No se pudo importar el archivo"
+        }
+      },
+      "generate": {
+        "entitySection": "Datos de la entidad",
+        "preview": "Previsualizar",
+        "previewing": "Generando…",
+        "download": "Descargar XML",
+        "downloading": "Descargando…",
+        "xmlPreview": "Vista previa del XML",
+        "operationCount": "{{count}} operaciones",
+        "warnings": "{{count}} advertencias",
+        "fields": {
+          "regime": "Régimen",
+          "reportType": "Tipo de reporte",
+          "period": "Período",
+          "claveRcc": "Clave RCC",
+          "rfc": "RFC",
+          "razonSocial": "Razón social"
+        },
+        "noOps": {
+          "title": "Sin operaciones",
+          "description": "No hay operaciones para ese período y tipo de reporte. Registra operaciones antes de generar el reporte."
+        },
+        "toast": {
+          "previewed": "Reporte generado con {{count}} operaciones",
+          "error": "No se pudo generar el reporte",
+          "downloaded": "Descarga iniciada",
+          "downloadError": "No se pudo descargar el reporte"
+        }
+      }
+    },
     "dashboard": {
       "title": "Panel de Cumplimiento",
       "description": "Gestión de casos, alertas, lista blanca y monitoreo continuo.",

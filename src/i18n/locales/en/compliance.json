@@ -1,5 +1,120 @@
 {
   "compliance": {
+    "regulatory": {
+      "title": "Regulatory Reports",
+      "description": "Capture operations and generate regulatory reports for authorities.",
+      "yes": "Yes",
+      "no": "No",
+      "tabs": {
+        "operations": "Operations",
+        "generate": "Generate report"
+      },
+      "reportTypes": {
+        "relevante": "Relevant",
+        "inusual": "Unusual",
+        "preocupante": "Concerning"
+      },
+      "personType": {
+        "fisica": "Individual",
+        "moral": "Legal entity"
+      },
+      "filters": {
+        "period": "Period",
+        "reportType": "Report type",
+        "allTypes": "All"
+      },
+      "columns": {
+        "reference": "Reference",
+        "date": "Date",
+        "reportType": "Report type",
+        "operation": "Operation",
+        "instrument": "Instrument",
+        "amount": "Amount",
+        "client": "Client",
+        "rfc": "RFC",
+        "reported": "Reported"
+      },
+      "pagination": {
+        "summary": "Showing {{from}}–{{to}} of {{total}}"
+      },
+      "fields": {
+        "reference": "Reference",
+        "reportType": "Report type",
+        "operationDate": "Operation date",
+        "period": "Period",
+        "operationType": "Operation type",
+        "instrument": "Instrument",
+        "amount": "Amount",
+        "currency": "Currency",
+        "amountMxn": "Amount MXN",
+        "branch": "Branch",
+        "personType": "Person type",
+        "subjectName": "Subject name",
+        "rfc": "RFC",
+        "curp": "CURP",
+        "birthDate": "Birth date",
+        "nationality": "Nationality",
+        "address": "Address",
+        "clientId": "Client ID",
+        "unusualReason": "Unusual reason"
+      },
+      "operations": {
+        "register": "Register operation",
+        "importCsv": "Import CSV",
+        "empty": {
+          "title": "No operations",
+          "description": "No operations match the selected filters. Register one or import a CSV."
+        }
+      },
+      "register": {
+        "title": "Register operation",
+        "submit": "Register",
+        "saving": "Saving…",
+        "toast": {
+          "created": "Operation registered",
+          "error": "Could not register the operation"
+        }
+      },
+      "import": {
+        "title": "Import operations (CSV)",
+        "file": "CSV file",
+        "submit": "Import",
+        "importing": "Importing…",
+        "expectedColumns": "Expected columns (flexible):",
+        "toast": {
+          "success": "{{count}} operations imported",
+          "error": "Could not import the file"
+        }
+      },
+      "generate": {
+        "entitySection": "Entity details",
+        "preview": "Preview",
+        "previewing": "Generating…",
+        "download": "Download XML",
+        "downloading": "Downloading…",
+        "xmlPreview": "XML preview",
+        "operationCount": "{{count}} operations",
+        "warnings": "{{count}} warnings",
+        "fields": {
+          "regime": "Regime",
+          "reportType": "Report type",
+          "period": "Period",
+          "claveRcc": "RCC key",
+          "rfc": "RFC",
+          "razonSocial": "Legal name"
+        },
+        "noOps": {
+          "title": "No operations",
+          "description": "There are no operations for that period and report type. Register operations before generating the report."
+        },
+        "toast": {
+          "previewed": "Report generated with {{count}} operations",
+          "error": "Could not generate the report",
+          "downloaded": "Download started",
+          "downloadError": "Could not download the report"
+        }
+      }
+    },
     "dashboard": {
       "title": "Compliance Dashboard",
       "description": "Manage cases, alerts, whitelist, and continuous monitoring.",

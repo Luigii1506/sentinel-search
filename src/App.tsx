@@ -54,6 +54,7 @@ const AuditPage = lazyNamedPage(() => import('@/pages/data/AuditPage'), 'AuditPa
 const MergeReviewPage = lazyNamedPage(() => import('@/pages/review/MergeReviewPage'), 'MergeReviewPage');
 const ComplianceDashboardPage = lazyNamedPage(() => import('@/pages/compliance/ComplianceDashboardPage'), 'ComplianceDashboardPage');
 const CaseDetailPage = lazyNamedPage(() => import('@/pages/compliance/CaseDetailPage'), 'CaseDetailPage');
+const RegulatoryReportsPage = lazyNamedPage(() => import('@/pages/compliance/RegulatoryReportsPage'), 'RegulatoryReportsPage');
 const ReportsPage = lazy(() => import('@/pages/insights/ReportsPage'));
 const AdverseMediaPage = lazyNamedPage(() => import('@/pages/compliance/AdverseMediaPage'), 'AdverseMediaPage');
 const FederatedSearchPage = lazyNamedPage(() => import('@/pages/workspace/FederatedSearchPage'), 'FederatedSearchPage');
@@ -369,6 +370,14 @@ function App() {
                 element={
                   <GuardedPage minimumRole="analyst">
                     <CaseDetailPage />
+                  </GuardedPage>
+                }
+              />
+              <Route
+                path="/compliance/regulatory"
+                element={
+                  <GuardedPage minimumRole="analyst">
+                    <RegulatoryReportsPage />
                   </GuardedPage>
                 }
               />
