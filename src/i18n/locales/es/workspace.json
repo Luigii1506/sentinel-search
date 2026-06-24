@@ -62,7 +62,7 @@
     "new": "Nuevo",
     "dropzone": {
       "title": "Arrastra un archivo CSV o haz click para seleccionar",
-      "hint": "Debe tener una columna llamada \"name\" o \"nombre\""
+      "hint": "CSV con columna name/nombre (más columnas opcionales)"
     },
     "status": {
       "found": "Encontrado",
@@ -74,17 +74,43 @@
       "status": "Estado",
       "matches": "Coincidencias",
       "bestMatch": "Mejor coincidencia",
-      "score": "Score"
+      "score": "Score",
+      "sanctioned": "Sancionado",
+      "risk": "Riesgo"
     },
     "toast": {
       "invalidFile": "Por favor sube un archivo CSV",
       "noNames": "No se encontraron nombres para procesar",
-      "tooManyNames": "Maximo 1000 nombres por batch",
+      "tooManyNames": "Máximo 5000 nombres por batch",
       "jobCreated": "Job creado: {{count}} nombres",
       "jobError": "Error al crear el job",
       "completed": "Screening completado",
       "downloaded": "Descargado: {{format}}",
       "downloadError": "Error al descargar"
+    },
+    "structuredRow": "Fila estructurada",
+    "supportedColumns": "Columnas opcionales soportadas (mayúsculas/acentos no importan): name/nombre, birth_date/fecha_nacimiento, country/país, nationality/nacionalidad, rfc, tax_id, passport/pasaporte, national_id/curp, wikidata_id.",
+    "field": {
+      "name": "Nombre",
+      "birthDate": "Fecha nac.",
+      "rfcCurp": "RFC / CURP",
+      "country": "País"
+    },
+    "addRow": "Agregar",
+    "rowsAdded": "{{count}} filas agregadas",
+    "removeRow": "Quitar fila",
+    "nameRequired": "El nombre es obligatorio",
+    "noRows": "Agrega al menos una fila",
+    "summaryMatched": "{{matched}} de {{total}} con coincidencia",
+    "badge": {
+      "sanctioned": "Sancionado",
+      "pep": "PEP"
+    },
+    "risk": {
+      "critical": "Crítico",
+      "high": "Alto",
+      "medium": "Medio",
+      "low": "Bajo"
     }
   },
   "federated": {

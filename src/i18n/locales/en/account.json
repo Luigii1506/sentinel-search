@@ -226,6 +226,14 @@
         "label": "High match",
         "description": "A search returned at least one match with risk_level=high."
       },
+      "alert_created": {
+        "label": "Alert created",
+        "description": "A monitoring alert was generated."
+      },
+      "bulk_completed": {
+        "label": "Bulk completed",
+        "description": "A bulk screening job finished."
+      },
       "source_sync_complete": {
         "label": "Source sync OK",
         "description": "A source finished syncing successfully."

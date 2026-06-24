@@ -3,6 +3,8 @@ import { api } from './api';
 export type WebhookEvent =
   | 'screening.critical_match'
   | 'screening.high_match'
+  | 'alert.created'
+  | 'bulk.completed'
   | 'source.sync_complete'
   | 'source.sync_failed';
 
@@ -11,6 +13,8 @@ export type WebhookEvent =
 export const ALL_EVENTS: { id: WebhookEvent }[] = [
   { id: 'screening.critical_match' },
   { id: 'screening.high_match' },
+  { id: 'alert.created' },
+  { id: 'bulk.completed' },
   { id: 'source.sync_complete' },
   { id: 'source.sync_failed' },
 ];

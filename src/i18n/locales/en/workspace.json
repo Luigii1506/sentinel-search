@@ -62,7 +62,7 @@
     "new": "New",
     "dropzone": {
       "title": "Drag a CSV file or click to select",
-      "hint": "It must have a column named \"name\" or \"nombre\""
+      "hint": "CSV with a name/nombre column (extra columns optional)"
     },
     "status": {
       "found": "Found",
@@ -74,17 +74,43 @@
       "status": "Status",
       "matches": "Matches",
       "bestMatch": "Best match",
-      "score": "Score"
+      "score": "Score",
+      "sanctioned": "Sanctioned",
+      "risk": "Risk"
     },
     "toast": {
       "invalidFile": "Please upload a CSV file",
       "noNames": "No names found to process",
-      "tooManyNames": "Maximum 1000 names per batch",
+      "tooManyNames": "Maximum 5000 names per batch",
       "jobCreated": "Job created: {{count}} names",
       "jobError": "Failed to create the job",
       "completed": "Screening completed",
       "downloaded": "Downloaded: {{format}}",
       "downloadError": "Download failed"
+    },
+    "structuredRow": "Structured row",
+    "supportedColumns": "Supported optional columns (case/accent-insensitive): name/nombre, birth_date/fecha_nacimiento, country/país, nationality/nacionalidad, rfc, tax_id, passport/pasaporte, national_id/curp, wikidata_id.",
+    "field": {
+      "name": "Name",
+      "birthDate": "Birth date",
+      "rfcCurp": "RFC / CURP",
+      "country": "Country"
+    },
+    "addRow": "Add",
+    "rowsAdded": "{{count}} rows added",
+    "removeRow": "Remove row",
+    "nameRequired": "Name is required",
+    "noRows": "Add at least one row",
+    "summaryMatched": "{{matched}} of {{total}} with a match",
+    "badge": {
+      "sanctioned": "Sanctioned",
+      "pep": "PEP"
+    },
+    "risk": {
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
     }
   },
   "federated": {

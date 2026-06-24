@@ -11,9 +11,13 @@ import {
   AlertCircle,
   RefreshCw,
   FileSpreadsheet,
+  Plus,
+  ShieldAlert,
+  Rows3,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,25 +26,53 @@ import { cn } from '@/lib/utils';
 import { api } from '@/services/api';
 import { AppPage, PageHeader } from '@/components/foundation';
 
-interface BatchJob {
-  job_id: string;
-  status: 'queued' | 'processing' | 'completed' | 'failed';
-  total: number;
-  processed: number;
-  completed_count: number;
-  failed_count: number;
-  results?: BatchResult[];
-  download_url?: string;
+type RiskLevel = 'critical' | 'high' | 'medium' | 'low' | string;
+
+interface BatchMatch {
+  entity_id?: string;
+  name?: string;
+  matched_name?: string;
+  score?: number;
+  risk_score?: number;
+  risk_level?: RiskLevel;
+  is_pep?: boolean;
+  sanctioned?: boolean;
+  sources?: string[];
+  topics?: string[];
+  countries?: string[];
 }
 
 interface BatchResult {
-  query: string;
+  query?: string;
+  query_name?: string;
   status: 'found' | 'not_found' | 'error';
   match_count: number;
   top_score?: number;
-  top_match_name?: string;
+  matches?: BatchMatch[];
   error?: string;
 }
+
+interface BatchJob {
+  job_id: string;
+  status: 'queued' | 'processing' | 'completed' | 'partial' | 'failed';
+  total: number;
+  processed: number;
+  completed: number;
+  failed: number;
+  matches?: number;
+  results?: BatchResult[];
+  download_url?: string;
+  error_message?: string;
+}
+
+interface StructuredRow {
+  name: string;
+  birth_date?: string;
+  rfc?: string;
+  country?: string;
+}
+
+const MAX_ITEMS = 5000;
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -52,12 +84,32 @@ const itemVariants = {
   show: { opacity: 1, y: 0 },
 };
 
+// Helpers operating on the new result shape ------------------------------------
+
+const resultQuery = (r: BatchResult): string => r.query ?? r.query_name ?? '';
+const topMatch = (r: BatchResult): BatchMatch | undefined => r.matches?.[0];
+const bestMatchName = (r: BatchResult): string => {
+  const m = topMatch(r);
+  return m?.matched_name || m?.name || '';
+};
+const bestScore = (r: BatchResult): number | undefined => {
+  if (typeof r.top_score === 'number') return r.top_score;
+  return topMatch(r)?.score;
+};
+const isCriticalResult = (r: BatchResult): boolean => {
+  const m = topMatch(r);
+  if (!m) return false;
+  return !!m.sanctioned || m.risk_level === 'critical';
+};
+
 export function BulkScreeningPage() {
   const { t } = useTranslation();
   const [step, setStep] = useState<'upload' | 'processing' | 'results'>('upload');
-  const [inputMethod, setInputMethod] = useState<'file' | 'text'>('file');
+  const [inputMethod, setInputMethod] = useState<'file' | 'text' | 'rows'>('file');
   const [file, setFile] = useState<File | null>(null);
   const [namesText, setNamesText] = useState('');
+  const [rows, setRows] = useState<StructuredRow[]>([]);
+  const [draftRow, setDraftRow] = useState<StructuredRow>({ name: '', birth_date: '', rfc: '', country: '' });
   const [minScore, setMinScore] = useState(0.7);
   const [job, setJob] = useState<BatchJob | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -73,7 +125,7 @@ export function BulkScreeningPage() {
     } else {
       toast.error(t('workspace.bulk.toast.invalidFile'));
     }
-  }, []);
+  }, [t]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -89,61 +141,91 @@ export function BulkScreeningPage() {
       .filter(n => n.length > 0);
   };
 
-  const parseNamesFromCSV = async (csvFile: File): Promise<string[]> => {
-    const text = await csvFile.text();
-    const lines = text.split('\n');
-    const headers = lines[0]?.split(',').map(h => h.trim().toLowerCase());
-    const nameIndex = headers?.findIndex(h => h === 'name' || h === 'nombre');
-    
-    if (nameIndex === -1 || nameIndex === undefined) {
-      // If no header, assume first column
-      return lines.filter(l => l.trim()).map(l => l.split(',')[0].trim());
+  const addRow = () => {
+    const name = draftRow.name.trim();
+    if (!name) {
+      toast.error(t('workspace.bulk.nameRequired'));
+      return;
     }
-    
-    return lines.slice(1).map(line => {
-      const cols = line.split(',');
-      return cols[nameIndex]?.trim();
-    }).filter(Boolean);
+    const row: StructuredRow = { name };
+    if (draftRow.birth_date?.trim()) row.birth_date = draftRow.birth_date.trim();
+    if (draftRow.rfc?.trim()) row.rfc = draftRow.rfc.trim();
+    if (draftRow.country?.trim()) row.country = draftRow.country.trim();
+    setRows(prev => [...prev, row]);
+    setDraftRow({ name: '', birth_date: '', rfc: '', country: '' });
+  };
+
+  const removeRow = (index: number) => {
+    setRows(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const initJob = (jobId: string, total: number) => {
+    const newJob: BatchJob = {
+      job_id: jobId,
+      status: 'queued',
+      total,
+      processed: 0,
+      completed: 0,
+      failed: 0,
+    };
+    setJob(newJob);
+    startPolling(jobId);
   };
 
   const startScreening = async () => {
-    let names: string[] = [];
-    
-    if (inputMethod === 'file' && file) {
-      names = await parseNamesFromCSV(file);
-    } else if (inputMethod === 'text') {
-      names = parseNamesFromText();
-    }
-    
-    if (names.length === 0) {
-      toast.error(t('workspace.bulk.toast.noNames'));
-      return;
-    }
-
-    if (names.length > 1000) {
-      toast.error(t('workspace.bulk.toast.tooManyNames'));
-      return;
-    }
-    
     setStep('processing');
-    
     try {
+      if (inputMethod === 'file' && file) {
+        // Send the raw file: backend does flexible column mapping server-side.
+        const fd = new FormData();
+        fd.append('file', file);
+        const response = await api.post('/api/v2/screen/gold/batch/upload', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+          params: { min_score: minScore },
+        });
+        const total = response.data.total ?? 0;
+        initJob(response.data.job_id, total);
+        toast.success(t('workspace.bulk.toast.jobCreated', { count: total }));
+        return;
+      }
+
+      if (inputMethod === 'rows') {
+        if (rows.length === 0) {
+          toast.error(t('workspace.bulk.noRows'));
+          setStep('upload');
+          return;
+        }
+        if (rows.length > MAX_ITEMS) {
+          toast.error(t('workspace.bulk.toast.tooManyNames'));
+          setStep('upload');
+          return;
+        }
+        const response = await api.post('/api/v2/screen/gold/batch', {
+          rows,
+          min_score: minScore,
+        });
+        initJob(response.data.job_id, rows.length);
+        toast.success(t('workspace.bulk.toast.jobCreated', { count: rows.length }));
+        return;
+      }
+
+      // text / paste mode -> legacy names[] path
+      const names = parseNamesFromText();
+      if (names.length === 0) {
+        toast.error(t('workspace.bulk.toast.noNames'));
+        setStep('upload');
+        return;
+      }
+      if (names.length > MAX_ITEMS) {
+        toast.error(t('workspace.bulk.toast.tooManyNames'));
+        setStep('upload');
+        return;
+      }
       const response = await api.post('/api/v2/screen/gold/batch', {
         names,
         min_score: minScore,
       });
-      
-      const newJob: BatchJob = {
-        job_id: response.data.job_id,
-        status: 'queued',
-        total: names.length,
-        processed: 0,
-        completed_count: 0,
-        failed_count: 0,
-      };
-      
-      setJob(newJob);
-      startPolling(response.data.job_id);
+      initJob(response.data.job_id, names.length);
       toast.success(t('workspace.bulk.toast.jobCreated', { count: names.length }));
     } catch (error) {
       toast.error(t('workspace.bulk.toast.jobError'));
@@ -153,26 +235,32 @@ export function BulkScreeningPage() {
 
   const startPolling = (jobId: string) => {
     if (pollingRef.current) clearInterval(pollingRef.current);
-    
+
     pollingRef.current = setInterval(async () => {
       try {
         const response = await api.get(`/api/v2/screen/gold/batch/${jobId}`);
         const data = response.data;
-        
+
         setJob(prev => ({
           ...prev!,
+          job_id: data.job_id ?? prev!.job_id,
           status: data.status,
-          processed: data.processed,
-          completed_count: data.completed,
-          failed_count: data.failed,
+          total: data.total ?? prev!.total,
+          processed: data.processed ?? 0,
+          completed: data.completed ?? 0,
+          failed: data.failed ?? 0,
+          matches: data.matches,
           results: data.results,
           download_url: data.download_url,
+          error_message: data.error_message,
         }));
-        
-        if (data.status === 'completed' || data.status === 'failed') {
+
+        if (data.status === 'completed' || data.status === 'partial' || data.status === 'failed') {
           if (pollingRef.current) clearInterval(pollingRef.current);
           setStep('results');
-          if (data.status === 'completed') {
+          if (data.status === 'failed') {
+            toast.error(data.error_message || t('workspace.bulk.toast.jobError'));
+          } else {
             toast.success(t('workspace.bulk.toast.completed'));
           }
         }
@@ -184,14 +272,14 @@ export function BulkScreeningPage() {
 
   const downloadResults = async (format: 'csv' | 'json') => {
     if (!job?.job_id) return;
-    
+
     try {
       const response = await api.get(`/api/v2/screen/gold/batch/${job.job_id}/download?format=${format}`, {
         responseType: 'blob',
       });
-      
-      const blob = new Blob([response.data], { 
-        type: format === 'csv' ? 'text/csv' : 'application/json' 
+
+      const blob = new Blob([response.data], {
+        type: format === 'csv' ? 'text/csv' : 'application/json',
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -201,7 +289,7 @@ export function BulkScreeningPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      
+
       toast.success(t('workspace.bulk.toast.downloaded', { format: format.toUpperCase() }));
     } catch (error) {
       toast.error(t('workspace.bulk.toast.downloadError'));
@@ -212,9 +300,76 @@ export function BulkScreeningPage() {
     setStep('upload');
     setFile(null);
     setNamesText('');
+    setRows([]);
+    setDraftRow({ name: '', birth_date: '', rfc: '', country: '' });
     setJob(null);
     if (pollingRef.current) clearInterval(pollingRef.current);
   };
+
+  const riskBadgeClass = (level?: RiskLevel) =>
+    level === 'critical'
+      ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+      : level === 'high'
+      ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+      : level === 'medium'
+      ? 'bg-yellow-500/10 text-yellow-700 dark:text-yellow-400 border-yellow-500/20'
+      : 'bg-gray-500/10 text-muted-foreground border-gray-500/20';
+
+  const riskLabel = (level?: RiskLevel) => {
+    if (!level) return '-';
+    const known = ['critical', 'high', 'medium', 'low'];
+    return known.includes(level) ? t(`workspace.bulk.risk.${level}`) : level;
+  };
+
+  const scoreBadgeClass = (score?: number) =>
+    typeof score === 'number'
+      ? score >= 90
+        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
+        : score >= 70
+        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
+        : 'bg-gray-500/10 text-muted-foreground border-gray-500/20'
+      : '';
+
+  const statusBadge = (status: BatchResult['status']) =>
+    status === 'found' ? (
+      <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
+        {t('workspace.bulk.status.found')}
+      </Badge>
+    ) : status === 'not_found' ? (
+      <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">
+        {t('workspace.bulk.status.notFound')}
+      </Badge>
+    ) : (
+      <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
+        {t('workspace.bulk.status.error')}
+      </Badge>
+    );
+
+  const sanctionBadge = (m?: BatchMatch) => {
+    if (!m) return <span className="text-muted-foreground">-</span>;
+    if (m.sanctioned) {
+      return (
+        <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
+          {t('workspace.bulk.badge.sanctioned')}
+        </Badge>
+      );
+    }
+    if (m.is_pep) {
+      return (
+        <Badge className="bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/20">
+          {t('workspace.bulk.badge.pep')}
+        </Badge>
+      );
+    }
+    return <span className="text-muted-foreground">-</span>;
+  };
+
+  const matchedCount = job?.results?.filter(r => r.status === 'found').length ?? 0;
+
+  const startDisabled =
+    (inputMethod === 'file' && !file) ||
+    (inputMethod === 'text' && parseNamesFromText().length === 0) ||
+    (inputMethod === 'rows' && rows.length === 0);
 
   return (
     <AppPage width="default">
@@ -239,11 +394,10 @@ export function BulkScreeningPage() {
               className="space-y-6"
             >
               {/* Input Method Toggle */}
-              <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-2">
+              <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Button
                   variant={inputMethod === 'file' ? 'default' : 'outline'}
                   onClick={() => setInputMethod('file')}
-                  className="flex-1"
                 >
                   <Upload className="w-4 h-4 mr-2" />
                   {t('workspace.bulk.uploadCsv')}
@@ -251,16 +405,22 @@ export function BulkScreeningPage() {
                 <Button
                   variant={inputMethod === 'text' ? 'default' : 'outline'}
                   onClick={() => setInputMethod('text')}
-                  className="flex-1"
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   {t('workspace.bulk.pasteNames')}
+                </Button>
+                <Button
+                  variant={inputMethod === 'rows' ? 'default' : 'outline'}
+                  onClick={() => setInputMethod('rows')}
+                >
+                  <Rows3 className="w-4 h-4 mr-2" />
+                  {t('workspace.bulk.structuredRow')}
                 </Button>
               </motion.div>
 
               {/* File Upload */}
               {inputMethod === 'file' && (
-                <motion.div variants={itemVariants}>
+                <motion.div variants={itemVariants} className="space-y-3">
                   <Card
                     className={cn(
                       'border-2 border-dashed transition-colors',
@@ -279,7 +439,7 @@ export function BulkScreeningPage() {
                         onChange={handleFileSelect}
                         className="hidden"
                       />
-                      
+
                       {file ? (
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-4">
                           <div className="flex items-center gap-2 min-w-0">
@@ -315,6 +475,9 @@ export function BulkScreeningPage() {
                       )}
                     </CardContent>
                   </Card>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {t('workspace.bulk.supportedColumns')}
+                  </p>
                 </motion.div>
               )}
 
@@ -335,6 +498,82 @@ export function BulkScreeningPage() {
                       <p className="text-sm text-muted-foreground mt-2">
                         {t('workspace.bulk.namesDetected', { count: parseNamesFromText().length })}
                       </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* Structured rows */}
+              {inputMethod === 'rows' && (
+                <motion.div variants={itemVariants}>
+                  <Card className="bg-card border-foreground/5">
+                    <CardHeader>
+                      <CardTitle className="text-foreground">{t('workspace.bulk.structuredRow')}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                        <Input
+                          placeholder={`${t('workspace.bulk.field.name')} *`}
+                          value={draftRow.name}
+                          onChange={(e) => setDraftRow(r => ({ ...r, name: e.target.value }))}
+                          onKeyDown={(e) => { if (e.key === 'Enter') addRow(); }}
+                        />
+                        <Input
+                          placeholder={t('workspace.bulk.field.birthDate')}
+                          value={draftRow.birth_date}
+                          onChange={(e) => setDraftRow(r => ({ ...r, birth_date: e.target.value }))}
+                          onKeyDown={(e) => { if (e.key === 'Enter') addRow(); }}
+                        />
+                        <Input
+                          placeholder={t('workspace.bulk.field.rfcCurp')}
+                          value={draftRow.rfc}
+                          onChange={(e) => setDraftRow(r => ({ ...r, rfc: e.target.value }))}
+                          onKeyDown={(e) => { if (e.key === 'Enter') addRow(); }}
+                        />
+                        <Input
+                          placeholder={t('workspace.bulk.field.country')}
+                          value={draftRow.country}
+                          onChange={(e) => setDraftRow(r => ({ ...r, country: e.target.value }))}
+                          onKeyDown={(e) => { if (e.key === 'Enter') addRow(); }}
+                        />
+                      </div>
+                      <Button variant="outline" onClick={addRow} className="w-full sm:w-auto">
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('workspace.bulk.addRow')}
+                      </Button>
+
+                      {rows.length > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-sm text-muted-foreground">
+                            {t('workspace.bulk.rowsAdded', { count: rows.length })}
+                          </p>
+                          <div className="space-y-1">
+                            {rows.map((row, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-between gap-3 rounded-lg border border-foreground/5 bg-background px-3 py-2"
+                              >
+                                <div className="min-w-0 text-sm">
+                                  <span className="text-foreground font-medium">{row.name}</span>
+                                  <span className="text-muted-foreground">
+                                    {[row.birth_date, row.rfc, row.country].filter(Boolean).length > 0
+                                      ? ` · ${[row.birth_date, row.rfc, row.country].filter(Boolean).join(' · ')}`
+                                      : ''}
+                                  </span>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  aria-label={t('workspace.bulk.removeRow')}
+                                  onClick={() => removeRow(index)}
+                                >
+                                  <X className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -374,10 +613,7 @@ export function BulkScreeningPage() {
                   size="lg"
                   className="w-full"
                   onClick={startScreening}
-                  disabled={
-                    (inputMethod === 'file' && !file) ||
-                    (inputMethod === 'text' && parseNamesFromText().length === 0)
-                  }
+                  disabled={startDisabled}
                 >
                   <Play className="w-5 h-5 mr-2" />
                   {t('workspace.bulk.startScreening')}
@@ -427,27 +663,27 @@ export function BulkScreeningPage() {
                       <RefreshCw className="w-8 h-8 text-blue-600 dark:text-blue-400 animate-spin" />
                     </div>
                   </div>
-                  
+
                   <h2 className="text-2xl font-bold text-foreground mb-2">{t('workspace.bulk.processing')}</h2>
                   <p className="text-muted-foreground mb-6">
                     {t('workspace.bulk.processedOf', { processed: job?.processed ?? 0, total: job?.total ?? 0 })}
                   </p>
-                  
+
                   <div className="w-full max-w-md mx-auto bg-foreground/10 rounded-full h-2 mb-4">
                     <div
                       className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-500"
                       style={{ width: `${((job?.processed || 0) / (job?.total || 1)) * 100}%` }}
                     />
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 text-sm">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-700 dark:text-green-400" />
-                      <span className="text-muted-foreground">{t('workspace.bulk.successful', { count: job?.completed_count ?? 0 })}</span>
+                      <span className="text-muted-foreground">{t('workspace.bulk.successful', { count: job?.completed ?? 0 })}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                      <span className="text-muted-foreground">{t('workspace.bulk.failed', { count: job?.failed_count ?? 0 })}</span>
+                      <span className="text-muted-foreground">{t('workspace.bulk.failed', { count: job?.failed ?? 0 })}</span>
                     </div>
                   </div>
                 </div>
@@ -472,7 +708,13 @@ export function BulkScreeningPage() {
                       <div>
                         <h2 className="text-2xl font-bold text-foreground mb-1">{t('workspace.bulk.results')}</h2>
                         <p className="text-muted-foreground">
-                          {t('workspace.bulk.resultsSummary', { processed: job?.completed_count ?? 0, failed: job?.failed_count ?? 0 })}
+                          {t('workspace.bulk.summaryMatched', {
+                            matched: matchedCount,
+                            total: job?.total ?? job?.results?.length ?? 0,
+                          })}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {t('workspace.bulk.resultsSummary', { processed: job?.completed ?? 0, failed: job?.failed ?? 0 })}
                         </p>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full sm:w-auto">
@@ -497,61 +739,69 @@ export function BulkScreeningPage() {
               {/* Results Table */}
               {job?.results && job.results.length > 0 && (
                 <motion.div variants={itemVariants}>
+                  {/* Mobile cards */}
                   <div className="space-y-3 md:hidden">
-                    {job.results.map((result, index) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: Math.min(index * 0.02, 0.3) }}
-                      >
-                        <Card className="bg-card border-foreground/5">
-                          <CardContent className="p-4 space-y-3">
-                            <div className="flex items-start justify-between gap-3">
-                              <p className="text-sm text-foreground break-words">{result.query}</p>
-                              {result.status === 'found' ? (
-                                <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">{t('workspace.bulk.status.found')}</Badge>
-                              ) : result.status === 'not_found' ? (
-                                <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">{t('workspace.bulk.status.notFound')}</Badge>
-                              ) : (
-                                <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">{t('workspace.bulk.status.error')}</Badge>
-                              )}
-                            </div>
-                            <div className="grid grid-cols-2 gap-3 text-sm">
-                              <div>
-                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.matches')}</p>
-                                <p className="text-muted-foreground">{result.match_count}</p>
+                    {job.results.map((result, index) => {
+                      const m = topMatch(result);
+                      const critical = isCriticalResult(result);
+                      return (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 16 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                        >
+                          <Card className={cn('bg-card border-foreground/5', critical && 'border-red-500/40 bg-red-500/5')}>
+                            <CardContent className="p-4 space-y-3">
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-sm text-foreground break-words flex items-center gap-1.5">
+                                  {critical && <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />}
+                                  {resultQuery(result)}
+                                </p>
+                                {statusBadge(result.status)}
+                              </div>
+                              <div className="grid grid-cols-2 gap-3 text-sm">
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.matches')}</p>
+                                  <p className="text-muted-foreground">{result.match_count}</p>
+                                </div>
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.score')}</p>
+                                  {typeof bestScore(result) === 'number' ? (
+                                    <Badge variant="outline" className={scoreBadgeClass(bestScore(result))}>
+                                      {Math.round(bestScore(result)!)}%
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.risk')}</p>
+                                  {m?.risk_level ? (
+                                    <Badge variant="outline" className={riskBadgeClass(m.risk_level)}>
+                                      {riskLabel(m.risk_level)}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.sanctioned')}</p>
+                                  {sanctionBadge(m)}
+                                </div>
                               </div>
                               <div>
-                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.score')}</p>
-                                {result.top_score ? (
-                                  <Badge
-                                    variant="outline"
-                                    className={cn(
-                                      result.top_score >= 90
-                                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-                                        : result.top_score >= 70
-                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                                        : 'bg-gray-500/10 text-muted-foreground border-gray-500/20'
-                                    )}
-                                  >
-                                    {Math.round(result.top_score)}%
-                                  </Badge>
-                                ) : (
-                                  <span className="text-muted-foreground">-</span>
-                                )}
+                                <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.bestMatch')}</p>
+                                <p className="text-sm text-muted-foreground break-words">{bestMatchName(result) || '-'}</p>
                               </div>
-                            </div>
-                            <div>
-                              <p className="text-[11px] uppercase tracking-wide text-muted-foreground mb-1">{t('workspace.bulk.table.bestMatch')}</p>
-                              <p className="text-sm text-muted-foreground break-words">{result.top_match_name || '-'}</p>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
+                            </CardContent>
+                          </Card>
+                        </motion.div>
+                      );
+                    })}
                   </div>
 
+                  {/* Desktop table */}
                   <Card className="hidden md:block bg-card border-foreground/5">
                     <div className="overflow-x-auto">
                       <table className="w-full">
@@ -569,66 +819,67 @@ export function BulkScreeningPage() {
                             <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               {t('workspace.bulk.table.bestMatch')}
                             </th>
+                            <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                              {t('workspace.bulk.table.risk')}
+                            </th>
+                            <th className="text-center text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
+                              {t('workspace.bulk.table.sanctioned')}
+                            </th>
                             <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-6 py-4">
                               {t('workspace.bulk.table.score')}
                             </th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-foreground/5">
-                          {job.results.map((result, index) => (
-                            <motion.tr
-                              key={index}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: index * 0.02 }}
-                              className="hover:bg-foreground/5 transition-colors"
-                            >
-                              <td className="px-6 py-4">
-                                <span className="text-sm text-foreground">{result.query}</span>
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                {result.status === 'found' ? (
-                                  <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20">
-                                    {t('workspace.bulk.status.found')}
-                                  </Badge>
-                                ) : result.status === 'not_found' ? (
-                                  <Badge className="bg-gray-500/10 text-muted-foreground border-gray-500/20">
-                                    {t('workspace.bulk.status.notFound')}
-                                  </Badge>
-                                ) : (
-                                  <Badge className="bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20">
-                                    {t('workspace.bulk.status.error')}
-                                  </Badge>
+                          {job.results.map((result, index) => {
+                            const m = topMatch(result);
+                            const critical = isCriticalResult(result);
+                            return (
+                              <motion.tr
+                                key={index}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: Math.min(index * 0.02, 0.3) }}
+                                className={cn(
+                                  'transition-colors',
+                                  critical ? 'bg-red-500/5 hover:bg-red-500/10' : 'hover:bg-foreground/5'
                                 )}
-                              </td>
-                              <td className="px-6 py-4 text-center">
-                                <span className="text-sm text-muted-foreground">{result.match_count}</span>
-                              </td>
-                              <td className="px-6 py-4">
-                                <span className="text-sm text-muted-foreground">
-                                  {result.top_match_name || '-'}
-                                </span>
-                              </td>
-                              <td className="px-6 py-4 text-right">
-                                {result.top_score ? (
-                                  <Badge
-                                    variant="outline"
-                                    className={cn(
-                                      result.top_score >= 90
-                                        ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'
-                                        : result.top_score >= 70
-                                        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20'
-                                        : 'bg-gray-500/10 text-muted-foreground border-gray-500/20'
-                                    )}
-                                  >
-                                    {Math.round(result.top_score)}%
-                                  </Badge>
-                                ) : (
-                                  <span className="text-muted-foreground">-</span>
-                                )}
-                              </td>
-                            </motion.tr>
-                          ))}
+                              >
+                                <td className="px-6 py-4">
+                                  <span className="text-sm text-foreground flex items-center gap-1.5">
+                                    {critical && <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />}
+                                    {resultQuery(result)}
+                                  </span>
+                                </td>
+                                <td className="px-6 py-4 text-center">{statusBadge(result.status)}</td>
+                                <td className="px-6 py-4 text-center">
+                                  <span className="text-sm text-muted-foreground">{result.match_count}</span>
+                                </td>
+                                <td className="px-6 py-4">
+                                  <span className="text-sm text-muted-foreground">{bestMatchName(result) || '-'}</span>
+                                </td>
+                                <td className="px-6 py-4 text-center">
+                                  {m?.risk_level ? (
+                                    <Badge variant="outline" className={riskBadgeClass(m.risk_level)}>
+                                      {riskLabel(m.risk_level)}
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </td>
+                                <td className="px-6 py-4 text-center">{sanctionBadge(m)}</td>
+                                <td className="px-6 py-4 text-right">
+                                  {typeof bestScore(result) === 'number' ? (
+                                    <Badge variant="outline" className={scoreBadgeClass(bestScore(result))}>
+                                      {Math.round(bestScore(result)!)}%
+                                    </Badge>
+                                  ) : (
+                                    <span className="text-muted-foreground">-</span>
+                                  )}
+                                </td>
+                              </motion.tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>

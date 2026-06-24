@@ -226,6 +226,14 @@
         "label": "Match alto",
         "description": "Una búsqueda devolvió al menos un match con risk_level=high."
       },
+      "alert_created": {
+        "label": "Alerta creada",
+        "description": "Se generó una alerta de monitoreo."
+      },
+      "bulk_completed": {
+        "label": "Lote completado",
+        "description": "Terminó un job de screening por lotes."
+      },
       "source_sync_complete": {
         "label": "Source sync OK",
         "description": "Una fuente terminó de sincronizar exitosamente."
